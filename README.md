@@ -147,7 +147,8 @@ Xem các file hướng dẫn sau để biết thêm chi tiết:
 - Xem tài liệu trong thư mục `docs/` (nếu có)
 - Check log files trong `Logs/` khi gặp lỗi
 - Đọc code comments để hiểu logic chi tiết
-
+- Face : AD Võ Lâm MU
+- Zalo : 0978174557
 ## License
 
 [Thêm thông tin license của dự án nếu có]
