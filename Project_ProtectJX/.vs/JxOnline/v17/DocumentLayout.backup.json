@@ -1,0 +1,237 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KLoginX.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KLoginX.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\stdafx.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\stdafx.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Goddess.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\Goddess.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\PluginWeb.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\PluginWeb.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\Main.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Util.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\Util.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Goddess.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\Goddess.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KPlayerNew.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KPlayerNew.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KItem.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KPlayerNew.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KPlayerNew.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KLuaScript.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KLuaScript.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KDetect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KDetect.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KDetect.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{89B2BA6D-BCF2-4615-A2FF-632560FC9DB5}|Project1\\Project1.vcxproj|solutionrelative:Project1\\KDetect.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "stdafx.h",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\stdafx.h",
+              "RelativeDocumentMoniker": "Project1\\stdafx.h",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\stdafx.h",
+              "RelativeToolTip": "Project1\\stdafx.h",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAACAAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-11-19T07:50:09.848Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "KLoginX.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KLoginX.cpp",
+              "RelativeDocumentMoniker": "Project1\\KLoginX.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KLoginX.cpp",
+              "RelativeToolTip": "Project1\\KLoginX.cpp",
+              "ViewState": "AgIAAOsIAAAAAAAAAAAAADkJAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-11-19T07:47:02.574Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Util.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Util.cpp",
+              "RelativeDocumentMoniker": "Project1\\Util.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Util.cpp",
+              "RelativeToolTip": "Project1\\Util.cpp",
+              "ViewState": "AgIAAKYHAAAAAAAAAAAEwLgHAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-11-19T07:42:59.124Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PluginWeb.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\PluginWeb.cpp",
+              "RelativeDocumentMoniker": "Project1\\PluginWeb.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\PluginWeb.cpp",
+              "RelativeToolTip": "Project1\\PluginWeb.cpp",
+              "ViewState": "AgIAAIIBAAAAAAAAAAAEwJQBAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-11-19T07:31:58.606Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "KItem.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KItem.cpp",
+              "RelativeDocumentMoniker": "Project1\\KItem.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KItem.cpp",
+              "RelativeToolTip": "Project1\\KItem.cpp",
+              "ViewState": "AgIAACUDAAAAAAAAAAAAACkAAAAuAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-29T12:09:25.479Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "KDetect.h",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KDetect.h",
+              "RelativeDocumentMoniker": "Project1\\KDetect.h",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KDetect.h",
+              "RelativeToolTip": "Project1\\KDetect.h",
+              "ViewState": "AgIAACQAAAAAAAAAAAAAADoAAAB9AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-29T12:09:25.856Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "KDetect.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KDetect.cpp",
+              "RelativeDocumentMoniker": "Project1\\KDetect.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KDetect.cpp",
+              "RelativeToolTip": "Project1\\KDetect.cpp",
+              "ViewState": "AgIAAN0BAAAAAAAAAAAAAO8BAABKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-29T12:09:25.858Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Goddess.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Goddess.cpp",
+              "RelativeDocumentMoniker": "Project1\\Goddess.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Goddess.cpp",
+              "RelativeToolTip": "Project1\\Goddess.cpp",
+              "ViewState": "AgIAABMAAABAMzMzM7MiwCsAAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-29T12:09:25.859Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Goddess.h",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Goddess.h",
+              "RelativeDocumentMoniker": "Project1\\Goddess.h",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Goddess.h",
+              "RelativeToolTip": "Project1\\Goddess.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-29T12:09:25.86Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Main.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Main.cpp",
+              "RelativeDocumentMoniker": "Project1\\Main.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\Main.cpp",
+              "RelativeToolTip": "Project1\\Main.cpp",
+              "ViewState": "AgIAAOUCAAAAAAAAAAAEwPcCAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-29T12:09:25.861Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "KLuaScript.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KLuaScript.cpp",
+              "RelativeDocumentMoniker": "Project1\\KLuaScript.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KLuaScript.cpp",
+              "RelativeToolTip": "Project1\\KLuaScript.cpp",
+              "ViewState": "AgIAAJ4BAAAAAAAAAAAwwKYBAAARAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-29T12:09:25.862Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "KPlayerNew.cpp",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KPlayerNew.cpp",
+              "RelativeDocumentMoniker": "Project1\\KPlayerNew.cpp",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KPlayerNew.cpp",
+              "RelativeToolTip": "Project1\\KPlayerNew.cpp",
+              "ViewState": "AgIAACcdAAAAAAAAAAAwwEUdAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2024-10-29T12:09:25.863Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "KPlayerNew.h",
+              "DocumentMoniker": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KPlayerNew.h",
+              "RelativeDocumentMoniker": "Project1\\KPlayerNew.h",
+              "ToolTip": "D:\\MaNguonAntiVolam\\MaNguonAntiVolam\\Project_ProtectJX\\Project1\\KPlayerNew.h",
+              "RelativeToolTip": "Project1\\KPlayerNew.h",
+              "ViewState": "AgIAAHoAAAAAAAAAAAAAAJIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2024-10-29T12:09:25.864Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

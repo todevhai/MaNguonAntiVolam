@@ -1,0 +1,5 @@
+// Hint files help the Visual Studio IDE interpret Visual C++ identifiers
+// such as names of functions and macros.
+// For more information see https://go.microsoft.com/fwlink/?linkid=865984
+#define DECLARE_COMCLASS(class_name) static KComClassInfo m_one; static void class_name::RegisterSelfClass() { gGetComClassFactory()->RegisterComClass(m_one); } static KWndWindow* class_name::CreateObject() { return new class_name; } static KComClassInfo* class_name::GetComClassInfo() { return &m_one; }
+#define CreateWndButton ((void(__thiscall*)(void* This)) 0x425E20)

@@ -1,0 +1,231 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{679A05FF-3E37-42B2-AACE-7382B1D25AE1}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Anti-Cheat-Client</RootNamespace>
+    <ProjectName>fProtectClient</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v100</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <TargetName>fProtectClient</TargetName>
+    <IncludePath>E:\Software\Vc++\openssl\openssl-1.0.2k-win32-msvc100\include;E:\AntiJX\Version2010\Util\include;..\Represent;..\Engine\Src;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\Software\Vc++\openssl\openssl-1.0.2k-win32-msvc100\shared\lib;$(LibraryPath)</LibraryPath>
+    <OutDir>E:\GameOnline\VoLamTruyenKy\VoLamHuyenThoaiUS</OutDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\admin\Desktop\ANTI_JX1\Util\Util\include;C:\Users\admin\Desktop\ANTI_JX1\WinLicenseSDK\Include\C;C:\Users\admin\Desktop\ANTI_JX1\openssl-1.0.2k-win32-msvc100\include;D:\Include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\admin\Desktop\ANTI_JX1\openssl-1.0.2k-win32-msvc100\shared\lib;C:\Users\admin\Desktop\ANTI_JX1\WinLicenseSDK\Lib\COFF;C:\Users\admin\Desktop\ANTI_JX1\ClientAnti_JX1\SwordOnline\sdk\PlatformSDK\lib\prerelease;D:\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_WIN32;__WIN32;__WIN32__;ENVIRONMENT32;ENV32BIT;NDEBUG;_WINDOWS;_USRDLL;_LIB;_WIN32_WINNT=0x0400;USE_STANDALONE_SPR;Anti-Cheat-Client_EXPORTS;SWORDONLINE_SHOW_DBUG_INFO;SWORDONLINE_USE_MD5_PASSWORD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <MinimalRebuild>true</MinimalRebuild>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <BrowseInformation>true</BrowseInformation>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <UndefinePreprocessorDefinitions>ENVIRONMENT64;ENV64BIT;_WIN64;%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>GdiPlus.lib;S3Client.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <AdditionalLibraryDirectories>D:\MaNguonAntiVolam\MaNguonAntiVolam\ClientAnti_JX1\SwordOnline\Lib\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>fProtectClient.lib</ImportLibrary>
+    </Link>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG</PreprocessorDefinitions>
+    </ResourceCompile>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+    </ResourceCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;USE_STANDALONE_SPR;Anti-Cheat-Client_EXPORTS;SWORDONLINE_SHOW_DBUG_INFO;SWORDONLINE_USE_MD5_PASSWORD;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>../Engine/src;../Core/src;../Engine/include;../../Headers;../NetWork;../Represent;Ui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)jxmu\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+    </Link>
+    <ResourceCompile />
+    <ResourceCompile />
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ResourceCompile>
+    <ResourceCompile>
+      <Culture>0x0804</Culture>
+    </ResourceCompile>
+    <PostBuildEvent>
+      <Command>if $(ConfigurationName) == Release (
+"C:\Users\admin\Desktop\ANTI_JX1\ClientAnti_JX1\SwordOnline\Sources\WinLicense\WinLicense.exe" /protect fProtectClient /software fProtectClient
+)</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="AddressTable1.bin" />
+    <None Include="AddressTable2.bin" />
+    <None Include="AddressTable3.bin" />
+    <None Include="cpp.hint" />
+    <None Include="SplashScreen\CloseSplash.bmp" />
+    <None Include="SplashScreen\InitSplash.bmp" />
+    <None Include="Ui\WmdCtrlKey.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Authenticate.h" />
+    <ClInclude Include="CCRC32.h" />
+    <ClInclude Include="Connection.h" />
+    <ClInclude Include="CriticalSection.h" />
+    <ClInclude Include="DetectVM.h" />
+    <ClInclude Include="FileCheck.h" />
+    <ClInclude Include="FileMappingCheck.h" />
+    <ClInclude Include="FileProtect.h" />
+    <ClInclude Include="INIReader.h" />
+    <ClInclude Include="iRepresentShell.h" />
+    <ClInclude Include="KItemEx.h" />
+    <ClInclude Include="KLuaScript.h" />
+    <ClInclude Include="KPlayerSafe.h" />
+    <ClInclude Include="KRepresentShell2.h" />
+    <ClInclude Include="KUiMissionTime.h" />
+    <ClInclude Include="LibraryCheck.h" />
+    <ClInclude Include="HackCheck.h" />
+    <ClInclude Include="Anti-Cheat-Client.h" />
+    <ClInclude Include="HackServerProtocol.h" />
+    <ClInclude Include="ListManager.h" />
+    <ClInclude Include="DumpCheck.h" />
+    <ClInclude Include="ExecutableCheck.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="MacroCheck.h" />
+    <ClInclude Include="Message.h" />
+    <ClInclude Include="NewImage.h" />
+    <ClInclude Include="NewImagePart.h" />
+    <ClInclude Include="NewUiButton.h" />
+    <ClInclude Include="NewUiImage.h" />
+    <ClInclude Include="NewUiText.h" />
+    <ClInclude Include="NewUiWindow.h" />
+    <ClInclude Include="PacketManager.h" />
+    <ClInclude Include="ProcessCheck.h" />
+    <ClInclude Include="ProcessManager.h" />
+    <ClInclude Include="ProcessQuery.h" />
+    <ClInclude Include="Protect.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SimpleModules.h" />
+    <ClInclude Include="SkillState.h" />
+    <ClInclude Include="SplashScreen.h" />
+    <ClInclude Include="StatusDisplayer.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TempButton.h" />
+    <ClInclude Include="TempImage.h" />
+    <ClInclude Include="TempWindow.h" />
+    <ClInclude Include="ThreadCheck.h" />
+    <ClInclude Include="Util.h" />
+    <ClInclude Include="RegistryCheck.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Authenticate.cpp" />
+    <ClCompile Include="CCRC32.cpp" />
+    <ClCompile Include="Connection.cpp" />
+    <ClCompile Include="CriticalSection.cpp" />
+    <ClCompile Include="DetectVM.cpp" />
+    <ClCompile Include="FileCheck.cpp" />
+    <ClCompile Include="FileMappingCheck.cpp" />
+    <ClCompile Include="FileProtect.cpp" />
+    <ClCompile Include="HackServerProtocol.cpp" />
+    <ClCompile Include="KItemEx.cpp" />
+    <ClCompile Include="KLuaScript.cpp" />
+    <ClCompile Include="KPlayerSafe.cpp" />
+    <ClCompile Include="KUiMissionTime.cpp" />
+    <ClCompile Include="LibraryCheck.cpp" />
+    <ClCompile Include="HackCheck.cpp" />
+    <ClCompile Include="Anti-Cheat-Client.cpp" />
+    <ClCompile Include="ListManager.cpp" />
+    <ClCompile Include="DumpCheck.cpp" />
+    <ClCompile Include="ExecutableCheck.cpp" />
+    <ClCompile Include="Log.cpp" />
+    <ClCompile Include="MacroCheck.cpp" />
+    <ClCompile Include="Message.cpp" />
+    <ClCompile Include="NewImage.cpp" />
+    <ClCompile Include="NewImagePart.cpp" />
+    <ClCompile Include="NewUiButton.cpp" />
+    <ClCompile Include="NewUiImage.cpp" />
+    <ClCompile Include="NewUiText.cpp" />
+    <ClCompile Include="NewUiWindow.cpp" />
+    <ClCompile Include="PacketManager.cpp" />
+    <ClCompile Include="ProcessCheck.cpp" />
+    <ClCompile Include="ProcessManager.cpp" />
+    <ClCompile Include="ProcessQuery.cpp" />
+    <ClCompile Include="Protect.cpp" />
+    <ClCompile Include="SimpleModules.cpp" />
+    <ClCompile Include="SkillState.cpp" />
+    <ClCompile Include="SplashScreen.cpp" />
+    <ClCompile Include="StatusDisplayer.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="TempButton.cpp" />
+    <ClCompile Include="TempImage.cpp" />
+    <ClCompile Include="TempWindow.cpp" />
+    <ClCompile Include="ThreadCheck.cpp" />
+    <ClCompile Include="Util.cpp" />
+    <ClCompile Include="RegistryCheck.cpp" />
+    <ClCompile Include="WindowCheck.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Anti-Cheat-Client1.rc" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,83 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Bishop - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Release/Bishop.res" /d "NDEBUG" "D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\Bishop.rc"" 
+Creating temporary file "C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3EB.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "..\Common" /I "..\Rainbow\Interface" /I "..\Heaven\Interface" /I "..\..\..\lib" /I "..\..\..\Headers" /I "..\..\Sword3PaySys\S3AccServer" /I "..\..\s3client\login" /I "..\..\RoleDBManager" /I "..\..\Core\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/Bishop.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\Application.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\Bishop.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Common\Event.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\GamePlayer.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\GameServer.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\Intercessor.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\Network.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\PlayerCreator.cpp"
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\SmartClient.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3EB.tmp" 
+Creating temporary file "C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3EC.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "..\Common" /I "..\Rainbow\Interface" /I "..\Heaven\Interface" /I "..\..\..\lib" /I "..\..\..\Headers" /I "..\..\Sword3PaySys\S3AccServer" /I "..\..\s3client\login" /I "..\..\RoleDBManager" /I "..\..\Core\src" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/Bishop.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\Build Source\SwordOnline\SwordOnline\Sources\MultiServer\Bishop\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3EC.tmp" 
+Creating temporary file "C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3ED.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/Bishop.pdb" /map:"Release/Bishop.map" /debug /machine:I386 /out:"Release/Bishop.exe" 
+".\Release\Application.obj"
+".\Release\Bishop.obj"
+".\Release\Event.obj"
+".\Release\GamePlayer.obj"
+".\Release\GameServer.obj"
+".\Release\Intercessor.obj"
+".\Release\Network.obj"
+".\Release\PlayerCreator.obj"
+".\Release\SmartClient.obj"
+".\Release\StdAfx.obj"
+".\Release\Bishop.res"
+"..\..\..\Lib\release\common.lib"
+"..\..\..\Lib\release\engine.lib"
+]
+Creating command line "link.exe @C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3ED.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+Application.cpp
+Bishop.cpp
+Event.cpp
+GamePlayer.cpp
+GameServer.cpp
+Intercessor.cpp
+Network.cpp
+PlayerCreator.cpp
+SmartClient.cpp
+Generating Code...
+Linking...
+Creating temporary file "C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3EF.bat" with contents
+[
+@echo off
+md ..\..\..\..\bin\client\release\
+copy release\Bishop.exe ..\..\..\..\bin\Client\Bishop.exe
+copy release\Bishop.exe ..\..\..\..\bin\Client\release\Bishop.exe
+]
+Creating command line "C:\DOCUME~1\Admin\LOCALS~1\Temp\RSP3EF.bat"
+
+A subdirectory or file ..\..\..\..\bin\client\release\ already exists.
+        1 file(s) copied.
+        1 file(s) copied.
+
+
+
+<h3>Results</h3>
+Bishop.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

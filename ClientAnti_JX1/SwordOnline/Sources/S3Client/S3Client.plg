@@ -1,0 +1,407 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: S3Client - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Release/Script1.res" /d "NDEBUG" "D:\JX\Sources\S3Client\Script1.rc"" 
+Creating temporary file "C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D4.tmp" with contents
+[
+/nologo /MD /W3 /GX /Zi /O2 /I "../Engine/src" /I "../Core/src" /I "../Engine/include" /I "../../Headers" /D "WIN32" /D "NDEBUG_WINDOWS" /D "_MBCS" /D "SWORDONLINE_USE_MD5_PASSWORD" /Fp"Release/S3Client.pch" /Yu"KWin32.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\JX\Sources\S3Client\Ui\Elem\AutoLocateWnd.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\ComWindow.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\MouseHover.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\PopupMenu.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\SpecialFuncs.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\TextPic.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\UiCursor.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\UiImage.cpp"
+"D:\JX\Sources\S3Client\myui\vongsang.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndButton.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndChessPanel.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndEdit.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndImage.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndImagePart.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndLabeledButton.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndList.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndList2.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndMessageListBox.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndMovingImage.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndObjContainer.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndPage.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndPureTextBtn.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\Wnds.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndScrollBar.cpp"
+"D:\JX\Sources\S3Client\Ui\elem\WndShadow.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndShowAnimate.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndText.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndToolBar.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndValueImage.cpp"
+"D:\JX\Sources\S3Client\Ui\Elem\WndWindow.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiConnectInfo.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiLogin.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiLoginBg.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiNotice.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSelServer.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiContainer.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiFaceSelector.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiPlayerBar.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiStatus.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiOptions.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiInit.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiChangePWBox.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiExBox1.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiExBox2.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiExBox3.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiGetMoney.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiItem.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiItemEX.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiResetPass.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSkills.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSkillTree.cpp"
+"D:\JX\Sources\S3Client\Ui\uicase\UiStoreBox.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiUnlockBox.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiESCDlg.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiGetString.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiGive.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiMsgSel.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiParadeItem.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSelPlayerNearby.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiNewPlayer.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSelNativePlace.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSelPlayer.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiChannelSubscibe.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiChatCentre.cpp"
+"D:\JX\Sources\S3Client\Ui\UiChatPhrase.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiChatStatus.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiInformation.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiInformation2.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiTeamManage.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiHeaderControlBar.cpp"
+"D:\JX\Sources\S3Client\Ui\uicase\UiMsgCentrePad.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiToolsControlBar.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiMarket.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiPlayerShop.cpp"
+"D:\JX\Sources\S3Client\Ui\UIcase\UiShop.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiTrade.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiTradeConfirmWnd.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiGame.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSysMsgCentre.cpp"
+"D:\JX\Sources\S3Client\Ui\uicase\UiMiniMap.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiSelColor.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiNewPlayerStartMsg.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiPlayVideo.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiHelper.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiHelper2.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiReconnect.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiTaskDataFile.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiTaskNote.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiWorldMap.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiNewsMessage.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiStrengthRank.cpp"
+"D:\JX\Sources\S3Client\ui\uicase\UiTongAssignBox.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiTongGetString.cpp"
+"D:\JX\Sources\S3Client\Ui\UiCase\UiCompoundItem.cpp"
+"D:\JX\Sources\S3Client\ui\uicase\UiTrembleItem.cpp"
+"D:\JX\Sources\S3Client\Ui\UiSoundSetting.cpp"
+"D:\JX\Sources\S3Client\Ui\GameSpaceChangedNotify.cpp"
+"D:\JX\Sources\S3Client\Ui\ShortcutKey.cpp"
+"D:\JX\Sources\S3Client\Ui\UiBase.cpp"
+"D:\JX\Sources\S3Client\Ui\UiShell.cpp"
+"D:\JX\Sources\S3Client\Ui\ChatFilter.cpp"
+"D:\JX\Sources\S3Client\Ui\FilterTextLib.cpp"
+"D:\JX\Sources\S3Client\S3Client.cpp"
+"D:\JX\Sources\S3Client\NetConnect\NetConnectAgent.cpp"
+"D:\JX\Sources\S3Client\Login\Login.cpp"
+"D:\JX\Sources\S3Client\TextCtrlCmd\TextCtrlCmd.cpp"
+"D:\JX\Sources\S3Client\ErrorCode.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D4.tmp" 
+Creating temporary file "C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D5.tmp" with contents
+[
+/nologo /MD /W3 /GX /Zi /O2 /I "../Engine/src" /I "../Core/src" /I "../Engine/include" /I "../../Headers" /D "WIN32" /D "NDEBUG_WINDOWS" /D "_MBCS" /D "SWORDONLINE_USE_MD5_PASSWORD" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\JX\Sources\S3Client\ui\uicase\UiPopupPasswordQuery.cpp"
+"D:\JX\Sources\S3Client\ui\uicase\UiTongCreateSheet.cpp"
+"D:\JX\Sources\S3Client\ui\uicase\UiTongManager.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D5.tmp" 
+Creating temporary file "C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D6.tmp" with contents
+[
+/nologo /MD /W3 /GX /Zi /O2 /I "../Engine/src" /I "../Core/src" /I "../Engine/include" /I "../../Headers" /D "WIN32" /D "NDEBUG_WINDOWS" /D "_MBCS" /D "SWORDONLINE_USE_MD5_PASSWORD" /Fp"Release/S3Client.pch" /Yc"KWin32.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"D:\JX\Sources\S3Client\stdafx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D6.tmp" 
+Creating temporary file "C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D7.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Winmm.lib shlwapi.lib lualibdll.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/Game.pdb" /map:"Release/Game.map" /debug /machine:I386 /out:"Release/Game.exe" /libpath:"../../lib/" 
+.\Release\AutoLocateWnd.obj
+.\Release\ComWindow.obj
+.\Release\MouseHover.obj
+.\Release\PopupMenu.obj
+.\Release\SpecialFuncs.obj
+.\Release\TextPic.obj
+.\Release\UiCursor.obj
+.\Release\UiImage.obj
+.\Release\vongsang.obj
+.\Release\WndButton.obj
+.\Release\WndChessPanel.obj
+.\Release\WndEdit.obj
+.\Release\WndImage.obj
+.\Release\WndImagePart.obj
+.\Release\WndLabeledButton.obj
+.\Release\WndList.obj
+.\Release\WndList2.obj
+.\Release\WndMessageListBox.obj
+.\Release\WndMovingImage.obj
+.\Release\WndObjContainer.obj
+.\Release\WndPage.obj
+.\Release\WndPureTextBtn.obj
+.\Release\Wnds.obj
+.\Release\WndScrollBar.obj
+.\Release\WndShadow.obj
+.\Release\WndShowAnimate.obj
+.\Release\WndText.obj
+.\Release\WndToolBar.obj
+.\Release\WndValueImage.obj
+.\Release\WndWindow.obj
+.\Release\UiConnectInfo.obj
+.\Release\UiLogin.obj
+.\Release\UiLoginBg.obj
+.\Release\UiNotice.obj
+.\Release\UiSelServer.obj
+.\Release\UiContainer.obj
+.\Release\UiFaceSelector.obj
+.\Release\UiPlayerBar.obj
+.\Release\UiStatus.obj
+.\Release\UiOptions.obj
+.\Release\UiInit.obj
+.\Release\UiChangePWBox.obj
+.\Release\UiExBox1.obj
+.\Release\UiExBox2.obj
+.\Release\UiExBox3.obj
+.\Release\UiGetMoney.obj
+.\Release\UiItem.obj
+.\Release\UiItemEX.obj
+.\Release\UiResetPass.obj
+.\Release\UiSkills.obj
+.\Release\UiSkillTree.obj
+.\Release\UiStoreBox.obj
+.\Release\UiUnlockBox.obj
+.\Release\UiESCDlg.obj
+.\Release\UiGetString.obj
+.\Release\UiGive.obj
+.\Release\UiMsgSel.obj
+.\Release\UiParadeItem.obj
+.\Release\UiSelPlayerNearby.obj
+.\Release\UiNewPlayer.obj
+.\Release\UiSelNativePlace.obj
+.\Release\UiSelPlayer.obj
+.\Release\UiChannelSubscibe.obj
+.\Release\UiChatCentre.obj
+.\Release\UiChatPhrase.obj
+.\Release\UiChatStatus.obj
+.\Release\UiInformation.obj
+.\Release\UiInformation2.obj
+.\Release\UiTeamManage.obj
+.\Release\UiHeaderControlBar.obj
+.\Release\UiMsgCentrePad.obj
+.\Release\UiToolsControlBar.obj
+.\Release\UiMarket.obj
+.\Release\UiPlayerShop.obj
+.\Release\UiShop.obj
+.\Release\UiTrade.obj
+.\Release\UiTradeConfirmWnd.obj
+.\Release\UiGame.obj
+.\Release\UiSysMsgCentre.obj
+.\Release\UiMiniMap.obj
+.\Release\UiSelColor.obj
+.\Release\UiNewPlayerStartMsg.obj
+.\Release\UiPlayVideo.obj
+.\Release\UiHelper.obj
+.\Release\UiHelper2.obj
+.\Release\UiReconnect.obj
+.\Release\UiTaskDataFile.obj
+.\Release\UiTaskNote.obj
+.\Release\UiWorldMap.obj
+.\Release\UiNewsMessage.obj
+.\Release\UiStrengthRank.obj
+.\Release\UiPopupPasswordQuery.obj
+.\Release\UiTongAssignBox.obj
+.\Release\UiTongCreateSheet.obj
+.\Release\UiTongGetString.obj
+.\Release\UiTongManager.obj
+.\Release\UiCompoundItem.obj
+.\Release\UiTrembleItem.obj
+.\Release\UiSoundSetting.obj
+.\Release\GameSpaceChangedNotify.obj
+.\Release\ShortcutKey.obj
+.\Release\UiBase.obj
+.\Release\UiShell.obj
+.\Release\ChatFilter.obj
+.\Release\FilterTextLib.obj
+.\Release\S3Client.obj
+.\Release\NetConnectAgent.obj
+.\Release\Login.obj
+.\Release\TextCtrlCmd.obj
+.\Release\ErrorCode.obj
+.\Release\stdafx.obj
+.\Release\Script1.res
+..\..\Lib\release\engine.lib
+..\..\Lib\release\CoreClient.lib
+]
+Creating command line "link.exe @C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D7.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+stdafx.cpp
+Compiling...
+AutoLocateWnd.cpp
+ComWindow.cpp
+MouseHover.cpp
+PopupMenu.cpp
+SpecialFuncs.cpp
+TextPic.cpp
+UiCursor.cpp
+UiImage.cpp
+vongsang.cpp
+WndButton.cpp
+WndChessPanel.cpp
+WndEdit.cpp
+WndImage.cpp
+WndImagePart.cpp
+WndLabeledButton.cpp
+WndList.cpp
+WndList2.cpp
+WndMessageListBox.cpp
+WndMovingImage.cpp
+WndObjContainer.cpp
+Generating Code...
+Compiling...
+WndPage.cpp
+WndPureTextBtn.cpp
+Wnds.cpp
+WndScrollBar.cpp
+WndShadow.cpp
+WndShowAnimate.cpp
+WndText.cpp
+WndToolBar.cpp
+WndValueImage.cpp
+WndWindow.cpp
+UiConnectInfo.cpp
+UiLogin.cpp
+UiLoginBg.cpp
+UiNotice.cpp
+UiSelServer.cpp
+UiContainer.cpp
+UiFaceSelector.cpp
+UiPlayerBar.cpp
+UiStatus.cpp
+UiOptions.cpp
+Generating Code...
+Compiling...
+UiInit.cpp
+UiChangePWBox.cpp
+UiExBox1.cpp
+UiExBox2.cpp
+UiExBox3.cpp
+UiGetMoney.cpp
+UiItem.cpp
+UiItemEX.cpp
+UiResetPass.cpp
+UiSkills.cpp
+UiSkillTree.cpp
+UiStoreBox.cpp
+UiUnlockBox.cpp
+UiESCDlg.cpp
+UiGetString.cpp
+UiGive.cpp
+UiMsgSel.cpp
+UiParadeItem.cpp
+UiSelPlayerNearby.cpp
+UiNewPlayer.cpp
+Generating Code...
+Compiling...
+UiSelNativePlace.cpp
+UiSelPlayer.cpp
+UiChannelSubscibe.cpp
+UiChatCentre.cpp
+UiChatPhrase.cpp
+UiChatStatus.cpp
+UiInformation.cpp
+UiInformation2.cpp
+UiTeamManage.cpp
+UiHeaderControlBar.cpp
+UiMsgCentrePad.cpp
+UiToolsControlBar.cpp
+UiMarket.cpp
+UiPlayerShop.cpp
+UiShop.cpp
+UiTrade.cpp
+UiTradeConfirmWnd.cpp
+UiGame.cpp
+UiSysMsgCentre.cpp
+UiMiniMap.cpp
+Generating Code...
+Compiling...
+UiSelColor.cpp
+UiNewPlayerStartMsg.cpp
+UiPlayVideo.cpp
+UiHelper.cpp
+UiHelper2.cpp
+UiReconnect.cpp
+UiTaskDataFile.cpp
+UiTaskNote.cpp
+UiWorldMap.cpp
+UiNewsMessage.cpp
+UiStrengthRank.cpp
+UiTongAssignBox.cpp
+UiTongGetString.cpp
+UiCompoundItem.cpp
+UiTrembleItem.cpp
+UiSoundSetting.cpp
+GameSpaceChangedNotify.cpp
+ShortcutKey.cpp
+UiBase.cpp
+UiShell.cpp
+Generating Code...
+Compiling...
+ChatFilter.cpp
+FilterTextLib.cpp
+S3Client.cpp
+NetConnectAgent.cpp
+Login.cpp
+TextCtrlCmd.cpp
+ErrorCode.cpp
+Generating Code...
+Compiling...
+UiPopupPasswordQuery.cpp
+UiTongCreateSheet.cpp
+UiTongManager.cpp
+Generating Code...
+Linking...
+Creating temporary file "C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D9.bat" with contents
+[
+@echo off
+md ..\..\..\bin\client\release\
+copy Release\Game.exe ..\..\..\bin\Client\Game.exe
+copy Release\Game.exe ..\..\..\bin\Client\release\Game.exe
+copy Release\Game.pdb ..\..\..\bin\Client\release\Game.pdb
+copy Release\Game.map ..\..\..\bin\Client\release\Game.map
+]
+Creating command line "C:\DOCUME~1\GAMEMA~1\LOCALS~1\Temp\RSP2D9.bat"
+
+A subdirectory or file ..\..\..\bin\client\release\ already exists.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+
+
+
+<h3>Results</h3>
+Game.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

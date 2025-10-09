@@ -1,0 +1,76 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: RoleDBServer - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Release/RoleDBServer.res" /d "NDEBUG" /d "_AFXDLL" "F:\DownLoads\SwordOnline\Sources\RoleDBServer\RoleDBServer.rc"" 
+Creating temporary file "D:\temp\RSP7B.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Release/RoleDBServer.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\KException.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\MainFrm.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\RoleDBServer.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\RoleDBServerDoc.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\RoleDBServerView.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\KDBProcessThread.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleDBServer.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleInfomation.cpp"
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleBlockProcess.cpp"
+]
+Creating command line "cl.exe @D:\temp\RSP7B.tmp" 
+Creating temporary file "D:\temp\RSP7C.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /D "_MBCS" /Fp"Release/RoleDBServer.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"F:\DownLoads\SwordOnline\Sources\RoleDBServer\StdAfx.cpp"
+]
+Creating command line "cl.exe @D:\temp\RSP7C.tmp" 
+Creating temporary file "D:\temp\RSP7D.tmp" with contents
+[
+/nologo /subsystem:windows /incremental:no /pdb:"Release/RoleDBServer.pdb" /machine:I386 /out:"Release/RoleDBServer.exe" 
+.\Release\KException.obj
+.\Release\MainFrm.obj
+.\Release\RoleDBServer.obj
+.\Release\RoleDBServerDoc.obj
+.\Release\RoleDBServerView.obj
+.\Release\StdAfx.obj
+.\Release\KDBProcessThread.obj
+.\Release\KRoleDBServer.obj
+.\Release\KRoleInfomation.obj
+.\Release\KRoleBlockProcess.obj
+.\Release\RoleDBServer.res
+..\..\Lib\S3DBInterface_d.lib
+]
+Creating command line "link.exe @D:\temp\RSP7D.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+KException.cpp
+F:\DownLoads\SwordOnline\Sources\RoleDBServer\KException.cpp(21) : fatal error C1010: unexpected end of file while looking for precompiled header directive
+MainFrm.cpp
+RoleDBServer.cpp
+F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleDBServer.h(6) : fatal error C1083: Cannot open include file: 'IServer.h': No such file or directory
+RoleDBServerDoc.cpp
+RoleDBServerView.cpp
+F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleDBServer.h(6) : fatal error C1083: Cannot open include file: 'IServer.h': No such file or directory
+KDBProcessThread.cpp
+F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleDBServer.h(6) : fatal error C1083: Cannot open include file: 'IServer.h': No such file or directory
+KRoleDBServer.cpp
+F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleDBServer.cpp(293) : fatal error C1010: unexpected end of file while looking for precompiled header directive
+KRoleInfomation.cpp
+F:\DownLoads\SwordOnline\Sources\RoleDBServer\KRoleDBServer.h(6) : fatal error C1083: Cannot open include file: 'IServer.h': No such file or directory
+KRoleBlockProcess.cpp
+Generating Code...
+Error executing cl.exe.
+
+
+
+<h3>Results</h3>
+RoleDBServer.exe - 6 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: GatewayRobot - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP11F.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "..\Common" /I "..\Rainbow\Interface" /I "..\Heaven\Interface" /I "..\..\..\lib" /I "..\..\..\Headers" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/GatewayRobot.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\GatewayRobot.cpp"
+"F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\md5.cpp"
+"F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\Player.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP11F.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP120.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "..\Common" /I "..\Rainbow\Interface" /I "..\Heaven\Interface" /I "..\..\..\lib" /I "..\..\..\Headers" /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /Fp"Release/GatewayRobot.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP120.tmp" 
+Creating temporary file "C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP121.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /incremental:no /pdb:"Release/GatewayRobot.pdb" /machine:I386 /out:"Release/GatewayRobot.exe" 
+".\Release\GatewayRobot.obj"
+".\Release\md5.obj"
+".\Release\Player.obj"
+".\Release\StdAfx.obj"
+]
+Creating command line "link.exe @C:\DOCUME~1\ADMINI~1\LOCALS~1\Temp\RSP121.tmp"
+<h3>Output Window</h3>
+Compiling...
+StdAfx.cpp
+Compiling...
+GatewayRobot.cpp
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(234) : error C2011: 'CNodeList' : 'class' type redefinition
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(290) : error C2084: function 'void __thiscall OnlineGameLib::CNodeList::Node::Next(class OnlineGameLib::CNodeList::Node *)' already has a body
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(312) : error C2953: 'TNodeList' : template class has already been defined
+        F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(312) : see declaration of 'TNodeList'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(318) : error C2995: 'PopNode' : template function has already been defined
+        ..\Common\NodeList.h(101) : see declaration of 'PopNode'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(324) : error C2995: 'Head' : template function has already been defined
+        ..\Common\NodeList.h(103) : see declaration of 'Head'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(330) : error C2995: 'Next' : template function has already been defined
+        ..\Common\NodeList.h(105) : see declaration of 'Next'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(340) : error C2011: 'CBuffer' : 'class' type redefinition
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(411) : error C2084: function 'void __thiscall OnlineGameLib::Win32::CBuffer::ConsumeAndRemove(unsigned int)' already has a body
+md5.cpp
+Player.cpp
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(234) : error C2011: 'CNodeList' : 'class' type redefinition
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(290) : error C2084: function 'void __thiscall OnlineGameLib::CNodeList::Node::Next(class OnlineGameLib::CNodeList::Node *)' already has a body
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(312) : error C2953: 'TNodeList' : template class has already been defined
+        F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(312) : see declaration of 'TNodeList'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(318) : error C2995: 'PopNode' : template function has already been defined
+        ..\Common\NodeList.h(101) : see declaration of 'PopNode'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(324) : error C2995: 'Head' : template function has already been defined
+        ..\Common\NodeList.h(103) : see declaration of 'Head'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(330) : error C2995: 'Next' : template function has already been defined
+        ..\Common\NodeList.h(105) : see declaration of 'Next'
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(340) : error C2011: 'CBuffer' : 'class' type redefinition
+F:\JX\Ω£œ¿1\Ω£œ¿\SwordOnline\Sources\MultiServer\GatewayRobot\..\..\LINUX\zport.h(411) : error C2084: function 'void __thiscall OnlineGameLib::Win32::CBuffer::ConsumeAndRemove(unsigned int)' already has a body
+Generating Code...
+÷¥–– cl.exe  ±≥ˆ¥Ì.
+
+
+
+<h3>Results</h3>
+GatewayRobot.exe - 1 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

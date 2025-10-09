@@ -1,0 +1,505 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: LINUX - Win32 Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "D:\temp\RSP28D.tmp" with contents
+[
+/nologo /MTd /W3 /Gm /GX /ZI /Od /I ".\core" /I ".\engine" /I ".\\" /I ".\lua" /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /D "_SERVER" /D "_STANDALONE" /FR"Debug/" /Fp"Debug/LINUX.pch" /YX /Fo"Debug/" /Fd"Debug/" /FD /GZ /c 
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\CoreServerShell.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KBasPropTbl.CPP"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KBuySell.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KCore.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KFaction.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KGMCommand.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KGMProcess.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KInventory.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KItem.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KItemChangeRes.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KItemGenerator.CPP"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KItemList.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KItemSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KMagicDesc.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KMission.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KMissle.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KMissleMagicAttribsData.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KMissleSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNewProtocolProcess.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpc.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcAI.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcAttribModify.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcDeathCalcExp.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcFindPath.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcGold.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpcTemplate.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KObj.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KObjSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayer.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerChat.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerFaction.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerMenuState.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerPK.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerTask.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerTeam.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerTong.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerTrade.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPolygon.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KProtocol.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KProtocolProcess.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KRegion.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSkillList.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSkillManager.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSkills.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSkillSpecial.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSubWorld.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSubWorldSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KTaskFuns.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KWeatherMgr.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Core\KWorldMsg.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KAutoMutex.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KBinTree.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KCache.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KDebug.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KEngine.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KFile.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KFilePath.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KIniFile.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KLinkArray.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KList.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KLittleMap.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KLuaScript.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KLuaScriptSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KLubCmpl_Blocker.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMath.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMemBase.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMemClass.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMemClass1.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMemManager.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMemStack.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMessage.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMutex.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KNode.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KPakFile.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KRandom.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KScript.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KScriptCache.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KScriptList.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KScriptSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KScriptValueSet.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KSG_MD5_String.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KSG_StringProcess.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KSortScript.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KStepLuaScript.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KStrBase.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KStrList.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KStrNode.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KTabFile.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KTabFileCtrl.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KThread.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KTimer.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KWin32.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\md5.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\ScriptFuns.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\Engine\Text.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lapi.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\baselib\lauxlib.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\baselib\lbaselib.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lcode.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\baselib\ldblib.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\ldebug.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\ldo.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lfunc.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lgc.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\baselib\liolib.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\llex.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\baselib\lmathlib.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lmem.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lobject.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lparser.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lstate.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lstring.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\baselib\lstrlib.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\ltable.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\ltests.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\ltm.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lundump.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lvm.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\lua\lzio.c"
+"F:\DownLoads\SwordOnline\Sources\Kernel\GameServer.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\KSG_EncodeDecode.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\KSOServer.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\package.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\zbuffer.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\zclient.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\zport.cpp"
+"F:\DownLoads\SwordOnline\Sources\Kernel\zserver.cpp"
+]
+Creating command line "cl.exe @D:\temp\RSP28D.tmp" 
+Creating temporary file "D:\temp\RSP28E.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib ws2_32.lib shlwapi.lib /nologo /subsystem:console /incremental:yes /pdb:"Debug/linux.pdb" /debug /machine:I386 /out:"..\..\..\bin\server\linux.exe" /pdbtype:sept 
+.\Debug\CoreServerShell.obj
+.\Debug\KBasPropTbl.obj
+.\Debug\KBuySell.obj
+.\Debug\KCore.obj
+.\Debug\KFaction.obj
+.\Debug\KGMCommand.obj
+.\Debug\KGMProcess.obj
+.\Debug\KInventory.obj
+.\Debug\KItem.obj
+.\Debug\KItemChangeRes.obj
+.\Debug\KItemGenerator.obj
+.\Debug\KItemList.obj
+.\Debug\KItemSet.obj
+.\Debug\KMagicDesc.obj
+.\Debug\KMission.obj
+.\Debug\KMissle.obj
+.\Debug\KMissleMagicAttribsData.obj
+.\Debug\KMissleSet.obj
+.\Debug\KNewProtocolProcess.obj
+.\Debug\KNpc.obj
+.\Debug\KNpcAI.obj
+.\Debug\KNpcAttribModify.obj
+.\Debug\KNpcDeathCalcExp.obj
+.\Debug\KNpcFindPath.obj
+.\Debug\KNpcGold.obj
+.\Debug\KNpcSet.obj
+.\Debug\KNpcTemplate.obj
+.\Debug\KObj.obj
+.\Debug\KObjSet.obj
+.\Debug\KPlayer.obj
+.\Debug\KPlayerChat.obj
+.\Debug\KPlayerDBFuns.obj
+.\Debug\KPlayerFaction.obj
+.\Debug\KPlayerMenuState.obj
+.\Debug\KPlayerPK.obj
+.\Debug\KPlayerSet.obj
+.\Debug\KPlayerTask.obj
+.\Debug\KPlayerTeam.obj
+.\Debug\KPlayerTong.obj
+.\Debug\KPlayerTrade.obj
+.\Debug\KPolygon.obj
+.\Debug\KProtocol.obj
+.\Debug\KProtocolProcess.obj
+.\Debug\KRegion.obj
+.\Debug\KSkillList.obj
+.\Debug\KSkillManager.obj
+.\Debug\KSkills.obj
+.\Debug\KSkillSpecial.obj
+.\Debug\KSubWorld.obj
+.\Debug\KSubWorldSet.obj
+.\Debug\KTaskFuns.obj
+.\Debug\KWeatherMgr.obj
+.\Debug\KWorldMsg.obj
+.\Debug\KAutoMutex.obj
+.\Debug\KBinTree.obj
+.\Debug\KCache.obj
+.\Debug\KDebug.obj
+.\Debug\KEngine.obj
+.\Debug\KFile.obj
+.\Debug\KFilePath.obj
+.\Debug\KIniFile.obj
+.\Debug\KLinkArray.obj
+.\Debug\KList.obj
+.\Debug\KLittleMap.obj
+.\Debug\KLuaScript.obj
+.\Debug\KLuaScriptSet.obj
+.\Debug\KLubCmpl_Blocker.obj
+.\Debug\KMath.obj
+.\Debug\KMemBase.obj
+.\Debug\KMemClass.obj
+.\Debug\KMemClass1.obj
+.\Debug\KMemManager.obj
+.\Debug\KMemStack.obj
+.\Debug\KMessage.obj
+.\Debug\KMutex.obj
+.\Debug\KNode.obj
+.\Debug\KPakFile.obj
+.\Debug\KRandom.obj
+.\Debug\KScript.obj
+.\Debug\KScriptCache.obj
+.\Debug\KScriptList.obj
+.\Debug\KScriptSet.obj
+.\Debug\KScriptValueSet.obj
+.\Debug\KSG_MD5_String.obj
+.\Debug\KSG_StringProcess.obj
+.\Debug\KSortScript.obj
+.\Debug\KStepLuaScript.obj
+.\Debug\KStrBase.obj
+.\Debug\KStrList.obj
+.\Debug\KStrNode.obj
+.\Debug\KTabFile.obj
+.\Debug\KTabFileCtrl.obj
+.\Debug\KThread.obj
+.\Debug\KTimer.obj
+.\Debug\KWin32.obj
+.\Debug\md5.obj
+.\Debug\ScriptFuns.obj
+.\Debug\Text.obj
+.\Debug\lapi.obj
+.\Debug\lauxlib.obj
+.\Debug\lbaselib.obj
+.\Debug\lcode.obj
+.\Debug\ldblib.obj
+.\Debug\ldebug.obj
+.\Debug\ldo.obj
+.\Debug\lfunc.obj
+.\Debug\lgc.obj
+.\Debug\liolib.obj
+.\Debug\llex.obj
+.\Debug\lmathlib.obj
+.\Debug\lmem.obj
+.\Debug\lobject.obj
+.\Debug\lparser.obj
+.\Debug\lstate.obj
+.\Debug\lstring.obj
+.\Debug\lstrlib.obj
+.\Debug\ltable.obj
+.\Debug\ltests.obj
+.\Debug\ltm.obj
+.\Debug\lundump.obj
+.\Debug\lvm.obj
+.\Debug\lzio.obj
+.\Debug\GameServer.obj
+.\Debug\KSG_EncodeDecode.obj
+.\Debug\KSOServer.obj
+.\Debug\package.obj
+.\Debug\zbuffer.obj
+.\Debug\zclient.obj
+.\Debug\zport.obj
+.\Debug\zserver.obj
+]
+Creating command line "link.exe @D:\temp\RSP28E.tmp"
+<h3>Output Window</h3>
+Compiling...
+CoreServerShell.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Node' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\downloads\swordonline\sources\kernel\core\coreservershell.cpp(17) : fatal error C1083: Cannot open include file: 'KLadder.h': No such file or directory
+KBasPropTbl.CPP
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KBuySell.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KCore.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KFaction.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KGMCommand.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KGMProcess.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Node' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+KInventory.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KItem.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KItemChangeRes.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KItemGenerator.CPP
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+f:\downloads\swordonline\sources\kernel\core\kitemgenerator.cpp(278) : error C2660: 'Gen_MagicAttrib' : function does not take 5 parameters
+f:\downloads\swordonline\sources\kernel\core\kitemgenerator.cpp(298) : error C2511: 'Gen_MagicAttrib' : overloaded member function 'int (int,const int *,int,int,struct KMagicAttrib *)' not found in 'KItemGenerator'
+        f:\downloads\swordonline\sources\kernel\core\kitemgenerator.h(24) : see declaration of 'KItemGenerator'
+f:\downloads\swordonline\sources\kernel\core\kitemgenerator.cpp(845) : error C2660: 'Gen_MagicAttrib' : function does not take 5 parameters
+KItemList.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KItemSet.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KMagicDesc.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KMission.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KMissle.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KMissleMagicAttribsData.cpp
+KMissleSet.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNewProtocolProcess.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Node' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNewProtocolProcess.cpp(111) : error C2065: 'ASSERT' : undeclared identifier
+KNpc.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KNpc.cpp(36) : fatal error C1083: Cannot open include file: 'KThiefSkill.h': No such file or directory
+KNpcAI.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNpcAttribModify.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNpcDeathCalcExp.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNpcFindPath.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNpcGold.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNpcSet.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KNpcTemplate.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KObj.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KObjSet.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayer.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerChat.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Node' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+f:\program files\microsoft visual studio\vc98\include\xtree(118) : warning C4786: 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::const_iterator' : identifier was truncated to '255' characters in the debug information
+        f:\program files\microsoft visual studio\vc98\include\map(46) : see reference to class template instantiation 'std::_Tree<unsigned short,std::pair<unsigned short const ,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)>,std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >::_Kfn,std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+        f:\downloads\swordonline\sources\kernel\core\knewprotocolprocess.h(45) : see reference to class template instantiation 'std::map<unsigned short,void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int),std::less<unsigned short>,std::allocator<void (__cdecl*)(IClient *,unsigned long,unsigned long,int,unsigned char *,int)> >' being compiled
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerChat.cpp(38) : fatal error C1083: Cannot open include file: 'KTongProtocol.h': No such file or directory
+KPlayerDBFuns.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(318) : error C2039: 'nForbiddenFlag' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(329) : error C2039: 'dwTongID' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(351) : error C2039: 'nWorldStat' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(352) : error C2039: 'nSectStat' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(540) : error C2039: 'idurability' : is not a member of 'TDBItemData'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(129) : see declaration of 'TDBItemData'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(541) : error C2039: 'idurability' : is not a member of 'TDBItemData'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(129) : see declaration of 'TDBItemData'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(734) : error C2039: 'nForbiddenFlag' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(742) : error C2039: 'dwTongID' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(761) : error C2039: 'nWorldStat' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(762) : error C2039: 'nSectStat' : is not a member of 'TRoleBaseInfo'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(44) : see declaration of 'TRoleBaseInfo'
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(774) : warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerDBFuns.cpp(862) : error C2039: 'idurability' : is not a member of 'TDBItemData'
+        f:\downloads\swordonline\sources\kernel\s3dbinterface.h(129) : see declaration of 'TDBItemData'
+KPlayerFaction.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerMenuState.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerPK.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerSet.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerTask.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerTeam.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KPlayerTeam.cpp(1019) : warning C4390: ';' : empty controlled statement found; is this the intent?
+KPlayerTong.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPlayerTrade.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KPolygon.cpp
+KProtocol.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KProtocol.cpp(7) : fatal error C1083: Cannot open include file: 'KLadder.h': No such file or directory
+KProtocolProcess.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KProtocolProcess.cpp(28) : fatal error C1083: Cannot open include file: 'KTongProtocol.h': No such file or directory
+KRegion.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KSkillList.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KSkillManager.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Core\KSkillManager.cpp(5) : fatal error C1083: Cannot open include file: 'KThiefSkill.h': No such file or directory
+KSkills.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KSkillSpecial.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KSubWorld.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KSubWorldSet.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KTaskFuns.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KWeatherMgr.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KWorldMsg.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KAutoMutex.cpp
+KBinTree.cpp
+KCache.cpp
+KDebug.cpp
+KEngine.cpp
+KFile.cpp
+KFilePath.cpp
+KIniFile.cpp
+KIniFile 当前不支持 KeyName 为中文! by Romandou
+KLinkArray.cpp
+KList.cpp
+KLittleMap.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+KLuaScript.cpp
+KLuaScriptSet.cpp
+KLubCmpl_Blocker.cpp
+KMath.cpp
+f:\downloads\swordonline\sources\kernel\zport.h(457) : error C2065: 'SAFE_DELETE' : undeclared identifier
+F:\DownLoads\SwordOnline\Sources\Kernel\Engine\KMath.cpp(11) : fatal error C1083: Cannot open include file: 'USBKey/epsJO.h': No such file or directory
+KMemBase.cpp
+KMemClass.cpp
+cl.exe terminated at user request.
+
+</pre>
+</body>
+</html>

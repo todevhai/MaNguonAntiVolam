@@ -1,0 +1,80 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: Goddess - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Release/Goddess.res" /d "NDEBUG" "E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\Goddess.rc"" 
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSP7531.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "..\Common\\" /I "..\Rainbow\Interface" /I "..\Heaven\Interface" /I "..\..\..\lib" /I "..\..\..\Headers" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/Goddess.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\ClientNode.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\DBBackup.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\DBDumpLoad.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\DBTable.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\FilterTextLib.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\Goddess.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\IDBRoleServer.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\RoleNameFilter.cpp"
+]
+Creating command line "cl.exe @C:\Users\Hoang8\AppData\Local\Temp\RSP7531.tmp" 
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSP7532.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /I "..\Common\\" /I "..\Rainbow\Interface" /I "..\Heaven\Interface" /I "..\..\..\lib" /I "..\..\..\Headers" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /Fp"Release/Goddess.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\Goddess\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\Users\Hoang8\AppData\Local\Temp\RSP7532.tmp" 
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSP7533.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/Goddess.pdb" /map:"Release/Goddess.map" /debug /machine:I386 /out:"Release/Goddess.exe" 
+".\Release\ClientNode.obj"
+".\Release\DBBackup.obj"
+".\Release\DBDumpLoad.obj"
+".\Release\DBTable.obj"
+".\Release\FilterTextLib.obj"
+".\Release\Goddess.obj"
+".\Release\IDBRoleServer.obj"
+".\Release\RoleNameFilter.obj"
+".\Release\StdAfx.obj"
+".\Release\Goddess.res"
+"..\..\..\Lib\release\common.lib"
+".\libdb41s.lib"
+]
+Creating command line "link.exe @C:\Users\Hoang8\AppData\Local\Temp\RSP7533.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+ClientNode.cpp
+DBBackup.cpp
+DBDumpLoad.cpp
+DBTable.cpp
+FilterTextLib.cpp
+Goddess.cpp
+IDBRoleServer.cpp
+RoleNameFilter.cpp
+Generating Code...
+Linking...
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSP7B10.bat" with contents
+[
+@echo off
+md ..\..\..\..\bin\client\release\
+copy release\Goddess.exe ..\..\..\..\bin\Client\Goddess.exe
+copy release\Goddess.exe ..\..\..\..\bin\Client\release\Goddess.exe
+]
+Creating command line "C:\Users\Hoang8\AppData\Local\Temp\RSP7B10.bat"
+
+A subdirectory or file ..\..\..\..\bin\client\release\ already exists.
+        1 file(s) copied.
+        1 file(s) copied.
+
+
+
+<h3>Results</h3>
+Goddess.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>

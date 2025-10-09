@@ -1,0 +1,9 @@
+SCC = This is a Source Code Control file
+
+[LINUX.dsp]
+SCC_Aux_Path = "\\Swordonline\Sword3Home\sword3vss"
+SCC_Project_Name = "$/SwordOnline/Sources/Kernel", AQVAAAAA
+
+[linux.mak]
+SCC_Aux_Path = "\\Swordonline\Sword3Home\sword3vss"
+SCC_Project_Name = "$/SwordOnline/Sources/Kernel", AQVAAAAA

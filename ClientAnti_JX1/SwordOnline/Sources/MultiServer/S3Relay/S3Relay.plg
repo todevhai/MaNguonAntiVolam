@@ -1,0 +1,171 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: S3Relay - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating command line "rc.exe /l 0x804 /fo"Release/S3Relay.res" /d "NDEBUG" "E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\S3Relay.rc"" 
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSPA281.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_WORKMODE_SINGLETHREAD" /D "_TESTING" /Fp"Release/S3Relay.pch" /Yu"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\ChannelMgr.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\ChatConnect.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\ChatServer.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\DBConnect.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\DBTable.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\DealRelay.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\DoScript.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\FriendMgr.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\GatewayCenter.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\GatewayClient.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\Global.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\HeavenLib.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\HostConnect.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\HostServer.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\KThread.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\Lock.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\LogFile.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\Memory.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\NetCenter.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\NetClient.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\NetConnect.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\NetServer.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\NetSockDupEx.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RainbowLib.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RelayCenter.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RelayClient.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RelayConnect.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RelayServer.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RootCenter.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\RootClient.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\S3Relay.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\SockThread.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\TongConnect.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\TongServer.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\KTongControl.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\KTongSet.cpp"
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\TONGDB.CPP"
+]
+Creating command line "cl.exe @C:\Users\Hoang8\AppData\Local\Temp\RSPA281.tmp" 
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSPA282.tmp" with contents
+[
+/nologo /MT /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_WORKMODE_SINGLETHREAD" /D "_TESTING" /Fp"Release/S3Relay.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"E:\Ma Nguon\SwordOnline\Sources\MultiServer\S3Relay\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\Users\Hoang8\AppData\Local\Temp\RSPA282.tmp" 
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSPA292.tmp" with contents
+[
+kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Ws2_32.lib lualibdll.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/S3Relay.pdb" /map:"Release/S3Relay.map" /debug /machine:I386 /out:"Release/S3Relay.exe" 
+".\Release\ChannelMgr.obj"
+".\Release\ChatConnect.obj"
+".\Release\ChatServer.obj"
+".\Release\DBConnect.obj"
+".\Release\DBTable.obj"
+".\Release\DealRelay.obj"
+".\Release\DoScript.obj"
+".\Release\FriendMgr.obj"
+".\Release\GatewayCenter.obj"
+".\Release\GatewayClient.obj"
+".\Release\Global.obj"
+".\Release\HeavenLib.obj"
+".\Release\HostConnect.obj"
+".\Release\HostServer.obj"
+".\Release\KThread.obj"
+".\Release\Lock.obj"
+".\Release\LogFile.obj"
+".\Release\Memory.obj"
+".\Release\NetCenter.obj"
+".\Release\NetClient.obj"
+".\Release\NetConnect.obj"
+".\Release\NetServer.obj"
+".\Release\NetSockDupEx.obj"
+".\Release\RainbowLib.obj"
+".\Release\RelayCenter.obj"
+".\Release\RelayClient.obj"
+".\Release\RelayConnect.obj"
+".\Release\RelayServer.obj"
+".\Release\RootCenter.obj"
+".\Release\RootClient.obj"
+".\Release\S3Relay.obj"
+".\Release\SockThread.obj"
+".\Release\StdAfx.obj"
+".\Release\TongConnect.obj"
+".\Release\TongServer.obj"
+".\Release\KTongControl.obj"
+".\Release\KTongSet.obj"
+".\Release\TONGDB.OBJ"
+".\Release\S3Relay.res"
+"..\..\..\Lib\release\engine.lib"
+".\libdb41s.lib"
+]
+Creating command line "link.exe @C:\Users\Hoang8\AppData\Local\Temp\RSPA292.tmp"
+<h3>Output Window</h3>
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+ChannelMgr.cpp
+ChatConnect.cpp
+ChatServer.cpp
+DBConnect.cpp
+DBTable.cpp
+DealRelay.cpp
+DoScript.cpp
+FriendMgr.cpp
+GatewayCenter.cpp
+GatewayClient.cpp
+Global.cpp
+HeavenLib.cpp
+HostConnect.cpp
+HostServer.cpp
+KThread.cpp
+Lock.cpp
+LogFile.cpp
+Memory.cpp
+NetCenter.cpp
+NetClient.cpp
+Generating Code...
+Compiling...
+NetConnect.cpp
+NetServer.cpp
+NetSockDupEx.cpp
+RainbowLib.cpp
+RelayCenter.cpp
+RelayClient.cpp
+RelayConnect.cpp
+RelayServer.cpp
+RootCenter.cpp
+RootClient.cpp
+S3Relay.cpp
+SockThread.cpp
+TongConnect.cpp
+TongServer.cpp
+KTongControl.cpp
+KTongSet.cpp
+TONGDB.CPP
+Generating Code...
+Linking...
+Creating temporary file "C:\Users\Hoang8\AppData\Local\Temp\RSPBE78.bat" with contents
+[
+@echo off
+md ..\..\..\..\bin\client\release\
+copy release\S3Relay.exe ..\..\..\..\bin\Client\S3Relay.exe
+copy release\S3Relay.exe ..\..\..\..\bin\Client\release\S3Relay.exe
+copy release\S3Relay.exe ..\..\..\..\bin\Server\S3Relay.exe
+]
+Creating command line "C:\Users\Hoang8\AppData\Local\Temp\RSPBE78.bat"
+
+A subdirectory or file ..\..\..\..\bin\client\release\ already exists.
+        1 file(s) copied.
+        1 file(s) copied.
+        1 file(s) copied.
+
+
+
+<h3>Results</h3>
+S3Relay.exe - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
