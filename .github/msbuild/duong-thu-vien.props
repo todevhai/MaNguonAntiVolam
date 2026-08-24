@@ -8,12 +8,17 @@
      "LNK1104: cannot open file 'common.lib'". Thay vi doan tiep, khai thang duong
      tim vao AdditionalLibraryDirectories — cach nay khong phu thuoc bien moi truong.
 
+     Thu muc MultiServer\Common\Release dat TRUOC Lib/: Lib/common.lib san co la ban
+     dung o che do GO LOI (cac .obj cua no tham chieu operator new[] cua debug heap,
+     std::_DebugHeapTag_t) nen keo theo libcpmtd.lib/atlsd.lib va gay LNK2038. Ban tu
+     dung tu MultiServer/Common cung mot cau hinh Release thi khong.
+
      Nap bang /p:ForceImportBeforeCppTargets tren dong lenh msbuild.
      $(MSBuildThisFileDirectory) tro toi .github/msbuild/ nen di len 2 muc la goc repo. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemDefinitionGroup>
     <Link>
-      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib;$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Sources\MultiServer\Common\Release;$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib;$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
 </Project>

@@ -61,6 +61,15 @@ jobs:
       # Engine va Core phu thuoc VONG: nguon Engine co #pragma comment(lib,"CoreClient.lib")
       # con Core lai can Engine.lib. Vi vay phai build hai luot: luot 1 dung .lib dung san
       # tu 2013 de co ban moi, luot 2 dung ban moi de co ban dung.
+      # MultiServer/Common -> common.lib. Ban co san trong Lib/ la ban dung o che do
+      # GO LOI: cac .obj cua no tham chieu operator new[](size_t, std::_DebugHeapTag_t
+      # const&, char*, int) — chi co trong CRT go loi. Do la nguon that cua rui ro
+      # "common.lib co the lech ABI CRT" ghi trong README tu truoc.
+      - name: 'Build Common (Release^|Win32)'
+        id: common
+        continue-on-error: true
+        run: msbuild "%SRC%\MultiServer\Common\Common.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=common.log;verbosity=normal
+
       - name: 'Build Engine (Release|Win32)'
         id: engine
         continue-on-error: true
@@ -134,16 +143,6 @@ jobs:
         if: always()
         id: rainbow
         continue-on-error: true
-        env:
-          # Da truy ra bang /VERBOSE:LIB: ca ba .obj deu chi xin ban Release
-          # (atls.lib, LIBCMT, libcpmt), nhung ngay sau khi tim atls.lib thi trinh
-          # lien ket tim tiep libcpmtd.lib roi doi atlsd.lib. Tuc chinh atls.lib cua
-          # VS2022 (atlmfc\lib\x86) keo theo cap thu vien GO LOI.
-          #
-          # Ta khong dung ATL o day: Common/Utils.h:37 include <atlbase.h> chi de lay
-          # USES_CONVERSION. Nen chan hai thu vien do lai; neu that su can ky hieu tu
-          # chung thi se lo ra bang loi "unresolved external", khong am tham.
-          LINK: /NODEFAULTLIB:libcpmtd.lib /NODEFAULTLIB:atlsd.lib
         run: msbuild "%SRC%\MultiServer\Rainbow\Rainbow.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:GenerateMapFile=true /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=rainbow.log;verbosity=normal
 
       # Chan doan: in chi thi thu vien ma tung .obj yeu cau. #pragma comment(lib,...)
@@ -184,6 +183,7 @@ jobs:
           echo Engine     = ${{ steps.engine.outcome }}
           echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
+          echo Common = ${{ steps.common.outcome }}
           echo Represent2 = ${{ steps.represent2.outcome }}
           echo Rainbow = ${{ steps.rainbow.outcome }}
           echo S3Client = ${{ steps.s3client.outcome }}
