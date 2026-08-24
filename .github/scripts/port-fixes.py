@@ -139,6 +139,13 @@ edit('Core/Src/KSkillList.cpp',
 # vong lai dung j. Sau vong j == 15, ma mang chi co 15 phan tu [0..14] -> ghi
 # NGOAI BIEN. Trinh dich cu cho j song sau vong nen loi nay chay im. Dung n_mMin
 # la dung y do da the hien ngay trong vong.
+# `k` duoc doc SAU vong lap de biet vong co chay het hay khong (kieu kiem tra
+# "khong tim thay"). Doi thanh khai bao lai trong vong se lam sai nghia, nen phai
+# dua khai bao ra ngoai. Giu tren MOT dong vi repo dung CRLF.
+edit('Core/Src/Scene/KScenePlaceC.cpp',
+     b'for (unsigned int k = 0; k < nTotalLineObj; k++)',
+     b'unsigned int k; for (k = 0; k < nTotalLineObj; k++)',
+     'k duoc doc sau vong -> dua khai bao ra ngoai')
 edit('Core/Src/Scene/KScenePlaceC.cpp',
      b'for (i = 0; i < nNum; i++)', b'for (int i = 0; i < nNum; i++)',
      'khai bao lai bien dem')

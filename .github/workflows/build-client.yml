@@ -46,6 +46,9 @@ jobs:
           rem MSBuild dung IncludePath cua project de dung moi truong cho cl.exe, nen bien
           rem INCLUDE cua shell bi bo qua. Bien CL thi cl.exe tu doc va them vao dau -> dung duoc.
           rem /Zc:forScope- : tra lai pham vi bien cua for kieu cu (for(int i..) roi dung lai i)
+          rem Cac project khong khai bao duong thu vien day du (Engine can common.lib o Lib/).
+          rem link.exe tu doc bien LIB, giong cach cl.exe doc CL.
+          echo LIB=%CD%\ClientAnti_JX1\SwordOnline\Lib;%CD%\ClientAnti_JX1\SwordOnline\Lib\Release;%LIB%>> %GITHUB_ENV%
           echo CL=/I"%CD%\%SRC%" /I"%CD%\%SRC%\Engine\Src" /I"%CD%\%SRC%\Engine\Include" /I"%CD%\%SRC%\Core\Src" /I"%CD%\ClientAnti_JX1\SwordOnline\Headers">> %GITHUB_ENV%
 
       - name: Kiem thu vien da dung san
