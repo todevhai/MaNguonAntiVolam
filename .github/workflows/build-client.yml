@@ -115,7 +115,7 @@ jobs:
         # Da do vong truoc: LIB dat dung duong tuyet doi va common.lib co that
         # (4.953.460 byte) nhung van LNK1104. Nen khai thang duong tim thu vien
         # bang .props thay vi tin vao bien moi truong. Xem .github/msbuild/duong-thu-vien.props
-        run: msbuild "%SRC%\Represent\Represent2\Represent2.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=represent2.log;verbosity=normal
+        run: msbuild "%SRC%\Represent\Represent2\Represent2.vcxproj" /p:GenerateMapFile=true /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=represent2.log;verbosity=normal
 
       # Represent3 (Direct3D) KHONG dung duoc: precompile.h can 'd3dx9.h' — thu vien
       # D3DX cua bo DirectX SDK cu, da bi go khoi Windows SDK tu lau va khong co
@@ -181,6 +181,10 @@ jobs:
             ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.dll
             ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.dll
             ClientAnti_JX1/SwordOnline/Sources/Represent/Represent2/Release/Represent2.dll
+            ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.map
+            ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.map
+            ClientAnti_JX1/SwordOnline/Sources/S3Client/Release/Game.map
+            ClientAnti_JX1/SwordOnline/Sources/Represent/Represent2/Release/Represent2.map
           if-no-files-found: warn
 
       - name: Tai log len
