@@ -144,15 +144,9 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          rem dumpbin khong nam tren PATH o buoc nay; chi thi thu vien nam trong
-          rem section .drectve duoi dang ASCII thuan nen findstr doc thang .obj duoc.
-          for %%F in ("%SRC%\MultiServer\Rainbow\Release\*.obj") do (
-            echo ===== %%~nxF =====
-            findstr /I /C:"atlsd" /C:"atls.lib" /C:"libcpmtd" /C:"libcpmt" /C:"LIBCMTD" /C:"LIBCMT" "%%F" >nul 2>&1 && echo   (co nhac toi thu vien ben duoi)
-            for %%L in (atlsd.lib atls.lib libcpmtd.lib libcpmt.lib LIBCMTD.lib LIBCMT.lib msvcrtd.lib msvcrt.lib) do (
-              findstr /I /C:"%%L" "%%F" >nul 2>&1 && echo     %%L
-            )
-          )
+          rem dumpbin khong nam tren PATH o buoc nay, va findstr chet voi dong qua dai
+          rem trong tep nhi phan. Doc thang byte bang powershell roi bat /DEFAULTLIB:.
+          powershell -Command "Get-ChildItem '%SRC%\MultiServer\Rainbow\Release\*.obj' | ForEach-Object { Write-Host ('===== ' + $_.Name); $t=[System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes($_.FullName)); ([regex]::Matches($t,'/DEFAULTLIB:\"?[A-Za-z0-9_.\\-]+') | ForEach-Object { $_.Value } | Sort-Object -Unique) | ForEach-Object { Write-Host ('   ' + $_) } }"
           exit /b 0
 
       - name: Build S3Client (Release^|Win32)
