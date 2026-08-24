@@ -95,6 +95,25 @@ edit('S3Client/S3Client.cpp',
      b'typedef struct iRepresentShell* (*fnCreateRepresentShell)();',
      'typedef fnCreateRepresentShell bi bo o ban header moi')
 
+# ---------------------------------------------------------------- Engine
+# KDirectDraw::SetWindowStyle() mo dau bang exit(1) — ket thuc tien trinh ngay
+# dong dau tien, moi thu con lai trong ham la ma chet.
+#
+# Day la rac go loi ai do de quen, khong phai logic game: ham nay chi dat kieu
+# cua so va goi SetWindowPos. KDirectDraw::Init() goi no ngay sau CreateDirectDraw(),
+# tuc moi client dung Engine nay deu chet o buoc khoi tao do hoa.
+#
+# Do bang WINEDEBUG=+relay ngay 25/08/2026: tien trinh goi ucrtbase.exit(00000001)
+# tu Engine.dll+0x127e8; tra bang Engine.map ra dung
+# ?SetWindowStyle@KDirectDraw@@QAEXXZ + 0x8.
+# Mau mot dong: kho GitHub checkout ra CRLF nen mau nhieu dong dung \n khong bao gio
+# khop. Chuoi "\texit(1);" xuat hien DUNG MOT LAN trong file nay.
+edit('Engine/Src/KDDraw.cpp',
+     b'\texit(1);',
+     b'\t/* Da bo exit(1) o day: rac go loi de quen, giet tien trinh ngay khi khoi\n'
+     b'\t   tao do hoa. Xem docs/chay-thu-client-tu-build-lan-dau.md. */',
+     'bo exit(1) bo quen dau SetWindowStyle')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
