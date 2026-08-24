@@ -98,6 +98,28 @@ jobs:
             copy /Y "%SRC%\FilterText\FilterText_StaticLib___Win32_Release\FilterText_StaticLib.lib" "%%~D\" 2>nul
           )
 
+      # Tang ve (Represent2 = DirectDraw, Represent3 = Direct3D). Client chon bang
+      # config.ini [Client] Represent=2 hoac 3.
+      #
+      # Vi sao phai dung tu nguon: ban Represent2.dll dung san (doi 2012) goi
+      # engine.dll.?Init@KDirectDraw@@QAEHXZ tuc Init() KHONG tham so, con nguon
+      # trong kho nay khai BOOL Init(KDirectDraw*) — chu ky khac nen ten mangled
+      # khac, Wine bao "unimplemented function" roi abort truoc khi mo cua so.
+      # Do bang client tu build ngay 24/08/2026.
+      #
+      # Phai dat SAU buoc dua Engine.lib vao Lib, vi hai project nay can no.
+      - name: 'Build Represent2 (Release^|Win32)'
+        if: always()
+        id: represent2
+        continue-on-error: true
+        run: msbuild "%SRC%\Represent\Represent2\Represent2.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=represent2.log;verbosity=normal
+
+      - name: 'Build Represent3 (Release^|Win32)'
+        if: always()
+        id: represent3
+        continue-on-error: true
+        run: msbuild "%SRC%\Represent\Represent3\Represent3.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=represent3.log;verbosity=normal
+
       - name: Build S3Client (Release^|Win32)
         if: always()
         id: s3client
@@ -110,6 +132,8 @@ jobs:
           echo Engine     = ${{ steps.engine.outcome }}
           echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
+          echo Represent2 = ${{ steps.represent2.outcome }}
+          echo Represent3 = ${{ steps.represent3.outcome }}
           echo S3Client = ${{ steps.s3client.outcome }}
           echo === san pham tim thay ===
           powershell -Command "Get-ChildItem -Recurse -Include *.exe,*.dll,*.lib -Path '%SRC%' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt (Get-Date).AddHours(-2) } | Select-Object FullName,Length | Format-Table -AutoSize"
@@ -155,6 +179,8 @@ jobs:
             ClientAnti_JX1/SwordOnline/Sources/S3Client/Release/Game.exe
             ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.dll
             ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.dll
+            ClientAnti_JX1/SwordOnline/Sources/Represent/Represent2/Release/Represent2.dll
+            ClientAnti_JX1/SwordOnline/Sources/Represent/Represent3/Release/Represent3.dll
           if-no-files-found: warn
 
       - name: Tai log len
