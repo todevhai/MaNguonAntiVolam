@@ -136,6 +136,21 @@ jobs:
         continue-on-error: true
         run: msbuild "%SRC%\MultiServer\Rainbow\Rainbow.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:GenerateMapFile=true /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=rainbow.log;verbosity=normal
 
+      # Chan doan: in chi thi thu vien ma tung .obj yeu cau. #pragma comment(lib,...)
+      # trong header nam o day. Vong truoc bao LNK1104 atlsd.lib va LNK2038
+      # libcpmtd.lib (deu la ban GO LOI) trong khi cau hinh Release co NDEBUG va
+      # RuntimeLibrary=MultiThreaded — nen phai xem .obj nao doi chung.
+      - name: 'Chan doan Rainbow: chi thi thu vien cua tung .obj'
+        if: always()
+        continue-on-error: true
+        run: |
+          dir "%SRC%\MultiServer\Rainbow\Release\*.obj" 2>nul
+          for %%F in ("%SRC%\MultiServer\Rainbow\Release\*.obj") do (
+            echo ===== %%~nxF =====
+            dumpbin /directives "%%F" | findstr /I "DEFAULTLIB"
+          )
+          exit /b 0
+
       - name: Build S3Client (Release^|Win32)
         if: always()
         id: s3client
