@@ -126,6 +126,25 @@ jobs:
           dumpbin /headers "%SRC%\S3Client\Release\Game.exe" | findstr /C:"machine" /C:"Name" /C:"subsystem"
           exit /b 0
 
+      # ---- Bao ve ban phat hanh (TAT SAN, bat khi len production) ----
+      # WinLicense KHONG phai thu vien goi trong code — no la trinh DONG GOI chay tren
+      # exe da bien dich xong. Nen cho dung cua no la o day, sau khi link, truoc khi tai len.
+      #
+      # Chua bat vi:
+      #   1. Chua co ban quyen (kho chi co SDK .lib/.h, khong co chinh trinh dong goi).
+      #   2. Bat len la moi lai dung lop loi da ton nhieu cong nhat: vdk.dll cua ban dang
+      #      chay bi WinLicense dong goi chinh la nguon cua c0000142.
+      #   3. Exe da dong goi thi het disasm, het breakpoint, crash dump vo nghia.
+      #
+      # Khi co ban quyen: dat bien repo PROTECT_RELEASE=1 va secret WINLICENSE_PROJECT
+      # (duong dan file .wlp), roi thay phan echo ben duoi bang lenh goi trinh dong goi.
+      - name: 'Dong goi ban phat hanh (WinLicense)'
+        if: vars.PROTECT_RELEASE == '1'
+        run: |
+          echo Chua noi trinh dong goi WinLicense.
+          echo Xem docs/bao-ve-va-chong-gian-lan.md trong repo VLTK-Origin.
+          exit 1
+
       - name: 'Tai san pham len'
         if: always()
         continue-on-error: true
