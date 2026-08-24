@@ -1,0 +1,78 @@
+# Dung client JX1 (S3Client) bang VS2022 tren runner Windows.
+# Muc dich: chung minh cay source build duoc. Chay tung buoc, KHONG dung o loi dau,
+# de mot lan chay cho biet het cho nao gay.
+name: build-client
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/build-client.yml'
+
+jobs:
+  build:
+    runs-on: windows-2022
+    defaults:
+      run:
+        shell: cmd
+    env:
+      SRC: ClientAnti_JX1\SwordOnline\Sources
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Moi truong
+        run: |
+          echo === danh sach VS ===
+          "C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationVersion
+          echo === toolset v143 co san? ===
+          dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC" 2>nul || dir "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC"
+          echo === cay source ===
+          dir %SRC%
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Kiem thu vien da dung san
+        run: |
+          echo === ClientAnti_JX1\SwordOnline\Lib ===
+          dir ClientAnti_JX1\SwordOnline\Lib
+          echo === kiem magic cua .lib (phai la "!<arch>") ===
+          powershell -Command "Get-ChildItem 'ClientAnti_JX1\SwordOnline\Lib\*.lib' | ForEach-Object { $b=[System.IO.File]::ReadAllBytes($_.FullName)[0..7]; $s=-join($b|%%{[char]$_}); Write-Host ('{0,-32} {1,10} bytes  magic=[{2}]' -f $_.Name,$_.Length,$s) }"
+
+      - name: Build Engine (Release^|Win32)
+        id: engine
+        continue-on-error: true
+        run: msbuild "%SRC%\Engine\Engine.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=engine.log;verbosity=normal
+
+      - name: Build Core (Client Release^|Win32)
+        id: core
+        continue-on-error: true
+        run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
+
+      - name: Build S3Client (Release^|Win32)
+        id: s3client
+        continue-on-error: true
+        run: msbuild "%SRC%\S3Client\S3Client.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=s3client.log;verbosity=normal
+
+      - name: Tong ket
+        if: always()
+        run: |
+          echo Engine   = ${{ steps.engine.outcome }}
+          echo Core     = ${{ steps.core.outcome }}
+          echo S3Client = ${{ steps.s3client.outcome }}
+          echo === san pham tim thay ===
+          powershell -Command "Get-ChildItem -Recurse -Include *.exe,*.dll,*.lib -Path '%SRC%' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt (Get-Date).AddHours(-2) } | Select-Object FullName,Length | Format-Table -AutoSize"
+          echo === 40 loi dau moi log ===
+          powershell -Command "Get-ChildItem *.log -ErrorAction SilentlyContinue | ForEach-Object { Write-Host ('##### '+$_.Name); Select-String -Path $_.FullName -Pattern 'error [A-Z]+[0-9]+' | Select-Object -First 40 | ForEach-Object { $_.Line } }"
+
+      - name: Tai log len
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: '*.log'
+          if-no-files-found: warn
