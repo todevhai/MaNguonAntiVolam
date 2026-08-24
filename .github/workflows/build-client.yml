@@ -36,6 +36,16 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      - name: Va nguon cho trinh dich hien dai
+        shell: bash
+        run: python .github/scripts/port-fixes.py .
+
+      - name: Dat duong include va co tuong thich
+        run: |
+          echo INCLUDE=%CD%\%SRC%\Engine\Src;%CD%\%SRC%\Engine\Include;%CD%\%SRC%\Core\Src;%CD%\ClientAnti_JX1\SwordOnline\Headers;%INCLUDE%>> %GITHUB_ENV%
+          rem /Zc:forScope- : tra lai pham vi bien cua for kieu cu (for(int i..) roi dung lai i)
+          echo CL=/Zc:forScope- >> %GITHUB_ENV%
+
       - name: Kiem thu vien da dung san
         run: |
           echo === ClientAnti_JX1\SwordOnline\Lib ===
@@ -51,6 +61,8 @@ jobs:
       - name: Build Core (Client Release^|Win32)
         id: core
         continue-on-error: true
+        env:
+          CL: /Zc:forScope- /FI"msvc-compat.h"
         run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
 
       - name: Build S3Client (Release^|Win32)

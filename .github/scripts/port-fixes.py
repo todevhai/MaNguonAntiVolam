@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""Vá nguồn JX1 cho trình dịch hiện đại (MSVC v143).
+
+Moi sua doi o day deu la mot bat nhat that trong nguon, khong phai "lam cho qua build".
+Chay tu goc repo. Idempotent — chay nhieu lan khong sao.
+"""
+import os, sys
+
+ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '.')
+SRC  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Sources')
+LIB  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Lib')
+n_ok = n_skip = 0
+
+def edit(rel, old, new, why):
+    """Thay chinh xac mot chuoi byte. Bao 'da vá roi' neu khong tim thay old nhung thay new."""
+    global n_ok, n_skip
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); return
+    d = open(p, 'rb').read()
+    if old not in d:
+        if new in d:
+            print('  bo qua (da va): %s' % rel); n_skip += 1
+        else:
+            print('  KHONG KHOP: %s  <- %s' % (rel, why)); n_skip += 1
+        return
+    open(p, 'wb').write(d.replace(old, new, 1))
+    print('  va: %-42s %s' % (rel, why)); n_ok += 1
+
+# ---------------------------------------------------------------- Core
+# Khai bao friend thieu kieu tra ve. C++ khong con mac dinh int.
+edit('Core/Src/KPlayer.h',
+     b'friend\t\t\tLuaInitStandAloneGame(Lua_State * L);',
+     b'friend\t\t\tint LuaInitStandAloneGame(Lua_State * L);',
+     'friend thieu kieu tra ve')
+
+# Bien toan cuc bi comment mat dinh nghia nhung con 5 cho dung no.
+edit('Core/Src/KCore.cpp',
+     b'//KLuaScript\t*\tg_pNpcLevelScript = NULL;',
+     b'KLuaScript\t*\tg_pNpcLevelScript = NULL;',
+     'dinh nghia bi comment nhung van con noi dung')
+
+# strstr nhan const char* thi tra const char*; gan vao char* phai ep kieu.
+edit('Core/Src/KGMCommand.cpp',
+     b'char * pStart = strstr(pGMCmd," ");',
+     b'char * pStart = (char *)strstr(pGMCmd," ");',
+     'strstr tra const char*')
+
+# ---------------------------------------------------------------- S3Client
+# Repo co HAI ban iRepresentShell.h khac nhau dung 8 dong o ham khoi tao.
+# S3Client.cpp viet theo ban cu (CreateRepresentShell, khong tham so) nhung lai
+# include ban moi (CreateRepresentDirect). Giao dien 33 ham ao thi giong het,
+# nen chi can khai bao lai dung mot typedef con thieu.
+edit('S3Client/S3Client.cpp',
+     b'#include "../../Represent/iRepresent/iRepresentShell.h"',
+     b'#include "../../Represent/iRepresent/iRepresentShell.h"\n'
+     b'/* Ban header duoc include dat ten ham khoi tao la CreateRepresentDirect va bo\n'
+     b'   typedef nay; file nay goi CreateRepresentShell() khong tham so (xem\n'
+     b'   CREATE_REPRESENT_SHELL_FUN ben duoi). Hai ban chi khac o ham khoi tao. */\n'
+     b'typedef struct iRepresentShell* (*fnCreateRepresentShell)();',
+     'typedef fnCreateRepresentShell bi bo o ban header moi')
+
+# ------------------------------------------------- hau to literal nguoi dung
+def scan_udl(data):
+    """Tim dau " ket thuc chuoi ma bi ngay mot dinh danh dinh sau.
+    C++03 coi la noi chuoi; tu C++11 doc thanh hau to literal (UDL) -> loi C3688."""
+    hits = []; i = 0; n = len(data)
+    in_s = in_c = in_lc = in_bc = False
+    while i < n:
+        ch = data[i]
+        if ch == 0x0a: in_lc = False
+        if in_lc: i += 1; continue
+        if in_bc:
+            if ch == 0x2a and i+1 < n and data[i+1] == 0x2f: in_bc = False; i += 2; continue
+            i += 1; continue
+        if not in_s and not in_c:
+            if ch == 0x2f and i+1 < n and data[i+1] == 0x2f: in_lc = True; i += 2; continue
+            if ch == 0x2f and i+1 < n and data[i+1] == 0x2a: in_bc = True; i += 2; continue
+        if in_s:
+            if ch == 0x5c: i += 2; continue
+            if ch == 0x22:
+                in_s = False
+                if i+1 < n:
+                    nx = data[i+1]
+                    if (0x41 <= nx <= 0x5a) or (0x61 <= nx <= 0x7a) or nx == 0x5f:
+                        hits.append(i)
+            i += 1; continue
+        if in_c:
+            if ch == 0x5c: i += 2; continue
+            if ch == 0x27: in_c = False
+            i += 1; continue
+        if ch == 0x22: in_s = True
+        elif ch == 0x27: in_c = True
+        i += 1
+    return hits
+
+print('\nChen dau cach giua chuoi va dinh danh dinh lien (loi C3688):')
+tot = 0
+for sub in ('Core/Src', 'S3Client', 'Engine/Src'):
+    base = os.path.join(SRC, sub)
+    for dp, _, fns in os.walk(base):
+        for fn in fns:
+            if not fn.lower().endswith(('.cpp', '.c', '.h', '.hpp', '.cxx')): continue
+            p = os.path.join(dp, fn)
+            d = open(p, 'rb').read()
+            h = scan_udl(d)
+            if not h: continue
+            out = bytearray(d)
+            for idx in reversed(h): out[idx+1:idx+1] = b' '
+            open(p, 'wb').write(bytes(out))
+            print('  %-58s %d cho' % (os.path.relpath(p, SRC), len(h)))
+            tot += len(h)
+print('  -> tong %d cho' % tot)
+
+# ---------------------------------------------------- Lib/Release va Lib/Debug
+# S3Client co #pragma comment(lib, "../../Lib/Release/FilterText_StaticLib.lib").
+# Nhung .gitignore cua repo co dong "Release" nen thu muc Lib/Release/ khong bao
+# gio duoc commit. Ban .lib that nam ngay o Lib/. Dung thu muc va copy sang.
+print('\nDung Lib/Release va Lib/Debug (bi .gitignore loai khoi repo):')
+srclib = os.path.join(LIB, 'FilterText_StaticLib.lib')
+if os.path.exists(srclib):
+    for sub in ('Release', 'Debug'):
+        d = os.path.join(LIB, sub)
+        os.makedirs(d, exist_ok=True)
+        dst = os.path.join(d, 'FilterText_StaticLib.lib')
+        open(dst, 'wb').write(open(srclib, 'rb').read())
+        print('  tao %s' % os.path.relpath(dst, ROOT))
+else:
+    print('  THIEU %s' % srclib)
+
+# --------------------------------------------------------- header bu ten ham
+# Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
+# g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
+# g_StrLen, g_StrLower, g_StrUpper) thi khop. Hai ten nay la di san lech ban.
+compat = os.path.join(SRC, 'msvc-compat.h')
+open(compat, 'wb').write(b'''/* Nap cuong buc khi dung Core (/FI). Engine khai bao g_strcpy va g_strcpyLen
+   voi chu 's' thuong; Core goi chung voi chu 'S' hoa. Moi ten g_Str* con lai
+   thi khop, nen chi bac cau dung hai ten nay. */
+#ifndef MSVC_COMPAT_H
+#define MSVC_COMPAT_H
+#define g_StrCpy    g_strcpy
+#define g_StrCpyLen g_strcpyLen
+#endif
+''')
+print('\ntao %s' % os.path.relpath(compat, ROOT))
+print('\n=== va %d cho, bo qua %d ===' % (n_ok, n_skip))
