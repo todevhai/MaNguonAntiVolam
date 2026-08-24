@@ -4,7 +4,7 @@
 Moi sua doi o day deu la mot bat nhat that trong nguon, khong phai "lam cho qua build".
 Chay tu goc repo. Idempotent — chay nhieu lan khong sao.
 """
-import os, sys
+import os, sys, re
 
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '.')
 SRC  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Sources')
@@ -26,6 +26,19 @@ def edit(rel, old, new, why):
         return
     open(p, 'wb').write(d.replace(old, new, 1))
     print('  va: %-42s %s' % (rel, why)); n_ok += 1
+
+def edit_all(rel, old, new, why):
+    """Thay MOI lan xuat hien."""
+    global n_ok, n_skip
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); return
+    d = open(p, 'rb').read()
+    c = d.count(old)
+    if c == 0:
+        print('  bo qua (da va?): %s' % rel); n_skip += 1; return
+    open(p, 'wb').write(d.replace(old, new))
+    print('  va: %-42s %s (%d cho)' % (rel, why, c)); n_ok += 1
 
 # ---------------------------------------------------------------- Core
 # Khai bao friend thieu kieu tra ve. C++ khong con mac dinh int.
@@ -59,6 +72,56 @@ edit('S3Client/S3Client.cpp',
      b'   CREATE_REPRESENT_SHELL_FUN ben duoi). Hai ban chi khac o ham khoi tao. */\n'
      b'typedef struct iRepresentShell* (*fnCreateRepresentShell)();',
      'typedef fnCreateRepresentShell bi bo o ban header moi')
+
+# Bang con tro ham thanh vien: MSVC doi phai co & truoc ten ham thanh vien.
+# Truoc day trinh dich cho phep bo, gio bao C3867. 101 cho, cung mot dang.
+def fix_member_fnptr():
+    global n_ok, n_skip
+    rel = 'Core/Src/KProtocolProcess.cpp'
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); return
+    d = open(p, 'rb').read()
+    pat = re.compile(rb'(ProcessFunc\[[^\]\n]+\]\s*=\s*)(?!&|NULL\b|0\b)([A-Za-z_][A-Za-z_0-9]*)(\s*;)')
+    n = [0]
+    def rep(m):
+        n[0] += 1
+        return m.group(1) + b'&KProtocolProcess::' + m.group(2) + m.group(3)
+    out = pat.sub(rep, d)
+    if n[0] == 0:
+        print('  bo qua (da va?): %s' % rel); n_skip += 1; return
+    open(p, 'wb').write(out)
+    print('  va: %-42s them & truoc ten ham thanh vien (%d cho)' % (rel, n[0])); n_ok += 1
+
+print('\nBang con tro ham thanh vien (loi C3867):')
+fix_member_fnptr()
+
+# Bien dem cua for khong con song sau vong lap (MSVC bo /Zc:forScope- tu VS2017).
+# Cac vong duoi dung lai bien dem khai bao o vong TRUOC do -> khai bao lai tai cho.
+print('\nBien dem for dung lai tu vong truoc:')
+edit_all('Core/Src/KItem.cpp',
+         b'for (i = 0; i < 6; i++)', b'for (int i = 0; i < 6; i++)',
+         'khai bao lai bien dem')
+edit('Core/Src/KItemList.cpp',
+     b'for (i = 0;i < MAX_PLAYER_ITEM;i++)', b'for (int i = 0;i < MAX_PLAYER_ITEM;i++)',
+     'khai bao lai bien dem')
+edit('Core/Src/KNpcSet.cpp',
+     b'for (i = MAX_NPC_REQUEST - 1', b'for (int i = MAX_NPC_REQUEST - 1',
+     'khai bao lai bien dem')
+edit('Core/Src/KSkillList.cpp',
+     b'for(i = 0;i < MAX_NPCSKILL;i++)', b'for(int i = 0;i < MAX_NPCSKILL;i++)',
+     'khai bao lai bien dem')
+
+# CANH BAO — day la cho DUY NHAT doi hanh vi, khong chi la cu phap:
+# vong lap tim vi tri co thoi gian nho nhat va luu vao n_mMin, nhung hai dong sau
+# vong lai dung j. Sau vong j == 15, ma mang chi co 15 phan tu [0..14] -> ghi
+# NGOAI BIEN. Trinh dich cu cho j song sau vong nen loi nay chay im. Dung n_mMin
+# la dung y do da the hien ngay trong vong.
+print('\nGhi ngoai bien do dung bien dem sau khi vong ket thuc:')
+edit('Core/Src/KNpc.cpp',
+     b'm_nBloodNo[j][0] = nNo;\n\t\t\t m_nBloodNo[j][1] = defMAX_SHOW_BLOOD_TIME;',
+     b'm_nBloodNo[n_mMin][0] = nNo;\n\t\t\t m_nBloodNo[n_mMin][1] = defMAX_SHOW_BLOOD_TIME;',
+     'j == 15 sau vong -> ghi ngoai bien; y do la n_mMin')
 
 # ------------------------------------------------- hau to literal nguoi dung
 def scan_udl(data):
