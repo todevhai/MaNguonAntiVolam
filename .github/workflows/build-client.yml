@@ -135,10 +135,15 @@ jobs:
         id: rainbow
         continue-on-error: true
         env:
-          # link.exe tu doc bien LINK. /VERBOSE:LIB in ra thu tu tim va thu vien nao
-          # keo theo thu vien nao — can de biet ai doi atlsd.lib/libcpmtd.lib khi ma
-          # ca ba .obj deu chi xin ban Release (atls.lib, LIBCMT, libcpmt).
-          LINK: /VERBOSE:LIB
+          # Da truy ra bang /VERBOSE:LIB: ca ba .obj deu chi xin ban Release
+          # (atls.lib, LIBCMT, libcpmt), nhung ngay sau khi tim atls.lib thi trinh
+          # lien ket tim tiep libcpmtd.lib roi doi atlsd.lib. Tuc chinh atls.lib cua
+          # VS2022 (atlmfc\lib\x86) keo theo cap thu vien GO LOI.
+          #
+          # Ta khong dung ATL o day: Common/Utils.h:37 include <atlbase.h> chi de lay
+          # USES_CONVERSION. Nen chan hai thu vien do lai; neu that su can ky hieu tu
+          # chung thi se lo ra bang loi "unresolved external", khong am tham.
+          LINK: /NODEFAULTLIB:libcpmtd.lib /NODEFAULTLIB:atlsd.lib
         run: msbuild "%SRC%\MultiServer\Rainbow\Rainbow.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:GenerateMapFile=true /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=rainbow.log;verbosity=normal
 
       # Chan doan: in chi thi thu vien ma tung .obj yeu cau. #pragma comment(lib,...)
