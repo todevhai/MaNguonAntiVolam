@@ -134,6 +134,11 @@ jobs:
         if: always()
         id: rainbow
         continue-on-error: true
+        env:
+          # link.exe tu doc bien LINK. /VERBOSE:LIB in ra thu tu tim va thu vien nao
+          # keo theo thu vien nao — can de biet ai doi atlsd.lib/libcpmtd.lib khi ma
+          # ca ba .obj deu chi xin ban Release (atls.lib, LIBCMT, libcpmt).
+          LINK: /VERBOSE:LIB
         run: msbuild "%SRC%\MultiServer\Rainbow\Rainbow.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:GenerateMapFile=true /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=rainbow.log;verbosity=normal
 
       # Chan doan: in chi thi thu vien ma tung .obj yeu cau. #pragma comment(lib,...)
