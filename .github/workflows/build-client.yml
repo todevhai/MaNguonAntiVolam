@@ -140,14 +140,27 @@ jobs:
       # trong header nam o day. Vong truoc bao LNK1104 atlsd.lib va LNK2038
       # libcpmtd.lib (deu la ban GO LOI) trong khi cau hinh Release co NDEBUG va
       # RuntimeLibrary=MultiThreaded — nen phai xem .obj nao doi chung.
+      # Chan doan: in chi thi /DEFAULTLIB ma tung .obj yeu cau — do la noi
+      # #pragma comment(lib,...) trong header de lai. Vong truoc bao LNK1104
+      # atlsd.lib va LNK2038 libcpmtd.lib (deu la ban GO LOI) trong khi cau hinh
+      # Release co NDEBUG va RuntimeLibrary=MultiThreaded.
+      #
+      # Dung shell powershell: dumpbin khong tren PATH, findstr chet voi dong qua
+      # dai trong tep nhi phan, con cmd thi nuot dau | ben trong -Command.
       - name: 'Chan doan Rainbow: chi thi thu vien cua tung .obj'
         if: always()
         continue-on-error: true
+        shell: powershell
         run: |
-          rem dumpbin khong nam tren PATH o buoc nay, va findstr chet voi dong qua dai
-          rem trong tep nhi phan. Doc thang byte bang powershell roi bat /DEFAULTLIB:.
-          powershell -Command "Get-ChildItem '%SRC%\MultiServer\Rainbow\Release\*.obj' | ForEach-Object { Write-Host ('===== ' + $_.Name); $t=[System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes($_.FullName)); ([regex]::Matches($t,'/DEFAULTLIB:\"?[A-Za-z0-9_.\\-]+') | ForEach-Object { $_.Value } | Sort-Object -Unique) | ForEach-Object { Write-Host ('   ' + $_) } }"
-          exit /b 0
+          $dir = "$env:SRC\MultiServer\Rainbow\Release"
+          if (-not (Test-Path $dir)) { Write-Host "khong co $dir"; exit 0 }
+          Get-ChildItem "$dir\*.obj" | ForEach-Object {
+            Write-Host ("===== " + $_.Name)
+            $t = [System.Text.Encoding]::ASCII.GetString([System.IO.File]::ReadAllBytes($_.FullName))
+            [regex]::Matches($t, '/DEFAULTLIB:"?[A-Za-z0-9_.\-]+') |
+              ForEach-Object { $_.Value } | Sort-Object -Unique |
+              ForEach-Object { Write-Host ("   " + $_) }
+          }
 
       - name: Build S3Client (Release^|Win32)
         if: always()
