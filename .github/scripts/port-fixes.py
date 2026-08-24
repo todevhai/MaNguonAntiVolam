@@ -141,6 +141,30 @@ edit('Engine/Src/KDebug.cpp',
      b'\tif (m_hWndDebug)',
      'g_DebugLog ghi them ra tep engine-debug.log')
 
+# ------------------------------------------------------- Engine: chan doan ve
+# Client khoi tao xong, vong lap chay 85% CPU, nhung man hinh den. Duong ve la
+# KCanvas -> m_pSurface -> BltToBackBuffer -> UpdateScreen(Blt len primary).
+# Gan log o hai diem quyet dinh de biet dut o dau. Chi la nhat ky, khong doi logic.
+edit('Engine/Src/KCanvas.cpp',
+     b'\t\tm_pSurface = g_pDirectDraw->CreateSurface(m_nWidth, m_nHeight);',
+     b'\t\tm_pSurface = g_pDirectDraw->CreateSurface(m_nWidth, m_nHeight);\n'
+     b'\t\tg_DebugLog("[ve] KCanvas::Init %dx%d surface=%p mode=%d screen=%dx%d pitch=%d",\n'
+     b'\t\t\tm_nWidth, m_nHeight, m_pSurface, (int)m_dwScreenMode,\n'
+     b'\t\t\tm_nScreenWidth, m_nScreenHeight, m_nScreenPitch);',
+     'log ket qua tao surface cua canvas')
+
+edit('Engine/Src/KCanvas.cpp',
+     b'\t\tg_pDirectDraw->BltToBackBuffer(m_pSurface, &DestRc, &SrcRc);',
+     b'\t\t{\n'
+     b'\t\t\tstatic int _daGhi = 0;\n'
+     b'\t\t\tif (_daGhi < 3) { _daGhi++;\n'
+     b'\t\t\t\tg_DebugLog("[ve] BltToBackBuffer src(%d,%d,%d,%d) dest(%d,%d,%d,%d) surface=%p",\n'
+     b'\t\t\t\t\t(int)SrcRc.left,(int)SrcRc.top,(int)SrcRc.right,(int)SrcRc.bottom,\n'
+     b'\t\t\t\t\t(int)DestRc.left,(int)DestRc.top,(int)DestRc.right,(int)DestRc.bottom, m_pSurface); }\n'
+     b'\t\t}\n'
+     b'\t\tg_pDirectDraw->BltToBackBuffer(m_pSurface, &DestRc, &SrcRc);',
+     'log 3 lan dau blt canvas len back buffer')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
