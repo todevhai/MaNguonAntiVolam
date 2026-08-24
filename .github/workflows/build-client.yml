@@ -68,7 +68,7 @@ jobs:
       - name: 'Build Common (Release^|Win32)'
         id: common
         continue-on-error: true
-        run: msbuild "%SRC%\MultiServer\Common\Common.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=common.log;verbosity=normal
+        run: msbuild "%SRC%\MultiServer\Common\Common.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=common.log;verbosity=normal
 
       - name: 'Build Engine (Release|Win32)'
         id: engine

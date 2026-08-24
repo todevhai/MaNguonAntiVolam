@@ -17,6 +17,15 @@
      $(MSBuildThisFileDirectory) tro toi .github/msbuild/ nen di len 2 muc la goc repo. -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemDefinitionGroup>
+    <ClCompile>
+      <!-- /Zc:sizedDealloc- : tra lai hanh vi truoc C++14. Nguon nay dung placement new
+           kieu `new(kich_thuoc) CBuffer(...)` (MultiServer/Common/Buffer.cpp:182,
+           IOBuffer.cpp:170) trong khi lop co san operator delete(void*, size_t).
+           Tu C++14, ham do tro thanh "usual deallocation function" nen trinh dich chon
+           no lam placement delete va bao error C2956. Tat sized dealloc la het,
+           khong phai sua nguon. Cung ho voi /Zc:forScope- da dung o buoc chung. -->
+      <AdditionalOptions>/Zc:sizedDealloc- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Sources\MultiServer\Common\Release;$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib;$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
