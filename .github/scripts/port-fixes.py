@@ -225,27 +225,6 @@ edit('Represent/Represent2/KImageStore2.cpp',
      + GHI_MO + b'"[ve] nap spr %s -> %s\\n", pszImageFile, pSprHeader ? "OK" : "HONG"' + GHI_DONG,
      'log 10 lan dau nap spr')
 
-# --------------------------------------------- Chan doan: to do ca canvas mot lan
-# Chia doi bai toan man hinh den: to DO toan bo canvas ngay truoc khi blt len back
-# buffer. Neu man hinh do => duong canvas->back->primary THONG, loi nam o cho cac
-# cua so ve vao canvas. Neu van den => duong blt hong.
-# (Tam thoi, se go sau khi biet cau tra loi.)
-edit('Engine/Src/KCanvas.cpp',
-     b'\tg_pDirectDraw->FillBackBuffer(NULL);',
-     b'\tg_pDirectDraw->FillBackBuffer(NULL);\n'
-     b'\tFillCanvas((WORD)0xF800);\t/* CHAN DOAN: do tuoi trong RGB565 */',
-     'to do canvas de thu duong blt')
-
-# ------------------------------------------ Chan doan: g_DrawSprite co ve khong
-# Da chung minh duong canvas->back->primary THONG (to do ca canvas thi man hinh do).
-# Vay cac cua so ve vao canvas ma khong thay gi. Log ngay tai g_DrawSprite.
-# Dung Win32 API cho khoi ghi: tep nay khong include KDebug.h.
-edit('Engine/Src/KDrawSprite.cpp',
-     b'\tvoid* pBuffer = pCanvas->LockCanvas(nPitch);',
-     GHI_MO + b'"[ve] g_DrawSprite %d,%d %dx%d clip(%d,%d,%d,%d)\\n", pNode->m_nX, pNode->m_nY, pNode->m_nWidth, pNode->m_nHeight, Clipper.x, Clipper.y, Clipper.width, Clipper.height' + GHI_DONG
-     + b'\tvoid* pBuffer = pCanvas->LockCanvas(nPitch);',
-     'log 10 lan dau g_DrawSprite')
-
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
