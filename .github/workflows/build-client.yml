@@ -112,17 +112,10 @@ jobs:
         if: always()
         id: represent2
         continue-on-error: true
-        env:
-          # Vong CI truoc: moi file .cpp dich sach, chi LINK : fatal error LNK1104
-          # cannot open file 'common.lib'. Engine/Core/S3Client cung can common.lib
-          # (Engine/Src/KWin32.h:145 co #pragma comment(lib,"common.lib")) va chung
-          # tim thay, nen bien LIB dat o buoc 'Dat co tuong thich' co tac dung —
-          # rieng project nay thi khong. Dat thang o day cho chac, va in ra de biet.
-          LIB: ${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Lib;${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Lib\Release
-        run: |
-          echo LIB=%LIB%
-          dir "%CD%\ClientAnti_JX1\SwordOnline\Lib\common.lib"
-          msbuild "%SRC%\Represent\Represent2\Represent2.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=represent2.log;verbosity=normal
+        # Da do vong truoc: LIB dat dung duong tuyet doi va common.lib co that
+        # (4.953.460 byte) nhung van LNK1104. Nen khai thang duong tim thu vien
+        # bang .props thay vi tin vao bien moi truong. Xem .github/msbuild/duong-thu-vien.props
+        run: msbuild "%SRC%\Represent\Represent2\Represent2.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=represent2.log;verbosity=normal
 
       # Represent3 (Direct3D) KHONG dung duoc: precompile.h can 'd3dx9.h' — thu vien
       # D3DX cua bo DirectX SDK cu, da bi go khoi Windows SDK tu lau va khong co

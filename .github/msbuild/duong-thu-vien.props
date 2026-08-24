@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Them thu muc Lib/ vao duong tim thu vien cua trinh lien ket.
+
+     Vi sao can: Engine/Src/KWin32.h:145 co #pragma comment(lib,"common.lib"), nen
+     moi project include header do deu doi common.lib luc lien ket. Cac project
+     Engine/Core/S3Client tim thay qua bien moi truong LIB, nhung Represent2 thi
+     khong — da do: LIB dat dung tuyet doi, file co that 4.953.460 byte, van
+     "LNK1104: cannot open file 'common.lib'". Thay vi doan tiep, khai thang duong
+     tim vao AdditionalLibraryDirectories — cach nay khong phu thuoc bien moi truong.
+
+     Nap bang /p:ForceImportBeforeCppTargets tren dong lenh msbuild.
+     $(MSBuildThisFileDirectory) tro toi .github/msbuild/ nen di len 2 muc la goc repo. -->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib;$(MSBuildThisFileDirectory)..\..\ClientAnti_JX1\SwordOnline\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>
