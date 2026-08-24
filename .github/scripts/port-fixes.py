@@ -118,10 +118,14 @@ edit('Core/Src/KSkillList.cpp',
 # NGOAI BIEN. Trinh dich cu cho j song sau vong nen loi nay chay im. Dung n_mMin
 # la dung y do da the hien ngay trong vong.
 print('\nGhi ngoai bien do dung bien dem sau khi vong ket thuc:')
+# Tach thanh hai sua doi MOT DONG: repo checkout ra CRLF tren Windows nen mau
+# nhieu dong dung \n se khong bao gio khop.
 edit('Core/Src/KNpc.cpp',
-     b'm_nBloodNo[j][0] = nNo;\n\t\t\t m_nBloodNo[j][1] = defMAX_SHOW_BLOOD_TIME;',
-     b'm_nBloodNo[n_mMin][0] = nNo;\n\t\t\t m_nBloodNo[n_mMin][1] = defMAX_SHOW_BLOOD_TIME;',
+     b'm_nBloodNo[j][0] = nNo;', b'm_nBloodNo[n_mMin][0] = nNo;',
      'j == 15 sau vong -> ghi ngoai bien; y do la n_mMin')
+edit('Core/Src/KNpc.cpp',
+     b'm_nBloodNo[j][1] = defMAX_SHOW_BLOOD_TIME;', b'm_nBloodNo[n_mMin][1] = defMAX_SHOW_BLOOD_TIME;',
+     'cung cho tren, dong thu hai')
 
 # ------------------------------------------------- hau to literal nguoi dung
 def scan_udl(data):
@@ -199,6 +203,13 @@ open(compat, 'wb').write(b'''/* Nap cuong buc khi dung Core (/FI). Engine khai b
    thi khop, nen chi bac cau dung hai ten nay. */
 #ifndef MSVC_COMPAT_H
 #define MSVC_COMPAT_H
+/* KProtocolProcess.cpp dung std::string va std::vector ma khong include; truoc day
+   chung den qua <windows.h> hoac qua header khac da doi. */
+#include <string>
+#include <vector>
+#include <map>
+#include <list>
+#include <algorithm>
 #define g_StrCpy    g_strcpy
 #define g_StrCpyLen g_strcpyLen
 #endif
