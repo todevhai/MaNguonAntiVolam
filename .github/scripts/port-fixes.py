@@ -113,20 +113,18 @@ for sub in ('Core/Src', 'S3Client', 'Engine/Src'):
 print('  -> tong %d cho' % tot)
 
 # ---------------------------------------------------- Lib/Release va Lib/Debug
-# S3Client co #pragma comment(lib, "../../Lib/Release/FilterText_StaticLib.lib").
-# Nhung .gitignore cua repo co dong "Release" nen thu muc Lib/Release/ khong bao
-# gio duoc commit. Ban .lib that nam ngay o Lib/. Dung thu muc va copy sang.
+# Project tro toi ..\..\Lib\release\*.lib (S3Client link CoreClient.lib o day, va
+# co #pragma comment(lib) tro toi FilterText_StaticLib.lib). Nhung .gitignore cua
+# repo co dong "Release" nen thu muc Lib/Release/ khong bao gio duoc commit — ban
+# .lib that nam ngay o Lib/. Dung lai hai thu muc do va copy sang.
 print('\nDung Lib/Release va Lib/Debug (bi .gitignore loai khoi repo):')
-srclib = os.path.join(LIB, 'FilterText_StaticLib.lib')
-if os.path.exists(srclib):
-    for sub in ('Release', 'Debug'):
-        d = os.path.join(LIB, sub)
-        os.makedirs(d, exist_ok=True)
-        dst = os.path.join(d, 'FilterText_StaticLib.lib')
-        open(dst, 'wb').write(open(srclib, 'rb').read())
-        print('  tao %s' % os.path.relpath(dst, ROOT))
-else:
-    print('  THIEU %s' % srclib)
+libs = [f for f in os.listdir(LIB) if f.lower().endswith(('.lib', '.dll'))] if os.path.isdir(LIB) else []
+for sub in ('Release', 'Debug'):
+    d = os.path.join(LIB, sub)
+    os.makedirs(d, exist_ok=True)
+    for f in libs:
+        open(os.path.join(d, f), 'wb').write(open(os.path.join(LIB, f), 'rb').read())
+    print('  Lib/%s <- %d file' % (sub, len(libs)))
 
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi

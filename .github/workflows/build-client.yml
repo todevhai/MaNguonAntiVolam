@@ -40,11 +40,12 @@ jobs:
         shell: bash
         run: python .github/scripts/port-fixes.py .
 
-      - name: Dat duong include va co tuong thich
+      - name: Dat co tuong thich va duong include
         run: |
-          echo INCLUDE=%CD%\%SRC%\Engine\Src;%CD%\%SRC%\Engine\Include;%CD%\%SRC%\Core\Src;%CD%\ClientAnti_JX1\SwordOnline\Headers;%INCLUDE%>> %GITHUB_ENV%
+          rem MSBuild dung IncludePath cua project de dung moi truong cho cl.exe, nen bien
+          rem INCLUDE cua shell bi bo qua. Bien CL thi cl.exe tu doc va them vao dau -> dung duoc.
           rem /Zc:forScope- : tra lai pham vi bien cua for kieu cu (for(int i..) roi dung lai i)
-          echo CL=/Zc:forScope- >> %GITHUB_ENV%
+          echo CL=/Zc:forScope- /I"%CD%\%SRC%" /I"%CD%\%SRC%\Engine\Src" /I"%CD%\%SRC%\Engine\Include" /I"%CD%\%SRC%\Core\Src" /I"%CD%\ClientAnti_JX1\SwordOnline\Headers">> %GITHUB_ENV%
 
       - name: Kiem thu vien da dung san
         run: |
@@ -62,7 +63,7 @@ jobs:
         id: core
         continue-on-error: true
         env:
-          CL: /Zc:forScope- /FI"msvc-compat.h"
+          CL: /Zc:forScope- /FI"msvc-compat.h" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Include" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Core\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Headers"
         run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
 
       - name: Build S3Client (Release^|Win32)
