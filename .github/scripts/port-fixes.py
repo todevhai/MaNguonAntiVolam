@@ -195,6 +195,17 @@ edit('Represent/Represent2/KImageStore2.cpp',
      + GHI_MO + b'"[ve] nap spr %s -> %s\\n", pszImageFile, pSprHeader ? "OK" : "HONG"' + GHI_DONG,
      'log 10 lan dau nap spr')
 
+# --------------------------------------------- Chan doan: to do ca canvas mot lan
+# Chia doi bai toan man hinh den: to DO toan bo canvas ngay truoc khi blt len back
+# buffer. Neu man hinh do => duong canvas->back->primary THONG, loi nam o cho cac
+# cua so ve vao canvas. Neu van den => duong blt hong.
+# (Tam thoi, se go sau khi biet cau tra loi.)
+edit('Engine/Src/KCanvas.cpp',
+     b'\tg_pDirectDraw->FillBackBuffer(NULL);',
+     b'\tg_pDirectDraw->FillBackBuffer(NULL);\n'
+     b'\tFillCanvas((WORD)0xF800);\t/* CHAN DOAN: do tuoi trong RGB565 */',
+     'to do canvas de thu duong blt')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
