@@ -165,6 +165,15 @@ edit('Core/Src/KNpc.cpp',
      b'm_nBloodNo[j][1] = defMAX_SHOW_BLOOD_TIME;', b'm_nBloodNo[n_mMin][1] = defMAX_SHOW_BLOOD_TIME;',
      'cung cho tren, dong thu hai')
 
+# ---------------------------------------------------------------- FilterText
+# `perr` duoc doc SAU vong lap — chinh comment trong nguon noi ro la co y ("since
+# we've fallen off the array"). Dua khai bao ra ngoai de giu nguyen nghia.
+print('\nFilterText — bien dem doc sau vong lap:')
+edit('FilterText/Regexp.cpp',
+     b'for ( struct regErr * perr = errors;',
+     b'struct regErr * perr; for ( perr = errors;',
+     'perr duoc doc sau vong -> dua khai bao ra ngoai')
+
 # ------------------------------------------------- hau to literal nguoi dung
 def scan_udl(data):
     """Tim dau " ket thuc chuoi ma bi ngay mot dinh danh dinh sau.
