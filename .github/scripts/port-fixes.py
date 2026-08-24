@@ -250,7 +250,12 @@ for rel in ('Engine/Engine.vcxproj', 'Core/Core.vcxproj', 'S3Client/S3Client.vcx
            b'$(SolutionDir)..\\Lib;$(SolutionDir)..\\Lib\\Release;'
            b'$(MSBuildThisFileDirectory)..\\..\\Lib;'
            b'$(MSBuildThisFileDirectory)..\\..\\Lib\\Release;'
-           b'%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>')
+           b'%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>'
+           # common.lib doi VC6 mang chi thi /DEFAULTLIB:LIBC. LIBC.lib (CRT tinh don
+           # luong) da bi go khoi MSVC tu lau -> phai bao trinh lien ket bo qua.
+           b'\r\n      <IgnoreSpecificDefaultLibraries>'
+           b'LIBC.lib;LIBCD.lib;%(IgnoreSpecificDefaultLibraries)'
+           b'</IgnoreSpecificDefaultLibraries>')
     out = d.replace(b'<Link>', b'<Link>\r\n      ' + tag)
     c = d.count(b'<Link>')
     open(p, 'wb').write(out)

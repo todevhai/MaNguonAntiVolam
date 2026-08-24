@@ -75,6 +75,7 @@ jobs:
 
       - name: 'Dua san pham luot 1 vao Lib'
         if: always()
+        continue-on-error: true
         run: |
           echo === Engine\Release ===
           dir "%SRC%\Engine\Release\*.lib" "%SRC%\Engine\Release\*.dll" 2>nul
@@ -88,11 +89,13 @@ jobs:
           )
 
       - name: 'Luot 2 - Engine (dung .lib vua build)'
+        if: always()
         id: engine
         continue-on-error: true
         run: msbuild "%SRC%\Engine\Engine.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /t:Rebuild /fl /flp:logfile=engine.log;verbosity=normal
 
       - name: 'Luot 2 - Core'
+        if: always()
         id: core
         continue-on-error: true
         env:
@@ -101,6 +104,7 @@ jobs:
 
       - name: 'Dua san pham luot 2 vao Lib'
         if: always()
+        continue-on-error: true
         run: |
           for %%D in ("ClientAnti_JX1\SwordOnline\Lib" "ClientAnti_JX1\SwordOnline\Lib\Release") do (
             copy /Y "%SRC%\Engine\Release\Engine.lib" "%%~D\" 2>nul
@@ -110,8 +114,10 @@ jobs:
           )
           echo === Lib sau hai luot ===
           dir "ClientAnti_JX1\SwordOnline\Lib\Engine.lib" "ClientAnti_JX1\SwordOnline\Lib\CoreClient.lib"
+          exit /b 0
 
       - name: Build S3Client (Release^|Win32)
+        if: always()
         id: s3client
         continue-on-error: true
         run: msbuild "%SRC%\S3Client\S3Client.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=s3client.log;verbosity=normal
