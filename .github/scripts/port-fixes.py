@@ -225,6 +225,32 @@ edit('Represent/Represent2/KImageStore2.cpp',
      + GHI_MO + b'"[ve] nap spr %s -> %s\\n", pszImageFile, pSprHeader ? "OK" : "HONG"' + GHI_DONG,
      'log 10 lan dau nap spr')
 
+# ------------------------------- Represent2: mo lai loi ve anh alpha bi comment
+# Day la thu lam man hinh den. KRepresentShell2::DrawPrimitives, nhanh
+# IMAGE_RENDER_STYLE_ALPHA (kieu ve MAC DINH cua moi anh spr — xem
+# KWndImage::Init, WndImage.cpp:57) co loi goi ve BI COMMENT:
+#
+#     case IMAGE_RENDER_STYLE_ALPHA:
+#     case IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT:
+#     /*  m_Canvas.DrawSpriteAlpha(...); */
+#         break;
+#
+# Nen moi anh spr deu "ve" ma khong ra pixel nao. Do bang WINEDEBUG + log: cua so
+# goi PaintWindow moi khung hinh, nhung g_DrawSprite KHONG BAO GIO duoc goi.
+# Cung ho voi exit(1) trong SetWindowStyle: rac de quen, khong phai logic game.
+# DrawSpriteAlpha co that va dang duoc dung o hai nhanh khac trong chinh ham nay.
+#
+# Hai ban va mot dong (kho checkout ra CRLF), moi chuoi xuat hien dung mot lan.
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'/*\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,',
+     b'\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,',
+     'mo lai loi ve alpha (bo dau mo comment)')
+
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'a / 8);*/',
+     b'a / 8);',
+     'mo lai loi ve alpha (bo dau dong comment)')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
