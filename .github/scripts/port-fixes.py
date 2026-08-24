@@ -261,6 +261,33 @@ for rel in ('Engine/Engine.vcxproj', 'Core/Core.vcxproj', 'S3Client/S3Client.vcx
     open(p, 'wb').write(out)
     print('  va: %-42s %d khoi <Link>' % (rel, c))
 
+# Lenh hau-build cua chinh cac project lo viec copy .lib/.dll vao Lib\release va
+# bin\client\release. Chung mo dau bang `md <thu muc>` — lenh nay tra ve loi khi thu
+# muc DA TON TAI, va MSBuild coi ma thoat khac 0 la build that bai (MSB3073), du
+# .lib/.dll da dung xong. Them `exit /b 0` de khoi phan copy tien loi nay khong the
+# lam sap build.
+print('\nLam lenh hau-build khong the lam sap build:')
+for rel in ('Engine/Engine.vcxproj', 'Core/Core.vcxproj', 'S3Client/S3Client.vcxproj'):
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); continue
+    d = open(p, 'rb').read()
+    if b'exit /b 0</Command>' in d:
+        print('  bo qua (da co): %s' % rel); continue
+    c = d.count(b'</Command>')
+    out = d.replace(b'</Command>', b'\r\nexit /b 0</Command>')
+    open(p, 'wb').write(out)
+    print('  va: %-42s %d khoi <Command>' % (rel, c))
+
+# Tao san cac thu muc dich cua lenh hau-build, de phan copy chay that thay vi truot.
+print('\nTao san thu muc dich cua lenh hau-build:')
+for d in ('Lib/release', 'Lib/debug',
+          '../bin/client/release', '../bin/client/debug',
+          '../bin/server/release', '../bin/server/debug'):
+    full = os.path.normpath(os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', d))
+    os.makedirs(full, exist_ok=True)
+    print('  %s' % os.path.relpath(full, ROOT))
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
