@@ -67,6 +67,24 @@ jobs:
           CL: /FI"msvc-compat.h" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Include" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Core\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Headers"
         run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
 
+      - name: Dua san pham Engine/Core vao Lib
+        if: always()
+        run: |
+          echo === san pham Engine ===
+          dir "%SRC%\Engine\Release" 2>nul
+          echo === san pham Core ===
+          dir "%SRC%\Core\ClientRelease" 2>nul
+          rem Lib/ chua ban .lib dung san tu 2013, THIEU nhieu symbol so voi nguon hien tai
+          rem (vd KPakList::Open, KPakFile::Open). Phai lay ban vua build de che len.
+          for %%D in ("ClientAnti_JX1\SwordOnline\Lib" "ClientAnti_JX1\SwordOnline\Lib\Release") do (
+            copy /Y "%SRC%\Engine\Release\Engine.lib" "%%~D\" 2>nul
+            copy /Y "%SRC%\Engine\Release\Engine.dll" "%%~D\" 2>nul
+            copy /Y "%SRC%\Core\ClientRelease\CoreClient.lib" "%%~D\" 2>nul
+            copy /Y "%SRC%\Core\ClientRelease\CoreClient.dll" "%%~D\" 2>nul
+          )
+          echo === Lib sau khi cap nhat ===
+          dir "ClientAnti_JX1\SwordOnline\Lib\*.lib"
+
       - name: Build S3Client (Release^|Win32)
         id: s3client
         continue-on-error: true

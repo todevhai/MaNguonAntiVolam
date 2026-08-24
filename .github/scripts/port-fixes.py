@@ -139,6 +139,9 @@ edit('Core/Src/KSkillList.cpp',
 # vong lai dung j. Sau vong j == 15, ma mang chi co 15 phan tu [0..14] -> ghi
 # NGOAI BIEN. Trinh dich cu cho j song sau vong nen loi nay chay im. Dung n_mMin
 # la dung y do da the hien ngay trong vong.
+edit('Core/Src/Scene/KScenePlaceC.cpp',
+     b'for (i = 0; i < nNum; i++)', b'for (int i = 0; i < nNum; i++)',
+     'khai bao lai bien dem')
 edit_after('Core/Src/Scene/KScenePlaceC.cpp',
            b'ClearPreprocess(true);',
            b'for (i = 0; i < SPWP_MAX_NUM_REGIONS; i++)',
