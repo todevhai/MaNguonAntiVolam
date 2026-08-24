@@ -122,6 +122,20 @@ jobs:
       # trong kho. Bo qua: config.ini cua ban dang doi chieu dat Represent=2.
       # Muon bat lai thi phai dua DirectX SDK (June 2010) vao runner truoc.
 
+      # Rainbow.dll = tang noi mang cua client. S3Client/NetConnect/NetConnectAgent.cpp:21
+      # LoadLibrary("Rainbow.dll") roi GetProcAddress(...,"CreateInterface").
+      #
+      # Vi sao phai dung tu nguon: ban rainbow.dll dung san (2012, 28.064 byte) khong lo
+      # ten "CreateInterface" ra ngoai, nen GetProcAddress tra NULL va Initialize() that
+      # bai — do bang chinh client tu build 25/08/2026, hop thoai
+      # "Khoi tao module that bai: NetConnectAgent (ma 4)".
+      # Nguon co san MultiServer/Rainbow/Rainbow.def khai EXPORTS CreateInterface @1.
+      - name: 'Build Rainbow (Release^|Win32)'
+        if: always()
+        id: rainbow
+        continue-on-error: true
+        run: msbuild "%SRC%\MultiServer\Rainbow\Rainbow.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:GenerateMapFile=true /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=rainbow.log;verbosity=normal
+
       - name: Build S3Client (Release^|Win32)
         if: always()
         id: s3client
@@ -135,6 +149,7 @@ jobs:
           echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
           echo Represent2 = ${{ steps.represent2.outcome }}
+          echo Rainbow = ${{ steps.rainbow.outcome }}
           echo S3Client = ${{ steps.s3client.outcome }}
           echo === san pham tim thay ===
           powershell -Command "Get-ChildItem -Recurse -Include *.exe,*.dll,*.lib -Path '%SRC%' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt (Get-Date).AddHours(-2) } | Select-Object FullName,Length | Format-Table -AutoSize"
@@ -181,6 +196,8 @@ jobs:
             ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.dll
             ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.dll
             ClientAnti_JX1/SwordOnline/Sources/Represent/Represent2/Release/Represent2.dll
+            ClientAnti_JX1/SwordOnline/Sources/MultiServer/Rainbow/Release/Rainbow.dll
+            ClientAnti_JX1/SwordOnline/Sources/MultiServer/Rainbow/Release/Rainbow.map
             ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.map
             ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.map
             ClientAnti_JX1/SwordOnline/Sources/S3Client/Release/Game.map
