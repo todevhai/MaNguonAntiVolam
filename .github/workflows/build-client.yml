@@ -58,35 +58,58 @@ jobs:
           echo === kiem magic cua .lib (phai la "!<arch>") ===
           powershell -Command "Get-ChildItem 'ClientAnti_JX1\SwordOnline\Lib\*.lib' | ForEach-Object { $b=[System.IO.File]::ReadAllBytes($_.FullName)[0..7]; $s=-join($b|%%{[char]$_}); Write-Host ('{0,-32} {1,10} bytes  magic=[{2}]' -f $_.Name,$_.Length,$s) }"
 
-      - name: Build Engine (Release^|Win32)
-        id: engine
+      # Engine va Core phu thuoc VONG: nguon Engine co #pragma comment(lib,"CoreClient.lib")
+      # con Core lai can Engine.lib. Vi vay phai build hai luot: luot 1 dung .lib dung san
+      # tu 2013 de co ban moi, luot 2 dung ban moi de co ban dung.
+      - name: 'Luot 1 - Engine (dung .lib 2013)'
+        id: engine1
         continue-on-error: true
-        run: msbuild "%SRC%\Engine\Engine.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=engine.log;verbosity=normal
+        run: msbuild "%SRC%\Engine\Engine.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=engine1.log;verbosity=normal
 
-      - name: Build Core (Client Release^|Win32)
-        id: core
+      - name: 'Luot 1 - Core'
+        id: core1
         continue-on-error: true
         env:
           CL: /FI"msvc-compat.h" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Include" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Core\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Headers"
-        run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
+        run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=core1.log;verbosity=normal
 
-      - name: Dua san pham Engine/Core vao Lib
+      - name: 'Dua san pham luot 1 vao Lib'
         if: always()
         run: |
-          echo === san pham Engine ===
-          dir "%SRC%\Engine\Release" 2>nul
-          echo === san pham Core ===
-          dir "%SRC%\Core\ClientRelease" 2>nul
-          rem Lib/ chua ban .lib dung san tu 2013, THIEU nhieu symbol so voi nguon hien tai
-          rem (vd KPakList::Open, KPakFile::Open). Phai lay ban vua build de che len.
+          echo === Engine\Release ===
+          dir "%SRC%\Engine\Release\*.lib" "%SRC%\Engine\Release\*.dll" 2>nul
+          echo === Core\ClientRelease ===
+          dir "%SRC%\Core\ClientRelease\*.lib" "%SRC%\Core\ClientRelease\*.dll" 2>nul
           for %%D in ("ClientAnti_JX1\SwordOnline\Lib" "ClientAnti_JX1\SwordOnline\Lib\Release") do (
             copy /Y "%SRC%\Engine\Release\Engine.lib" "%%~D\" 2>nul
             copy /Y "%SRC%\Engine\Release\Engine.dll" "%%~D\" 2>nul
             copy /Y "%SRC%\Core\ClientRelease\CoreClient.lib" "%%~D\" 2>nul
             copy /Y "%SRC%\Core\ClientRelease\CoreClient.dll" "%%~D\" 2>nul
           )
-          echo === Lib sau khi cap nhat ===
-          dir "ClientAnti_JX1\SwordOnline\Lib\*.lib"
+
+      - name: 'Luot 2 - Engine (dung .lib vua build)'
+        id: engine
+        continue-on-error: true
+        run: msbuild "%SRC%\Engine\Engine.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /t:Rebuild /fl /flp:logfile=engine.log;verbosity=normal
+
+      - name: 'Luot 2 - Core'
+        id: core
+        continue-on-error: true
+        env:
+          CL: /FI"msvc-compat.h" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Include" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Core\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Headers"
+        run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /t:Rebuild /fl /flp:logfile=core.log;verbosity=normal
+
+      - name: 'Dua san pham luot 2 vao Lib'
+        if: always()
+        run: |
+          for %%D in ("ClientAnti_JX1\SwordOnline\Lib" "ClientAnti_JX1\SwordOnline\Lib\Release") do (
+            copy /Y "%SRC%\Engine\Release\Engine.lib" "%%~D\" 2>nul
+            copy /Y "%SRC%\Engine\Release\Engine.dll" "%%~D\" 2>nul
+            copy /Y "%SRC%\Core\ClientRelease\CoreClient.lib" "%%~D\" 2>nul
+            copy /Y "%SRC%\Core\ClientRelease\CoreClient.dll" "%%~D\" 2>nul
+          )
+          echo === Lib sau hai luot ===
+          dir "ClientAnti_JX1\SwordOnline\Lib\Engine.lib" "ClientAnti_JX1\SwordOnline\Lib\CoreClient.lib"
 
       - name: Build S3Client (Release^|Win32)
         id: s3client
@@ -96,6 +119,8 @@ jobs:
       - name: Tong ket
         if: always()
         run: |
+          echo Engine luot1 = ${{ steps.engine1.outcome }}
+          echo Core   luot1 = ${{ steps.core1.outcome }}
           echo Engine   = ${{ steps.engine.outcome }}
           echo Core     = ${{ steps.core.outcome }}
           echo S3Client = ${{ steps.s3client.outcome }}

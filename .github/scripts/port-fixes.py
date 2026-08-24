@@ -234,7 +234,7 @@ for sub in ('Release', 'Debug'):
 # Cac .lib dung san (JpgLib, FilterText_StaticLib) duoc dich truoc thoi SAFESEH nen
 # trinh lien ket tu choi sinh anh co bang xu ly ngoai le an toan. SAFESEH la metadata
 # cua item <Link> trong vcxproj, khong ghi de duoc bang /p: tren dong lenh -> sua file.
-print('\nTat SAFESEH trong vcxproj:')
+print('\nTat SAFESEH + them duong thu vien vao vcxproj:')
 for rel in ('Engine/Engine.vcxproj', 'Core/Core.vcxproj', 'S3Client/S3Client.vcxproj'):
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
@@ -242,7 +242,15 @@ for rel in ('Engine/Engine.vcxproj', 'Core/Core.vcxproj', 'S3Client/S3Client.vcx
     d = open(p, 'rb').read()
     if b'<ImageHasSafeExceptionHandlers>' in d:
         print('  bo qua (da co): %s' % rel); continue
-    tag = b'<ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>'
+    # Nguon Engine co #pragma comment(lib,"common.lib") va "CoreClient.lib" nhung
+    # project khong khai bao duong thu vien nao -> trinh lien ket khong thay Lib/.
+    # LibraryPath cua MSBuild ghi de bien LIB cua shell, nen phai ghi vao vcxproj.
+    tag = (b'<ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>'
+           b'\r\n      <AdditionalLibraryDirectories>'
+           b'$(SolutionDir)..\\Lib;$(SolutionDir)..\\Lib\\Release;'
+           b'$(MSBuildThisFileDirectory)..\\..\\Lib;'
+           b'$(MSBuildThisFileDirectory)..\\..\\Lib\\Release;'
+           b'%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>')
     out = d.replace(b'<Link>', b'<Link>\r\n      ' + tag)
     c = d.count(b'<Link>')
     open(p, 'wb').write(out)
