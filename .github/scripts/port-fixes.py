@@ -95,6 +95,54 @@ edit('S3Client/S3Client.cpp',
      b'typedef struct iRepresentShell* (*fnCreateRepresentShell)();',
      'typedef fnCreateRepresentShell bi bo o ban header moi')
 
+# ---------------------------------------------------------------- Represent2
+# Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
+#
+# Represent2 trong kho la doi CHONG GIAN LAN: exe cap vung nho, DLL dung
+# KCanvas/KDirectDraw NGAY TRONG vung nho do, va xuat CreateRepresentDirect(uint*, uint*).
+# Con Engine/Src va S3Client la doi CU: doi tuong tu so huu, ham xuat khong tham so.
+#
+# Do bang client tu build 24/08/2026: Game.exe goi GetProcAddress("CreateRepresentShell")
+# roi pCreate() khong tham so. Neu chi vá cho Represent2 DICH duoc thi luc CHAY
+# GetProcAddress van tra NULL -> ERR_T_MODULE_UNCORRECT.
+#
+# Keo Represent2 ve doi cu (thay vi nang Engine len doi moi) vi dem phe: S3Client cu,
+# Engine/Src cu, chi Represent2/3 va mot header la moi. Va khong dung Engine —
+# thu dung chung voi Core/CoreClient.
+#
+# Giu nguyen CreateRepresentDirect: no khong hai, va de danh cho huong chong gian lan sau nay.
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'iRepresentShell* CreateRepresentDirect(unsigned int* m_Canvas, unsigned int* m_DirectDraw)',
+     b'/* Ham xuat doi cu - dung cai nay. S3Client/S3Client.cpp:34,139 tim dung ten\n'
+     b'   "CreateRepresentShell" va goi khong tham so. Hai con tro vung nho cua doi\n'
+     b'   chong gian lan truyen NULL: ctor chi cat chung vao m_CanvasLocal/\n'
+     b'   m_DirectDrawLocal, ma hai bien do khong con cho nao dung nua sau hai ban va\n'
+     b'   ben duoi. */\n'
+     b'iRepresentShell* CreateRepresentShell()\n'
+     b'{\n'
+     b'\treturn (new KRepresentShell2(NULL, NULL));\n'
+     b'}\n'
+     b'\n'
+     b'extern "C" __declspec(dllexport)\n'
+     b'iRepresentShell* CreateRepresentDirect(unsigned int* m_Canvas, unsigned int* m_DirectDraw)',
+     'them ham xuat doi cu CreateRepresentShell()')
+
+# KDirectDraw::Init(KDirectDraw*) doi mot KDirectDraw KHAC da khoi tao — dung khi tao
+# be mat phu (cua so thu hai). Nhanh do chi chay khi m_lpDirectDraw != NULL, ma ctor
+# (Engine/Src/KDDraw.cpp:29) dat no = NULL. Nen o lan khoi tao dau, tham so KHONG duoc
+# dung den, va NULL la dung nghia "tu tao be mat chinh cua minh".
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'if (m_DirectDraw.Init(m_DirectDrawLocal))',
+     b'if (m_DirectDraw.Init(NULL))',
+     'Init nhan KDirectDraw* chu khong phai vung nho ngoai')
+
+# KCanvas::Init cua Engine/Src (KCanvas.h:83) la Init(int, int) — khong co tham so
+# vung nho ngoai.
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'm_Canvas.Init(nWidth, nHeight, m_CanvasLocal);',
+     b'm_Canvas.Init(nWidth, nHeight);',
+     'KCanvas::Init doi cu chi nhan 2 tham so')
+
 # Bang con tro ham thanh vien: MSVC doi phai co & truoc ten ham thanh vien.
 # Truoc day trinh dich cho phep bo, gio bao C3867. 101 cho, cung mot dang.
 def fix_member_fnptr():

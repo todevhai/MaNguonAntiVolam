@@ -114,11 +114,10 @@ jobs:
         continue-on-error: true
         run: msbuild "%SRC%\Represent\Represent2\Represent2.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=represent2.log;verbosity=normal
 
-      - name: 'Build Represent3 (Release^|Win32)'
-        if: always()
-        id: represent3
-        continue-on-error: true
-        run: msbuild "%SRC%\Represent\Represent3\Represent3.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=represent3.log;verbosity=normal
+      # Represent3 (Direct3D) KHONG dung duoc: precompile.h can 'd3dx9.h' — thu vien
+      # D3DX cua bo DirectX SDK cu, da bi go khoi Windows SDK tu lau va khong co
+      # trong kho. Bo qua: config.ini cua ban dang doi chieu dat Represent=2.
+      # Muon bat lai thi phai dua DirectX SDK (June 2010) vao runner truoc.
 
       - name: Build S3Client (Release^|Win32)
         if: always()
@@ -133,7 +132,6 @@ jobs:
           echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
           echo Represent2 = ${{ steps.represent2.outcome }}
-          echo Represent3 = ${{ steps.represent3.outcome }}
           echo S3Client = ${{ steps.s3client.outcome }}
           echo === san pham tim thay ===
           powershell -Command "Get-ChildItem -Recurse -Include *.exe,*.dll,*.lib -Path '%SRC%' -ErrorAction SilentlyContinue | Where-Object { $_.LastWriteTime -gt (Get-Date).AddHours(-2) } | Select-Object FullName,Length | Format-Table -AutoSize"
@@ -180,7 +178,6 @@ jobs:
             ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.dll
             ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.dll
             ClientAnti_JX1/SwordOnline/Sources/Represent/Represent2/Release/Represent2.dll
-            ClientAnti_JX1/SwordOnline/Sources/Represent/Represent3/Release/Represent3.dll
           if-no-files-found: warn
 
       - name: Tai log len
