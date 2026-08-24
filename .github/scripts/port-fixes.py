@@ -40,6 +40,28 @@ def edit_all(rel, old, new, why):
     open(p, 'wb').write(d.replace(old, new))
     print('  va: %-42s %s (%d cho)' % (rel, why, c)); n_ok += 1
 
+def edit_after(rel, anchor, old, new, why, window=400):
+    """Va lan xuat hien dau tien cua `old` nam trong `window` byte sau `anchor`.
+    Dung khi chuoi can sua xuat hien nhieu lan trong file nhung chi mot cho sai."""
+    global n_ok, n_skip
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); return
+    d = open(p, 'rb').read()
+    a = d.find(anchor)
+    if a < 0:
+        print('  KHONG THAY MOC: %s  <- %s' % (rel, why)); n_skip += 1; return
+    seg = d[a:a+window]
+    if old not in seg:
+        if new in seg:
+            print('  bo qua (da va): %s' % rel); n_skip += 1
+        else:
+            print('  KHONG KHOP: %s  <- %s' % (rel, why)); n_skip += 1
+        return
+    d = d[:a] + seg.replace(old, new, 1) + d[a+window:]
+    open(p, 'wb').write(d)
+    print('  va: %-42s %s' % (rel, why)); n_ok += 1
+
 # ---------------------------------------------------------------- Core
 # Khai bao friend thieu kieu tra ve. C++ khong con mac dinh int.
 edit('Core/Src/KPlayer.h',
@@ -117,6 +139,12 @@ edit('Core/Src/KSkillList.cpp',
 # vong lai dung j. Sau vong j == 15, ma mang chi co 15 phan tu [0..14] -> ghi
 # NGOAI BIEN. Trinh dich cu cho j song sau vong nen loi nay chay im. Dung n_mMin
 # la dung y do da the hien ngay trong vong.
+edit_after('Core/Src/Scene/KScenePlaceC.cpp',
+           b'ClearPreprocess(true);',
+           b'for (i = 0; i < SPWP_MAX_NUM_REGIONS; i++)',
+           b'for (int i = 0; i < SPWP_MAX_NUM_REGIONS; i++)',
+           'khai bao lai bien dem (file co 19 vong dung i, chi cho nay thieu)')
+
 print('\nGhi ngoai bien do dung bien dem sau khi vong ket thuc:')
 # Tach thanh hai sua doi MOT DONG: repo checkout ra CRLF tren Windows nen mau
 # nhieu dong dung \n se khong bao gio khop.
@@ -192,6 +220,23 @@ for sub in ('Release', 'Debug'):
     for f in libs:
         open(os.path.join(d, f), 'wb').write(open(os.path.join(LIB, f), 'rb').read())
     print('  Lib/%s <- %d file' % (sub, len(libs)))
+
+# Cac .lib dung san (JpgLib, FilterText_StaticLib) duoc dich truoc thoi SAFESEH nen
+# trinh lien ket tu choi sinh anh co bang xu ly ngoai le an toan. SAFESEH la metadata
+# cua item <Link> trong vcxproj, khong ghi de duoc bang /p: tren dong lenh -> sua file.
+print('\nTat SAFESEH trong vcxproj:')
+for rel in ('Engine/Engine.vcxproj', 'Core/Core.vcxproj', 'S3Client/S3Client.vcxproj'):
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); continue
+    d = open(p, 'rb').read()
+    if b'<ImageHasSafeExceptionHandlers>' in d:
+        print('  bo qua (da co): %s' % rel); continue
+    tag = b'<ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>'
+    out = d.replace(b'<Link>', b'<Link>\r\n      ' + tag)
+    c = d.count(b'<Link>')
+    open(p, 'wb').write(out)
+    print('  va: %-42s %d khoi <Link>' % (rel, c))
 
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
