@@ -73,6 +73,15 @@ jobs:
           CL: /FI"msvc-compat.h" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Include" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Core\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Headers"
         run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
 
+      # Ban FilterText_StaticLib.lib dung san nhung std::basic_string cua thu vien
+      # chuan doi 2003 (cac ky hieu __declspec(dllimport) khong con ton tai trong
+      # MSVC hien dai). Repo co san nguon nen dung lai de ca solution cung mot ABI.
+      - name: 'Build FilterText_StaticLib (Release|Win32)'
+        id: filtertext
+        if: always()
+        continue-on-error: true
+        run: msbuild "%SRC%\FilterText\FilterText_StaticLib.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=filtertext.log;verbosity=normal
+
       - name: 'Dua san pham Engine/Core vao Lib'
         if: always()
         continue-on-error: true
@@ -86,6 +95,7 @@ jobs:
             copy /Y "%SRC%\Engine\Release\Engine.dll" "%%~D\" 2>nul
             copy /Y "%SRC%\Core\ClientRelease\CoreClient.lib" "%%~D\" 2>nul
             copy /Y "%SRC%\Core\ClientRelease\CoreClient.dll" "%%~D\" 2>nul
+            copy /Y "%SRC%\FilterText\FilterText_StaticLib___Win32_Release\FilterText_StaticLib.lib" "%%~D\" 2>nul
           )
 
       - name: Build S3Client (Release^|Win32)
@@ -97,7 +107,8 @@ jobs:
       - name: Tong ket
         if: always()
         run: |
-          echo Engine   = ${{ steps.engine.outcome }}
+          echo Engine     = ${{ steps.engine.outcome }}
+          echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
           echo S3Client = ${{ steps.s3client.outcome }}
           echo === san pham tim thay ===
