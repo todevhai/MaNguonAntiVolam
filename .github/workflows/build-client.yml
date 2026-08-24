@@ -8,6 +8,7 @@ on:
   push:
     paths:
       - '.github/workflows/build-client.yml'
+      - '.github/scripts/**'
 
 jobs:
   build:
