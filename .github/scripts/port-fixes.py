@@ -114,6 +114,33 @@ edit('Engine/Src/KDDraw.cpp',
      b'\t   tao do hoa. Xem docs/chay-thu-client-tu-build-lan-dau.md. */',
      'bo exit(1) bo quen dau SetWindowStyle')
 
+# ---------------------------------------------------------------- Engine: nhat ky
+# g_DebugLog gui thong diep bang WM_COPYDATA toi mot cua so go loi. Khong co cua so
+# do thi no la HAM RONG — moi loi khoi tao bien mat khong dau vet.
+#
+# Trong mot dem port (25/08/2026) diem mu nay che mat it nhat ba thu: KEvent tao
+# handle hong, "Can't open ini file", va cac loi nap tai nguyen. Cho no ghi them ra
+# tep de con thay duong ma di. Chi la nhat ky, khong doi hanh vi game.
+#
+# Mau MOT DONG (kho checkout ra CRLF). "\tif (m_hWndDebug)" xuat hien dung mot lan.
+edit('Engine/Src/KDebug.cpp',
+     b'\tif (m_hWndDebug)',
+     b'\t{\n'
+     b'\t\t/* Ghi ra tep de thay duoc ca khi khong co cua so go loi. */\n'
+     b'\t\tchar _szNhatKy[512];\n'
+     b'\t\tva_list _vaNhatKy;\n'
+     b'\t\tva_start(_vaNhatKy, Fmt);\n'
+     b'\t\t_vsnprintf(_szNhatKy, sizeof(_szNhatKy) - 2, Fmt, _vaNhatKy);\n'
+     b'\t\tva_end(_vaNhatKy);\n'
+     b'\t\t_szNhatKy[sizeof(_szNhatKy) - 1] = 0;\n'
+     b'\t\t{\n'
+     b'\t\t\tFILE *_fNhatKy = fopen("engine-debug.log", "a");\n'
+     b'\t\t\tif (_fNhatKy) { fputs(_szNhatKy, _fNhatKy); fputc(10, _fNhatKy); fclose(_fNhatKy); }\n'
+     b'\t\t}\n'
+     b'\t}\n'
+     b'\tif (m_hWndDebug)',
+     'g_DebugLog ghi them ra tep engine-debug.log')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
