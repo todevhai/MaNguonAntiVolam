@@ -116,6 +116,28 @@ jobs:
           echo === 40 loi dau moi log ===
           powershell -Command "Get-ChildItem *.log -ErrorAction SilentlyContinue | ForEach-Object { Write-Host ('##### '+$_.Name); Select-String -Path $_.FullName -Pattern 'error [A-Z]+[0-9]+' | Select-Object -First 40 | ForEach-Object { $_.Line } }"
 
+      - name: 'Kiem tra Game.exe'
+        if: always()
+        continue-on-error: true
+        run: |
+          echo === kich thuoc san pham ===
+          powershell -Command "'Game.exe','..\..\Engine\Release\Engine.dll','..\..\Core\ClientRelease\CoreClient.dll' | ForEach-Object { $p=Join-Path '%SRC%\S3Client\Release' $_; if(Test-Path $p){ $f=Get-Item $p; Write-Host ('{0,-16} {1,10:N0} bytes' -f $f.Name,$f.Length) } }"
+          echo === section header cua Game.exe (kiem WinLicense/Themida) ===
+          dumpbin /headers "%SRC%\S3Client\Release\Game.exe" | findstr /C:"machine" /C:"Name" /C:"subsystem"
+          exit /b 0
+
+      - name: 'Tai san pham len'
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-binaries
+          path: |
+            ClientAnti_JX1/SwordOnline/Sources/S3Client/Release/Game.exe
+            ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.dll
+            ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.dll
+          if-no-files-found: warn
+
       - name: Tai log len
         if: always()
         uses: actions/upload-artifact@v4
