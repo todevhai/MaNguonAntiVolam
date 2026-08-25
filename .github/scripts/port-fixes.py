@@ -632,6 +632,24 @@ edit('S3Client/Login/Login.cpp',
            b'\t\t\tif (g_NetConnectAgent.ConnectToGameSvr('),
      'log dia chi world server truoc khi noi')
 
+# Log dung cho vao ra tren socket world server: bao nhieu byte, byte dau la gi,
+# va bang kich thuoc cua CLIENT tra ve bao nhieu cho tung opcode. Day la cho duy
+# nhat biet duoc client CO doc dung khoi du lieu dang nhap hay khong.
+edit('S3Client/NetConnect/NetConnectAgent.cpp',
+     b'\t\t\twhile(pMsg < (PROTOCOL_MSG_TYPE*)(pBuffer + nSize))',
+     _crlf(b'\t\t\tg_DebugLog("[TuDong] the gioi: %u byte, dau %d %d %d %d", nSize,\n'
+           b'\t\t\t\t(int)(unsigned char)pBuffer[0], (int)(unsigned char)pBuffer[1],\n'
+           b'\t\t\t\t(int)(unsigned char)pBuffer[2], (int)(unsigned char)pBuffer[3]);\n'
+           b'\t\t\twhile(pMsg < (PROTOCOL_MSG_TYPE*)(pBuffer + nSize))'),
+     'log khoi du lieu tu world server')
+
+edit('S3Client/NetConnect/NetConnectAgent.cpp',
+     b'\t\t\t\t\tg_pCoreShell->NetMsgCallbackFunc(pMsg);',
+     _crlf(b'\t\t\t\t\tg_DebugLog("[TuDong]   opcode=%d, bang bao %d byte",\n'
+           b'\t\t\t\t\t\t(int)Msg, g_pCoreShell->GetProtocolSize(Msg));\n'
+           b'\t\t\t\t\tg_pCoreShell->NetMsgCallbackFunc(pMsg);'),
+     'log tung opcode va kich thuoc bang tra ve')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
