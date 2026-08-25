@@ -593,6 +593,24 @@ edit('S3Client/Ui/UiShell.cpp',
      'goi KiemDangNhapTuDong moi khung hinh')
 
 
+# Log chan doan tang giao thuc client: biet dich xac opcode nao khong co nguoi xu ly,
+# va biet client co coi la "da vao game" hay khong.
+edit('Core/Src/KProtocolProcess.cpp',
+     b'\t\tg_DebugLog("[error]Net Msg Error");',
+     b'\t\tg_DebugLog("[error]Net Msg Error, opcode=%d", pMsg ? (int)pMsg[0] : -1);',
+     'ghi ca opcode vao Net Msg Error')
+
+edit('Core/Src/KProtocolProcess.cpp',
+     b'\tg_DebugLog("[net]Msg:%c", pMsg[0]);',
+     b'\tg_DebugLog("[net]Msg:%d", (int)pMsg[0]);',
+     'in opcode dang so thay vi ky tu')
+
+edit('S3Client/Login/Login.cpp',
+     b'\t\tm_Status = LL_S_IN_GAME;',
+     _crlf(b'\t\tg_DebugLog("[TuDong] DA VAO GAME, nhan vat=%s", m_Choices.szProcessingRoleName);\n'
+           b'\t\tm_Status = LL_S_IN_GAME;'),
+     'log khi client coi la da vao game')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
