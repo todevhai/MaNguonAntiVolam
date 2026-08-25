@@ -861,6 +861,37 @@ edit('S3Client/Ui/UiCase/UiManage.cpp',
      b'"quan-ly-bang-hoi.ini"',
      'ten tep MANAGE_INI_CONFRATERNITY -> quan-ly-bang-hoi.ini')
 
+# g_DirSin/g_DirCos EP mang byte g_InternalDirSinCosCode thanh con tro ham roi
+# GOI no — ma may x86 nhung lam du lieu, mot mieng chong sua cua ban AntiVolam.
+# Tren Linux vung du lieu co bit NX nen nhay vao do la segfault; do 25/08/2026:
+# MOI buoc di deu lam server sap, dung tai g_DirCos. Client dung y het ma nay
+# nen cung se sap khi nhan vat di chuyen.
+#
+# Bang thi that va dung: g_nSinBuffer chua 65 so 1024,1019,1004,...,-1024,...
+# tuc 1024*cos(2*pi*d/64). Nen chi can TRA BANG.
+#
+# g_IsAccrue/g_IsConquer (khac che ngu hanh) dung dung meo do; bang cua chung
+# da duoc g_InitSeries() dien san.
+for ham, bang in (('g_DirSin', 'g_nSin'), ('g_DirCos', 'g_nCos')):
+    edit('Core/Src/KMath.h',
+         ('inline int %s(int nDir, int nMaxDir)\n{\n    return (*(g_InternalDirSinCosFunction *)(&(g_InternalDirSinCosCode[0])))(%s, nDir, nMaxDir);\n}' % (ham, bang)).encode('latin-1'),
+         ('inline int %s(int nDir, int nMaxDir)\n{\n'
+          '    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault. */\n'
+          '    if (nMaxDir <= 0)\n'
+          '        return 0;\n'
+          '    int d = (nDir * 64) / nMaxDir;\n'
+          '    return %s[((d %% 64) + 64) %% 64];\n}' % (ham, bang)).encode('latin-1'),
+         'tra bang thay vi goi ma may: %s' % ham)
+
+for ham, bang in (('g_IsAccrue', 'g_nAccrueSeries'), ('g_IsConquer', 'g_nConquerSeries')):
+    edit('Core/Src/KMath.h',
+         ('inline int %s(int nSrcSeries, int nDesSeries)\n{\n    return (*(g_InternalIsAccrueConquerFunction *)(&(g_InternalIsAccrueConquerCode[0])))(%s, nSrcSeries, nDesSeries);\n}' % (ham, bang)).encode('latin-1'),
+         ('inline int %s(int nSrcSeries, int nDesSeries)\n{\n'
+          '    if (nSrcSeries < 0 || nSrcSeries >= series_num)\n'
+          '        return 0;\n'
+          '    return %s[nSrcSeries] == nDesSeries;\n}' % (ham, bang)).encode('latin-1'),
+         'tra bang thay vi goi ma may: %s' % ham)
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
