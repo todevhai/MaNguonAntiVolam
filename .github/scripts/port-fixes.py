@@ -515,17 +515,25 @@ edit('S3Client/Login/Login.cpp',
            b'void KLogin::AutoLogin()'),
      'them KLogin::DangNhapTuDongTheoCauHinh')
 
+# ShowCompleted() chay NGAY TRONG KUiInit::OpenWindow. Goi CloseWindow() o do
+# se dat m_pSelf = NULL truoc khi OpenWindow kip tra ve no -> UiStart() thay NULL
+# -> hop thoai "Khoi tao module that bai: UiStart (ma 4)". Nen o day chi dung co,
+# viec that lam trong WndProc, dung cho ma OnAutoLogin (Alt+A) van lam.
 edit('S3Client/Ui/UiCase/UiInit.cpp',
      b'    m_EnterGame.SetCursorAbove();',
      _crlf(b'    m_EnterGame.SetCursorAbove();\n'
+           b'    g_bXinDangNhapTuDong = true;'),
+     'dung co xin dang nhap tu dong')
+
+edit('S3Client/Ui/UiCase/UiInit.cpp',
+     b'int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'/* Dang nhap tu dong theo cau hinh cua ta. Dat o day chu khong o ShowCompleted\n'
+           b'   vi ShowCompleted chay ngay trong OpenWindow: dong cua so o do se lam\n'
+           b'   UiStart() thay NULL. */\n'
+           b'bool g_bXinDangNhapTuDong = false;\n'
            b'\n'
-           b'    /* Man khoi dong da hien xong -> thu dang nhap tu dong theo cau hinh cua ta.\n'
-           b'       Chi thu MOT lan cho moi lan chay. */\n'
-           b'    static bool bDaThuDangNhap = false;\n'
-           b'    if (bDaThuDangNhap)\n'
-           b'        return;\n'
-           b'    bDaThuDangNhap = true;\n'
-           b'\n'
+           b'static void DangNhapTuDongTheoCauHinh()\n'
+           b'{\n'
            b'    char szTepCauHinh[] = "\\\\Ui\\\\Setting.ini";\n'
            b'    KIniFile Ini;\n'
            b'    if (!Ini.Load(szTepCauHinh))\n'
@@ -546,10 +554,24 @@ edit('S3Client/Ui/UiCase/UiInit.cpp',
            b'    if (!szTaiKhoan[0])\n'
            b'        return;\n'
            b'\n'
-           b'    CloseWindow();\n'
+           b'    KUiInit::CloseWindow();\n'
            b'    KUiConnectInfo::OpenWindow(CI_MI_CONNECTING, LL_S_IN_GAME);\n'
-           b'    g_LoginLogic.DangNhapTuDongTheoCauHinh(szTaiKhoan, MatKhau);'),
-     'ban [AutoLogin] khi man khoi dong hien xong')
+           b'    g_LoginLogic.DangNhapTuDongTheoCauHinh(szTaiKhoan, MatKhau);\n'
+           b'}\n'
+           b'\n'
+           b'int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'ham dang nhap tu dong + co toan cuc')
+
+edit('S3Client/Ui/UiCase/UiInit.cpp',
+     b'\tint nRet = 0;',
+     _crlf(b'\tint nRet = 0;\n'
+           b'\tif (g_bXinDangNhapTuDong)\n'
+           b'\t{\n'
+           b'\t\tg_bXinDangNhapTuDong = false;\n'
+           b'\t\tDangNhapTuDongTheoCauHinh();\n'
+           b'\t\treturn 0;\n'
+           b'\t}'),
+     'ban dang nhap tu dong tu WndProc')
 
 
 # --------------------------------------------------------- header bu ten ham
