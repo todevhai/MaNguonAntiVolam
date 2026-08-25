@@ -892,6 +892,50 @@ for ham, bang in (('g_IsAccrue', 'g_nAccrueSeries'), ('g_IsConquer', 'g_nConquer
           '    return %s[nSrcSeries] == nDesSeries;' % bang).encode('latin-1'),
          'tra bang thay vi goi ma may: %s' % ham)
 
+# ------------------------------------------------- tran nhip ve (CPU 100%)
+# KMyApp::GameLoop gioi han LOGIC o GAME_FPS=18 nhung KHONG gioi han nhip VE:
+# ve xong chi Sleep(1) roi ve tiep. Nam 2003 ve mot khung mat vai ms nen tu no
+# da cham; nay ve xong con thua thoi gian -> vong lap quay het mot loi CPU.
+# Do 25/08/2026 tren cung prefix Wine, cung cua so 800x62x, cung man dang nhap:
+# ban ta 83% CPU, ban voz2 26%. Ho so `sample` cho thay ca hai di cung duong
+# CA::Render::copy_image -> CGContextDrawImage, ban ta nhieu gap ~4 lan mau,
+# tuc ve nhieu gap ~4 lan chu khong phai moi khung dat hon.
+#
+# Khoa [Client] FPS da co san trong config.ini tu doi nao ma nguon KHONG he doc.
+# Dung lai dung no. FPS=0 giu nguyen hanh vi goc.
+edit('S3Client/S3Client.cpp',
+     b'#define\tGAME_FPS\t\t\t18',
+     b'#define\tGAME_FPS\t\t\t18\n'
+     b'\n'
+     b'/* Tran nhip VE, doc tu [Client] FPS trong config.ini. 0 = khong gioi han. */\n'
+     b'int\tg_nTranNhipVe = 0;',
+     'khai bao tran nhip ve')
+
+edit('S3Client/S3Client.cpp',
+     b'\tIniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);',
+     b'\tIniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);\n'
+     b'\tIniFile.GetInteger("Client", "FPS", 0, &g_nTranNhipVe);',
+     'doc [Client] FPS lam tran nhip ve')
+
+edit('S3Client/S3Client.cpp',
+     b'\t\tUiPaint(nGameFps);',
+     b'\t\tif (g_nTranNhipVe <= 0)\n'
+     b'\t\t{\n'
+     b'\t\t\tUiPaint(nGameFps);\n'
+     b'\t\t}\n'
+     b'\t\telse\n'
+     b'\t\t{\n'
+     b'\t\t\t/* GetTickCount quay vong sau 49 ngay; hieu hai DWORD van dung. */\n'
+     b'\t\t\tstatic DWORD\ts_dwVeLanTruoc = 0;\n'
+     b'\t\t\tDWORD\t\tdwBayGio = GetTickCount();\n'
+     b'\t\t\tif ((DWORD)(dwBayGio - s_dwVeLanTruoc) >= (DWORD)(1000 / g_nTranNhipVe))\n'
+     b'\t\t\t{\n'
+     b'\t\t\t\ts_dwVeLanTruoc = dwBayGio;\n'
+     b'\t\t\t\tUiPaint(nGameFps);\n'
+     b'\t\t\t}\n'
+     b'\t\t}',
+     'ap tran nhip ve trong GameLoop')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
