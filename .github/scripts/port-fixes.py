@@ -562,16 +562,35 @@ edit('S3Client/Ui/UiCase/UiInit.cpp',
            b'int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
      'ham dang nhap tu dong + co toan cuc')
 
+# WndProc chi chay khi CO thong diep (chuot/phim). Man khoi dong khong nhan gi
+# thi co khong bao gio duoc tieu thu. Nen ban tu UiPaint() — ham chay MOI KHUNG HINH,
+# va la diem an toan (ngoai luc dung cua so).
+edit('S3Client/Ui/UiCase/UiInit.h',
+     b'#endif // __UIINIT_H__',
+     _crlf(b'//Kiem xem co xin dang nhap tu dong khong; goi moi khung hinh tu UiPaint().\n'
+           b'void KiemDangNhapTuDong();\n'
+           b'\n'
+           b'#endif // __UIINIT_H__'),
+     'khai bao KiemDangNhapTuDong')
+
 edit('S3Client/Ui/UiCase/UiInit.cpp',
-     b'\tint nRet = 0;',
-     _crlf(b'\tint nRet = 0;\n'
-           b'\tif (g_bXinDangNhapTuDong)\n'
-           b'\t{\n'
-           b'\t\tg_bXinDangNhapTuDong = false;\n'
-           b'\t\tDangNhapTuDongTheoCauHinh();\n'
-           b'\t\treturn 0;\n'
-           b'\t}'),
-     'ban dang nhap tu dong tu WndProc')
+     b'int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'void KiemDangNhapTuDong()\n'
+           b'{\n'
+           b'    if (!g_bXinDangNhapTuDong)\n'
+           b'        return;\n'
+           b'    g_bXinDangNhapTuDong = false;\n'
+           b'    DangNhapTuDongTheoCauHinh();\n'
+           b'}\n'
+           b'\n'
+           b'int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'ham KiemDangNhapTuDong')
+
+edit('S3Client/Ui/UiShell.cpp',
+     b'\tif (g_pRepresentShell == NULL ||',
+     _crlf(b'\tKiemDangNhapTuDong();\n'
+           b'\tif (g_pRepresentShell == NULL ||'),
+     'goi KiemDangNhapTuDong moi khung hinh')
 
 
 # --------------------------------------------------------- header bu ten ham
