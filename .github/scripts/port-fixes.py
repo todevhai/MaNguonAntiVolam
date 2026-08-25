@@ -437,24 +437,28 @@ def _crlf(s):
 # thay vi &nValue[2]. Hau qua: nValue[2] giu rac ngan xep, phep kiem
 # `nValue[2] < 256` truot -> GetIpAddress tra false -> MOI may chu trong
 # ServerList.ini bi bo qua -> danh sach may chu rong.
-# Do duoc 25/08/2026: log "[TuDong] so may chu=0" du ServerList.ini co 1 muc hop le.
-edit('S3Client/Login/Login.cpp',
-     b'&nValue[1], &nValue\n',
-     b'&nValue[1], &nValue[2]\n',
-     'GetIpAddress: &nValue -> &nValue[2] (octet thu ba ghi nham cho)')
+# Do duoc 25/08/2026 bang log cua chinh game: "[TuDong] so may chu=0" trong khi
+# settings/ServerList.ini co dung mot muc hop le.
+#
+# Khong dung edit(): mau neo phai KHONG chua ky tu xuong dong (repo checkout ra
+# CRLF tren CI nhung LF tren macOS), ma neu bo xuong dong thi "&nValue" lai nam
+# trong chinh ket qua "&nValue[2]" -> khong con idempotent. Nen tu kiem truoc.
+def fix_getipaddress():
+    global n_ok, n_skip
+    rel = 'S3Client/Login/Login.cpp'
+    p = os.path.join(SRC, rel)
+    if not os.path.exists(p):
+        print('  THIEU FILE %s' % rel); return
+    d = open(p, 'rb').read()
+    if b'&nValue[1], &nValue[2]' in d:
+        print('  bo qua (da va): %s' % rel); n_skip += 1; return
+    if b'&nValue[1], &nValue' not in d:
+        print('  KHONG KHOP: %s  <- GetIpAddress octet thu ba' % rel); n_skip += 1; return
+    d = d.replace(b'&nValue[1], &nValue', b'&nValue[1], &nValue[2]', 1)
+    open(p, 'wb').write(d)
+    print('  va: %-42s GetIpAddress: &nValue -> &nValue[2]' % rel); n_ok += 1
 
-# Log chan doan trong GetServerList: cho biet doc duoc vung nao, bao nhieu may chu.
-edit('S3Client/Login/Login.cpp',
-     b'\t\t\tFile.GetInteger(szSection, "Count", 0, &nReadCount);',
-     b'\t\t\tFile.GetInteger(szSection, "Count", 0, &nReadCount);\n'
-     b'\t\t\tg_DebugLog("[TuDong] vung=%s so muc=%d", szSection, nReadCount);',
-     'log so muc doc duoc trong GetServerList')
-
-edit('S3Client/Login/Login.cpp',
-     b'\tif (File.Load(SERVER_LIST_FILE))\n\t{\n\t\tint\t\tnReadCount = 0;',
-     b'\tg_DebugLog("[TuDong] vung chon=%d, mo %s", nRegion, SERVER_LIST_FILE);\n'
-     b'\tif (File.Load(SERVER_LIST_FILE))\n\t{\n\t\tint\t\tnReadCount = 0;',
-     'log vung chon truoc khi mo ServerList.ini')
+fix_getipaddress()
 
 edit('S3Client/Login/Login.cpp',
      b'#include "KEngine.h"',
