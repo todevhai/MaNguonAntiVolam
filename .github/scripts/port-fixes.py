@@ -737,6 +737,130 @@ for cu, moi, ten in (
 ):
     edit('Core/Src/CoreUseNameDef.h', cu, moi, 'ten cot %s -> %s' % (ten, moi.decode()))
 
+# Doi ten tep giao dien tu GBK sang ASCII cua ta.
+# Ban do va ly do: client/ten-ini-tu-viet.txt trong kho VLTK-Origin.
+# Ten GBK khong song duoc qua nhieu tang: APFS tu choi (Errno 92), va hien
+# chi chay duoc nho mot trung hop trong cach Wine doi ANSI CP1252 sang UTF-8.
+edit('S3Client/Ui/UiChatPhrase.cpp',
+     b'"\\\\Ui\\\\\xc1\xc4\xcc\xec\xb6\xaf\xd7\xf7.ini"',
+     b'"\\\\Ui\\\\dong-tac-chat.ini"',
+     'ten tep EMOTE_INI_FILE -> dong-tac-chat.ini')
+
+edit('S3Client/Ui/UiCase/UiEquip.cpp',
+     b'"\xd7\xb0\xb1\xb8\xb7\xd6\xd2\xb3.ini"',
+     b'"trang-bi-phan-trang.ini"',
+     'ten tep EQUIP_INI_PAGE -> trang-bi-phan-trang.ini')
+
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'"\\\\Ui\\\\\xd4\xd3\xbb\xe2.ini"',
+     b'"\\\\Ui\\\\tap-hop.ini"',
+     'ten tep GAME_CONFIG_STRING_INI -> tap-hop.ini')
+
+edit('S3Client/Ui/UiCase/UiEquip.cpp',
+     b'"\xd7\xb0\xb1\xb8\xc2\xed\xb7\xd6\xd2\xb3.ini"',
+     b'"trang-bi-ngua-phan-trang.ini"',
+     'ten tep HORSE_INI_PAGE -> trang-bi-ngua-phan-trang.ini')
+
+edit('S3Client/Ui/UiCase/UiStrengthRank.cpp',
+     b'"\xc5\xc5\xc3\xfb\xb5\xc4\xc1\xd9\xca\xb1\xce\xc4\xbc\xfe.ini"',
+     b'"xep-hang-tam.ini"',
+     'ten tep INDEX_AND_RANK_DATA_INI -> xep-hang-tam.ini')
+
+edit('S3Client/Ui/GameSpaceChangedNotify.cpp',
+     b'"\\\\Ui\\\\\xd4\xd3\xbb\xe2.ini"',
+     b'"\\\\Ui\\\\tap-hop.ini"',
+     'ten tep LEVEL_TIPS_INI -> tap-hop.ini')
+
+edit('S3Client/Ui/UiCase/UiManage.cpp',
+     b'"\xb0\xef\xc5\xc9\xb9\xdc\xc0\xed.ini"',
+     b'"quan-ly-bang-phai.ini"',
+     'ten tep MANAGE_INI_CLIQUE -> quan-ly-bang-phai.ini')
+
+edit('S3Client/Ui/UiCase/UiManage.cpp',
+     b'"\xb0\xef\xbb\xe1\xb9\xdc\xc0\xed.ini"',
+     b'"quan-ly-bang-hoi.ini"',
+     'ten tep MANAGE_INI_CONFRATERNITY -> quan-ly-bang-hoi.ini')
+
+edit('S3Client/Ui/UiCase/UiManage.cpp',
+     b'"\xb9\xdc\xc0\xed\xd6\xf7\xb4\xb0\xbf\xda.ini"',
+     b'"quan-ly-cua-so-chinh.ini"',
+     'ten tep MANAGE_INI_SHEET -> quan-ly-cua-so-chinh.ini')
+
+edit('S3Client/Ui/UiCase/UiEquip.cpp',
+     b'"\xd7\xb0\xb1\xb8.ini"',
+     b'"trang-bi.ini"',
+     'ten tep SCHEME_INI_EQUIP -> trang-bi.ini')
+
+edit('S3Client/Ui/UiCase/UiNewPlayer2.cpp',
+     b'"\xd0\xc2\xbd\xa8\xbd\xc7\xc9\xab\xd1\xa1\xca\xf4\xd0\xd4.ini"',
+     b'"tao-nhan-vat-chon-thuoc-tinh.ini"',
+     'ten tep SCHEME_INI_NEWPLAYER2 -> tao-nhan-vat-chon-thuoc-tinh.ini')
+
+edit('S3Client/Ui/UiCase/UiSelDlg.cpp',
+     b'"\xb6\xe0\xcf\xee\xd1\xa1\xd4\xf1\xbd\xe7\xc3\xe6.ini"',
+     b'"chon-nhieu-muc.ini"',
+     'ten tep SCHEME_INI_SELDLG -> chon-nhieu-muc.ini')
+
+edit('S3Client/Ui/UiCase/UiUpdatePatch.cpp',
+     b'"\xcf\xc2\xd4\xd8\xb2\xb9\xb6\xa4.ini"',
+     b'"tai-ban-va.ini"',
+     'ten tep SCHEME_INI_UPDATAPATCH -> tai-ban-va.ini')
+
+edit('S3Client/Ui/UiCase/UiTongManager.cpp',
+     b'"\xb0\xef\xbb\xe1\xc1\xd9\xca\xb1\xce\xc4\xbc\xfe.ini"',
+     b'"bang-hoi-tam.ini"',
+     'ten tep TONG_DATA_TEMP_FILE -> bang-hoi-tam.ini')
+
+edit('Core/Src/CoreUseNameDef.h',
+     b'"\\\\Ui\\\\Default\\\\\xd0\xa1\xb5\xd8\xcd\xbc\xd1\xd5\xc9\xab.ini"',
+     b'"\\\\Ui\\\\Default\\\\mau-ban-do-nho.ini"',
+     'ten tep defLITTLE_MAP_SET_FILE -> mau-ban-do-nho.ini')
+
+edit('S3Client/Ui/UiCase/UiFriendInterview.cpp',
+     b'"\xc4\xe3\xd2\xbb\xbe\xe4\xce\xd2\xd2\xbb\xbe\xe4\xc1\xc4\xcc\xec.ini"',
+     b'"chat-doi-dap.ini"',
+     'ten tep SCHEME_INI -> chat-doi-dap.ini')
+
+edit('S3Client/Ui/UiCase/UiTeamApply.cpp',
+     b'"\xbc\xd3\xc8\xeb\xd7\xe9\xb6\xd3.ini"',
+     b'"gia-nhap-doi.ini"',
+     'ten tep SCHEME_INI -> gia-nhap-doi.ini')
+
+edit('S3Client/Ui/UiCase/UiFastInputMsg.cpp',
+     b'"\xbf\xec\xcb\xd9\xca\xe4\xc8\xeb\xcf\xfb\xcf\xa2\xbd\xe7\xc3\xe6.ini"',
+     b'"nhap-nhanh-tin-nhan.ini"',
+     'ten tep SCHEME_INI -> nhap-nhanh-tin-nhan.ini')
+
+edit('S3Client/Ui/UiCase/UiTeamNew.cpp',
+     b'"\xd0\xc2\xbd\xa8\xb6\xd3\xce\xe9.ini"',
+     b'"tao-doi-moi.ini"',
+     'ten tep SCHEME_INI -> tao-doi-moi.ini')
+
+edit('S3Client/Ui/UiCase/UiEquip.cpp',
+     b'"\xd7\xb0\xb1\xb8\xb7\xd6\xd2\xb3.ini"',
+     b'"trang-bi-phan-trang.ini"',
+     'ten tep EQUIP_INI_PAGE -> trang-bi-phan-trang.ini')
+
+edit('S3Client/Ui/UiCase/UiEquip.cpp',
+     b'"\xd7\xb0\xb1\xb8\xc2\xed\xb7\xd6\xd2\xb3.ini"',
+     b'"trang-bi-ngua-phan-trang.ini"',
+     'ten tep HORSE_INI_PAGE -> trang-bi-ngua-phan-trang.ini')
+
+edit('S3Client/Ui/UiCase/UiManage.cpp',
+     b'"\xb9\xdc\xc0\xed\xd6\xf7\xb4\xb0\xbf\xda.ini"',
+     b'"quan-ly-cua-so-chinh.ini"',
+     'ten tep MANAGE_INI_SHEET -> quan-ly-cua-so-chinh.ini')
+
+edit('S3Client/Ui/UiCase/UiManage.cpp',
+     b'"\xb0\xef\xc5\xc9\xb9\xdc\xc0\xed.ini"',
+     b'"quan-ly-bang-phai.ini"',
+     'ten tep MANAGE_INI_CLIQUE -> quan-ly-bang-phai.ini')
+
+edit('S3Client/Ui/UiCase/UiManage.cpp',
+     b'"\xb0\xef\xbb\xe1\xb9\xdc\xc0\xed.ini"',
+     b'"quan-ly-bang-hoi.ini"',
+     'ten tep MANAGE_INI_CONFRATERNITY -> quan-ly-bang-hoi.ini')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
