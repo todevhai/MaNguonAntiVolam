@@ -9,30 +9,30 @@ import os, sys, re
 ROOT = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else '.')
 SRC  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Sources')
 LIB  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Lib')
-n_ok = n_skip = 0
+n_ok = n_skip = n_hong = 0
 
 def edit(rel, old, new, why):
     """Thay chinh xac mot chuoi byte. Bao 'da vá roi' neu khong tim thay old nhung thay new."""
-    global n_ok, n_skip
+    global n_ok, n_skip, n_hong
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
-        print('  THIEU FILE %s' % rel); return
+        print('  THIEU FILE %s' % rel); n_hong += 1; return
     d = open(p, 'rb').read()
     if old not in d:
         if new in d:
             print('  bo qua (da va): %s' % rel); n_skip += 1
         else:
-            print('  KHONG KHOP: %s  <- %s' % (rel, why)); n_skip += 1
+            print('  KHONG KHOP: %s  <- %s' % (rel, why)); n_hong += 1
         return
     open(p, 'wb').write(d.replace(old, new, 1))
     print('  va: %-42s %s' % (rel, why)); n_ok += 1
 
 def edit_all(rel, old, new, why):
     """Thay MOI lan xuat hien."""
-    global n_ok, n_skip
+    global n_ok, n_skip, n_hong
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
-        print('  THIEU FILE %s' % rel); return
+        print('  THIEU FILE %s' % rel); n_hong += 1; return
     d = open(p, 'rb').read()
     c = d.count(old)
     if c == 0:
@@ -43,20 +43,20 @@ def edit_all(rel, old, new, why):
 def edit_after(rel, anchor, old, new, why, window=400):
     """Va lan xuat hien dau tien cua `old` nam trong `window` byte sau `anchor`.
     Dung khi chuoi can sua xuat hien nhieu lan trong file nhung chi mot cho sai."""
-    global n_ok, n_skip
+    global n_ok, n_skip, n_hong
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
-        print('  THIEU FILE %s' % rel); return
+        print('  THIEU FILE %s' % rel); n_hong += 1; return
     d = open(p, 'rb').read()
     a = d.find(anchor)
     if a < 0:
-        print('  KHONG THAY MOC: %s  <- %s' % (rel, why)); n_skip += 1; return
+        print('  KHONG THAY MOC: %s  <- %s' % (rel, why)); n_hong += 1; return
     seg = d[a:a+window]
     if old not in seg:
         if new in seg:
             print('  bo qua (da va): %s' % rel); n_skip += 1
         else:
-            print('  KHONG KHOP: %s  <- %s' % (rel, why)); n_skip += 1
+            print('  KHONG KHOP: %s  <- %s' % (rel, why)); n_hong += 1
         return
     d = d[:a] + seg.replace(old, new, 1) + d[a+window:]
     open(p, 'wb').write(d)
@@ -218,11 +218,11 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
 # Bang con tro ham thanh vien: MSVC doi phai co & truoc ten ham thanh vien.
 # Truoc day trinh dich cho phep bo, gio bao C3867. 101 cho, cung mot dang.
 def fix_member_fnptr():
-    global n_ok, n_skip
+    global n_ok, n_skip, n_hong
     rel = 'Core/Src/KProtocolProcess.cpp'
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
-        print('  THIEU FILE %s' % rel); return
+        print('  THIEU FILE %s' % rel); n_hong += 1; return
     d = open(p, 'rb').read()
     pat = re.compile(rb'(ProcessFunc\[[^\]\n]+\]\s*=\s*)(?!&|NULL\b|0\b)([A-Za-z_][A-Za-z_0-9]*)(\s*;)')
     n = [0]
@@ -444,16 +444,16 @@ def _crlf(s):
 # CRLF tren CI nhung LF tren macOS), ma neu bo xuong dong thi "&nValue" lai nam
 # trong chinh ket qua "&nValue[2]" -> khong con idempotent. Nen tu kiem truoc.
 def fix_getipaddress():
-    global n_ok, n_skip
+    global n_ok, n_skip, n_hong
     rel = 'S3Client/Login/Login.cpp'
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
-        print('  THIEU FILE %s' % rel); return
+        print('  THIEU FILE %s' % rel); n_hong += 1; return
     d = open(p, 'rb').read()
     if b'&nValue[1], &nValue[2]' in d:
         print('  bo qua (da va): %s' % rel); n_skip += 1; return
     if b'&nValue[1], &nValue' not in d:
-        print('  KHONG KHOP: %s  <- GetIpAddress octet thu ba' % rel); n_skip += 1; return
+        print('  KHONG KHOP: %s  <- GetIpAddress octet thu ba' % rel); n_hong += 1; return
     d = d.replace(b'&nValue[1], &nValue', b'&nValue[1], &nValue[2]', 1)
     open(p, 'wb').write(d)
     print('  va: %-42s GetIpAddress: &nValue -> &nValue[2]' % rel); n_ok += 1
@@ -914,4 +914,8 @@ open(compat, 'wb').write(b'''/* Nap cuong buc khi dung Core (/FI). Engine khai b
 #endif
 ''')
 print('\ntao %s' % os.path.relpath(compat, ROOT))
-print('\n=== va %d cho, bo qua %d ===' % (n_ok, n_skip))
+print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
+# Mau neo truot (thuong do CRLF) tung lam CI xanh trong khi Game.exe chua he
+# duoc va. Hong mot cho la hong ca ban dung -> dung han.
+if n_hong:
+    sys.exit(1)
