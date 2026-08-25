@@ -443,6 +443,19 @@ edit('S3Client/Login/Login.cpp',
      b'&nValue[1], &nValue[2]\n',
      'GetIpAddress: &nValue -> &nValue[2] (octet thu ba ghi nham cho)')
 
+# Log chan doan trong GetServerList: cho biet doc duoc vung nao, bao nhieu may chu.
+edit('S3Client/Login/Login.cpp',
+     b'\t\t\tFile.GetInteger(szSection, "Count", 0, &nReadCount);',
+     b'\t\t\tFile.GetInteger(szSection, "Count", 0, &nReadCount);\n'
+     b'\t\t\tg_DebugLog("[TuDong] vung=%s so muc=%d", szSection, nReadCount);',
+     'log so muc doc duoc trong GetServerList')
+
+edit('S3Client/Login/Login.cpp',
+     b'\tif (File.Load(SERVER_LIST_FILE))\n\t{\n\t\tint\t\tnReadCount = 0;',
+     b'\tg_DebugLog("[TuDong] vung chon=%d, mo %s", nRegion, SERVER_LIST_FILE);\n'
+     b'\tif (File.Load(SERVER_LIST_FILE))\n\t{\n\t\tint\t\tnReadCount = 0;',
+     'log vung chon truoc khi mo ServerList.ini')
+
 edit('S3Client/Login/Login.cpp',
      b'#include "KEngine.h"',
      b'#include "KEngine.h"\r\n#include "KDebug.h"',
