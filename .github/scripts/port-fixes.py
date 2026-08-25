@@ -611,6 +611,27 @@ edit('S3Client/Login/Login.cpp',
            b'\t\tm_Status = LL_S_IN_GAME;'),
      'log khi client coi la da vao game')
 
+# ProcessToLoginGameServResponse so ten tai khoan bang cach DAO BIT m_Choices.Account.
+# SetAccountPassword dung strncpy (dem bang '\0') roi dao ca 32 byte, nen ban tham
+# chieu pzAc la "taikhoanthu" + 21 byte 0xFF. Goi tu cong vao lai dem bang '\0'.
+# strcmp gap 0x00 vs 0xFF o vi tri 11 -> KHONG BAO GIO khop voi tai khoan ngan hon
+# 32 ky tu -> client bo qua goi va khong noi toi world server.
+# Chinh tac gia ban nay da COMMENT phep so do trong ham anh em ProcessGetRoleResponse.
+# Nen: giu phep so TEN NHAN VAT, bo phep so tai khoan.
+edit('S3Client/Login/Login.cpp',
+     b'&& strcmp((const char*)pResponse->szAccountName, pzAc) == 0)',
+     b'/* bo phep so tai khoan: pzAc dem bang 0xFF nen khong bao gio khop */)',
+     'bo phep so tai khoan khong bao gio khop trong notifyplayerlogin')
+
+edit('S3Client/Login/Login.cpp',
+     b'\t\t\tif (g_NetConnectAgent.ConnectToGameSvr(',
+     _crlf(b'\t\t\tg_DebugLog("[TuDong] noi world server %d.%d.%d.%d:%d",\n'
+           b'\t\t\t\t((unsigned char*)&pResponse->nIPAddr)[0], ((unsigned char*)&pResponse->nIPAddr)[1],\n'
+           b'\t\t\t\t((unsigned char*)&pResponse->nIPAddr)[2], ((unsigned char*)&pResponse->nIPAddr)[3],\n'
+           b'\t\t\t\t(int)pResponse->nPort);\n'
+           b'\t\t\tif (g_NetConnectAgent.ConnectToGameSvr('),
+     'log dia chi world server truoc khi noi')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
