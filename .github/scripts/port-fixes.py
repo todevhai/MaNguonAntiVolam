@@ -650,6 +650,24 @@ edit('S3Client/NetConnect/NetConnectAgent.cpp',
            b'\t\t\t\t\tg_pCoreShell->NetMsgCallbackFunc(pMsg);'),
      'log tung opcode va kich thuoc bang tra ve')
 
+# Log duong dung nhan vat phia client: s2c_syncnpc tao doi tuong, s2c_syncplayer
+# dat trang bi, s2c_synccurplayer gan nhan vat cua minh. Neu mot khau tra chi so 0
+# thi khong co gi de ve.
+edit('Core/Src/KProtocolProcess.cpp',
+     b'\t\tnIdx = NpcSet.Add(NpcSync->NpcSettingIdx, 0, NpcSync->MapX, NpcSync->MapY);',
+     _crlf(b'\t\tnIdx = NpcSet.Add(NpcSync->NpcSettingIdx, 0, NpcSync->MapX, NpcSync->MapY);\n'
+           b'\t\tg_DebugLog("[TuDong] SyncNpc: mau=%d cap=%d vitri=%d,%d -> nIdx=%d",\n'
+           b'\t\t\t(int)(short)HIWORD(NpcSync->NpcSettingIdx), (int)LOWORD(NpcSync->NpcSettingIdx),\n'
+           b'\t\t\t(int)NpcSync->MapX, (int)NpcSync->MapY, nIdx);'),
+     'log SyncNpc tao doi tuong')
+
+edit('Core/Src/KPlayer.cpp',
+     b'\tthis->m_nIndex = NpcSet.SearchID(PlaySync->m_dwID);',
+     _crlf(b'\tthis->m_nIndex = NpcSet.SearchID(PlaySync->m_dwID);\n'
+           b'\tg_DebugLog("[TuDong] SyncCurPlayer: dwID=%u -> m_nIndex=%d",\n'
+           b'\t\t(unsigned)PlaySync->m_dwID, this->m_nIndex);'),
+     'log SyncCurPlayer tim doi tuong')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
