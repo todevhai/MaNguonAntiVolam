@@ -668,6 +668,34 @@ edit('Core/Src/KPlayer.cpp',
            b'\t\t(unsigned)PlaySync->m_dwID, this->m_nIndex);'),
      'log SyncCurPlayer tim doi tuong')
 
+# KNpc::Load voi nhan vat NGUOI CHOI dat szNpcTypeName = "" (nhanh bi rut ruot),
+# ma KNpcRes::Init tra FALSE ngay khi ten rong (KNpcRes.cpp:58) -> m_DataRes khong
+# bao gio duoc dung -> m_DataRes.Draw() trong KNpc::Paint khong ve gi.
+#
+# Ten loai tai nguyen nam san trong settings/npcres/<nhan vat>.txt: dong 2 la
+# MainMan, dong 3 la MainLady. Nhanh NPC thuong ngay ben duoi da lay dung bang
+# nay bang g_NpcKindFile.GetString(2, ...), chi nhanh nguoi choi la bo trong.
+edit('Core/Src/KNpc.cpp',
+     b'\t\t\tm_StandFrame = NpcSet.GetPlayerStandFrame(TRUE);',
+     _crlf(b'\t\t\t/* dong 2 cua bang loai nhan vat = MainMan */\n'
+           b'\t\t\tg_NpcKindFile.GetString(2, "", "", szNpcTypeName, sizeof(szNpcTypeName));\n'
+           b'\t\t\tm_StandFrame = NpcSet.GetPlayerStandFrame(TRUE);'),
+     'lay ten tai nguyen nam nhan vat tu bang loai')
+
+edit('Core/Src/KNpc.cpp',
+     b'\t\t\tm_StandFrame = NpcSet.GetPlayerStandFrame(FALSE);',
+     _crlf(b'\t\t\t/* dong 3 cua bang loai nhan vat = MainLady */\n'
+           b'\t\t\tg_NpcKindFile.GetString(3, "", "", szNpcTypeName, sizeof(szNpcTypeName));\n'
+           b'\t\t\tm_StandFrame = NpcSet.GetPlayerStandFrame(FALSE);'),
+     'lay ten tai nguyen nu nhan vat tu bang loai')
+
+edit('Core/Src/KNpc.cpp',
+     b'\tm_DataRes.Init(szNpcTypeName, &g_NpcResList);',
+     _crlf(b'\tg_DebugLog("[TuDong] KNpc::Load mau=%d ten tai nguyen=\\"%s\\" -> Init=%d",\n'
+           b'\t\tnNpcSettingIdx, szNpcTypeName,\n'
+           b'\t\t(int)m_DataRes.Init(szNpcTypeName, &g_NpcResList));'),
+     'log ket qua dung tai nguyen hinh')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
