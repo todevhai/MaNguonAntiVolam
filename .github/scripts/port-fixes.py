@@ -876,11 +876,12 @@ for ham, bang in (('g_DirSin', 'g_nSin'), ('g_DirCos', 'g_nCos')):
     edit('Core/Src/KMath.h',
          ('inline int %s(int nDir, int nMaxDir)\n{\n    return (*(g_InternalDirSinCosFunction *)(&(g_InternalDirSinCosCode[0])))(%s, nDir, nMaxDir);\n}' % (ham, bang)).encode('latin-1'),
          ('inline int %s(int nDir, int nMaxDir)\n{\n'
-          '    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault. */\n'
-          '    if (nMaxDir <= 0)\n'
-          '        return 0;\n'
-          '    int d = (nDir * 64) / nMaxDir;\n'
-          '    return %s[((d %% 64) + 64) %% 64];\n}' % (ham, bang)).encode('latin-1'),
+          '    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault.\n'
+          '       Chep dung ban C tuong duong dat trong comment o KMath.cpp,\n'
+          '       ke ca viec tra -1 khi huong ngoai khoang (ma may: 83 C8 FF). */\n'
+          '    if (nDir < 0 || nDir >= nMaxDir)\n'
+          '        return -1;\n'
+          '    return %s[(nDir << 6) / nMaxDir];\n}' % (ham, bang)).encode('latin-1'),
          'tra bang thay vi goi ma may: %s' % ham)
 
 for ham, bang in (('g_IsAccrue', 'g_nAccrueSeries'), ('g_IsConquer', 'g_nConquerSeries')):
