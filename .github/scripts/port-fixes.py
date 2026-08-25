@@ -465,6 +465,12 @@ edit('S3Client/Login/Login.cpp',
      b'#include "KEngine.h"\r\n#include "KDebug.h"',
      'them KDebug.h cho g_DebugLog')
 
+# KiemDangNhapTuDong goi KSG_StringToMD5String nen phai keo header vao.
+edit('S3Client/Ui/UiCase/UiInit.cpp',
+     b'#include "KIniFile.h"',
+     b'#include "KIniFile.h"\n#include "KSG_MD5_String.h"',
+     'them KSG_MD5_String.h cho UiInit')
+
 edit('S3Client/Ui/UiCase/UiInit.cpp',
      b'#include "KIniFile.h"',
      b'#include "KIniFile.h"\r\n#include "KDebug.h"',
@@ -549,7 +555,19 @@ edit('S3Client/Ui/UiCase/UiInit.cpp',
            b'    szTaiKhoan[0] = 0;\n'
            b'    memset(&MatKhau, 0, sizeof(MatKhau));\n'
            b'    Ini.GetString("AutoLogin", "Account", "", szTaiKhoan, sizeof(szTaiKhoan));\n'
-           b'    Ini.GetString("AutoLogin", "Password", "", MatKhau.szPassword, sizeof(MatKhau.szPassword));\n'
+           b'    char szMatKhauTho[KSG_PASSWORD_MAX_SIZE];\n'
+           b'    szMatKhauTho[0] = 0;\n'
+           b'    Ini.GetString("AutoLogin", "Password", "", szMatKhauTho, sizeof(szMatKhauTho));\n'
+           b'    /* Phai di DUNG duong ma giao dien di (UiLogin.cpp:316), khong thi\n'
+           b'       tu dang nhap gui mat khau THO con go tay gui MD5 -> cung mot tai\n'
+           b'       khoan ma hai bi mat khac nhau, duong nao dang ky truoc thi duong\n'
+           b'       kia bi khoa ngoai. Chi lo ra khi may chu bat kiem mat khau. */\n'
+           b'#ifdef SWORDONLINE_USE_MD5_PASSWORD\n'
+           b'    KSG_StringToMD5String(MatKhau.szPassword, szMatKhauTho);\n'
+           b'#else\n'
+           b'    strncpy(MatKhau.szPassword, szMatKhauTho, sizeof(MatKhau.szPassword) - 1);\n'
+           b'#endif\n'
+           b'    memset(szMatKhauTho, 0, sizeof(szMatKhauTho));\n'
            b'    g_DebugLog("[TuDong] Setting.ini Enable=%d Account=\\"%s\\"", nBat, szTaiKhoan);\n'
            b'    if (!szTaiKhoan[0])\n'
            b'        return;\n'
