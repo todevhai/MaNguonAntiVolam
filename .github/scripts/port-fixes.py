@@ -433,6 +433,16 @@ print('\nDang nhap tu dong theo cau hinh:')
 def _crlf(s):
     return s.replace(b'\n', b'\r\n')
 
+edit('S3Client/Login/Login.cpp',
+     b'#include "KEngine.h"',
+     b'#include "KEngine.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho g_DebugLog')
+
+edit('S3Client/Ui/UiCase/UiInit.cpp',
+     b'#include "KIniFile.h"',
+     b'#include "KIniFile.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho g_DebugLog')
+
 edit('S3Client/Login/Login.h',
      b'\tvoid AutoLogin();',
      _crlf(b'\tvoid AutoLogin();\n'
@@ -461,12 +471,18 @@ edit('S3Client/Login/Login.cpp',
            b'\tKLoginServer* pList = GetServerList(-1, nCount, nSel);\n'
            b'\tif (pList)\n'
            b'\t\tfree(pList);\n'
+           b'\tg_DebugLog("[TuDong] tai khoan=%s so may chu=%d dia chi=%d.%d.%d.%d",\n'
+           b'\t\tpszAccount, nCount,\n'
+           b'\t\tm_Choices.AccountServer.Address[0], m_Choices.AccountServer.Address[1],\n'
+           b'\t\tm_Choices.AccountServer.Address[2], m_Choices.AccountServer.Address[3]);\n'
            b'\tif (nCount <= 0)\n'
            b'\t{\n'
            b'\t\tm_bInAutoProgress = false;\n'
            b'\t\treturn false;\n'
            b'\t}\n'
-           b'\treturn CreateConnection(m_Choices.AccountServer.Address);\n'
+           b'\tint nNoi = CreateConnection(m_Choices.AccountServer.Address);\n'
+           b'\tg_DebugLog("[TuDong] CreateConnection tra %d, trang thai %d", nNoi, (int)m_Status);\n'
+           b'\treturn nNoi;\n'
            b'}\n'
            b'\n'
            b'void KLogin::AutoLogin()'),
@@ -499,6 +515,7 @@ edit('S3Client/Ui/UiCase/UiInit.cpp',
            b'    memset(&MatKhau, 0, sizeof(MatKhau));\n'
            b'    Ini.GetString("AutoLogin", "Account", "", szTaiKhoan, sizeof(szTaiKhoan));\n'
            b'    Ini.GetString("AutoLogin", "Password", "", MatKhau.szPassword, sizeof(MatKhau.szPassword));\n'
+           b'    g_DebugLog("[TuDong] Setting.ini Enable=%d Account=\\"%s\\"", nBat, szTaiKhoan);\n'
            b'    if (!szTaiKhoan[0])\n'
            b'        return;\n'
            b'\n'
