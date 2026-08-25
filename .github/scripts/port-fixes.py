@@ -696,6 +696,24 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t(int)m_DataRes.Init(szNpcTypeName, &g_NpcResList));'),
      'log ket qua dung tai nguyen hinh')
 
+# Log tung cua ai trong KNpcResNode::Init de biet dung cho nao tra FALSE.
+edit('Core/Src/KNpcResNode.cpp',
+     b'#include\t"KFilePath.h"',
+     b'#include\t"KFilePath.h"\r\n#include\t"KDebug.h"',
+     'them KDebug.h cho g_DebugLog')
+
+edit('Core/Src/KNpcResNode.cpp',
+     b'\tnFindNo = KindFile.FindRow(lpszNpcName);',
+     _crlf(b'\tnFindNo = KindFile.FindRow(lpszNpcName);\n'
+           b'\tg_DebugLog("[TuDong] ResNode \\"%s\\": dong trong bang = %d", lpszNpcName, nFindNo);'),
+     'log tim dong trong bang loai nhan vat')
+
+edit('Core/Src/KNpcResNode.cpp',
+     b'\t\tif ( !PartFile.Load(szBuf) )',
+     _crlf(b'\t\tg_DebugLog("[TuDong] ResNode: tep bo phan = \\"%s\\"", szBuf);\n'
+           b'\t\tif ( !PartFile.Load(szBuf) )'),
+     'log tep danh sach bo phan')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
