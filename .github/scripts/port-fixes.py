@@ -714,6 +714,29 @@ edit('Core/Src/KNpcResNode.cpp',
            b'\t\tif ( !PartFile.Load(szBuf) )'),
      'log tep danh sach bo phan')
 
+# Bang settings/npcres/<nhan vat>.txt trong bo du lieu ta dung co dong tieu de
+# bang TIENG ANH:
+#   CharacterName CharacterType ResFilePath PartFileName WeaponActionTab1
+#   WeaponActionTab2 ActionRenderOrderTab Head Hair Shoulder Body ...
+# con nguon tra cot bang TEN TIENG TRUNG -> khong khop -> GetString tra rong ->
+# KNpcResNode::Init tra FALSE -> nhan vat khong co bo hinh nao.
+# Do duoc 25/08/2026: log "ResNode MainMan: dong trong bang = 2" chay qua, nhung
+# log ke tiep (tep bo phan) khong bao gio in ra.
+#
+# Doi dinh nghia sang dung ten cot cua du lieu. Gia tri CharacterType cung vay:
+# du lieu ghi 'SpecialNpc'/'NormalNpc' chu khong phai chu Trung.
+for cu, moi, ten in (
+        (b'"\xc8\xcb\xce\xef\xc0\xe0\xd0\xcd"', b'"CharacterType"', 'KIND_NAME_SECT'),
+        (b'"\xcc\xd8\xca\xe2npc"', b'"SpecialNpc"', 'KIND_NAME_SPECIAL'),
+        (b'"\xc6\xd5\xcd\xa8npc"', b'"NormalNpc"', 'KIND_NAME_NORMAL'),
+        (b'"\xb2\xbf\xbc\xfe\xcb\xb5\xc3\xf7\xce\xc4\xbc\xfe\xc3\xfb"', b'"PartFileName"', 'KIND_FILE_SECT1'),
+        (b'"\xce\xe4\xc6\xf7\xd0\xd0\xce\xaa\xb9\xd8\xc1\xaa\xb1\xed1"', b'"WeaponActionTab1"', 'KIND_FILE_SECT2'),
+        (b'"\xce\xe4\xc6\xf7\xd0\xd0\xce\xaa\xb9\xd8\xc1\xaa\xb1\xed2"', b'"WeaponActionTab2"', 'KIND_FILE_SECT3'),
+        (b'"\xb6\xaf\xd7\xf7\xcc\xf9\xcd\xbc\xcb\xb3\xd0\xf2\xb1\xed"', b'"ActionRenderOrderTab"', 'KIND_FILE_SECT4'),
+        (b'"\xd7\xca\xd4\xb4\xce\xc4\xbc\xfe\xc2\xb7\xbe\xad"', b'"ResFilePath"', 'KIND_FILE_SECT5'),
+):
+    edit('Core/Src/CoreUseNameDef.h', cu, moi, 'ten cot %s -> %s' % (ten, moi.decode()))
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
