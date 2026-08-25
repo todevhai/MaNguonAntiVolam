@@ -417,6 +417,97 @@ for d in ('Lib/release', 'Lib/debug',
     os.makedirs(full, exist_ok=True)
     print('  %s' % os.path.relpath(full, ROOT))
 
+# ------------------------------------------------- dang nhap tu dong cua ta
+# Nguon co san mot duong tu dang nhap (KLogin::AutoLogin, ban bang Alt+A tren
+# man khoi dong), nhung no doi ba thu: config.ini [Main] AutoLogin=6323, tai
+# khoan/mat khau da ma hoa trong UserData\UiCommon.ini, VA ten nhan vat trong
+# UserData\<id>\UiConfig.ini. Cai cuoi la vong tron: <id> chi sinh ra tu
+# (tai khoan + ten nhan vat) SAU lan dang nhap dau tien, nen tren mot may sach
+# IsAutoLoginEnable() luon tra false.
+#
+# Ta so huu nguon nen khong phai cam ngoai hay ghi thang vao bo nho: them mot
+# duong vao doc [AutoLogin] trong \Ui\Setting.ini. Khong hook, khong dia chi
+# cung, song cung binary cua ta.
+print('\nDang nhap tu dong theo cau hinh:')
+
+def _crlf(s):
+    return s.replace(b'\n', b'\r\n')
+
+edit('S3Client/Login/Login.h',
+     b'\tvoid AutoLogin();',
+     _crlf(b'\tvoid AutoLogin();\n'
+           b'\t//Dang nhap tu dong tu tai khoan cho san, khong qua UserData\\<id>\\UiConfig.ini\n'
+           b'\tint\tDangNhapTuDongTheoCauHinh(const char* pszAccount, const KSG_PASSWORD& crPassword);'),
+     'khai bao DangNhapTuDongTheoCauHinh')
+
+edit('S3Client/Login/Login.cpp',
+     b'void KLogin::AutoLogin()',
+     _crlf(b'/* Dang nhap tu dong tu tai khoan + mat khau cho san.\n'
+           b'   Khac AutoLogin() goc o cho khong doi ten nhan vat va ten may chu da luu:\n'
+           b'   danh sach nhan vat ve toi dau thi m_bInAutoProgress tu chon muc dau tien,\n'
+           b'   con dia chi may chu lay tu Settings\\ServerList.ini. */\n'
+           b'int KLogin::DangNhapTuDongTheoCauHinh(const char* pszAccount, const KSG_PASSWORD& crPassword)\n'
+           b'{\n'
+           b'\tif (!pszAccount || !pszAccount[0])\n'
+           b'\t\treturn false;\n'
+           b'\n'
+           b'\tReturnToIdle();\n'
+           b'\tLoadLoginChoice();\t\t\t/* memset m_Choices - phai goi TRUOC khi dat tai khoan */\n'
+           b'\tSetAccountPassword(pszAccount, &crPassword);\n'
+           b'\tm_bInAutoProgress = true;\n'
+           b'\n'
+           b'\tint nCount = 0, nSel = 0;\n'
+           b'\t/* Ham nay dong thoi dien m_Choices.AccountServer.Address tu ServerList.ini */\n'
+           b'\tKLoginServer* pList = GetServerList(-1, nCount, nSel);\n'
+           b'\tif (pList)\n'
+           b'\t\tfree(pList);\n'
+           b'\tif (nCount <= 0)\n'
+           b'\t{\n'
+           b'\t\tm_bInAutoProgress = false;\n'
+           b'\t\treturn false;\n'
+           b'\t}\n'
+           b'\treturn CreateConnection(m_Choices.AccountServer.Address);\n'
+           b'}\n'
+           b'\n'
+           b'void KLogin::AutoLogin()'),
+     'them KLogin::DangNhapTuDongTheoCauHinh')
+
+edit('S3Client/Ui/UiCase/UiInit.cpp',
+     b'    m_EnterGame.SetCursorAbove();',
+     _crlf(b'    m_EnterGame.SetCursorAbove();\n'
+           b'\n'
+           b'    /* Man khoi dong da hien xong -> thu dang nhap tu dong theo cau hinh cua ta.\n'
+           b'       Chi thu MOT lan cho moi lan chay. */\n'
+           b'    static bool bDaThuDangNhap = false;\n'
+           b'    if (bDaThuDangNhap)\n'
+           b'        return;\n'
+           b'    bDaThuDangNhap = true;\n'
+           b'\n'
+           b'    char szTepCauHinh[] = "\\\\Ui\\\\Setting.ini";\n'
+           b'    KIniFile Ini;\n'
+           b'    if (!Ini.Load(szTepCauHinh))\n'
+           b'        return;\n'
+           b'\n'
+           b'    int nBat = 0;\n'
+           b'    Ini.GetInteger("AutoLogin", "Enable", 0, &nBat);\n'
+           b'    if (!nBat)\n'
+           b'        return;\n'
+           b'\n'
+           b'    char szTaiKhoan[32];\n'
+           b'    KSG_PASSWORD MatKhau;\n'
+           b'    szTaiKhoan[0] = 0;\n'
+           b'    memset(&MatKhau, 0, sizeof(MatKhau));\n'
+           b'    Ini.GetString("AutoLogin", "Account", "", szTaiKhoan, sizeof(szTaiKhoan));\n'
+           b'    Ini.GetString("AutoLogin", "Password", "", MatKhau.szPassword, sizeof(MatKhau.szPassword));\n'
+           b'    if (!szTaiKhoan[0])\n'
+           b'        return;\n'
+           b'\n'
+           b'    CloseWindow();\n'
+           b'    KUiConnectInfo::OpenWindow(CI_MI_CONNECTING, LL_S_IN_GAME);\n'
+           b'    g_LoginLogic.DangNhapTuDongTheoCauHinh(szTaiKhoan, MatKhau);'),
+     'ban [AutoLogin] khi man khoi dong hien xong')
+
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
