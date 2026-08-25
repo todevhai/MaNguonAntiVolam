@@ -433,6 +433,16 @@ print('\nDang nhap tu dong theo cau hinh:')
 def _crlf(s):
     return s.replace(b'\n', b'\r\n')
 
+# DOI HANH VI: sscanf ghi octet thu ba vao &nValue (dia chi CA MANG = &nValue[0])
+# thay vi &nValue[2]. Hau qua: nValue[2] giu rac ngan xep, phep kiem
+# `nValue[2] < 256` truot -> GetIpAddress tra false -> MOI may chu trong
+# ServerList.ini bi bo qua -> danh sach may chu rong.
+# Do duoc 25/08/2026: log "[TuDong] so may chu=0" du ServerList.ini co 1 muc hop le.
+edit('S3Client/Login/Login.cpp',
+     b'&nValue[1], &nValue\n',
+     b'&nValue[1], &nValue[2]\n',
+     'GetIpAddress: &nValue -> &nValue[2] (octet thu ba ghi nham cho)')
+
 edit('S3Client/Login/Login.cpp',
      b'#include "KEngine.h"',
      b'#include "KEngine.h"\r\n#include "KDebug.h"',
