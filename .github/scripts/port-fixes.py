@@ -872,25 +872,24 @@ edit('S3Client/Ui/UiCase/UiManage.cpp',
 #
 # g_IsAccrue/g_IsConquer (khac che ngu hanh) dung dung meo do; bang cua chung
 # da duoc g_InitSeries() dien san.
+# Neo MOT DONG: CI checkout ra CRLF nen mau neo chua \n khong bao gio khop.
 for ham, bang in (('g_DirSin', 'g_nSin'), ('g_DirCos', 'g_nCos')):
     edit('Core/Src/KMath.h',
-         ('inline int %s(int nDir, int nMaxDir)\n{\n    return (*(g_InternalDirSinCosFunction *)(&(g_InternalDirSinCosCode[0])))(%s, nDir, nMaxDir);\n}' % (ham, bang)).encode('latin-1'),
-         ('inline int %s(int nDir, int nMaxDir)\n{\n'
-          '    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault.\n'
+         ('    return (*(g_InternalDirSinCosFunction *)(&(g_InternalDirSinCosCode[0])))(%s, nDir, nMaxDir);' % bang).encode('latin-1'),
+         ('    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault.\n'
           '       Chep dung ban C tuong duong dat trong comment o KMath.cpp,\n'
           '       ke ca viec tra -1 khi huong ngoai khoang (ma may: 83 C8 FF). */\n'
           '    if (nDir < 0 || nDir >= nMaxDir)\n'
           '        return -1;\n'
-          '    return %s[(nDir << 6) / nMaxDir];\n}' % (ham, bang)).encode('latin-1'),
+          '    return %s[(nDir << 6) / nMaxDir];' % bang).encode('latin-1'),
          'tra bang thay vi goi ma may: %s' % ham)
 
 for ham, bang in (('g_IsAccrue', 'g_nAccrueSeries'), ('g_IsConquer', 'g_nConquerSeries')):
     edit('Core/Src/KMath.h',
-         ('inline int %s(int nSrcSeries, int nDesSeries)\n{\n    return (*(g_InternalIsAccrueConquerFunction *)(&(g_InternalIsAccrueConquerCode[0])))(%s, nSrcSeries, nDesSeries);\n}' % (ham, bang)).encode('latin-1'),
-         ('inline int %s(int nSrcSeries, int nDesSeries)\n{\n'
-          '    if (nSrcSeries < 0 || nSrcSeries >= series_num)\n'
+         ('    return (*(g_InternalIsAccrueConquerFunction *)(&(g_InternalIsAccrueConquerCode[0])))(%s, nSrcSeries, nDesSeries);' % bang).encode('latin-1'),
+         ('    if (nSrcSeries < 0 || nSrcSeries >= series_num)\n'
           '        return 0;\n'
-          '    return %s[nSrcSeries] == nDesSeries;\n}' % (ham, bang)).encode('latin-1'),
+          '    return %s[nSrcSeries] == nDesSeries;' % bang).encode('latin-1'),
          'tra bang thay vi goi ma may: %s' % ham)
 
 # --------------------------------------------------------- header bu ten ham
