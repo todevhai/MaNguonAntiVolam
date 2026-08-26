@@ -167,6 +167,26 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'a / 8);',
      'mo lai loi ve alpha (bo dau dong comment)')
 
+# ------------------------------------------- Nhat ky tam: vong tao font
+# Trieu chung 27/08/2026: moi cua so va sprite deu ve dung nhung KHONG CO MOT
+# CHU NAO, va khong loi nao duoc ghi ra. Da do bang dau thoi gian truy cap:
+# PublicSetting.ini CO duoc doc, tep font CO duoc mo (sau khi bo dau cheo dau
+# duong dan), tep font hop le. Nen mat xich dut nam SAU luc nap.
+# Log nay in ra: dem duoc may font, id nao, tep nao, va CreateAFont tra ve gi.
+edit('S3Client/Ui/UiBase.cpp',
+     b'\t\t\t\t\t\tg_pRepresentShell->CreateAFont(Buffer, CHARACTER_CODE_SET_GBK, nId);',
+     b'\t\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\t\tbool bOk = g_pRepresentShell->CreateAFont(Buffer, CHARACTER_CODE_SET_GBK, nId);\r\n'
+     b'\t\t\t\t\t\t\tg_DebugLog(\"[font] id=%d tep=%s -> %s\", nId, Buffer, bOk ? \"OK\" : \"HONG\");\r\n'
+     b'\t\t\t\t\t\t}',
+     'nhat ky tam: ket qua tung lan tao font')
+
+edit('S3Client/Ui/UiBase.cpp',
+     b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, \"Count\", 0, &nCount))',
+     b'\t\tg_DebugLog(\"[font] shell=%p, doc %s\", (void*)g_pRepresentShell, Buffer);\r\n'
+     b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, \"Count\", 0, &nCount))',
+     'nhat ky tam: co shell chua, va doc tep nao')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
