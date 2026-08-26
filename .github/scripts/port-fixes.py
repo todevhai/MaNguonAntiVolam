@@ -169,23 +169,36 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
 
 # ------------------------------------------- Nhat ky tam: vong tao font
 # Trieu chung 27/08/2026: moi cua so va sprite deu ve dung nhung KHONG CO MOT
-# CHU NAO, va khong loi nao duoc ghi ra. Da do bang dau thoi gian truy cap:
+# CHU NAO, khong loi nao duoc ghi ra. Da do bang dau thoi gian truy cap:
 # PublicSetting.ini CO duoc doc, tep font CO duoc mo (sau khi bo dau cheo dau
 # duong dan), tep font hop le. Nen mat xich dut nam SAU luc nap.
-# Log nay in ra: dem duoc may font, id nao, tep nao, va CreateAFont tra ve gi.
+#
+# Ghi thang ra tep, KHONG dung g_DebugLog: ham do khong co trong S3Client
+# (lan truoc va bang no lam S3Client hong voi error C3861, va vi buoc build
+# co continue-on-error nen CI van bao XANH trong khi Game.exe khong he sinh ra).
+edit('S3Client/Ui/UiBase.cpp',
+     b'#include "KWin32.h"',
+     b'#include <stdio.h>\r\n#include "KWin32.h"',
+     'nhat ky tam: can stdio de ghi tep')
+
 edit('S3Client/Ui/UiBase.cpp',
      b'\t\t\t\t\t\tg_pRepresentShell->CreateAFont(Buffer, CHARACTER_CODE_SET_GBK, nId);',
      b'\t\t\t\t\t\t{\r\n'
      b'\t\t\t\t\t\t\tbool bOk = g_pRepresentShell->CreateAFont(Buffer, CHARACTER_CODE_SET_GBK, nId);\r\n'
-     b'\t\t\t\t\t\t\tg_DebugLog(\"[font] id=%d tep=%s -> %s\", nId, Buffer, bOk ? \"OK\" : \"HONG\");\r\n'
+     b'\t\t\t\t\t\t\tFILE *fLog = fopen("nhat-ky-font.txt", "a");\r\n'
+     b'\t\t\t\t\t\t\tif (fLog) { fprintf(fLog, "tao font id=%d tep=%s -> %s\\n", nId, Buffer, bOk ? "OK" : "HONG"); fclose(fLog); }\r\n'
      b'\t\t\t\t\t\t}',
      'nhat ky tam: ket qua tung lan tao font')
 
 edit('S3Client/Ui/UiBase.cpp',
-     b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, \"Count\", 0, &nCount))',
-     b'\t\tg_DebugLog(\"[font] shell=%p, doc %s\", (void*)g_pRepresentShell, Buffer);\r\n'
-     b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, \"Count\", 0, &nCount))',
-     'nhat ky tam: co shell chua, va doc tep nao')
+     b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, "Count", 0, &nCount))',
+     b'\t\t{\r\n'
+     b'\t\t\tint nThu = 0; bool bDoc = Ini.GetInteger(FONT_SECTION, "Count", 0, &nThu);\r\n'
+     b'\t\t\tFILE *fLog = fopen("nhat-ky-font.txt", "a");\r\n'
+     b'\t\t\tif (fLog) { fprintf(fLog, "vong font: shell=%p tep=%s doc-Count=%d so=%d\\n", (void*)g_pRepresentShell, Buffer, (int)bDoc, nThu); fclose(fLog); }\r\n'
+     b'\t\t}\r\n'
+     b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, "Count", 0, &nCount))',
+     'nhat ky tam: co shell chua, doc duoc Count khong')
 
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
