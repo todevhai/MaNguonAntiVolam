@@ -235,6 +235,32 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'#include <stdio.h>\r\n#include "KRepresentShell2.h"',
      'nhat ky tam: can stdio')
 
+# ------------------------- Nhat ky tam: khau cuoi cung - do pixel tung chu
+# Do 27/08/2026: font nap OK, OutputRichText duoc goi dung voi font hop le va
+# noi dung tieng Viet that, mau sang, toa do hop ly - NHUNG chu khong hien ra
+# ke ca tren nen trang. Nen mat xich dut o khau do pixel:
+#   OutputRichText -> KFont2::DrawCharacter -> KCanvas::DrawFont -> g_DrawFont
+# g_DrawFont viet bang hop ngu x86 noi tuyen va ghi pixel 16 BIT.
+# Bay nay tra loi hai cau: DrawCharacter co duoc goi khong, va bang font co tra
+# ra du lieu chu khong (GetCharacterData tra NULL thi khong co gi de ve).
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'#include "KFont2.h"',
+     b'#include <stdio.h>\r\n#include "KFont2.h"',
+     'nhat ky tam: can stdio')
+
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'\t\tunsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);',
+     b'\t\tunsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tstatic int nDemChu = 0;\r\n'
+     b'\t\t\tif (nDemChu < 30) { nDemChu++;\r\n'
+     b'\t\t\t\tFILE *fLog = fopen("nhat-ky-font.txt", "a");\r\n'
+     b'\t\t\t\tif (fLog) { fprintf(fLog, "do chu: byte=%02X,%02X co-du-lieu=%d x=%d y=%d wh=%dx%d mau=%08X\\n",\r\n'
+     b'\t\t\t\t\tcFirst, cNext, pCharacterData ? 1 : 0, x, y, m_nFontWidth, m_nFontHeight, (unsigned)nColor); fclose(fLog); }\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t}',
+     'nhat ky tam: bang font co tra ra du lieu chu khong')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
