@@ -200,6 +200,41 @@ edit('S3Client/Ui/UiBase.cpp',
      b'\t\tif (g_pRepresentShell && Ini.GetInteger(FONT_SECTION, "Count", 0, &nCount))',
      'nhat ky tam: co shell chua, doc duoc Count khong')
 
+# ------------------------------- Nhat ky tam: choc chan cuoi cua duong ve chu
+# Do 27/08/2026: font dang ky THANH CONG het (id 12/14/16 -> OK) nhung van khong
+# co chu nao hien ra. Nen mat xich dut nam o khau VE. OutputRichText la cho moi
+# loai chu deu di qua.
+# Neo phai la DONG KY TEN HAM: cac dong ben trong nhu 'if (pParam == NULL)' hay
+# 'KTextProcess tp(...)' deu xuat hien HAI lan (OutputText dung y het), va edit()
+# doi duy nhat mot lan khop.
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'int KRepresentShell2::OutputRichText(int nFontId, KOutputTextParam* pParam, ',
+     b'static void GhiNhatKyVeChu(int nFontId, int nCount, unsigned int uColor, int nX, int nY, const char* psText)\r\n'
+     b'{\r\n'
+     b'\tstatic int nDem = 0;\r\n'
+     b'\tif (nDem >= 40) return;\r\n'
+     b'\tnDem++;\r\n'
+     b'\tFILE *fLog = fopen("nhat-ky-font.txt", "a");\r\n'
+     b'\tif (!fLog) return;\r\n'
+     b'\tfprintf(fLog, "ve chu: font=%d so-ky-tu=%d mau=%08X x=%d y=%d chu=[%.24s]\\n",\r\n'
+     b'\t\tnFontId, nCount, uColor, nX, nY, psText ? psText : "(rong)");\r\n'
+     b'\tfclose(fLog);\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'int KRepresentShell2::OutputRichText(int nFontId, KOutputTextParam* pParam, ',
+     'nhat ky tam: ham ghi cho duong ve chu')
+
+edit_all('Represent/Represent2/KRepresentShell2.cpp',
+     b'\t\tKTextProcess\ttp(psText, nCount, nLineWidth * 2 / nFontId);',
+     b'\t\tGhiNhatKyVeChu(nFontId, nCount, pParam->Color, pParam->nX, pParam->nY, psText);\r\n'
+     b'\t\tKTextProcess\ttp(psText, nCount, nLineWidth * 2 / nFontId);',
+     'nhat ky tam: choc o ca hai duong ve chu')
+
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'#include "KRepresentShell2.h"',
+     b'#include <stdio.h>\r\n#include "KRepresentShell2.h"',
+     'nhat ky tam: can stdio')
+
 # ---------------------------------------------------------------- Represent2
 # Cung mot bat nhat "hai doi API" nhu o S3Client tren, nhung o phia DLL.
 #
