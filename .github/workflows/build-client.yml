@@ -192,15 +192,20 @@ jobs:
           echo === 40 loi dau moi log ===
           powershell -Command "Get-ChildItem *.log -ErrorAction SilentlyContinue | ForEach-Object { Write-Host ('##### '+$_.Name); Select-String -Path $_.FullName -Pattern 'error [A-Z]+[0-9]+' | Select-Object -First 40 | ForEach-Object { $_.Line } }"
 
+      # Buoc nay PHAI that bai that khi khong co Game.exe.
+      # Truoc day no 'continue-on-error: true' va ket thuc bang 'exit /b 0', nen mot lan
+      # bien dich hong (error C3861) van cho ca lan chay mau XANH va moi buoc 'success',
+      # trong khi Game.exe KHONG he duoc sinh ra. Chi phat hien duoc vi goi tai len
+      # thieu tep. Xem docs/08-giao-dien/04-truy-loi-khong-hien-chu.md
+      #
+      # 'dumpbin' KHONG co san tren may CI - dung no o day chi lam buoc thoat 255 roi
+      # bi nuot. Bo han.
       - name: 'Kiem tra Game.exe'
         if: always()
-        continue-on-error: true
         run: |
           echo === kich thuoc san pham ===
-          powershell -Command "'Game.exe','..\..\Engine\Release\Engine.dll','..\..\Core\ClientRelease\CoreClient.dll' | ForEach-Object { $p=Join-Path '%SRC%\S3Client\Release' $_; if(Test-Path $p){ $f=Get-Item $p; Write-Host ('{0,-16} {1,10:N0} bytes' -f $f.Name,$f.Length) } }"
-          echo === section header cua Game.exe (kiem WinLicense/Themida) ===
-          dumpbin /headers "%SRC%\S3Client\Release\Game.exe" | findstr /C:"machine" /C:"Name" /C:"subsystem"
-          exit /b 0
+          powershell -Command "'Game.exe','..\..\Engine\Release\Engine.dll','..\..\Core\ClientRelease\CoreClient.dll' | ForEach-Object { $p=Join-Path '%SRC%\S3Client\Release' $_; if(Test-Path $p){ $f=Get-Item $p; Write-Host ('{0,-16} {1,10:N0} bytes' -f $f.Name,$f.Length) } else { Write-Host ('{0,-16} THIEU' -f $_) } }"
+          powershell -Command "if (-not (Test-Path (Join-Path '%SRC%\S3Client\Release' 'Game.exe'))) { Write-Host '::error::Game.exe KHONG duoc sinh ra - build da hong du cac buoc bao xanh'; exit 1 }"
 
       # ---- Bao ve ban phat hanh (TAT SAN, bat khi len production) ----
       # WinLicense KHONG phai thu vien goi trong code — no la trinh DONG GOI chay tren
