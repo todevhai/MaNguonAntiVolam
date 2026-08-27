@@ -954,6 +954,42 @@ edit('S3Client/S3Client.cpp',
      b'\t\t}',
      'ap tran nhip ve trong GameLoop')
 
+# ------------------------------------------------- do: vi sao khong co dong tac danh
+# May chu da chung minh sach: nhan lenh danh (ky nang=53), qua ca ba cua ai trong
+# DoSkill, va co sat thuong. Nhung nhan vat KHONG co dong tac danh nao.
+#
+# KNpcAI.cpp:688 goi SendCommand(do_skill,...) NGAY TRUOC SendClientCmdSkill, tuc
+# lenh co vao toi DoSkill ben client. Trong DoSkill chi con mot loi thoat im lang
+# truoc khi dat m_ClientDoing:
+#     if (IsPlayer()) { if (!m_FightMode) return; }
+# nen nghi ngo m_FightMode ben client bang 0. Nhung s2c_syncplayermin (opcode 75)
+# ve toi 3345 lan, va SyncPlayerMin co dat m_FightMode tu bit 0x02.
+#
+# Hai dong duoi in ra hai dau: gia tri m_FightMode luc DoSkill, va nIdx ma
+# SyncPlayerMin tra ve (no KHONG kiem nIdx == 0 - truot la ghi vao Npc[0]).
+edit_after('Core/Src/KNpc.cpp',
+     b'KNpc::DoSkill(int nX, int nY)',
+     b'\tm_Hide.nTime = 0;',
+     _crlf(b'\tm_Hide.nTime = 0;\n'
+           b'\tif (IsPlayer())\n'
+           b'\t\tg_DebugLog("[TuDong] DoSkill: che-do-chien-dau=%d dang-lam=%d chieu=%d",\n'
+           b'\t\t\t(int)m_FightMode, (int)m_Doing, m_ActiveSkillID);'),
+     'log che do chien dau luc tung chieu')
+
+edit_after('Core/Src/KProtocolProcess.cpp',
+     b'void KProtocolProcess::SyncPlayerMin(BYTE* pMsg)',
+     b'\tint nIdx = NpcSet.SearchID(pPlaySync->ID);',
+     _crlf(b'\tint nIdx = NpcSet.SearchID(pPlaySync->ID);\n'
+           b'\t{\n'
+           b'\t\t/* 3345 goi mot phien - chi in thua ra 1/200 de khong ngap nhat ky. */\n'
+           b'\t\tstatic int s_nDem = 0;\n'
+           b'\t\tif ((s_nDem++ % 200) == 0)\n'
+           b'\t\t\tg_DebugLog("[TuDong] SyncPlayerMin: dwID=%u -> nIdx=%d co=%02X minh=%d",\n'
+           b'\t\t\t\t(unsigned)pPlaySync->ID, nIdx, (int)pPlaySync->m_btSomeFlag,\n'
+           b'\t\t\t\t(int)(nIdx == Player[CLIENT_PLAYER_INDEX].m_nIndex));\n'
+           b'\t}'),
+     'log SyncPlayerMin tim doi tuong va co trang thai')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
