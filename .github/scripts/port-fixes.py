@@ -1226,6 +1226,47 @@ edit('S3Client/Ui/ShortcutKey.cpp',
            b'\tif (uKey == 0)'),
      'in moi lan tra bang theo ma phim')
 
+# ------------------------------------- so cot cua cay chon chieu doc tu cau hinh
+# DOI HANH VI - cay chon chieu (bam vao o T/P tren thanh duoi) xep TAM chieu mot
+# hang, cung nhac trong ma: KSkillList gan nLevel = nCount / 8, va ca ba cho ben
+# giao dien (UpdateWndRect, PaintWindow, GetSkillAtPos) deu ngat hang theo nLevel.
+#
+# Ban chay that xep NAM cot. Khoa MaxBtnCountPerRow da co san trong tep cau hinh
+# nhung khong ai doc. Cho doc that, roi gan lai nLevel ngay sau khi lay danh sach
+# - mot vong lap, khong phai sua ca ba cho kia.
+edit('S3Client/Ui/UiCase/UiSkillTree.h',
+     b'\tint\t\t\t\tm_nWidthPerSkill, m_nHeightPerSkill;',
+     _crlf(b'\tint\t\t\t\tm_nWidthPerSkill, m_nHeightPerSkill;\n'
+           b'\tint\t\t\t\tm_nMaxPerRow;\t/* MaxBtnCountPerRow, mac dinh 5 */'),
+     'khai so cot moi hang cua cay chon chieu')
+
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'\t\tIni.GetInteger("Main", "KeyFont", 12, &m_pSelf->m_nFont);',
+     _crlf(b'\t\tIni.GetInteger("Main", "MaxBtnCountPerRow", 5, &m_pSelf->m_nMaxPerRow);\n'
+           b'\t\tif (m_pSelf->m_nMaxPerRow < 1)\n'
+           b'\t\t\tm_pSelf->m_nMaxPerRow = 1;\n'
+           b'\t\tIni.GetInteger("Main", "KeyFont", 12, &m_pSelf->m_nFont);'),
+     'doc MaxBtnCountPerRow')
+
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'\tm_nNumSkills = g_pCoreShell->GetGameData(',
+     _crlf(b'\t/* Gan lai chi so hang theo so cot cua cau hinh. KSkillList chia TAM\n'
+           b'\t   chieu mot hang bang hang so; ca ba cho ngat hang deu doc nLevel nen\n'
+           b'\t   sua o day la du. */\n'
+           b'\tif (m_nMaxPerRow < 1)\n'
+           b'\t\tm_nMaxPerRow = 5;\n'
+           b'\tm_nNumSkills = g_pCoreShell->GetGameData('),
+     'chan so cot truoc khi lay danh sach')
+
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'\t\tm_bLeft ? GDI_LEFT_ENABLE_SKILLS : GDI_RIGHT_ENABLE_SKILLS, (unsigned int)&m_Skills, 0);',
+     _crlf(b'\t\tm_bLeft ? GDI_LEFT_ENABLE_SKILLS : GDI_RIGHT_ENABLE_SKILLS, (unsigned int)&m_Skills, 0);\n'
+           b'\t{\n'
+           b'\t\tfor (int nHang = 0; nHang < m_nNumSkills; nHang++)\n'
+           b'\t\t\tm_Skills[nHang].nLevel = nHang / m_nMaxPerRow;\n'
+           b'\t}'),
+     'xep lai hang theo so cot cau hinh')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
