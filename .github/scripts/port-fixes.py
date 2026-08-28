@@ -1049,6 +1049,26 @@ edit_after('Core/Src/KProtocolProcess.cpp',
      'gan lai chieu chuot sau khi co danh sach vo cong',
      window=1200)
 
+# Van chieu=0 sau khi goi lai SetDefaultImmedSkill(). Ham do chi co ba nhanh theo
+# loai vu khi; tay khong (GetWeaponType tra -1) thi lay g_nHandSkill. Nen hoac
+# g_nHandSkill = 0 (bang \\settings\\<GBK>.txt khong nap duoc), hoac SetLeftSkill
+# bi guard tu choi vi danh sach vo cong khong co chieu do.
+#
+# Luu y: ten tep bang do la GBK, ma APFS tu choi ten GBK (Errno 92) nen ban tren
+# dia mang ten da boc hai lan - client KHONG mo duoc, phai lay tu update01.pak.
+#
+# In het mot the: loai vu khi, g_nHandSkill, cap cua chieu do trong danh sach, va
+# chieu dau tien co trong danh sach.
+edit_after('Core/Src/KPlayer.cpp',
+     b'void\tKPlayer::SetDefaultImmedSkill()',
+     b'\tint nParticularType = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponParticular();',
+     _crlf(b'\tint nParticularType = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponParticular();\n'
+           b'\tg_DebugLog("[TuDong] SetDefaultImmedSkill: loai=%d rieng=%d tay-khong=%d cap=%d chieu0=%d",\n'
+           b'\t\tnDetailType, nParticularType, g_nHandSkill,\n'
+           b'\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.GetCurrentLevel(g_nHandSkill),\n'
+           b'\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.m_Skills[1].SkillId);'),
+     'log vi sao khong gan duoc chieu vao nut chuot')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
