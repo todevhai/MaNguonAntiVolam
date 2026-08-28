@@ -989,6 +989,11 @@ edit('Core/Src/CoreUseNameDef.h',
 # Moc neo phai la MOT DONG: ban sao duoi may la LF con checkout tren CI ra CRLF,
 # mau nhieu dong khong bao gio khop ca hai.
 edit('S3Client/S3Client.cpp',
+     b'#include "KWin32.h"',
+     b'#include "KWin32.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho dong in do phan giai')
+
+edit('S3Client/S3Client.cpp',
      b'#define\tSCREEN_WIDTH\t800',
      _crlf(b'/* Khong con la hang so: doc tu [General] Resolution trong config.ini.\n'
            b'   Dat mac dinh 800x600 de khong doi hanh vi khi thieu khoa. */\n'
@@ -1006,15 +1011,21 @@ edit('S3Client/S3Client.cpp',
      b'\tIniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);',
      _crlf(b'\tIniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);\n'
            b'\t{\n'
+           b'\t\t/* Doc ca hai cho: [Client] la muc da chac chan doc duoc (FullScreen\n'
+           b'\t\t   ngay tren dung no), [General] la cho ban 8.x quen dat. */\n'
            b'\t\tint nDoPhanGiai = 0;\n'
            b'\t\tIniFile.GetInteger("General", "Resolution", 0, &nDoPhanGiai);\n'
+           b'\t\tif (nDoPhanGiai != 1)\n'
+           b'\t\t\tIniFile.GetInteger("Client", "Resolution", nDoPhanGiai, &nDoPhanGiai);\n'
            b'\t\tif (nDoPhanGiai == 1)\n'
            b'\t\t{\n'
            b'\t\t\tg_nBeNgangManHinh = 1024;\n'
            b'\t\t\tg_nBeDocManHinh = 768;\n'
            b'\t\t}\n'
+           b'\t\tg_DebugLog("[man hinh] Resolution=%d -> %dx%d", nDoPhanGiai,\n'
+           b'\t\t\tg_nBeNgangManHinh, g_nBeDocManHinh);\n'
            b'\t}'),
-     'doc [General] Resolution')
+     'doc Resolution tu [Client] hoac [General]')
 
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
