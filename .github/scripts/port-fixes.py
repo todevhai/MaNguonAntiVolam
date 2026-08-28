@@ -1217,6 +1217,15 @@ edit('S3Client/Ui/ShortcutKey.cpp',
            b'\tif (g_UiBase.GetStatus() != UIS_S_IDLE || !ms_Enable)'),
      'in lenh nhan duoc va hai cua ai cua ExcuteScript')
 
+# ExcuteScript KHONG duoc goi lan nao - ke ca cho chuot. Vay phim khong toi
+# duoc khau tra bang, hoac tra khong ra. In ngay trong FindCommand: no la cho
+# ca phim lan chuot deu di qua, va chi co MOT ban theo ma phim.
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'\tif (uKey == 0)',
+     _crlf(b'\tg_DebugLog("[phim] tra ma=%u trong %d lenh", (unsigned)uKey, ms_nCommands);\n'
+           b'\tif (uKey == 0)'),
+     'in moi lan tra bang theo ma phim')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
