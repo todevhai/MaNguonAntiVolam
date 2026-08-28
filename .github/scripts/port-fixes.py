@@ -1292,6 +1292,23 @@ edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
            b'\t\t}'),
      'in vi tri va kich thuoc o nhap ten')
 
+# ------------------------------------------- do duong di cua TIEU DIEM ban phim
+# O nhap ten dung kich thuoc, dang hien, khong muc nao phu len (da do het), ma
+# van khong co con tro nhap nhay - tuc no KHONG giu tieu diem. Phim go vao lai
+# di thang xuong bo phim tat, thay vi bi o nhap nuot.
+#
+# In moi lan doi tieu diem: tu cua so nao sang cua so nao, va o nhap ten o dau.
+edit('S3Client/Ui/Elem/Wnds.cpp',
+     b'#include "Wnds.h"',
+     b'#include "Wnds.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho dong in tieu diem')
+
+edit('S3Client/Ui/Elem/Wnds.cpp',
+     b'\tif (s_WndStation.pFocusWnd != pWnd)',
+     _crlf(b'\tg_DebugLog("[tieu diem] doi %p -> %p", s_WndStation.pFocusWnd, pWnd);\n'
+           b'\tif (s_WndStation.pFocusWnd != pWnd)'),
+     'in moi lan doi tieu diem')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
