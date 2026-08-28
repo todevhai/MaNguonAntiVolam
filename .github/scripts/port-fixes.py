@@ -1117,6 +1117,26 @@ edit('Core/Src/CoreUseNameDef.h',
      b'#define WEAPON_PHYSICSSKILLFILE\t\t\t"\\\\settings\\\\vukhi-kynang-vatly.txt"',
      'doi bang vu khi->chieu sang ten ASCII (APFS tu choi ten GBK)')
 
+# Doi ten TEP thoi thi chua du: FindColumn tra cuu theo TEN COT, va ba ten cot
+# trong nguon van la GBK trong khi tep tren dia dung tieu de ASCII. Khong khop
+# thi FindColumn tra -1, GetInteger doc rong, g_nHandSkill giu nguyen 0 - va do
+# duoc bang probe: 'tay-khong=0' du bang da nam dung cho. May chu da doi ca ba
+# ten cot tu truoc (Core/CoreUseNameDef.h), day la ve con thieu ben client.
+edit('Core/Src/CoreUseNameDef.h',
+     b'#define WEAPON_PARTICULARTYPE\t\t\t"\xcf\xea\xcf\xb8\xc0\xe0\xb1\xf0"',
+     b'#define WEAPON_PARTICULARTYPE\t\t\t"ParticularType"',
+     'ten cot ParticularType sang ASCII')
+
+edit('Core/Src/CoreUseNameDef.h',
+     b'#define\tWEAPON_DETAILTYPE\t\t\t\t"\xbe\xdf\xcc\xe5\xc0\xe0\xb1\xf0"',
+     b'#define\tWEAPON_DETAILTYPE\t\t\t\t"DetailType"',
+     'ten cot DetailType sang ASCII')
+
+edit('Core/Src/CoreUseNameDef.h',
+     b'#define\tWEAPON_SKILLID\t\t\t\t\t"\xb6\xd4\xd3\xa6\xce\xef\xc0\xed\xbc\xbc\xc4\xdc\xb1\xe0\xba\xc5"',
+     b'#define\tWEAPON_SKILLID\t\t\t\t\t"PhysicsSkillID"',
+     'ten cot PhysicsSkillID sang ASCII')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
