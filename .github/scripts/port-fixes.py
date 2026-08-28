@@ -990,6 +990,23 @@ edit_after('Core/Src/KProtocolProcess.cpp',
            b'\t}'),
      'log SyncPlayerMin tim doi tuong va co trang thai')
 
+# Do ngay 28/08: DoSkill KHONG HE duoc goi (0 dong nhat ky) du client CO gui goi
+# len may chu (ky nang=53) - tuc SendCommand da xep lenh vao hang. Chet o khau THI
+# HANH: KNpc::Activate goi ProcCommand(m_ProcessAI), ma ProcCommand BO QUA TAT CA
+# khi nAI == 0. Nhieu nhanh trong KNpcAI tu dat m_ProcessAI = 0 ngay sau khi ra
+# lenh. Kha nang con lai: FindSame(53) tra 0 vi danh sach vo cong ben client
+# khong co chieu do -> roi vao DoStand().
+# Mot dong duoi chia not hai kha nang do.
+edit_after('Core/Src/KNpc.cpp',
+     b'void KNpc::ProcCommand(int nAI)',
+     b'\tif (nAI)',
+     _crlf(b'\tif (IsPlayer() && m_Command.CmdKind == do_skill)\n'
+           b'\t\tg_DebugLog("[TuDong] ProcCommand: nAI=%d chieu=%d timthay=%d vung=%d",\n'
+           b'\t\t\tnAI, m_Command.Param_X, m_SkillList.FindSame(m_Command.Param_X),\n'
+           b'\t\t\tm_RegionIndex);\n'
+           b'\tif (nAI)'),
+     'log ProcCommand co thi hanh lenh danh khong')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
