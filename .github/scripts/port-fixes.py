@@ -1267,6 +1267,31 @@ edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
            b'\t}'),
      'xep lai hang theo so cot cau hinh')
 
+# --------------------------------- do vi sao o nhap ten nhan vat khong go duoc
+# Da loai bang doc ma: WM_CHAR CO sinh ra (KWin32App goi TranslateMessage),
+# Wnd_ProcessInput nhan moi thong diep, KWndEdit tu SetFocus khi bi bam, va
+# KUiNewPlayer nam o WL_TOPMOST nen no la cua so active.
+#
+# Con lai: o ten co thuc su duoc dung dung kich thuoc khong. PtInWindow doi
+# WND_S_VISIBLE va x < left + Width - Width bang 0 thi khong bao gio bat duoc
+# chuot. In ra ngay sau khi Init de biet cau hinh co toi noi.
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'#include "UiNewPlayer.h"',
+     b'#include "UiNewPlayer.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho dong in o nhap ten')
+
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'\t\tm_Name  .Init(&Ini, "Name");',
+     _crlf(b'\t\tm_Name  .Init(&Ini, "Name");\n'
+           b'\t\t{\n'
+           b'\t\t\tint nL = 0, nT = 0, nW = 0, nH = 0;\n'
+           b'\t\t\tm_Name.GetPosition(&nL, &nT);\n'
+           b'\t\t\tm_Name.GetSize(&nW, &nH);\n'
+           b'\t\t\tg_DebugLog("[ten] o nhap: %d,%d %dx%d hien=%d",\n'
+           b'\t\t\t\tnL, nT, nW, nH, (int)m_Name.IsVisible());\n'
+           b'\t\t}'),
+     'in vi tri va kich thuoc o nhap ten')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
