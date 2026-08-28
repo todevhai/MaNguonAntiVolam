@@ -977,6 +977,110 @@ edit('Core/Src/CoreUseNameDef.h',
      b'#define\tWEAPON_SKILLID\t\t\t\t\t"PhysicsSkillID"',
      'ten cot PhysicsSkillID sang ASCII')
 
+# ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
+# DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
+#
+# KUiHeaderControlBar DA duoc mo san (UiShell.cpp goi OpenWindow khi vao game) va
+# DA doc UiHeaderControlBar.ini, nhung lop chi khai HAI o chu: cap va hang. Khong
+# co o nao cho mau, noi luc, the luc, kinh nghiem - nen thanh tren dinh trong tron.
+#
+# Ban 8.x lam viec nay bang cach khai ClassType=Player_Life trong ini roi tra mot
+# xuong lop. Duong do KHONG di duoc ben ta: xuong lop (KComClassFactory) co ton tai
+# nhung KHONG lop nao dang ky vao, nen CreateComObject tra NULL voi moi ten.
+#
+# Duong ngan hon va dung kieu nguon 2003: khai thang bon KWndImagePart lam thanh
+# vien, y het cach KUiPlayerBar khai cac nut cua no. KWndImagePart::SetPart(hien,
+# day) ve mot phan anh theo ti le - dung thu can. PartType quyet dinh chieu voi:
+# 0 = trai sang phai, 1 = phai sang trai (lay tu bo giao dien ban chay that).
+#
+# Bon anh .spr lay tu \Spr\Ui3\<GBK>\ - deu co san trong spr.pak/ui.pak/uik.pak.
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     b'#include "../../../core/src/coreshell.h"',
+     b'#include "../../../core/src/gamedatadef.h"\r\n#include "../../../core/src/coreshell.h"',
+     'keo gamedatadef.h cho KUiPlayerRuntimeInfo')
+
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.h',
+     b'#include "../Elem/WndButton.h"',
+     b'#include "../Elem/WndButton.h"\r\n#include "../Elem/WndImagePart.h"\r\n#include "../Elem/WndText.h"',
+     'them header cho thanh ve theo ti le')
+
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.h',
+     b'\tKWndText80\tm_RankWorldText;',
+     _crlf(b'\tKWndText80\tm_RankWorldText;\n'
+           b'\t/* Bon thanh: anh ve theo ti le + o chu hien so. Thu tu tren thanh\n'
+           b'\t   la the luc, sinh luc, noi luc, kinh nghiem - trai sang phai. */\n'
+           b'\tKWndImagePart\tm_Stamina;\n'
+           b'\tKWndImagePart\tm_Life;\n'
+           b'\tKWndImagePart\tm_Mana;\n'
+           b'\tKWndImagePart\tm_Exp;\n'
+           b'\tKWndText32\tm_StaminaText;\n'
+           b'\tKWndText32\tm_LifeText;\n'
+           b'\tKWndText32\tm_ManaText;\n'
+           b'\tKWndText32\tm_ExpText;'),
+     'khai bon thanh va bon o chu')
+
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     b'\t\t\tm_pSelf->m_RankWorldText.Init(&Ini,"RankWorldText");',
+     _crlf(b'\t\t\tm_pSelf->m_RankWorldText.Init(&Ini,"RankWorldText");\n'
+           b'\t\t\tm_pSelf->m_Stamina.Init(&Ini, "Stamina");\n'
+           b'\t\t\tm_pSelf->m_Life   .Init(&Ini, "Life");\n'
+           b'\t\t\tm_pSelf->m_Mana   .Init(&Ini, "Mana");\n'
+           b'\t\t\tm_pSelf->m_Exp    .Init(&Ini, "Exp");\n'
+           b'\t\t\tm_pSelf->m_StaminaText.Init(&Ini, "StaminaText");\n'
+           b'\t\t\tm_pSelf->m_LifeText   .Init(&Ini, "LifeText");\n'
+           b'\t\t\tm_pSelf->m_ManaText   .Init(&Ini, "ManaText");\n'
+           b'\t\t\tm_pSelf->m_ExpText    .Init(&Ini, "ExpText");\n'
+           b'\t\t\t/* Khong gan con thi cua so co ton tai cung khong ai ve.\n'
+           b'\t\t\t   Hai o chu cu cung chua tung duoc gan - gan luon o day. */\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_LevelText);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_RankWorldText);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_Stamina);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_Life);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_Mana);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_Exp);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_StaminaText);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_LifeText);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_ManaText);\n'
+           b'\t\t\tm_pSelf->AddChild(&m_pSelf->m_ExpText);'),
+     'dung bon thanh va gan chung lam con')
+
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     b'void KUiHeaderControlBar::Breathe()',
+     _crlf(b'/* Cap nhat bon thanh moi nhip tho. GDI_PLAYER_RT_INFO la duong ma\n'
+           b'   KUiPlayerBar da dung san de lay mau va noi luc, dung lai o day.\n'
+           b'   Kinh nghiem tinh theo phan da di trong cap HIEN TAI, khong phai\n'
+           b'   tong tich luy - nExperienceFull la moc cua cap truoc. */\n'
+           b'static void DatThanh(KWndImagePart& Thanh, KWndText32& Chu, int nHienTai, int nDay)\n'
+           b'{\n'
+           b'\tif (nDay <= 0)\n'
+           b'\t\tnDay = 1;\n'
+           b'\tif (nHienTai < 0)\n'
+           b'\t\tnHienTai = 0;\n'
+           b'\tif (nHienTai > nDay)\n'
+           b'\t\tnHienTai = nDay;\n'
+           b'\tThanh.SetPart(nHienTai, nDay);\n'
+           b'\tchar szSo[48];\n'
+           b'\tsprintf(szSo, "%d/%d", nHienTai, nDay);\n'
+           b'\tChu.SetText(szSo);\n'
+           b'}\n'
+           b'\n'
+           b'void KUiHeaderControlBar::Breathe()'),
+     'ham dat mot thanh theo ti le')
+
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     b'\tUpdateData();',
+     _crlf(b'\tUpdateData();\n'
+           b'\tKUiPlayerRuntimeInfo Info;\n'
+           b'\tmemset(&Info, 0, sizeof(Info));\n'
+           b'\tg_pCoreShell->GetGameData(GDI_PLAYER_RT_INFO, (int)&Info, 0);\n'
+           b'\tDatThanh(m_Stamina, m_StaminaText, Info.nStamina, Info.nStaminaFull);\n'
+           b'\tDatThanh(m_Life,    m_LifeText,    Info.nLife,    Info.nLifeFull);\n'
+           b'\tDatThanh(m_Mana,    m_ManaText,    Info.nMana,    Info.nManaFull);\n'
+           b'\tDatThanh(m_Exp,     m_ExpText,\n'
+           b'\t\tInfo.nExperience - Info.nExperienceFull,\n'
+           b'\t\tInfo.nCurLevelExperience - Info.nExperienceFull);'),
+     'cap nhat bon thanh moi nhip tho')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
