@@ -1069,6 +1069,32 @@ edit_after('Core/Src/KPlayer.cpp',
            b'\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.m_Skills[1].SkillId);'),
      'log vi sao khong gan duoc chieu vao nut chuot')
 
+# DOI HANH VI - mo khoa 38.679 muc bi ket trong cac pak nen kieu 0x20.
+#
+# XPackFile::ExtractRead chi biet TYPE_NONE va TYPE_UCL (0x01000000). Ca 14 tep
+# updatejx*.pak cua ban Viet hoa nen bang 0x20000000 - gap la ham tra false va
+# tep KHONG NAP DUOC, khong mot dong bao loi. Hau qua thay duoc: thanh HUD trong
+# tron (da chua tam bang cach xep lai thu tu pak), va nhan vat thieu dau/tay.
+#
+# DO DUOC 28/08/2026: 0x20 CUNG LA NRV2B, chi khac so hieu. Bang chung:
+#   * \settings\skills.txt co ca hai ban - update01.pak (0x01) va slistcache.pak
+#     (0x20). 24 byte dau cua HAI khoi nen GIONG HET NHAU:
+#       ff536b696c6c4e616dff650950726f706572ec747909127f
+#   * Giai ban 0x20 bang chinh ucl_nrv2b ra dung 673205 byte, noi dung la bang
+#     skills.txt hop le.
+#   * Thu 237 muc 0x20 lay ngau nhien tu 6 pak khac nhau: 237 thanh cong, 0 hong.
+#     Ket qua ra SPR hop le (127 muc), .ini (12 muc), va du lieu nhi phan.
+#
+# Nen chi can nhan them so hieu 0x20 la doc duoc het.
+edit('Engine/Src/XPackFile.cpp',
+     b'\t\t    if (lCompressType == TYPE_UCL && DirectRead(pReadBuffer, uOffset, uSize))',
+     _crlf(b'\t\t    /* 0x20000000 la nrv2b y het TYPE_UCL, chi khac so hieu - ban Viet\n'
+           b'\t\t       hoa dung no cho toan bo updatejx*.pak. Do 28/08/2026: 237/237\n'
+           b'\t\t       muc thu ngau nhien giai nen dung. */\n'
+           b'\t\t    if ((lCompressType == TYPE_UCL || lCompressType == 0x20000000) &&\n'
+           b'\t\t        DirectRead(pReadBuffer, uOffset, uSize))'),
+     'nhan them phuong phap nen 0x20 (cung la nrv2b)')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
