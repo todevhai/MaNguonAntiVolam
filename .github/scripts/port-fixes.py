@@ -1027,6 +1027,29 @@ edit('S3Client/S3Client.cpp',
            b'\t}'),
      'doc Resolution tu [Client] hoac [General]')
 
+# ----------------------------------------- cua so OS theo dung do phan giai
+# DOI HANH VI - cua so that van 800x600 du be ngang VE da la 1024.
+#
+# Do duoc 28/08/2026: dong in cua ta noi "Resolution=1 -> 1024x768" nhung ngay
+# sau do engine ghi "Screen Width = 800". Hai con so nay den tu hai cho khac
+# nhau: be ngang VE do S3Client truyen vao, con CUA SO THAT do
+# KWin32App::InitWindow dung bang hang so rieng cua engine (WND_INIT_WIDTH 800),
+# khong lien quan gi den tham so kia.
+#
+# Sua o KDirectDraw::Mode - noi DA nhan duoc be ngang/doc that va chay TRUOC
+# Init(). Cong them vien dung bang cong thuc san co cua InitWindow (+6, +25).
+edit('Engine/Src/KDDraw.cpp',
+     b'\tm_dwScreenHeight = nHeight;',
+     _crlf(b'\tm_dwScreenHeight = nHeight;\n'
+           b'\t/* Cua so that duoc dung bang hang so WND_INIT_WIDTH tu truoc khi biet\n'
+           b'\t   do phan giai. Keo lai cho khop, neu khong thi khung game van 800\n'
+           b'\t   du be ngang ve da doi. Vien +6/+25 lay dung cong thuc cua\n'
+           b'\t   KWin32App::InitWindow. */\n'
+           b'\tif (!bFullScreen && g_GetMainHWnd())\n'
+           b'\t\tSetWindowPos(g_GetMainHWnd(), NULL, 0, 0, nWidth + 6, nHeight + 25,\n'
+           b'\t\t\tSWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);'),
+     'keo cua so that theo do phan giai')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
