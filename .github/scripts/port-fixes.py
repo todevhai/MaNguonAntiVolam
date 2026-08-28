@@ -650,42 +650,6 @@ edit('S3Client/Login/Login.cpp',
            b'\t\t\tif (g_NetConnectAgent.ConnectToGameSvr('),
      'log dia chi world server truoc khi noi')
 
-# Log dung cho vao ra tren socket world server: bao nhieu byte, byte dau la gi,
-# va bang kich thuoc cua CLIENT tra ve bao nhieu cho tung opcode. Day la cho duy
-# nhat biet duoc client CO doc dung khoi du lieu dang nhap hay khong.
-edit('S3Client/NetConnect/NetConnectAgent.cpp',
-     b'\t\t\twhile(pMsg < (PROTOCOL_MSG_TYPE*)(pBuffer + nSize))',
-     _crlf(b'\t\t\tg_DebugLog("[TuDong] the gioi: %u byte, dau %d %d %d %d", nSize,\n'
-           b'\t\t\t\t(int)(unsigned char)pBuffer[0], (int)(unsigned char)pBuffer[1],\n'
-           b'\t\t\t\t(int)(unsigned char)pBuffer[2], (int)(unsigned char)pBuffer[3]);\n'
-           b'\t\t\twhile(pMsg < (PROTOCOL_MSG_TYPE*)(pBuffer + nSize))'),
-     'log khoi du lieu tu world server')
-
-edit('S3Client/NetConnect/NetConnectAgent.cpp',
-     b'\t\t\t\t\tg_pCoreShell->NetMsgCallbackFunc(pMsg);',
-     _crlf(b'\t\t\t\t\tg_DebugLog("[TuDong]   opcode=%d, bang bao %d byte",\n'
-           b'\t\t\t\t\t\t(int)Msg, g_pCoreShell->GetProtocolSize(Msg));\n'
-           b'\t\t\t\t\tg_pCoreShell->NetMsgCallbackFunc(pMsg);'),
-     'log tung opcode va kich thuoc bang tra ve')
-
-# Log duong dung nhan vat phia client: s2c_syncnpc tao doi tuong, s2c_syncplayer
-# dat trang bi, s2c_synccurplayer gan nhan vat cua minh. Neu mot khau tra chi so 0
-# thi khong co gi de ve.
-edit('Core/Src/KProtocolProcess.cpp',
-     b'\t\tnIdx = NpcSet.Add(NpcSync->NpcSettingIdx, 0, NpcSync->MapX, NpcSync->MapY);',
-     _crlf(b'\t\tnIdx = NpcSet.Add(NpcSync->NpcSettingIdx, 0, NpcSync->MapX, NpcSync->MapY);\n'
-           b'\t\tg_DebugLog("[TuDong] SyncNpc: mau=%d cap=%d vitri=%d,%d -> nIdx=%d",\n'
-           b'\t\t\t(int)(short)HIWORD(NpcSync->NpcSettingIdx), (int)LOWORD(NpcSync->NpcSettingIdx),\n'
-           b'\t\t\t(int)NpcSync->MapX, (int)NpcSync->MapY, nIdx);'),
-     'log SyncNpc tao doi tuong')
-
-edit('Core/Src/KPlayer.cpp',
-     b'\tthis->m_nIndex = NpcSet.SearchID(PlaySync->m_dwID);',
-     _crlf(b'\tthis->m_nIndex = NpcSet.SearchID(PlaySync->m_dwID);\n'
-           b'\tg_DebugLog("[TuDong] SyncCurPlayer: dwID=%u -> m_nIndex=%d",\n'
-           b'\t\t(unsigned)PlaySync->m_dwID, this->m_nIndex);'),
-     'log SyncCurPlayer tim doi tuong')
-
 # KNpc::Load voi nhan vat NGUOI CHOI dat szNpcTypeName = "" (nhanh bi rut ruot),
 # ma KNpcRes::Init tra FALSE ngay khi ten rong (KNpcRes.cpp:58) -> m_DataRes khong
 # bao gio duoc dung -> m_DataRes.Draw() trong KNpc::Paint khong ve gi.
@@ -706,31 +670,6 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\tg_NpcKindFile.GetString(3, "", "", szNpcTypeName, sizeof(szNpcTypeName));\n'
            b'\t\t\tm_StandFrame = NpcSet.GetPlayerStandFrame(FALSE);'),
      'lay ten tai nguyen nu nhan vat tu bang loai')
-
-edit('Core/Src/KNpc.cpp',
-     b'\tm_DataRes.Init(szNpcTypeName, &g_NpcResList);',
-     _crlf(b'\tg_DebugLog("[TuDong] KNpc::Load mau=%d ten tai nguyen=\\"%s\\" -> Init=%d",\n'
-           b'\t\tnNpcSettingIdx, szNpcTypeName,\n'
-           b'\t\t(int)m_DataRes.Init(szNpcTypeName, &g_NpcResList));'),
-     'log ket qua dung tai nguyen hinh')
-
-# Log tung cua ai trong KNpcResNode::Init de biet dung cho nao tra FALSE.
-edit('Core/Src/KNpcResNode.cpp',
-     b'#include\t"KFilePath.h"',
-     b'#include\t"KFilePath.h"\r\n#include\t"KDebug.h"',
-     'them KDebug.h cho g_DebugLog')
-
-edit('Core/Src/KNpcResNode.cpp',
-     b'\tnFindNo = KindFile.FindRow(lpszNpcName);',
-     _crlf(b'\tnFindNo = KindFile.FindRow(lpszNpcName);\n'
-           b'\tg_DebugLog("[TuDong] ResNode \\"%s\\": dong trong bang = %d", lpszNpcName, nFindNo);'),
-     'log tim dong trong bang loai nhan vat')
-
-edit('Core/Src/KNpcResNode.cpp',
-     b'\t\tif ( !PartFile.Load(szBuf) )',
-     _crlf(b'\t\tg_DebugLog("[TuDong] ResNode: tep bo phan = \\"%s\\"", szBuf);\n'
-           b'\t\tif ( !PartFile.Load(szBuf) )'),
-     'log tep danh sach bo phan')
 
 # Bang settings/npcres/<nhan vat>.txt trong bo du lieu ta dung co dong tieu de
 # bang TIENG ANH:
@@ -954,85 +893,6 @@ edit('S3Client/S3Client.cpp',
      b'\t\t}',
      'ap tran nhip ve trong GameLoop')
 
-# ------------------------------------------------- do: vi sao khong co dong tac danh
-# May chu da chung minh sach: nhan lenh danh (ky nang=53), qua ca ba cua ai trong
-# DoSkill, va co sat thuong. Nhung nhan vat KHONG co dong tac danh nao.
-#
-# KNpcAI.cpp:688 goi SendCommand(do_skill,...) NGAY TRUOC SendClientCmdSkill, tuc
-# lenh co vao toi DoSkill ben client. Trong DoSkill chi con mot loi thoat im lang
-# truoc khi dat m_ClientDoing:
-#     if (IsPlayer()) { if (!m_FightMode) return; }
-# nen nghi ngo m_FightMode ben client bang 0. Nhung s2c_syncplayermin (opcode 75)
-# ve toi 3345 lan, va SyncPlayerMin co dat m_FightMode tu bit 0x02.
-#
-# Hai dong duoi in ra hai dau: gia tri m_FightMode luc DoSkill, va nIdx ma
-# SyncPlayerMin tra ve (no KHONG kiem nIdx == 0 - truot la ghi vao Npc[0]).
-edit_after('Core/Src/KNpc.cpp',
-     b'KNpc::DoSkill(int nX, int nY)',
-     b'\tm_Hide.nTime = 0;',
-     _crlf(b'\tm_Hide.nTime = 0;\n'
-           b'\tif (IsPlayer())\n'
-           b'\t\tg_DebugLog("[TuDong] DoSkill: che-do-chien-dau=%d dang-lam=%d chieu=%d",\n'
-           b'\t\t\t(int)m_FightMode, (int)m_Doing, m_ActiveSkillID);'),
-     'log che do chien dau luc tung chieu')
-
-edit_after('Core/Src/KProtocolProcess.cpp',
-     b'void KProtocolProcess::SyncPlayerMin(BYTE* pMsg)',
-     b'\tint nIdx = NpcSet.SearchID(pPlaySync->ID);',
-     _crlf(b'\tint nIdx = NpcSet.SearchID(pPlaySync->ID);\n'
-           b'\t{\n'
-           b'\t\t/* 3345 goi mot phien - chi in thua ra 1/200 de khong ngap nhat ky. */\n'
-           b'\t\tstatic int s_nDem = 0;\n'
-           b'\t\tif ((s_nDem++ % 200) == 0)\n'
-           b'\t\t\tg_DebugLog("[TuDong] SyncPlayerMin: dwID=%u -> nIdx=%d co=%02X minh=%d",\n'
-           b'\t\t\t\t(unsigned)pPlaySync->ID, nIdx, (int)pPlaySync->m_btSomeFlag,\n'
-           b'\t\t\t\t(int)(nIdx == Player[CLIENT_PLAYER_INDEX].m_nIndex));\n'
-           b'\t}'),
-     'log SyncPlayerMin tim doi tuong va co trang thai')
-
-# Do ngay 28/08: DoSkill KHONG HE duoc goi (0 dong nhat ky) du client CO gui goi
-# len may chu (ky nang=53) - tuc SendCommand da xep lenh vao hang. Chet o khau THI
-# HANH: KNpc::Activate goi ProcCommand(m_ProcessAI), ma ProcCommand BO QUA TAT CA
-# khi nAI == 0. Nhieu nhanh trong KNpcAI tu dat m_ProcessAI = 0 ngay sau khi ra
-# lenh. Kha nang con lai: FindSame(53) tra 0 vi danh sach vo cong ben client
-# khong co chieu do -> roi vao DoStand().
-# Mot dong duoi chia not hai kha nang do.
-edit_after('Core/Src/KNpc.cpp',
-     b'void KNpc::ProcCommand(int nAI)',
-     b'\tif (nAI)',
-     _crlf(b'\tif (IsPlayer() && m_Command.CmdKind == do_skill)\n'
-           b'\t\tg_DebugLog("[TuDong] ProcCommand: nAI=%d chieu=%d timthay=%d vung=%d",\n'
-           b'\t\t\tnAI, m_Command.Param_X, m_SkillList.FindSame(m_Command.Param_X),\n'
-           b'\t\t\tm_RegionIndex);\n'
-           b'\tif (nAI)'),
-     'log ProcCommand co thi hanh lenh danh khong')
-
-# DOI HANH VI - vi sao nhan vat khong co dong tac danh (do xong 28/08/2026):
-#
-#   [TuDong] ProcCommand: nAI=1 chieu=0 timthay=0 vung=1
-#
-# nAI=1 (lenh CO duoc thi hanh) nhung chieu=0. Client xep lenh do_skill voi so
-# hieu chieu bang KHONG, nen FindSame(0) tra 0 va roi vao DoStand() - khong ve gi.
-# May chu van thay "ky nang=53" chi vi NpcSkillCommand cua ta TU THAY 0 bang chieu
-# vu khi dang cam; do la gia tri SAU khi thay, khong phai cai client gui.
-#
-# Goc: KPlayer::SetLeftSkill BO IM LANG khi chieu chua co trong danh sach vo cong
-#     if (m_SkillList.GetCurrentLevel(nSkillID) <= 0) return;
-# ma SetDefaultImmedSkill() lai chay trong SyncEnd (opcode 67). Danh sach vo cong
-# den bang opcode 69, va thu tu hai goi nay KHONG dam bao - do duoc: khung dang
-# nhap dau tien chua 159,162,73,74,68,67 con 69 nam o khung khac. Luc 67 chay thi
-# danh sach con rong -> gan chieu that bai -> m_nLeftSkillID = 0 mai mai.
-#
-# Va: goi lai SetDefaultImmedSkill() ngay sau khi nap xong danh sach vo cong.
-# Khong dong cham guard trong SetLeftSkill - guard do dung, chi la chay qua som.
-edit_after('Core/Src/KProtocolProcess.cpp',
-     b'KProtocolProcess::s2cSyncAllSkill(BYTE * pMsg)',
-     b'\tint nNpcIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;',
-     _crlf(b'\tint nNpcIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
-           b'\tg_DebugLog("[TuDong] s2cSyncAllSkill: nNpcIndex=%d so chieu=%d",\n'
-           b'\t\tnNpcIndex, nSkillCount);'),
-     'log nap danh sach vo cong')
-
 edit_after('Core/Src/KProtocolProcess.cpp',
      b'KProtocolProcess::s2cSyncAllSkill(BYTE * pMsg)',
      b'            );',
@@ -1048,26 +908,6 @@ edit_after('Core/Src/KProtocolProcess.cpp',
            b'\t\t\tPlayer[CLIENT_PLAYER_INDEX].SetDefaultImmedSkill();'),
      'gan lai chieu chuot sau khi co danh sach vo cong',
      window=1200)
-
-# Van chieu=0 sau khi goi lai SetDefaultImmedSkill(). Ham do chi co ba nhanh theo
-# loai vu khi; tay khong (GetWeaponType tra -1) thi lay g_nHandSkill. Nen hoac
-# g_nHandSkill = 0 (bang \\settings\\<GBK>.txt khong nap duoc), hoac SetLeftSkill
-# bi guard tu choi vi danh sach vo cong khong co chieu do.
-#
-# Luu y: ten tep bang do la GBK, ma APFS tu choi ten GBK (Errno 92) nen ban tren
-# dia mang ten da boc hai lan - client KHONG mo duoc, phai lay tu update01.pak.
-#
-# In het mot the: loai vu khi, g_nHandSkill, cap cua chieu do trong danh sach, va
-# chieu dau tien co trong danh sach.
-edit_after('Core/Src/KPlayer.cpp',
-     b'void\tKPlayer::SetDefaultImmedSkill()',
-     b'\tint nParticularType = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponParticular();',
-     _crlf(b'\tint nParticularType = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponParticular();\n'
-           b'\tg_DebugLog("[TuDong] SetDefaultImmedSkill: loai=%d rieng=%d tay-khong=%d cap=%d chieu0=%d",\n'
-           b'\t\tnDetailType, nParticularType, g_nHandSkill,\n'
-           b'\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.GetCurrentLevel(g_nHandSkill),\n'
-           b'\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.m_Skills[1].SkillId);'),
-     'log vi sao khong gan duoc chieu vao nut chuot')
 
 # DOI HANH VI - mo khoa 38.679 muc bi ket trong cac pak nen kieu 0x20.
 #
