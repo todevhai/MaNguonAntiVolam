@@ -1007,6 +1007,48 @@ edit_after('Core/Src/KNpc.cpp',
            b'\tif (nAI)'),
      'log ProcCommand co thi hanh lenh danh khong')
 
+# DOI HANH VI - vi sao nhan vat khong co dong tac danh (do xong 28/08/2026):
+#
+#   [TuDong] ProcCommand: nAI=1 chieu=0 timthay=0 vung=1
+#
+# nAI=1 (lenh CO duoc thi hanh) nhung chieu=0. Client xep lenh do_skill voi so
+# hieu chieu bang KHONG, nen FindSame(0) tra 0 va roi vao DoStand() - khong ve gi.
+# May chu van thay "ky nang=53" chi vi NpcSkillCommand cua ta TU THAY 0 bang chieu
+# vu khi dang cam; do la gia tri SAU khi thay, khong phai cai client gui.
+#
+# Goc: KPlayer::SetLeftSkill BO IM LANG khi chieu chua co trong danh sach vo cong
+#     if (m_SkillList.GetCurrentLevel(nSkillID) <= 0) return;
+# ma SetDefaultImmedSkill() lai chay trong SyncEnd (opcode 67). Danh sach vo cong
+# den bang opcode 69, va thu tu hai goi nay KHONG dam bao - do duoc: khung dang
+# nhap dau tien chua 159,162,73,74,68,67 con 69 nam o khung khac. Luc 67 chay thi
+# danh sach con rong -> gan chieu that bai -> m_nLeftSkillID = 0 mai mai.
+#
+# Va: goi lai SetDefaultImmedSkill() ngay sau khi nap xong danh sach vo cong.
+# Khong dong cham guard trong SetLeftSkill - guard do dung, chi la chay qua som.
+edit_after('Core/Src/KProtocolProcess.cpp',
+     b'KProtocolProcess::s2cSyncAllSkill(BYTE * pMsg)',
+     b'\tint nNpcIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;',
+     _crlf(b'\tint nNpcIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
+           b'\tg_DebugLog("[TuDong] s2cSyncAllSkill: nNpcIndex=%d so chieu=%d",\n'
+           b'\t\tnNpcIndex, nSkillCount);'),
+     'log nap danh sach vo cong')
+
+edit_after('Core/Src/KProtocolProcess.cpp',
+     b'KProtocolProcess::s2cSyncAllSkill(BYTE * pMsg)',
+     b'            );',
+     _crlf(b'            );\n'
+           b'\t\t\t/* Dat TRONG vong lap la co y: moc neo phai la MOT DONG thi moi\n'
+           b'\t\t\t   song duoc ca LF (ban sao duoi may) lan CRLF (checkout tren CI).\n'
+           b'\t\t\t   Goi vai lan khong hai gi.\n'
+           b'\t\t\t   Gan lai chieu cho nut chuot SAU khi da co danh sach vo cong.\n'
+           b'\t\t\t   SetLeftSkill bo im lang neu chieu chua co trong danh sach, ma\n'
+           b'\t\t\t   SetDefaultImmedSkill() chay o SyncEnd - som hon goi nay. Khong\n'
+           b'\t\t\t   goi lai thi m_nLeftSkillID bang 0 mai mai va nhan vat khong bao\n'
+           b'\t\t\t   gio co dong tac danh. */\n'
+           b'\t\t\tPlayer[CLIENT_PLAYER_INDEX].SetDefaultImmedSkill();'),
+     'gan lai chieu chuot sau khi co danh sach vo cong',
+     window=1200)
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
