@@ -1171,6 +1171,41 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
 
+# ------------------------------------------- do vi sao phim tat khong an
+# Phim tat khong chay mot cai nao (F1..F6, P, Tab...). Da loai: ky tu la trong
+# tep (thu ban chi ASCII, van khong an), macOS chiem phim F (Fn+F3 cung khong),
+# o nhap chu nuot phim (OnKeyDown tra 0 voi phim chuc nang nen di tiep),
+# HandleKeyInput khong duoc goi (Wnds.cpp:387 co goi), InitScript khong chay
+# (UiShell.cpp:200 co goi).
+#
+# Con lai hai kha nang, va chung khac nhau o mot con so: tep kich ban co nap
+# duoc khong, va co bao nhieu lenh vao bang. In ra de biet.
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'#include "KIniFile.h"',
+     b'#include "KIniFile.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho hai dong in phim tat')
+
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'\treturn ms_Script.Load(pFileName);',
+     _crlf(b'\t{\n'
+           b'\t\tBOOL bXong = ms_Script.Load(pFileName);\n'
+           b'\t\tg_DebugLog("[phim] nap \\"%s\\" -> %d", pFileName, (int)bXong);\n'
+           b'\t\treturn bXong;\n'
+           b'\t}'),
+     'in ket qua nap kich ban phim tat')
+
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'\tKShortcutKeyCentre::AddCommand(&cs);',
+     _crlf(b'\tKShortcutKeyCentre::AddCommand(&cs);\n'
+           b'\t{\n'
+           b'\t\tstatic int nDemLenh = 0;\n'
+           b'\t\tnDemLenh++;\n'
+           b'\t\tif (nDemLenh <= 3 || (nDemLenh % 40) == 0)\n'
+           b'\t\t\tg_DebugLog("[phim] lenh thu %d: phim=%u lam=\\"%s\\"",\n'
+           b'\t\t\t\tnDemLenh, (unsigned)cs.uKey, cs.szDo);\n'
+           b'\t}'),
+     'dem so lenh phim tat da dang ky')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
