@@ -1206,6 +1206,17 @@ edit('S3Client/Ui/ShortcutKey.cpp',
            b'\t}'),
      'dem so lenh phim tat da dang ky')
 
+# Bang phim da nap du 127 lenh ma bam van khong mo cua so nao. Nut that o khau
+# sau: phim -> FindCommand -> ExcuteScript -> Open(...). ExcuteScript la cho hoi
+# tu cua ca phim lan chuot, va no co MOT cua ai im lang o dong dau. In ra.
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'\tif (g_UiBase.GetStatus() != UIS_S_IDLE || !ms_Enable)',
+     _crlf(b'\tg_DebugLog("[phim] chay \\"%s\\" trang-thai=%d bat=%d",\n'
+           b'\t\tScriptCommand ? ScriptCommand : "(rong)",\n'
+           b'\t\t(int)g_UiBase.GetStatus(), (int)ms_Enable);\n'
+           b'\tif (g_UiBase.GetStatus() != UIS_S_IDLE || !ms_Enable)'),
+     'in lenh nhan duoc va hai cua ai cua ExcuteScript')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
