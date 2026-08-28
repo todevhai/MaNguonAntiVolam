@@ -1089,6 +1089,88 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.h',
      b'#define\tUPB_IMMEDIA_ITEM_COUNT\t9',
      'so o lop khung duoi dung 3 -> 9')
 
+# ------------------------------------- muoi nut chuc nang tren thanh cong cu
+# DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
+# Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
+# trang, vo cong, to doi, chay, ngoi, ngua, giao dich, bang phai, PK.
+#
+# Engine da co san duong thi hanh cho tung cai (ShortcutKey.h khai 18 kich ban
+# SCK_*), chi thieu nut de bam. Anh cua ca muoi nut deu co san trong spr.pak.
+#
+# Ban 8.x lam bang ClassType + xuong lop; duong do khong di duoc ben ta vi xuong
+# lop rong. Khai thang thanh vien, y het sau nut da co.
+edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
+     b'\tKWndButton\tm_Options;',
+     _crlf(b'\tKWndButton\tm_Options;\n'
+           b'\t/* Muoi nut them 28/08/2026. Ba nut cuoi la CONG TAC (bat/tat) chu\n'
+           b'\t   khong mo cua so: chay, ngoi, cuoi ngua, giao dich, PK. */\n'
+           b'\tKWndButton\tm_Status;\n'
+           b'\tKWndButton\tm_Items;\n'
+           b'\tKWndButton\tm_Skills;\n'
+           b'\tKWndButton\tm_Team;\n'
+           b'\tKWndButton\tm_Faction;\n'
+           b'\tKWndButton\tm_Run;\n'
+           b'\tKWndButton\tm_Sit;\n'
+           b'\tKWndButton\tm_Horse;\n'
+           b'\tKWndButton\tm_Exchange;\n'
+           b'\tKWndButton\tm_PK;'),
+     'khai muoi nut chuc nang')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\t\t\tm_pSelf->m_Options.Init(&Ini, "Options");',
+     _crlf(b'\t\t\tm_pSelf->m_Options.Init(&Ini, "Options");\n'
+           b'\t\t\tm_pSelf->m_Status  .Init(&Ini, "Status");\n'
+           b'\t\t\tm_pSelf->m_Items   .Init(&Ini, "Items");\n'
+           b'\t\t\tm_pSelf->m_Skills  .Init(&Ini, "Skills");\n'
+           b'\t\t\tm_pSelf->m_Team    .Init(&Ini, "Team");\n'
+           b'\t\t\tm_pSelf->m_Faction .Init(&Ini, "Faction");\n'
+           b'\t\t\tm_pSelf->m_Run     .Init(&Ini, "Run");\n'
+           b'\t\t\tm_pSelf->m_Sit     .Init(&Ini, "Sit");\n'
+           b'\t\t\tm_pSelf->m_Horse   .Init(&Ini, "Horse");\n'
+           b'\t\t\tm_pSelf->m_Exchange.Init(&Ini, "Exchange");\n'
+           b'\t\t\tm_pSelf->m_PK      .Init(&Ini, "PK");'),
+     'dung muoi nut tu tep cau hinh')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\tAddChild(&m_Options);',
+     _crlf(b'\tAddChild(&m_Options);\n'
+           b'\tAddChild(&m_Status);\n'
+           b'\tAddChild(&m_Items);\n'
+           b'\tAddChild(&m_Skills);\n'
+           b'\tAddChild(&m_Team);\n'
+           b'\tAddChild(&m_Faction);\n'
+           b'\tAddChild(&m_Run);\n'
+           b'\tAddChild(&m_Sit);\n'
+           b'\tAddChild(&m_Horse);\n'
+           b'\tAddChild(&m_Exchange);\n'
+           b'\tAddChild(&m_PK);'),
+     'gan muoi nut lam con')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_Friend)',
+     _crlf(b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_Status)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_STATUS);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Items)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_ITEMS);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Skills)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_SKILLS);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Team)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TEAM);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Faction)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_MAP);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Run)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_RUN);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Sit)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_SIT);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Horse)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_HORSE);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Exchange)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
+     'noi muoi nut vao kich ban co san cua engine')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
