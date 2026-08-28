@@ -977,6 +977,45 @@ edit('Core/Src/CoreUseNameDef.h',
      b'#define\tWEAPON_SKILLID\t\t\t\t\t"PhysicsSkillID"',
      'ten cot PhysicsSkillID sang ASCII')
 
+# --------------------------------------------------- do phan giai doc tu cau hinh
+# DOI HANH VI - be ngang man hinh dang la HANG SO bien dich (SCREEN_WIDTH 800),
+# nen doi do phan giai phai dung lai CI. Bo giao dien cua ban chay that chi con
+# ban 1024 cho khung duoi (bo 800 cua ho khong con tep do), nen muon bo cuc cua
+# ho la phai chay 1024.
+#
+# Khoa [General] Resolution trong config.ini la cua ban 8.x - nguon ta KHONG doc
+# no o dau ca. Cho doc that: 0 = 800x600 (mac dinh, giu nguyen hanh vi cu),
+# 1 = 1024x768. IniFile da duoc mo san ngay tren cho nay.
+# Moc neo phai la MOT DONG: ban sao duoi may la LF con checkout tren CI ra CRLF,
+# mau nhieu dong khong bao gio khop ca hai.
+edit('S3Client/S3Client.cpp',
+     b'#define\tSCREEN_WIDTH\t800',
+     _crlf(b'/* Khong con la hang so: doc tu [General] Resolution trong config.ini.\n'
+           b'   Dat mac dinh 800x600 de khong doi hanh vi khi thieu khoa. */\n'
+           b'int\tg_nBeNgangManHinh = 800;\n'
+           b'int\tg_nBeDocManHinh = 600;\n'
+           b'#define\tSCREEN_WIDTH\tg_nBeNgangManHinh'),
+     'be ngang man hinh thanh bien')
+
+edit('S3Client/S3Client.cpp',
+     b'#define SCREEN_HEIGHT\t600',
+     b'#define SCREEN_HEIGHT\tg_nBeDocManHinh',
+     'be doc man hinh thanh bien')
+
+edit('S3Client/S3Client.cpp',
+     b'\tIniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);',
+     _crlf(b'\tIniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);\n'
+           b'\t{\n'
+           b'\t\tint nDoPhanGiai = 0;\n'
+           b'\t\tIniFile.GetInteger("General", "Resolution", 0, &nDoPhanGiai);\n'
+           b'\t\tif (nDoPhanGiai == 1)\n'
+           b'\t\t{\n'
+           b'\t\t\tg_nBeNgangManHinh = 1024;\n'
+           b'\t\t\tg_nBeDocManHinh = 768;\n'
+           b'\t\t}\n'
+           b'\t}'),
+     'doc [General] Resolution')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
