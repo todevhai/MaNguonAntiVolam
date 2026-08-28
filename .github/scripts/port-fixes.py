@@ -1050,6 +1050,45 @@ edit('Engine/Src/KDDraw.cpp',
            b'\t\t\tSWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);'),
      'keo cua so that theo do phan giai')
 
+# ------------------------------------------- chin o mang theo thay vi ba
+# DOI HANH VI - o phim tat 4..9 khong bao gio hien vi nguon 2003 CHI CO BA o.
+#
+# Bon cho cung rang buoc, ba trong so do la 3 va chi moi tep giao dien khai 9:
+#   IMMEDIACY_ROOM_WIDTH   3   ngan do mang theo (GameDataDef.h)
+#   ImmediaItem[3]             cau truc dua len giao dien (GameDataDef.h)
+#   UPB_IMMEDIA_ITEM_COUNT 3   so o lop khung duoi dung (UiPlayerBar.h)
+#
+# MAX_IMMEDIACY_ITEM tham gia MAX_PLAYER_ITEM (tong so o do cua nhan vat), nen
+# doi no lam mang m_Items dai them 6. May chu dung CHINH cong thuc do, va ban va
+# ben may chu doi cung luc - hai ben van khop. Cau truc ImmediaItem chi di trong
+# mot tien trinh (Core -> S3Client), khong qua mang.
+#
+# Ban ghi nhan vat cu se lech nen phai tao lai nhan vat sau khi doi.
+edit('Core/Src/GameDataDef.h',
+     b'#define\t\tIMMEDIACY_ROOM_WIDTH\t\t3',
+     b'#define\t\tIMMEDIACY_ROOM_WIDTH\t\t9',
+     'ngan do mang theo 3 -> 9 o')
+
+edit('Engine/Core/GameDataDef.h',
+     b'#define\t\tIMMEDIACY_ROOM_WIDTH\t\t3',
+     b'#define\t\tIMMEDIACY_ROOM_WIDTH\t\t9',
+     'ban sao trong Engine cung 3 -> 9')
+
+edit('Core/Src/GameDataDef.h',
+     b'\tKUiGameObject\tImmediaItem[3];',
+     b'\tKUiGameObject\tImmediaItem[9];',
+     'cau truc dua len giao dien 3 -> 9')
+
+edit('Engine/Core/GameDataDef.h',
+     b'\tKUiGameObject\tImmediaItem[3];',
+     b'\tKUiGameObject\tImmediaItem[9];',
+     'ban sao trong Engine cung 3 -> 9')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.h',
+     b'#define\tUPB_IMMEDIA_ITEM_COUNT\t3',
+     b'#define\tUPB_IMMEDIA_ITEM_COUNT\t9',
+     'so o lop khung duoi dung 3 -> 9')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
