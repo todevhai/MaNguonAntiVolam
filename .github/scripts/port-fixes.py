@@ -1309,6 +1309,46 @@ edit('S3Client/Ui/Elem/Wnds.cpp',
            b'\tif (s_WndStation.pFocusWnd != pWnd)'),
      'in moi lan doi tieu diem')
 
+# ------------------------------- SUA LOI: moi ten dai hon MOT ky tu deu bi tu choi
+# KUiNewPlayer::GetInputInfo duyet tung ky tu cua ten, roi kiem "i < nLen" NGAY
+# TRONG vong lap:
+#
+#     for (int i = 0; i < nLen;) {
+#         ... i++ hoac i += 2 ...
+#         if (i < nLen) { bao "ten co ky tu khong hop le"; return false; }
+#     }
+#
+# Sau ky tu DAU TIEN, neu ten con ky tu nua thi i < nLen dung -> bao loi va thoat.
+# Nghia la chi ten dai DUNG MOT ky tu moi qua duoc, ma do lai ngan hon muc toi
+# thieu ba ky tu. Khong ten nao tao duoc.
+#
+# Cho kiem tra do le ra nam SAU vong lap, de bat truong hop vong lap break giua
+# chung vi gap ky tu ngoai khoang cho phep. Vo hieu trong vong lap, dat lai sau.
+# Bien dem khai TRONG for; MSVC moi khong cho dung no sau vong lap nua.
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'\tfor (int i = 0; i < nLen;)',
+     _crlf(b'\tint i = 0;\n'
+           b'\tfor (; i < nLen;)'),
+     'dua bien dem ra ngoai vong lap')
+
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'\t\tif (i < nLen)',
+     b'\t\tif (0)\t/* kiem tra nay da chuyen ra SAU vong lap */',
+     'bo kiem tra dat nham trong vong lap duyet ten')
+
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'\tif (nLen >= LOGIN_ROLE_NAME_MIN_LEN && nLen <= LOGIN_ROLE_NAME_MAX_LEN)',
+     _crlf(b'\t/* Vong lap tren break khi gap ky tu ngoai khoang cho phep; luc do i\n'
+           b'\t   dung lai truoc cuoi chuoi. Day moi la cho kiem dung. */\n'
+           b'\tif (i < nLen)\n'
+           b'\t{\n'
+           b'\t\tCloseWindow(false);\n'
+           b'\t\tKUiConnectInfo::OpenWindow(CI_MI_INVALID_LOGIN_INPUT1, CI_NS_NEW_ROLE_WND);\n'
+           b'\t\treturn false;\n'
+           b'\t}\n'
+           b'\tif (nLen >= LOGIN_ROLE_NAME_MIN_LEN && nLen <= LOGIN_ROLE_NAME_MAX_LEN)'),
+     'dat lai kiem tra ky tu ten SAU vong lap')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
