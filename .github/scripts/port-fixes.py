@@ -1095,6 +1095,28 @@ edit('Engine/Src/XPackFile.cpp',
            b'\t\t        DirectRead(pReadBuffer, uOffset, uSize))'),
      'nhan them phuong phap nen 0x20 (cung la nrv2b)')
 
+# DOI HANH VI - doi ten bang vu khi->chieu sang ASCII.
+#
+# Do 28/08/2026:
+#   [TuDong] SetDefaultImmedSkill: loai=-1 rieng=-1 tay-khong=0 cap=0 chieu0=53
+# loai=-1 la tay khong nen nhanh dung chay, chieu0=53 nen danh sach vo cong CO
+# chieu 53. Nhung tay-khong=0, tuc g_nHandSkill = 0: bang vu khi->chieu KHONG
+# NAP DUOC. Ma SetLeftSkill(0) bi guard tu choi -> m_nLeftSkillID = 0 -> client
+# xep lenh do_skill voi chieu 0 -> FindSame(0) = 0 -> DoStand() -> khong co dong
+# tac danh. May chu van ra don vi NpcSkillCommand tu thay 0 bang chieu vu khi.
+#
+# Vi sao khong nap duoc: ten tep la GBK, ma APFS TU CHOI ten GBK (Errno 92) nen
+# ban tren dia mang ten da boc hai lan. Doi sang ASCII la duong da dung cho toan
+# bo tep giao dien (client/ten-ini-tu-viet.txt) va cho chinh may chu - may chu
+# doc settings/vukhi-kynang-vatly.txt.
+#
+# Tep di kem: client/ui-tu-viet/settings/vukhi-kynang-vatly.txt (cot DetailType,
+# ParticularType, PhysicsSkillID; dong -1 0 53 cho tay khong).
+edit('Core/Src/CoreUseNameDef.h',
+     b'#define WEAPON_PHYSICSSKILLFILE\t\t\t"\\\\settings\\\\\xce\xe4\xc6\xf7\xce\xef\xc0\xed\xb9\xa5\xbb\xf7\xb6\xd4\xd5\xd5\xb1\xed.txt"',
+     b'#define WEAPON_PHYSICSSKILLFILE\t\t\t"\\\\settings\\\\vukhi-kynang-vatly.txt"',
+     'doi bang vu khi->chieu sang ten ASCII (APFS tu choi ten GBK)')
+
 # --------------------------------------------------------- header bu ten ham
 # Engine khai bao g_strcpy / g_strcpyLen (chu 's' thuong) nhung Core goi
 # g_StrCpy / g_StrCpyLen (chu 'S' hoa). Ca nhom con lai (g_StrCat, g_StrCmp,
