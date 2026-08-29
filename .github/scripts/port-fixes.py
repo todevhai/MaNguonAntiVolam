@@ -1469,6 +1469,25 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\t\tm_ImmediaItem[i].SetObjectGenre(CGOG_NOTHING);\t/* nhan ca vo cong lan vat pham */',
      'o phim tat nhan ca vo cong')
 
+# ---------------------------------------- SUA LOI: hover vat pham lam sap client
+# KItem::GetDesc dung sprintf khong gioi han de ghep TEN vat pham vao hai bo dem
+# qua nho tren ngan xep:
+#   char sItemName[64];  sprintf(sItemName, "%s + %d", szItemName, nEnChance);
+#   char TextLevel[10];  sprintf(TextLevel, "%s [Cap %d]", szItemName, ...);
+# Ma szItemName dai 80 byte (KItem.h:105). Ten thuong ngan nen it lo, nhung vat
+# pham co cap hoac co so lan ep thi tran ngay - hong con hem ngan xep, Wine bao
+# "Unhandled exception code c0000409".
+# Do 29/08/2026: F4 mo binh thuong, HOVER vao con ngua la sap.
+edit('Core/Src/KItem.cpp',
+     b'\t\tchar sItemName[64];',
+     b'\t\tchar sItemName[160];\t/* ten dai 80 byte, cong hau to - xem ghi chu */',
+     'noi bo dem ten trong mo ta vat pham')
+
+edit_all('Core/Src/KItem.cpp',
+     b'\t\t\tchar    TextLevel[10];',
+     b'\t\t\tchar    TextLevel[160];\t/* phai chua ca TEN 80 byte, khong chi con so */',
+     'noi bo dem ten kem cap trong mo ta vat pham')
+
 # ---------------------------------------- xoa nhan vat: ten bi cat con BON ky tu
 # SUA LOI. KLogin::DeleteRole chep ten nhan vat vao goi xoa bang
 #   strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName,
