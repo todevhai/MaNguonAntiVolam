@@ -681,6 +681,30 @@ edit('Core/Src/KNpcSet.cpp',
      'gan gio that vao log hoi NPC')
 
 
+edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
+     b'\tstatic KUiToolsControlBar* GetSelf()',
+     _crlf(b'\tstatic void\tMoMenuPK(int x, int y);\t/* Player_PK::OnButtonClick goi */\n'
+           b'\tstatic KUiToolsControlBar* GetSelf()'),
+     'khai bao MoMenuPK cho lop ngoai goi duoc')
+
+edit('S3Client/Ui/UiShell.cpp',
+     b'\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);',
+     _crlf(b'\t/* Mo menu chon che do thay vi lat co ngay. Lop Player_PK van lo phan\n'
+           b'\t   VE trang thai nut qua UpdateData/CheckButton. */\n'
+           b'\tKUiToolsControlBar* pThanh = KUiToolsControlBar::GetSelf();\n'
+           b'\tif (pThanh)\n'
+           b'\t{\n'
+           b'\t\tint nX = 0, nY = 0;\n'
+           b'\t\tGetAbsolutePos(&nX, &nY);\n'
+           b'\t\tKUiToolsControlBar::MoMenuPK(nX, nY);\n'
+           b'\t}'),
+     'nut PK mo menu thay vi tu lat co')
+
+edit('S3Client/Ui/UiShell.cpp',
+     b'#include "UiCase/UiChatCentre.h"',
+     b'#include "UiCase/UiChatCentre.h"\r\n#include "UiCase/UiToolsControlBar.h"',
+     'them UiToolsControlBar.h cho UiShell')
+
 # ---------------------------------------------------------------------------
 # Nut chon che do PK tren thanh cong cu.
 #
@@ -700,6 +724,8 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'   0 = luyen cong (tat PK thuong), 1 = chien dau (bat PK thuong). */\n'
            b'void KUiToolsControlBar::MoMenuPK(int x, int y)\n'
            b'{\n'
+           b'\tif (!m_pSelf)\n'
+           b'\t\treturn;\n'
            b'\tKPopupMenuData* pMenu = (KPopupMenuData*)malloc(MENU_DATA_SIZE(3));\n'
            b'\tif (!pMenu)\n'
            b'\t\treturn;\n'
@@ -719,7 +745,7 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\tpMenu->nY = y;\n'
            b'\tpMenu->nSelectedItem = g_pCoreShell ?\n'
            b'\t\tg_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0) : 0;\n'
-           b'\tKPopupMenu::Popup(pMenu, (KWndWindow*)this, MENU_CHON_CHE_DO_PK);\n'
+           b'\tKPopupMenu::Popup(pMenu, (KWndWindow*)m_pSelf, MENU_CHON_CHE_DO_PK);\n'
            b'}\n'
            b'\n'
            b'int KUiToolsControlBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
@@ -1309,8 +1335,7 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
            b'\tKWndButton\tm_Sit;\n'
            b'\tKWndButton\tm_Horse;\n'
            b'\tKWndButton\tm_Exchange;\n'
-           b'\tKWndButton\tm_PK;\n'
-           b'\tvoid\tMoMenuPK(int x, int y);'),
+           b'\tKWndButton\tm_PK;'),
      'khai muoi nut chuc nang')
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
@@ -1363,12 +1388,6 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_HORSE);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Exchange)\n'
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
-           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
-           b'\t\t{\n'
-           b'\t\t\tint nX = 0, nY = 0;\n'
-           b'\t\t\tm_PK.GetAbsolutePos(&nX, &nY);\n'
-           b'\t\t\tMoMenuPK(nX, nY);\n'
-           b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
 
