@@ -623,6 +623,17 @@ edit('Core/Src/KProtocolProcess.cpp',
      b'\tg_DebugLog("[net]Msg:%d", (int)pMsg[0]);',
      'in opcode dang so thay vi ky tu')
 
+# Log NGAY TRUOC nhanh `if (nIndex > 0)`: hai log duoi nam trong nhanh do nen
+# khong noi gi khi ItemSet.Add tra 0 - va do dung la truong hop dang gap.
+edit_after('Core/Src/KProtocolProcess.cpp',
+     b'void KProtocolProcess::s2cSyncItem(BYTE* pMsg)',
+     b'\tif (nIndex > 0)',
+     _crlf(b'\tg_DebugLog("[vatpham]goi genre=%d detail=%d part=%d level=%d series=%d gold=%d -> idx=%d",\n'
+           b'\t\t(int)pItemSync->m_Genre, (int)pItemSync->m_Detail, (int)pItemSync->m_Particur,\n'
+           b'\t\t(int)pItemSync->m_Level, (int)pItemSync->m_Series, (int)pItemSync->m_GoldId, nIndex);\n'
+           b'\tif (nIndex > 0)'),
+     'log ca khi ItemSet.Add that bai', 2000)
+
 # Do vi sao vat pham may chu cap xuong khong hien trong tui: goi s2c_syncitem CO
 # toi client (dem duoc o log), nhung tui van trong. Hai cho co the nuot im lang:
 # ItemSet.Add tra 0 khi het o, va KItemList::Add tra 0 khi PlaceItem tu choi
