@@ -623,6 +623,26 @@ edit('Core/Src/KProtocolProcess.cpp',
      b'\tg_DebugLog("[net]Msg:%d", (int)pMsg[0]);',
      'in opcode dang so thay vi ky tu')
 
+# Do vi sao vat pham may chu cap xuong khong hien trong tui: goi s2c_syncitem CO
+# toi client (dem duoc o log), nhung tui van trong. Hai cho co the nuot im lang:
+# ItemSet.Add tra 0 khi het o, va KItemList::Add tra 0 khi PlaceItem tu choi
+# (vat pham rong 0x0 vi bang du lieu client khong khop se roi vao truong hop nay).
+edit('Core/Src/KProtocolProcess.cpp',
+     b'\t\tItem[nIndex].SetStackNum(pItemSync->m_StackNum);',
+     _crlf(b'\t\tg_DebugLog("[vatpham]tao idx=%d genre=%d detail=%d part=%d level=%d series=%d",\n'
+           b'\t\t\tnIndex, (int)pItemSync->m_Genre, (int)pItemSync->m_Detail,\n'
+           b'\t\t\t(int)pItemSync->m_Particur, (int)pItemSync->m_Level, (int)pItemSync->m_Series);\n'
+           b'\t\tItem[nIndex].SetStackNum(pItemSync->m_StackNum);'),
+     'log vat pham nhan duoc tu may chu')
+
+edit('Core/Src/KProtocolProcess.cpp',
+     b'\t\tPlayer[CLIENT_PLAYER_INDEX].m_ItemList.Add(nIndex, pItemSync->m_btPlace, pItemSync->m_btX, pItemSync->m_btY);',
+     _crlf(b'\t\tint nVaoTui = Player[CLIENT_PLAYER_INDEX].m_ItemList.Add(nIndex, pItemSync->m_btPlace, pItemSync->m_btX, pItemSync->m_btY);\n'
+           b'\t\tg_DebugLog("[vatpham]dat place=%d x=%d y=%d cd=%dx%d ket qua=%d",\n'
+           b'\t\t\t(int)pItemSync->m_btPlace, (int)pItemSync->m_btX, (int)pItemSync->m_btY,\n'
+           b'\t\t\tItem[nIndex].GetWidth(), Item[nIndex].GetHeight(), nVaoTui);'),
+     'log ket qua dat vat pham vao tui')
+
 edit('S3Client/Login/Login.cpp',
      b'\t\tm_Status = LL_S_IN_GAME;',
      _crlf(b'\t\tg_DebugLog("[TuDong] DA VAO GAME, nhan vat=%s", m_Choices.szProcessingRoleName);\n'
