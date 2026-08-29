@@ -1349,20 +1349,6 @@ edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
            b'\tif (nLen >= LOGIN_ROLE_NAME_MIN_LEN && nLen <= LOGIN_ROLE_NAME_MAX_LEN)'),
      'dat lai kiem tra ky tu ten SAU vong lap')
 
-# ---------------------------------------- cho go lenh GM o kenh noi quanh
-# DOI HANH VI. KUiPlayerBar chan moi dong bat dau "?gm" tru khi kenh dich la kenh
-# GM, de khoi lo lenh ra kenh cong khai. Nhung ben may chu, TextGMFilter CHI duoc
-# goi o nhanh CHAT_CUR_CHANNEL_SCREEN (noi quanh man hinh) - noi rieng khong qua
-# do. Hai dieu kien khong bao gio cung dung, nen khong duong nao go duoc lenh GM.
-#
-# Bo phep chan. Phong thu can lenh GM de phat vat pham va chay script thu.
-# CANH BAO: TextGMFilter ben may chu KHONG kiem quyen GM. Truoc khi mo cho nguoi
-# choi that phai them kiem quyen, hoac dat lai phep chan nay.
-edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
-     b'\t\tif (nMsgLength > 3 &&',
-     b'\t\tif (false && nMsgLength > 3 &&\t/* bo chan: xem ghi chu trong port-fixes */',
-     'cho go lenh GM o kenh thuong')
-
 # ---------------------------------------- xoa nhan vat: ten bi cat con BON ky tu
 # SUA LOI. KLogin::DeleteRole chep ten nhan vat vao goi xoa bang
 #   strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName,
