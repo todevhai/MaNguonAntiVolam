@@ -691,34 +691,6 @@ edit('Core/Src/KNpcSet.cpp',
 # May chu giu ba co rieng (m_nNormalPKFlag, m_nExercisePKFlag, m_nEnmityPKState)
 # nhung chi mo HAI lenh c2s: doi co PK thuong va do sat. Do sat con phai chon
 # nguoi truoc nen khong dat vao menu nay duoc; menu chi co hai muc that su chay.
-edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
-     b'\tKWndButton\tm_Options;',
-     _crlf(b'\tKWndButton\tm_Options;\n'
-           b'\tKWndButton\tm_PK;\n'
-           b'\tvoid\tMoMenuPK(int x, int y);'),
-     'khai bao nut PK va menu cua no')
-
-edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'\tAddChild(&m_Options);',
-     _crlf(b'\tAddChild(&m_Options);\n\tAddChild(&m_PK);'),
-     'gan nut PK vao thanh cong cu')
-
-edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'\t\t\tm_pSelf->m_Options.Init(&Ini, "Options");',
-     _crlf(b'\t\t\tm_pSelf->m_Options.Init(&Ini, "Options");\n'
-           b'\t\t\tm_pSelf->m_PK.Init(&Ini, "PK");'),
-     'nap muc [PK] tu ini')
-
-edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_Friend)',
-     _crlf(b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
-           b'\t\t{\n'
-           b'\t\t\tint x = 0, y = 0;\n'
-           b'\t\t\tm_PK.GetAbsolutePos(&x, &y);\n'
-           b'\t\t\tMoMenuPK(x, y);\n'
-           b'\t\t}\n'
-           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
-     'bam nut PK thi mo menu')
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      b'int KUiToolsControlBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
@@ -1319,7 +1291,8 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
            b'\tKWndButton\tm_Sit;\n'
            b'\tKWndButton\tm_Horse;\n'
            b'\tKWndButton\tm_Exchange;\n'
-           b'\tKWndButton\tm_PK;'),
+           b'\tKWndButton\tm_PK;\n'
+           b'\tvoid\tMoMenuPK(int x, int y);'),
      'khai muoi nut chuc nang')
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
@@ -1373,7 +1346,11 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Exchange)\n'
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
-           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);\n'
+           b'\t\t{\n'
+           b'\t\t\tint nX = 0, nY = 0;\n'
+           b'\t\t\tm_PK.GetAbsolutePos(&nX, &nY);\n'
+           b'\t\t\tMoMenuPK(nX, nY);\n'
+           b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
 
