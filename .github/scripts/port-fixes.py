@@ -1349,6 +1349,19 @@ edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
            b'\tif (nLen >= LOGIN_ROLE_NAME_MIN_LEN && nLen <= LOGIN_ROLE_NAME_MAX_LEN)'),
      'dat lai kiem tra ky tu ten SAU vong lap')
 
+# ---------------------------------------- xoa nhan vat: ten bi cat con BON ky tu
+# SUA LOI. KLogin::DeleteRole chep ten nhan vat vao goi xoa bang
+#   strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName,
+#           sizeof((const char*)pResponse->szRoleName));
+# sizeof cua mot bieu thuc DA EP sang con tro la 4 - kich thuoc con tro, khong
+# phai kich thuoc mang. Nen chi bon ky tu dau duoc chep; phan con lai giu nguyen
+# rac tu RandMemSet o tren. May chu doc ra ten kieu "Thie" + rac va tu choi.
+# Do 29/08/2026: nhat ky cong vao ghi  xoa "ThieNC...rac...": SAI MAT KHAU.
+edit('S3Client/Login/Login.cpp',
+     b'\t\tstrncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName, sizeof((const char*)pResponse->szRoleName));',
+     b'\t\tstrncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName, sizeof(NetCommand.szRoleName));',
+     'chep du ten nhan vat vao goi xoa (sizeof con tro -> sizeof mang)')
+
 # ---------------------------------------- thanh mau/noi/the/kinh nghiem tren dinh
 # DOI HANH VI - bon thanh tren dinh man hinh chua bao gio ve ra gi.
 #
