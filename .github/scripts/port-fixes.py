@@ -683,22 +683,10 @@ edit('Core/Src/KNpcSet.cpp',
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
      b'\tstatic KUiToolsControlBar* GetSelf()',
-     _crlf(b'\tstatic void\tMoMenuPK(int x, int y);\t/* Player_PK::OnButtonClick goi */\n'
+     _crlf(b'\tstatic void\tMoMenuPK(int x, int y);\t/* static: dung m_pSelf */\n'
            b'\tstatic KUiToolsControlBar* GetSelf()'),
      'khai bao MoMenuPK cho lop ngoai goi duoc')
 
-edit('S3Client/Ui/UiShell.cpp',
-     b'\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);',
-     _crlf(b'\t/* Mo menu chon che do thay vi lat co ngay. Lop Player_PK van lo phan\n'
-           b'\t   VE trang thai nut qua UpdateData/CheckButton. */\n'
-           b'\tKUiToolsControlBar* pThanh = KUiToolsControlBar::GetSelf();\n'
-           b'\tif (pThanh)\n'
-           b'\t{\n'
-           b'\t\tint nX = 0, nY = 0;\n'
-           b'\t\tGetAbsolutePos(&nX, &nY);\n'
-           b'\t\tKUiToolsControlBar::MoMenuPK(nX, nY);\n'
-           b'\t}'),
-     'nut PK mo menu thay vi tu lat co')
 
 edit('S3Client/Ui/UiShell.cpp',
      b'#include "UiCase/UiChatCentre.h"',
@@ -762,6 +750,9 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\t{\n'
            b'\t\t\t\tif (g_pCoreShell)\n'
            b'\t\t\t\t\tg_pCoreShell->OperationRequest(GOI_PK_SETTING, 0, nChon);\n'
+           b'\t\t\t\t/* Tu ve lai trang thai nut: khong dat ClassType=Player_PK\n'
+           b'\t\t\t\t   nen khong con UpdateData/CheckButton cua lop do lam ho. */\n'
+           b'\t\t\t\tm_PK.CheckButton(nChon);\n'
            b'\t\t\t}\n'
            b'\t\t\telse if (nChon == 2 && g_pCoreShell)\n'
            b'\t\t\t{\n'
@@ -1388,6 +1379,12 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_HORSE);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Exchange)\n'
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nX = 0, nY = 0;\n'
+           b'\t\t\tm_PK.GetAbsolutePos(&nX, &nY);\n'
+           b'\t\t\tMoMenuPK(nX, nY);\n'
+           b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
 
