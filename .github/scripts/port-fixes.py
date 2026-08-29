@@ -688,10 +688,13 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);',
      _crlf(b'\t\tif (s_uChieuTrongO[nIndex])\n'
            b'\t\t{\n'
-           b'\t\t\t/* Thi trien NGAY tai cho con tro dang chi, khong doi chieu tay trai.\n'
-           b'\t\t\t   Cung duong ma Mouse_Force0 dung (ShortcutKey.cpp). */\n'
-           b'\t\t\tg_pCoreShell->UseSkill(KShortcutKeyCentre::ms_MouseX,\n'
-           b'\t\t\t\tKShortcutKeyCentre::ms_MouseY, s_uChieuTrongO[nIndex]);\n'
+           b'\t\t\t/* Thi trien NGAY ve phia con tro. Khong dung\n'
+           b'\t\t\t   KShortcutKeyCentre::ms_MouseX: bien do chi duoc gan trong\n'
+           b'\t\t\t   HandleMouseInput, tuc luc BAM chuot - bam phim so khong di qua\n'
+           b'\t\t\t   do nen no giu toa do cu va chieu ra theo huong nhan vat. */\n'
+           b'\t\t\tint nChuotX = 0, nChuotY = 0;\n'
+           b'\t\t\tWnd_GetCursorPos(&nChuotX, &nChuotY);\n'
+           b'\t\t\tg_pCoreShell->UseSkill(nChuotX, nChuotY, s_uChieuTrongO[nIndex]);\n'
            b'\t\t\treturn;\n'
            b'\t\t}\n'
            b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);'),
