@@ -1349,6 +1349,21 @@ edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
            b'\tif (nLen >= LOGIN_ROLE_NAME_MIN_LEN && nLen <= LOGIN_ROLE_NAME_MAX_LEN)'),
      'dat lai kiem tra ky tu ten SAU vong lap')
 
+# ---------------------------------------- DO: goi mo rong den client mang gi
+# Tam thoi. May chu bao da gui 4 goi mo kenh, client nhan duoc ma 250 (s2c_extend),
+# nhung danh sach kenh van rong. Can biet goi den mang family/id/ten gi.
+edit('Kernel/Core/KProtocolProcess.cpp',
+     b'\tEXTEND_HEADER* pHeader = (EXTEND_HEADER*)(pMsg + sizeof(tagExtendProtoHeader));',
+     b'\tEXTEND_HEADER* pHeader = (EXTEND_HEADER*)(pMsg + sizeof(tagExtendProtoHeader));\r\n'
+     b'\tg_DebugLog("[goi mo rong] family=%d id=%d", (int)pHeader->ProtocolFamily, (int)pHeader->ProtocolID);',
+     'DO: in family/id cua goi mo rong')
+
+edit('Kernel/Core/KProtocolProcess.cpp',
+     b'\t\t\tl_pDataChangedNotifyFunc->NotifyChannelID(pNChann->channel, pNChann->channelid, pNChann->cost);',
+     b'\t\t\tg_DebugLog("[goi mo kenh] ten=\\"%s\\" id=%d gia=%d", pNChann->channel, (int)pNChann->channelid, (int)pNChann->cost);\r\n'
+     b'\t\t\tl_pDataChangedNotifyFunc->NotifyChannelID(pNChann->channel, pNChann->channelid, pNChann->cost);',
+     'DO: in ten kenh nhan duoc')
+
 # ---------------------------------------- xoa nhan vat: ten bi cat con BON ky tu
 # SUA LOI. KLogin::DeleteRole chep ten nhan vat vao goi xoa bang
 #   strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName,
