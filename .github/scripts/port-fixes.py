@@ -1391,6 +1391,11 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\tint nX = 0, nY = 0;\n'
            b'\t\t\tm_PK.GetAbsolutePos(&nX, &nY);\n'
            b'\t\t\tMoMenuPK(nX, nY);\n'
+           b'\t\t\t/* Ep nut ve dung trang thai hien hanh. Khong lam thi bam nut la\n'
+           b'\t\t\t   nut doi hinh nhu vua bat PK, trong khi may chu chua nhan lenh\n'
+           b'\t\t\t   nao ca - do duoc: bam nut khong sinh mot dong log c2s nao. */\n'
+           b'\t\t\tif (g_pCoreShell)\n'
+           b'\t\t\t\tm_PK.CheckButton(g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0));\n'
            b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
