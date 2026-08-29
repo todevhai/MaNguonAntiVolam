@@ -1420,6 +1420,46 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
            b'\t\tPick.h = m_pObjects[nPicked].DataX;'),
      'o ma tran: bat trang thai cam khi nhac len')
 
+# ---------------------------------------- bang vo cong: het diem thi nhac chieu
+# DOI HANH VI. Bang vo cong khoa nhac (UiSkills.cpp:61 EnablePickPut(false)) nen
+# click trai di sang nhanh WND_N_LEFT_CLICK_ITEM, ma nhanh do CHI lam viec khi
+# con diem ky nang - het diem thi roi xuong lop cha va khong lam gi.
+#
+# Nen: con diem thi click cong diem (giu nguyen), HET diem thi click NHAC chieu
+# len con tro de keo vao o phim tat. Hai lop (chieu thuc va ky nang song) dung
+# chung mot khuon nen phai doi ca hai cho - dung edit_all.
+edit('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'int\tKUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'/* Ve chieu dang cam theo con tro. Wnd_RenderWindows goi moi khung hinh. */\n'
+           b'static int VeChieuDangCam(int x, int y, const KUiDraggedObject& Obj, int nDropQueryResult)\n'
+           b'{\n'
+           b'\tif (g_pCoreShell && Obj.uGenre != CGOG_NOTHING)\n'
+           b'\t\tg_pCoreShell->DrawGameObj(Obj.uGenre, Obj.uId, x - 16, y - 16, 32, 32, 0);\n'
+           b'\treturn 1;\n'
+           b'}\n'
+           b'\n'
+           b'int\tKUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'them ham ve chieu dang cam')
+
+edit_all('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'\treturn KWndPage::WndProc(uMsg, uParam, nParam);',
+     _crlf(b'\t/* Het diem ky nang: click trai NHAC chieu len con tro, de dat vao o phim tat. */\n'
+           b'\tif (uMsg == WND_N_LEFT_CLICK_ITEM && uParam && m_nRemainSkillPoint == 0)\n'
+           b'\t{\n'
+           b'\t\tKUiDraggedObject* pChieu = (KUiDraggedObject*)uParam;\n'
+           b'\t\tif (pChieu->uGenre != CGOG_NOTHING)\n'
+           b'\t\t\tWnd_DragBegin(pChieu, VeChieuDangCam);\n'
+           b'\t\treturn 0;\n'
+           b'\t}\n'
+           b'\treturn KWndPage::WndProc(uMsg, uParam, nParam);'),
+     'het diem thi nhac chieu len con tro')
+
+# O phim tat: nhan CA vo cong, khong chi vat pham. CGOG_NOTHING = khong loc loai.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\t\tm_ImmediaItem[i].SetObjectGenre(CGOG_ITEM);',
+     b'\t\tm_ImmediaItem[i].SetObjectGenre(CGOG_NOTHING);\t/* nhan ca vo cong lan vat pham */',
+     'o phim tat nhan ca vo cong')
+
 # ---------------------------------------- xoa nhan vat: ten bi cat con BON ky tu
 # SUA LOI. KLogin::DeleteRole chep ten nhan vat vao goi xoa bang
 #   strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName,
