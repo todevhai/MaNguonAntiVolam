@@ -1422,12 +1422,13 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
 
 # ---------------------------------------- bang vo cong: het diem thi nhac chieu
 # DOI HANH VI. Bang vo cong khoa nhac (UiSkills.cpp:61 EnablePickPut(false)) nen
-# click trai di sang nhanh WND_N_LEFT_CLICK_ITEM, ma nhanh do CHI lam viec khi
-# con diem ky nang - het diem thi roi xuong lop cha va khong lam gi.
+# click trai di sang nhanh WND_N_LEFT_CLICK_ITEM, ma nhanh do dung de CONG DIEM.
+# Nhin ban chuan thi thay do la hai viec KHAC nhau: moi chieu co mot nut dau cong
+# rieng de cong diem, con click vao chinh chieu la NHAC no len con tro.
 #
-# Nen: con diem thi click cong diem (giu nguyen), HET diem thi click NHAC chieu
-# len con tro de keo vao o phim tat. Hai lop (chieu thuc va ky nang song) dung
-# chung mot khuon nen phai doi ca hai cho - dung edit_all.
+# Nen: click vao chieu LUON nhac len, khong con cong diem nua. Nut dau cong chua
+# co - phai them vao so do bang va vao ma, la viec rieng.
+# Hai lop (chieu thuc va ky nang song) dung chung mot khuon nen doi ca hai cho.
 edit('S3Client/Ui/UiCase/UiSkills.cpp',
      b'int\tKUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
      _crlf(b'/* Ve chieu dang cam theo con tro. Wnd_RenderWindows goi moi khung hinh. */\n'
@@ -1441,10 +1442,18 @@ edit('S3Client/Ui/UiCase/UiSkills.cpp',
            b'int\tKUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
      'them ham ve chieu dang cam')
 
+# Vo hieu nhanh cong diem cu: no dung CU CLICK VAO CHIEU, tuc cuop mat cu click
+# le ra de nhac chieu len. Cong diem se lam bang nut dau cong rieng nhu ban chuan.
+edit_all('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'\tif (uMsg == WND_N_LEFT_CLICK_ITEM && uParam && m_nRemainSkillPoint)',
+     b'\tif (0)\t/* cong diem chuyen sang nut dau cong rieng, xem ghi chu tren */',
+     'bo cong diem khoi cu click vao chieu')
+
 edit_all('S3Client/Ui/UiCase/UiSkills.cpp',
      b'\treturn KWndPage::WndProc(uMsg, uParam, nParam);',
-     _crlf(b'\t/* Het diem ky nang: click trai NHAC chieu len con tro, de dat vao o phim tat. */\n'
-           b'\tif (uMsg == WND_N_LEFT_CLICK_ITEM && uParam && m_nRemainSkillPoint == 0)\n'
+     _crlf(b'\t/* Click vao chieu: NHAC len con tro de dat vao o phim tat.\n'
+           b'\t   Cong diem la viec cua nut dau cong rieng, khong phai cua cu click nay. */\n'
+           b'\tif (uMsg == WND_N_LEFT_CLICK_ITEM && uParam)\n'
            b'\t{\n'
            b'\t\tKUiDraggedObject* pChieu = (KUiDraggedObject*)uParam;\n'
            b'\t\tif (pChieu->uGenre != CGOG_NOTHING)\n'
