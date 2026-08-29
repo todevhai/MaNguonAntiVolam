@@ -623,6 +623,61 @@ edit('Core/Src/KProtocolProcess.cpp',
      b'\tg_DebugLog("[net]Msg:%d", (int)pMsg[0]);',
      'in opcode dang so thay vi ky tu')
 
+# ---------------------------------------------------------------------------
+# Vo cong dat vao o phim tat so (1..9).
+#
+# Nguon 8.x chi luu duoc chieu o TAY TRAI va TAY PHAI: GOI_SET_IMMDIA_SKILL
+# (CoreShell.cpp) chi hien thuc nParam 0 va 1, du chu thich ngay tren no hua
+# "1..4 -> F1..F4". Khong co phong nao ben may chu chua chieu theo o so, khac han
+# vat pham - vat pham di qua GOI_SWITCH_OBJECT vi may chu giu tui do.
+#
+# Nen giu ngay o client. Chieu trong o MAT khi thoat game; muon giu lai phai them
+# duong luu xuong may chu, chua lam.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'void KUiPlayerBar::OnObjPickedDropped(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)',
+     _crlf(b'/* Chieu dang nam trong tung o phim tat. 0 = o do khong giu chieu\n'
+           b'   (dang trong, hoac dang giu vat pham - vat pham do may chu quan ly). */\n'
+           b'static unsigned int s_uChieuTrongO[UPB_IMMEDIA_ITEM_COUNT] = {0};\n'
+           b'\n'
+           b'void KUiPlayerBar::OnObjPickedDropped(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)'),
+     'cho o phim tat nho duoc chieu')
+
+# Chan truoc GOI_SWITCH_OBJECT: yeu cau do la duong cua VAT PHAM, may chu se
+# khong hieu mot cai id chieu gui vao room_immediacy.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, ',
+     _crlf(b'\tif ((pPickPos && Pick.Obj.uGenre == CGOG_SKILL) ||\n'
+           b'\t\t(pDropPos && Drop.Obj.uGenre == CGOG_SKILL))\n'
+           b'\t{\n'
+           b'\t\tif (pPickPos && Pick.Region.h >= 0 && Pick.Region.h < UPB_IMMEDIA_ITEM_COUNT)\n'
+           b'\t\t{\n'
+           b'\t\t\ts_uChieuTrongO[Pick.Region.h] = 0;\n'
+           b'\t\t\tm_ImmediaItem[Pick.Region.h].HoldObject(CGOG_NOTHING, 0, 0, 0);\n'
+           b'\t\t}\n'
+           b'\t\tif (pDropPos && Drop.Region.h >= 0 && Drop.Region.h < UPB_IMMEDIA_ITEM_COUNT)\n'
+           b'\t\t{\n'
+           b'\t\t\ts_uChieuTrongO[Drop.Region.h] = Drop.Obj.uId;\n'
+           b'\t\t\tm_ImmediaItem[Drop.Region.h].HoldObject(CGOG_SKILL, Drop.Obj.uId, 0, 0);\n'
+           b'\t\t}\n'
+           b'\t\treturn;\n'
+           b'\t}\n'
+           b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, '),
+     'tha vo cong vao o phim tat thi giu o client')
+
+# Bam so vao o giu chieu: dat chieu do thanh chieu tay trai, dung thoi quen VLTK.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);',
+     _crlf(b'\t\tif (s_uChieuTrongO[nIndex])\n'
+           b'\t\t{\n'
+           b'\t\t\tKUiGameObject Chieu;\n'
+           b'\t\t\tChieu.uGenre = CGOG_SKILL;\n'
+           b'\t\t\tChieu.uId = s_uChieuTrongO[nIndex];\n'
+           b'\t\t\tg_pCoreShell->OperationRequest(GOI_SET_IMMDIA_SKILL, (unsigned int)&Chieu, 0);\n'
+           b'\t\t\treturn;\n'
+           b'\t\t}\n'
+           b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);'),
+     'bam so vao o giu chieu thi doi chieu tay trai')
+
 # Log NGAY TRUOC nhanh `if (nIndex > 0)`: hai log duoi nam trong nhanh do nen
 # khong noi gi khi ItemSet.Add tra 0 - va do dung la truong hop dang gap.
 edit_after('Core/Src/KProtocolProcess.cpp',
