@@ -1364,6 +1364,62 @@ edit('Kernel/Core/KProtocolProcess.cpp',
      b'\t\t\tl_pDataChangedNotifyFunc->NotifyChannelID(pNChann->channel, pNChann->channelid, pNChann->cost);',
      'DO: in ten kenh nhan duoc')
 
+# ---------------------------------------- keo vat pham / vo cong len con tro
+# DOI HANH VI - khung keo tha da dung DU nhung chua bao gio duoc noi.
+#
+# Wnds.cpp co san cho luu vat dang cam, Wnd_GetDragObj de hoi, va
+# Wnd_RenderWindows DA ve vat theo con tro neu duoc dua cho mot ham ve. Nhung
+# Wnd_DragBegin - ham bat trang thai "dang cam" - CHI duoc khai trong Wnds.h,
+# khong mot cho nao goi. Nen bDragging vinh vien false: nhac khong len, tha
+# khong duoc, ca vat pham lan vo cong.
+#
+# Noi o LOP NEN (WndObjContainer) nen moi o deu duoc: tui, kho, vo cong, phim tat.
+# Moi moc vao deu la MOT DONG: nguon o day dung LF con CI checkout ra CRLF, mau
+# nhieu dong khong bao gio khop.
+
+# 1. Ham ve vat dang cam theo con tro. Dat truoc KWndObjectBox::WndProc vi do la
+#    cho dung DAU TIEN - de sau thi trinh dich khong thay.
+#    Dung dung duong ma o vat pham ve chinh no (g_pCoreShell->DrawGameObj).
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'int KWndObjectBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'/* Ve vat dang cam theo con tro. Wnd_RenderWindows goi ham nay moi khung\n'
+           b'   hinh khi co vat duoc nhac len. 32x32 vua mot o phim tat.\n'
+           b'   Tra 1 de con tro chuot van duoc ve len tren. */\n'
+           b'static int VeVatDangCam(int x, int y, const KUiDraggedObject& Obj, int nDropQueryResult)\n'
+           b'{\n'
+           b'\tif (g_pCoreShell && Obj.uGenre != CGOG_NOTHING)\n'
+           b'\t\tg_pCoreShell->DrawGameObj(Obj.uGenre, Obj.uId, x - 16, y - 16, 32, 32, 0);\n'
+           b'\treturn 1;\n'
+           b'}\n'
+           b'\n'
+           b'int KWndObjectBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'them ham ve vat dang cam theo con tro')
+
+# 2. O DON - nhac len: bat trang thai cam truoc khi bao len cha.
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'\t\t\t\telse if (m_Object.uGenre != CGOG_NOTHING )',
+     b'\t\t\t\telse if (m_Object.uGenre != CGOG_NOTHING && Wnd_DragBegin(&m_Object, VeVatDangCam))',
+     'o don: bat trang thai cam khi nhac len')
+
+# 3. O DON - tha xong thi nha vat khoi con tro.
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'\t\t\t\t\tDropObject(false);',
+     b'\t\t\t\t\tDropObject(false);\tWnd_DragFinished();',
+     'o don: nha vat sau khi tha')
+
+# 4. O MA TRAN (tui do, bang vo cong) - tha xong thi nha.
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'\t\t\t\tDropObject(LOWORD(nParam), HIWORD(nParam), false);',
+     b'\t\t\t\t{ DropObject(LOWORD(nParam), HIWORD(nParam), false); Wnd_DragFinished(); }',
+     'o ma tran: nha vat sau khi tha')
+
+# 5. O MA TRAN - nhac len.
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'\t\tPick.h = m_pObjects[nPicked].DataX;',
+     _crlf(b'\t\tWnd_DragBegin(&m_pObjects[nPicked], VeVatDangCam);\n'
+           b'\t\tPick.h = m_pObjects[nPicked].DataX;'),
+     'o ma tran: bat trang thai cam khi nhac len')
+
 # ---------------------------------------- xoa nhan vat: ten bi cat con BON ky tu
 # SUA LOI. KLogin::DeleteRole chep ten nhan vat vao goi xoa bang
 #   strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName,
