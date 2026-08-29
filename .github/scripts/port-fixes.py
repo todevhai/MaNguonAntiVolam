@@ -804,6 +804,25 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\tcase WND_N_BUTTON_CLICK:'),
      'chon muc trong menu PK')
 
+# ---------------------------------------------------------------------------
+# Chon ngu hanh: bam mot lan khong an, phai bam hai lan.
+#
+# Vong lap goc dat gia tri roi break NGAY, nen UpdateProperty() khong bao gio
+# chay cho nut vua bam; con nhanh "if (i < series_num)" thi LUON dung, nen no ve
+# lai giao dien theo he CU o moi vong truoc do. Ket qua: hien thi tre dung mot
+# nhip - bam Thuy thi thay Moc, bam lan hai moi ra Thuy.
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'\t\t\t\tm_Info.Attribute = i;',
+     _crlf(b'\t\t\t\tm_Info.Attribute = i;\n'
+           b'\t\t\t\tUiSoundPlay(UI_SI_PLAYER_ATTRIB);\n'
+           b'\t\t\t\tUpdateProperty();'),
+     'chon ngu hanh: cap nhat ngay cho nut vua bam')
+
+edit('S3Client/Ui/UiCase/UiNewPlayer.cpp',
+     b'\t\t\tif (i < series_num)',
+     b'\t\t\tif (0)\t/* nhanh nay luon dung va ve lai theo he CU - xem tren */',
+     'bo nhanh ve lai theo he cu')
+
 # Do vi sao tha vat pham vao o phim tat lai khong an: van con cam tren tay, tuc
 # DropObject tu choi hoac WndProc khong toi noi. In ra loai vat dang keo.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
