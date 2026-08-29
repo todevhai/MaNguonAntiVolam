@@ -670,12 +670,12 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
 # Do vi sao tha vat pham vao o phim tat lai khong an: van con cam tren tay, tuc
 # DropObject tu choi hoac WndProc khong toi noi. In ra loai vat dang keo.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
-     b'\tif ((pPickPos && Pick.Obj.uGenre == CGOG_SKILL) ||',
+     b'\tif ((pPickPos && (Pick.Obj.uGenre & 0xFFFF) == CGOG_SKILL) ||',
      _crlf(b'\tg_DebugLog("[o]pick=%d drop=%d gpick=%u gdrop=%u o=%d",\n'
            b'\t\tpPickPos ? 1 : 0, pDropPos ? 1 : 0,\n'
            b'\t\tpPickPos ? Pick.Obj.uGenre : 0, pDropPos ? Drop.Obj.uGenre : 0,\n'
            b'\t\tpDropPos ? Drop.Region.h : (pPickPos ? Pick.Region.h : -1));\n'
-           b'\tif ((pPickPos && Pick.Obj.uGenre == CGOG_SKILL) ||'),
+           b'\tif ((pPickPos && (Pick.Obj.uGenre & 0xFFFF) == CGOG_SKILL) ||'),
      'log loai vat keo vao o phim tat')
 
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
