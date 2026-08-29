@@ -693,6 +693,39 @@ edit('S3Client/Ui/UiShell.cpp',
      b'#include "UiCase/UiChatCentre.h"\r\n#include "UiCase/UiToolsControlBar.h"',
      'them UiToolsControlBar.h cho UiShell')
 
+edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
+     b'\tstatic void\tMoMenuPK(int x, int y);',
+     _crlf(b'\tstatic void\tMoMenuPK(int x, int y);\n'
+           b'\tstatic void\tVeCoPK(int nBat);\t/* goi tu GDCNI_PK_SETTING */'),
+     'khai bao VeCoPK')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'void KUiToolsControlBar::MoMenuPK(int x, int y)',
+     _crlf(b'/* Ve trang thai nut PK theo goi s2c_pksyncnormalflag cua may chu.\n'
+           b'   Client KHONG tu giu co: truoc day nut tu doi hinh khi bam trong khi may\n'
+           b'   chu chua nhan lenh nao, nen hai ben lech nhau va nut nhay loan. */\n'
+           b'void KUiToolsControlBar::VeCoPK(int nBat)\n'
+           b'{\n'
+           b'\tif (m_pSelf)\n'
+           b'\t\tm_pSelf->m_PK.CheckButton(nBat ? 1 : 0);\n'
+           b'}\n'
+           b'\n'
+           b'void KUiToolsControlBar::MoMenuPK(int x, int y)'),
+     'ham ve trang thai nut PK')
+
+edit('S3Client/Ui/GameSpaceChangedNotify.cpp',
+     b'#include "UiCase/UiPlayerBar.h"',
+     b'#include "UiCase/UiPlayerBar.h"\r\n#include "UiCase/UiToolsControlBar.h"',
+     'them UiToolsControlBar.h cho GameSpaceChangedNotify')
+
+edit('S3Client/Ui/GameSpaceChangedNotify.cpp',
+     b'\tcase GDCNI_PK_SETTING:',
+     _crlf(b'\tcase GDCNI_PK_SETTING:\n'
+           b'\t\t/* May chu la nguon duy nhat cua co PK: goi s2c_pksyncnormalflag ve\n'
+           b'\t\t   toi day qua KPlayerPK::SetNormalPKState. Client chi VE theo. */\n'
+           b'\t\tKUiToolsControlBar::VeCoPK(nParam);'),
+     've nut PK theo goi may chu')
+
 # ---------------------------------------------------------------------------
 # Nut chon che do PK tren thanh cong cu.
 #
@@ -757,9 +790,6 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\t{\n'
            b'\t\t\t\tif (g_pCoreShell)\n'
            b'\t\t\t\t\tg_pCoreShell->OperationRequest(GOI_PK_SETTING, 0, nChon);\n'
-           b'\t\t\t\t/* Tu ve lai trang thai nut: khong dat ClassType=Player_PK\n'
-           b'\t\t\t\t   nen khong con UpdateData/CheckButton cua lop do lam ho. */\n'
-           b'\t\t\t\tm_PK.CheckButton(nChon);\n'
            b'\t\t\t}\n'
            b'\t\t\telse if (nChon == 2 && g_pCoreShell)\n'
            b'\t\t\t{\n'
@@ -1391,11 +1421,6 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\tint nX = 0, nY = 0;\n'
            b'\t\t\tm_PK.GetAbsolutePos(&nX, &nY);\n'
            b'\t\t\tMoMenuPK(nX, nY);\n'
-           b'\t\t\t/* Ep nut ve dung trang thai hien hanh. Khong lam thi bam nut la\n'
-           b'\t\t\t   nut doi hinh nhu vua bat PK, trong khi may chu chua nhan lenh\n'
-           b'\t\t\t   nao ca - do duoc: bam nut khong sinh mot dong log c2s nao. */\n'
-           b'\t\t\tif (g_pCoreShell)\n'
-           b'\t\t\t\tm_PK.CheckButton(g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0));\n'
            b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
