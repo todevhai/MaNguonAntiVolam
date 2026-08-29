@@ -683,19 +683,19 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'#include "UiPlayerBar.h"\r\n#include "../../../Engine/src/KDebug.h"',
      'them KDebug.h cho UiPlayerBar')
 
-# Bam so vao o giu chieu: dat chieu do thanh chieu tay trai, dung thoi quen VLTK.
+# Bam so vao o giu chieu: thi trien chieu ngay, khong dong toi chieu tay trai.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);',
      _crlf(b'\t\tif (s_uChieuTrongO[nIndex])\n'
            b'\t\t{\n'
-           b'\t\t\tKUiGameObject Chieu;\n'
-           b'\t\t\tChieu.uGenre = s_uLoaiChieuTrongO[nIndex];\n'
-           b'\t\t\tChieu.uId = s_uChieuTrongO[nIndex];\n'
-           b'\t\t\tg_pCoreShell->OperationRequest(GOI_SET_IMMDIA_SKILL, (unsigned int)&Chieu, 0);\n'
+           b'\t\t\t/* Thi trien NGAY tai cho con tro dang chi, khong doi chieu tay trai.\n'
+           b'\t\t\t   Cung duong ma Mouse_Force0 dung (ShortcutKey.cpp). */\n'
+           b'\t\t\tg_pCoreShell->UseSkill(KShortcutKeyCentre::ms_MouseX,\n'
+           b'\t\t\t\tKShortcutKeyCentre::ms_MouseY, s_uChieuTrongO[nIndex]);\n'
            b'\t\t\treturn;\n'
            b'\t\t}\n'
            b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);'),
-     'bam so vao o giu chieu thi doi chieu tay trai')
+     'bam so vao o giu chieu thi thi trien ngay')
 
 # Log NGAY TRUOC nhanh `if (nIndex > 0)`: hai log duoi nam trong nhanh do nen
 # khong noi gi khi ItemSet.Add tra 0 - va do dung la truong hop dang gap.
