@@ -664,6 +664,22 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, '),
      'tha vo cong vao o phim tat thi giu o client')
 
+# Do vi sao tha vat pham vao o phim tat lai khong an: van con cam tren tay, tuc
+# DropObject tu choi hoac WndProc khong toi noi. In ra loai vat dang keo.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tif ((pPickPos && Pick.Obj.uGenre == CGOG_SKILL) ||',
+     _crlf(b'\tg_DebugLog("[o]pick=%d drop=%d gpick=%u gdrop=%u o=%d",\n'
+           b'\t\tpPickPos ? 1 : 0, pDropPos ? 1 : 0,\n'
+           b'\t\tpPickPos ? Pick.Obj.uGenre : 0, pDropPos ? Drop.Obj.uGenre : 0,\n'
+           b'\t\tpDropPos ? Drop.Region.h : (pPickPos ? Pick.Region.h : -1));\n'
+           b'\tif ((pPickPos && Pick.Obj.uGenre == CGOG_SKILL) ||'),
+     'log loai vat keo vao o phim tat')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'#include "UiPlayerBar.h"',
+     b'#include "UiPlayerBar.h"\r\n#include "../../../Engine/src/KDebug.h"',
+     'them KDebug.h cho UiPlayerBar')
+
 # Bam so vao o giu chieu: dat chieu do thanh chieu tay trai, dung thoi quen VLTK.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\t\tm_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);',
