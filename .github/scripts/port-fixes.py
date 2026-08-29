@@ -597,21 +597,8 @@ edit('S3Client/Ui/UiCase/UiInit.cpp',
            b'{\n'
            b'    if (!g_bXinDangNhapTuDong)\n'
            b'        return;\n'
-           b'    /* Thu lai vai lan: ngay sau khi Game Started tang mang chua san sang\n'
-           b'       va CreateConnection tra 0. Bo cuoc ngay lan dau thi client dung o\n'
-           b'       man dang nhap mai. Cach nhau ~30 khung hinh, thu toi 20 lan. */\n'
-           b'    static int s_nDemKhung = 0;\n'
-           b'    static int s_nSoLanThu = 0;\n'
-           b'    if (++s_nDemKhung < 30)\n'
-           b'        return;\n'
-           b'    s_nDemKhung = 0;\n'
-           b'    if (++s_nSoLanThu > 20)\n'
-           b'    {\n'
-           b'        g_bXinDangNhapTuDong = false;\n'
-           b'        return;\n'
-           b'    }\n'
-           b'    if (DangNhapTuDongTheoCauHinh())\n'
-           b'        g_bXinDangNhapTuDong = false;\n'
+           b'    g_bXinDangNhapTuDong = false;\n'
+           b'    DangNhapTuDongTheoCauHinh();\n'
            b'}\n'
            b'\n'
            b'int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
@@ -693,6 +680,90 @@ edit('Core/Src/KNpcSet.cpp',
            b'\t}'),
      'gan gio that vao log hoi NPC')
 
+
+# ---------------------------------------------------------------------------
+# Nut chon che do PK tren thanh cong cu.
+#
+# Ban chuan co menu "Luyen cong / Chien dau / Do sat". Ben ta muc [PK] da co
+# trong UiToolsControlBar.ini nhung ma KHONG khai bao nut nao, nen no khong ve
+# ra va bam khong duoc.
+#
+# May chu giu ba co rieng (m_nNormalPKFlag, m_nExercisePKFlag, m_nEnmityPKState)
+# nhung chi mo HAI lenh c2s: doi co PK thuong va do sat. Do sat con phai chon
+# nguoi truoc nen khong dat vao menu nay duoc; menu chi co hai muc that su chay.
+edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
+     b'\tKWndButton\tm_Options;',
+     _crlf(b'\tKWndButton\tm_Options;\n'
+           b'\tKWndButton\tm_PK;\n'
+           b'\tvoid\tMoMenuPK(int x, int y);'),
+     'khai bao nut PK va menu cua no')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\tAddChild(&m_Options);',
+     _crlf(b'\tAddChild(&m_Options);\n\tAddChild(&m_PK);'),
+     'gan nut PK vao thanh cong cu')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\t\t\tm_pSelf->m_Options.Init(&Ini, "Options");',
+     _crlf(b'\t\t\tm_pSelf->m_Options.Init(&Ini, "Options");\n'
+           b'\t\t\tm_pSelf->m_PK.Init(&Ini, "PK");'),
+     'nap muc [PK] tu ini')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_Friend)',
+     _crlf(b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
+           b'\t\t{\n'
+           b'\t\t\tint x = 0, y = 0;\n'
+           b'\t\t\tm_PK.GetAbsolutePos(&x, &y);\n'
+           b'\t\t\tMoMenuPK(x, y);\n'
+           b'\t\t}\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
+     'bam nut PK thi mo menu')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'int KUiToolsControlBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'#define\tMENU_CHON_CHE_DO_PK\t0x50\n'
+           b'\n'
+           b'/* Menu chon che do PK. Hai muc, dung dung mot lenh GOI_PK_SETTING:\n'
+           b'   0 = luyen cong (tat PK thuong), 1 = chien dau (bat PK thuong). */\n'
+           b'void KUiToolsControlBar::MoMenuPK(int x, int y)\n'
+           b'{\n'
+           b'\tKPopupMenuData* pMenu = (KPopupMenuData*)malloc(MENU_DATA_SIZE(2));\n'
+           b'\tif (!pMenu)\n'
+           b'\t\treturn;\n'
+           b'\tKPopupMenu::InitMenuData(pMenu, 2);\n'
+           b'\tpMenu->usMenuFlag &= ~PM_F_HAVE_HEAD_TAIL_IMG;\n'
+           b'\tpMenu->usMenuFlag |= (PM_F_AUTO_DEL_WHEN_HIDE | PM_F_CANCEL_BY_CALLER);\n'
+           b'\tpMenu->nItemTitleIndent = 0;\n'
+           b'\tpMenu->byItemTitleUpSpace = 0;\n'
+           b'\tstrcpy(pMenu->Items[0].szData, "Luyen cong");\n'
+           b'\tpMenu->Items[0].uDataLen = strlen(pMenu->Items[0].szData);\n'
+           b'\tstrcpy(pMenu->Items[1].szData, "Chien dau");\n'
+           b'\tpMenu->Items[1].uDataLen = strlen(pMenu->Items[1].szData);\n'
+           b'\tpMenu->nNumItem = 2;\n'
+           b'\tpMenu->nX = x;\n'
+           b'\tpMenu->nY = y;\n'
+           b'\tpMenu->nSelectedItem = g_pCoreShell ?\n'
+           b'\t\tg_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0) : 0;\n'
+           b'\tKPopupMenu::Popup(pMenu, (KWndWindow*)this, MENU_CHON_CHE_DO_PK);\n'
+           b'}\n'
+           b'\n'
+           b'int KUiToolsControlBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'ham mo menu PK')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\tcase WND_N_BUTTON_CLICK:',
+     _crlf(b'\tcase WND_M_MENUITEM_SELECTED:\n'
+           b'\t\tif (uParam == (unsigned int)(KWndWindow*)this &&\n'
+           b'\t\t\tHIWORD(nParam) == MENU_CHON_CHE_DO_PK)\n'
+           b'\t\t{\n'
+           b'\t\t\tif (short(LOWORD(nParam)) >= 0 && g_pCoreShell)\n'
+           b'\t\t\t\tg_pCoreShell->OperationRequest(GOI_PK_SETTING, 0, LOWORD(nParam));\n'
+           b'\t\t\tKPopupMenu::Cancel();\n'
+           b'\t\t}\n'
+           b'\t\tbreak;\n'
+           b'\tcase WND_N_BUTTON_CLICK:'),
+     'chon muc trong menu PK')
 
 # Do vi sao tha vat pham vao o phim tat lai khong an: van con cam tren tay, tuc
 # DropObject tu choi hoac WndProc khong toi noi. In ra loai vat dang keo.
