@@ -638,6 +638,7 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      _crlf(b'/* Chieu dang nam trong tung o phim tat. 0 = o do khong giu chieu\n'
            b'   (dang trong, hoac dang giu vat pham - vat pham do may chu quan ly). */\n'
            b'static unsigned int s_uChieuTrongO[UPB_IMMEDIA_ITEM_COUNT] = {0};\n'
+           b'static unsigned int s_uLoaiChieuTrongO[UPB_IMMEDIA_ITEM_COUNT] = {0};\n'
            b'\n'
            b'void KUiPlayerBar::OnObjPickedDropped(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)'),
      'cho o phim tat nho duoc chieu')
@@ -646,18 +647,20 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
 # khong hieu mot cai id chieu gui vao room_immediacy.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, ',
-     _crlf(b'\tif ((pPickPos && Pick.Obj.uGenre == CGOG_SKILL) ||\n'
-           b'\t\t(pDropPos && Drop.Obj.uGenre == CGOG_SKILL))\n'
+     _crlf(b'\tif ((pPickPos && (Pick.Obj.uGenre & 0xFFFF) == CGOG_SKILL) ||\n'
+           b'\t\t(pDropPos && (Drop.Obj.uGenre & 0xFFFF) == CGOG_SKILL))\n'
            b'\t{\n'
            b'\t\tif (pPickPos && Pick.Region.h >= 0 && Pick.Region.h < UPB_IMMEDIA_ITEM_COUNT)\n'
            b'\t\t{\n'
            b'\t\t\ts_uChieuTrongO[Pick.Region.h] = 0;\n'
+           b'\t\t\ts_uLoaiChieuTrongO[Pick.Region.h] = 0;\n'
            b'\t\t\tm_ImmediaItem[Pick.Region.h].HoldObject(CGOG_NOTHING, 0, 0, 0);\n'
            b'\t\t}\n'
            b'\t\tif (pDropPos && Drop.Region.h >= 0 && Drop.Region.h < UPB_IMMEDIA_ITEM_COUNT)\n'
            b'\t\t{\n'
            b'\t\t\ts_uChieuTrongO[Drop.Region.h] = Drop.Obj.uId;\n'
-           b'\t\t\tm_ImmediaItem[Drop.Region.h].HoldObject(CGOG_SKILL, Drop.Obj.uId, 0, 0);\n'
+           b'\t\t\ts_uLoaiChieuTrongO[Drop.Region.h] = Drop.Obj.uGenre;\n'
+           b'\t\t\tm_ImmediaItem[Drop.Region.h].HoldObject(Drop.Obj.uGenre, Drop.Obj.uId, 0, 0);\n'
            b'\t\t}\n'
            b'\t\treturn;\n'
            b'\t}\n'
@@ -686,7 +689,7 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      _crlf(b'\t\tif (s_uChieuTrongO[nIndex])\n'
            b'\t\t{\n'
            b'\t\t\tKUiGameObject Chieu;\n'
-           b'\t\t\tChieu.uGenre = CGOG_SKILL;\n'
+           b'\t\t\tChieu.uGenre = s_uLoaiChieuTrongO[nIndex];\n'
            b'\t\t\tChieu.uId = s_uChieuTrongO[nIndex];\n'
            b'\t\t\tg_pCoreShell->OperationRequest(GOI_SET_IMMDIA_SKILL, (unsigned int)&Chieu, 0);\n'
            b'\t\t\treturn;\n'
