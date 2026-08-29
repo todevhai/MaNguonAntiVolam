@@ -667,6 +667,20 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, '),
      'tha vo cong vao o phim tat thi giu o client')
 
+# Do khoang cho dau khi vao game: gan GIO THAT vao hai moc cua client de ghep
+# voi truc thoi gian cua may chu (may chu da co [do] hh:mm:ss.mmm).
+edit('Core/Src/KNpcSet.cpp',
+     b'\tg_DebugLog("[Request]Insert %d at %d on %d", dwID, nIndex, SubWorld[0].m_dwCurrentTime);',
+     _crlf(b'\t{\n'
+           b'\t\tSYSTEMTIME st;\n'
+           b'\t\tGetLocalTime(&st);\n'
+           b'\t\tg_DebugLog("[Request]%02d:%02d:%02d.%03d Insert %d at %d on %d",\n'
+           b'\t\t\tst.wHour, st.wMinute, st.wSecond, st.wMilliseconds,\n'
+           b'\t\t\tdwID, nIndex, SubWorld[0].m_dwCurrentTime);\n'
+           b'\t}'),
+     'gan gio that vao log hoi NPC')
+
+
 # Do vi sao tha vat pham vao o phim tat lai khong an: van con cam tren tay, tuc
 # DropObject tu choi hoac WndProc khong toi noi. In ra loai vat dang keo.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
