@@ -1981,10 +1981,10 @@ edit('S3Client/Ui/UiCase/UiPK.cpp',
 edit('S3Client/Ui/UiCase/UiPK.cpp',
      b'\t\tm_pSelf->Show();',
      _crlf(b'\t{\n'
-           b'\t\tg_DebugLog("[UiPK] truoc Show: hien=%d toc-do=%d",\n'
-           b'\t\t\t(int)m_pSelf->IsVisible(), m_pSelf->m_nCurrentSpeed);\n'
+           b'\t\t/* m_nCurrentSpeed la private cua KWndShowAnimate nen khong doc\n'
+           b'\t\t   duoc tu day - chi in co hien. */\n'
+           b'\t\tg_DebugLog("[UiPK] truoc Show: hien=%d", (int)m_pSelf->IsVisible());\n'
            b'\t\tm_pSelf->Show();\n'
-           b'\t\tg_DebugLog("[UiPK] sau  Show: hien=%d toc-do=%d",\n'
-           b'\t\t\t(int)m_pSelf->IsVisible(), m_pSelf->m_nCurrentSpeed);\n'
+           b'\t\tg_DebugLog("[UiPK] sau  Show: hien=%d", (int)m_pSelf->IsVisible());\n'
            b'\t}'),
      'in trang thai co cua so PK moi lan mo')
