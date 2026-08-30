@@ -691,14 +691,24 @@ edit('S3Client/Ui/UiShell.cpp',
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      b'\tUpdateData();',
      _crlf(b'\tUpdateData();\n'
-           b'\t/* Ve nut PK theo trang thai MAY CHU o moi nhip, khong doi goi bao.\n'
+           b'\t/* Ve nut PK theo trang thai MAY CHU, nhung CHI KHI GIA TRI DOI.\n'
            b'\t   Goi s2c_pksyncnormalflag ve ngay luc vao the gioi, co khi truoc ca\n'
            b'\t   luc thanh cong cu dung xong; ve mot lan luc do thi nut ket o khung\n'
-           b'\t   "luyen cong" du may chu da bat chien dau, va khong ai ve lai nua.\n'
-           b'\t   Lop Player_PK goc cung ve kieu nay (UiShell.cpp UpdateData).\n'
+           b'\t   "luyen cong" du may chu da bat chien dau. Nhung goi CheckButton MOI\n'
+           b'\t   NHIP thi no SetFrame lien tuc, de len khung "dang bam" - nguoi choi\n'
+           b'\t   thay icon nhay mot cai roi bi keo ve, va cu bam mat luon (OnLBtnUp\n'
+           b'\t   chi phat click khi co WNDBTN_F_DOWN con nguyen).\n'
            b'\t   Nut chi co hai khung Up/Down nen chien dau va do sat trong giong nhau. */\n'
            b'\tif (g_pCoreShell)\n'
-           b'\t\tm_PK.CheckButton(g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0) != 0);'),
+           b'\t{\n'
+           b'\t\tstatic int s_nCoPKDaVe = -1;\n'
+           b'\t\tint nCoPK = g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0) ? 1 : 0;\n'
+           b'\t\tif (nCoPK != s_nCoPKDaVe)\n'
+           b'\t\t{\n'
+           b'\t\t\ts_nCoPKDaVe = nCoPK;\n'
+           b'\t\t\tm_PK.CheckButton(nCoPK);\n'
+           b'\t\t}\n'
+           b'\t}'),
      've nut PK moi nhip theo trang thai may chu')
 
 # ---------------------------------------------------------------------------
