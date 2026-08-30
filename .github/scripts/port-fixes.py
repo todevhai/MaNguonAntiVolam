@@ -1873,3 +1873,22 @@ edit('S3Client/Ui/UiCase/UiGame.cpp',
      b'\t"Bang h\xe9i",',
      b'\t"Bang hoi",',
      'nhan menu nguoi choi: Bang hoi')
+
+# ---------------------------------------------------------------------------
+# Ba nut cua so PK: nhan van la tieng Viet nhung go theo bang ma cua font Viet
+# hoa cu ("Luy\xd6n c\xabng"), ma font dang dung chi ve dung ASCII nen ra chu
+# loi. Doi sang KHONG DAU cho khop voi cac menu khac.
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'SetText("Luy\xd6n c\xabng")',
+     b'SetText("Luyen cong")',
+     'nhan cua so PK: Luyen cong')
+
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'SetText("Chi\xd5n \xae\xcau")',
+     b'SetText("Chien dau")',
+     'nhan cua so PK: Chien dau')
+
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'SetText("\xa7\xe5 s\xb8t")',
+     b'SetText("Do sat")',
+     'nhan cua so PK: Do sat')
