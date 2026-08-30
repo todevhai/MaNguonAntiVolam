@@ -701,7 +701,6 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t   Nut chi co hai khung Up/Down nen chien dau va do sat trong giong nhau. */\n'
            b'\tif (g_pCoreShell)\n'
            b'\t{\n'
-           b'\t\tstatic int s_nCoPKDaVe = -1;\n'
            b'\t\tint nCoPK = g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0) ? 1 : 0;\n'
            b'\t\tif (nCoPK != s_nCoPKDaVe)\n'
            b'\t\t{\n'
@@ -2014,3 +2013,24 @@ edit('S3Client/Ui/ShortcutKey.cpp',
            b'\t\t\tg_DebugLog("[UiPK] Switch(pk): da-mo-ruong=%d",\n'
            b'\t\t\t\tg_pCoreShell ? g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0) : -1);'),
      'in co da-mo-ruong khi bam nut PK')
+
+# Bien theo doi khung da ve cua nut PK. De o pham vi TEP chu khong trong ham,
+# vi nhanh bam nut phai dat lai duoc: OnLBtnUp goi SetFrame(m_nUpFrame) khi tha
+# tay, keo icon ve khung "luyen cong" bat ke trang thai that. Dat lai -1 thi
+# nhip ke tiep ve lai cho dung.
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'void KUiToolsControlBar::Breathe()',
+     _crlf(b'static int s_nCoPKDaVe = -1;\t/* khung nut PK da ve; -1 = chua ve lan nao */\n'
+           b'\n'
+           b'void KUiToolsControlBar::Breathe()'),
+     'bien theo doi khung nut PK o pham vi tep')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);',
+     _crlf(b'\t\t{\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);\n'
+           b'\t\t\t/* Tha tay xong OnLBtnUp da SetFrame(m_nUpFrame), nen phai ve lai\n'
+           b'\t\t\t   theo trang thai that o nhip ke tiep. */\n'
+           b'\t\t\ts_nCoPKDaVe = -1;\n'
+           b'\t\t}'),
+     've lai nut PK sau khi bam')
