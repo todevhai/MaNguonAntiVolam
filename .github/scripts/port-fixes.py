@@ -1988,37 +1988,11 @@ edit('S3Client/Ui/UiCase/UiPK.cpp',
 # Da thu ba cach ma khong dut: bo toggle o nut, bo nhanh tu an khi co viec khac,
 # day dem ngay khi doi co. Het duong suy luan tu ma - in thang trang thai co ra
 # engine-debug.log moi lan OpenWindow duoc goi.
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'#include "../UiBase.h"',
-     b'#include "../UiBase.h"\r\n#include "KDebug.h"',
-     'them KDebug.h cho cua so PK')
 
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'\t\tm_pSelf->Show();',
-     _crlf(b'\t{\n'
-           b'\t\t/* m_nCurrentSpeed la private cua KWndShowAnimate nen khong doc\n'
-           b'\t\t   duoc tu day - chi in co hien. */\n'
-           b'\t\tg_DebugLog("[UiPK] truoc Show: hien=%d", (int)m_pSelf->IsVisible());\n'
-           b'\t\tm_pSelf->Show();\n'
-           b'\t\tg_DebugLog("[UiPK] sau  Show: hien=%d", (int)m_pSelf->IsVisible());\n'
-           b'\t}'),
-     'in trang thai co cua so PK moi lan mo')
 
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'\tcase WND_N_BUTTON_CLICK:',
-     _crlf(b'\tcase WND_N_BUTTON_CLICK:\n'
-           b'\t\tg_DebugLog("[UiPK] nhan click, uParam=%08X (LuyenCong=%08X)",\n'
-           b'\t\t\tuParam, (unsigned int)(KWndWindow*)&LuyenCong);'),
-     'in click nhan duoc trong cua so PK')
 
 # Case 3 cua Switch: in gia tri co "da mo ruong" - no quyet dinh mo cua so PK
 # hay lam dong tac. Neo phai la dong RIENG cua case 3 nen lay ca dong truoc.
-edit('S3Client/Ui/ShortcutKey.cpp',
-     b'\t\tcase 3: //PK',
-     _crlf(b'\t\tcase 3: //PK\n'
-           b'\t\t\tg_DebugLog("[UiPK] Switch(pk): da-mo-ruong=%d",\n'
-           b'\t\t\t\tg_pCoreShell ? g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0) : -1);'),
-     'in co da-mo-ruong khi bam nut PK')
 
 # Bien theo doi khung da ve cua nut PK. De o pham vi TEP chu khong trong ham,
 # vi nhanh bam nut phai dat lai duoc: OnLBtnUp goi SetFrame(m_nUpFrame) khi tha
