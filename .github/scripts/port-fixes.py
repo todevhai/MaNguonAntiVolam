@@ -1950,3 +1950,19 @@ edit('S3Client/Ui/ShortcutKey.cpp',
      b'\t\t\t\tif (KUiPK::GetIfVisible())',
      b'\t\t\t\tif (false)\t/* xem ghi chu: khong bat-tat nua, luon mo */',
      'nut PK / F9 luon mo cua so, khong bat-tat')
+
+# ---------------------------------------------------------------------------
+# Cua so PK: bo nhanh TU AN khi co "viec khac".
+#
+# WND_M_OTHER_WORK_RESULT duoc engine phat moi khi co viec khac xay ra - ke ca
+# goi tin ve sau khi nguoi choi vua chon che do. Cua so vua mo da bi an ngay,
+# nhin ra ngoai la "lan dau duoc, lan sau khong". Dong cua so bang cach CHON
+# mot muc la du.
+#
+# Neo phai la MOT dong (kho GitHub checkout ra CRLF), nen khong xoa duoc thang
+# "Hide(); break;" cu; thay vao do cho case that thoat ngay, con than cu treo
+# vao mot ma thong diep khong bao gio xay ra.
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'\tcase WND_M_OTHER_WORK_RESULT:',
+     b'\tcase WND_M_OTHER_WORK_RESULT:\r\n\t\tbreak;\r\n\tcase 0x7FFFFFFF:\t/* khong bao gio xay ra */',
+     'cua so PK khong tu an khi co viec khac')
