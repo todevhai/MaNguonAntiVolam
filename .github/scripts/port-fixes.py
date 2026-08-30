@@ -689,11 +689,6 @@ edit('S3Client/Ui/UiShell.cpp',
      'them UiToolsControlBar.h cho UiShell')
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'#include "UiUnlockBox.h"',
-     b'#include "UiUnlockBox.h"\r\n#include "UiPK.h"',
-     'them UiPK.h cho thanh cong cu')
-
-edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      b'\tUpdateData();',
      _crlf(b'\tUpdateData();\n'
            b'\t/* Ve nut PK theo trang thai MAY CHU o moi nhip, khong doi goi bao.\n'
@@ -1346,17 +1341,11 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Exchange)\n'
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
-           b'\t\t{\n'
-           b'\t\t\t/* Mo CUA SO PK co san cua client (KUiPK), khong tu che menu bat\n'
-           b'\t\t\t   len. Menu bat len la doi tuong tam: bam lan hai hay khong an, va\n'
-           b'\t\t\t   bung ra xa nut. Cua so thi engine tu lo, ba nut cua no gui dung\n'
-           b'\t\t\t   GOI_PKVALUE 1/2/3, va bo cuc nam trong ui3/UiPK.ini - sua duoc\n'
-           b'\t\t\t   ma khong phai dung lai client. */\n'
-           b'\t\t\tif (KUiPK::GetIfVisible())\n'
-           b'\t\t\t\tKUiPK::CloseWindow();\n'
-           b'\t\t\telse\n'
-           b'\t\t\t\tKUiPK::OpenWindow();\n'
-           b'\t\t}\n'
+           b'\t\t\t/* Di DUNG duong ma phim F9 dang di: Switch([[pk]]) mo cua so\n'
+           b'\t\t\t   KUiPK. Goi thang KUiPK::OpenWindow() thi F9 an ma nut khong -\n'
+           b'\t\t\t   do 30/08/2026. Dung mot duong cho ca hai, giong het chin nut\n'
+           b'\t\t\t   con lai o day va giong Player_PK::OnButtonClick ban goc. */\n'
+           b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
 
