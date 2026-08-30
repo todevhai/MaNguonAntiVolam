@@ -2093,27 +2093,4 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\ts_nCoPKDaVe = -1;'),
      've lai nut PK ngay khi tha tay')
 
-# ---------------------------------------------------------------------------
-# Do vi sao chu Viet khong hien.
-#
-# Da loai het bang chung ngoai: chuoi trong game.exe co du byte F9 BD; font tren
-# dia co glyph (da thu dat khoi dac vao dung ma do); client doc font tu DIA (giau
-# tep di thi chu co 12 mat sach); represent2.dll dang chay la ban vua build va
-# co bien dich KFont2.cpp. Vay phai in tu trong ham ve ra moi biet.
-edit('Represent/iRepresent/Font/KFont2.cpp',
-     b'\t\tunsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);',
-     _crlf(b'\t\tunsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);\n'
-           b'\t\tif (cFirst == 0xF9 || cFirst == 0xFA)\n'
-           b'\t\t{\n'
-           b'\t\t\t/* Ghi thang ra tep: KDebug.h khai ham nhan HWND nen keo ca\n'
-           b'\t\t\t   windows.h vao du an nay va lam hong build. */\n'
-           b'\t\t\tFILE* fp = fopen("chuviet.log", "a");\n'
-           b'\t\t\tif (fp)\n'
-           b'\t\t\t{\n'
-           b'\t\t\t\tfprintf(fp, "ve %02X%02X -> glyph=%s\\n", cFirst, cNext,\n'
-           b'\t\t\t\t\tpCharacterData ? "CO" : "KHONG");\n'
-           b'\t\t\t\tfclose(fp);\n'
-           b'\t\t\t}\n'
-           b'\t\t}'),
-     'in ket qua tra glyph chu Viet')
 
