@@ -1910,7 +1910,11 @@ edit('S3Client/Ui/UiCase/UiPK.cpp',
 # moi chu co dau rong gap doi chu thuong va hang chu so le.
 edit('Represent/iRepresent/Font/KFont2.cpp',
      b'\t\t\th += m_nOutputWidth;',
-     _crlf(b'\t\t\tif (lpByte[nPos] == 0xF9 || lpByte[nPos] == 0xFA)\n'
+     _crlf(b'\t\t\t/* nPos DA tang 2 o dong tren, nen phai xem lai byte dan tai\n'
+           b'\t\t\t   nPos-2. Kiem lpByte[nPos] la doc byte cua ky tu KE TIEP -\n'
+           b'\t\t\t   do 31/08/2026: chu co dau hien dung nhung sau moi chu lai\n'
+           b'\t\t\t   thua mot khoang, vi buoc van la nguyen o. */\n'
+           b'\t\t\tif (lpByte[nPos - 2] == 0xF9 || lpByte[nPos - 2] == 0xFA)\n'
            b'\t\t\t{\n'
            b'\t\t\t\th += m_nFontHalfWidth[nHalfIndex];\n'
            b'\t\t\t\tnHalfIndex ^= 1;\n'
