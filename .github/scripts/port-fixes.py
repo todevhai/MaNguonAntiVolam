@@ -1966,3 +1966,25 @@ edit('S3Client/Ui/UiCase/UiPK.cpp',
      b'\tcase WND_M_OTHER_WORK_RESULT:',
      b'\tcase WND_M_OTHER_WORK_RESULT:\r\n\t\tbreak;\r\n\tcase 0x7FFFFFFF:\t/* khong bao gio xay ra */',
      'cua so PK khong tu an khi co viec khac')
+
+# ---------------------------------------------------------------------------
+# Do vi sao cua so PK chi hien lan dau.
+#
+# Da thu ba cach ma khong dut: bo toggle o nut, bo nhanh tu an khi co viec khac,
+# day dem ngay khi doi co. Het duong suy luan tu ma - in thang trang thai co ra
+# engine-debug.log moi lan OpenWindow duoc goi.
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'#include "../UiBase.h"',
+     b'#include "../UiBase.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho cua so PK')
+
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'\t\tm_pSelf->Show();',
+     _crlf(b'\t{\n'
+           b'\t\tg_DebugLog("[UiPK] truoc Show: hien=%d toc-do=%d",\n'
+           b'\t\t\t(int)m_pSelf->IsVisible(), m_pSelf->m_nCurrentSpeed);\n'
+           b'\t\tm_pSelf->Show();\n'
+           b'\t\tg_DebugLog("[UiPK] sau  Show: hien=%d toc-do=%d",\n'
+           b'\t\t\t(int)m_pSelf->IsVisible(), m_pSelf->m_nCurrentSpeed);\n'
+           b'\t}'),
+     'in trang thai co cua so PK moi lan mo')
