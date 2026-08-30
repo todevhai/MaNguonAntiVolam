@@ -2106,5 +2106,5 @@ edit('Represent/iRepresent/Font/KFont2.cpp',
 
 edit('Represent/iRepresent/Font/KFont2.cpp',
      b'#include "KFont2.h"',
-     b'#include "KFont2.h"\r\n#include "KDebug.h"',
-     'them KDebug.h cho KFont2')
+     b'#include "KFont2.h"\r\n#include <windows.h>\r\n#include "KDebug.h"',
+     'them KDebug.h cho KFont2 (kem windows.h vi KDebug.h dung HWND)')
