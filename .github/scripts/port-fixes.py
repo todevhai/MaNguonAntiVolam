@@ -1988,3 +1988,19 @@ edit('S3Client/Ui/UiCase/UiPK.cpp',
            b'\t\tg_DebugLog("[UiPK] sau  Show: hien=%d", (int)m_pSelf->IsVisible());\n'
            b'\t}'),
      'in trang thai co cua so PK moi lan mo')
+
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'\tcase WND_N_BUTTON_CLICK:',
+     _crlf(b'\tcase WND_N_BUTTON_CLICK:\n'
+           b'\t\tg_DebugLog("[UiPK] nhan click, uParam=%08X (LuyenCong=%08X)",\n'
+           b'\t\t\tuParam, (unsigned int)(KWndWindow*)&LuyenCong);'),
+     'in click nhan duoc trong cua so PK')
+
+# Case 3 cua Switch: in gia tri co "da mo ruong" - no quyet dinh mo cua so PK
+# hay lam dong tac. Neo phai la dong RIENG cua case 3 nen lay ca dong truoc.
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'\t\tcase 3: //PK',
+     _crlf(b'\t\tcase 3: //PK\n'
+           b'\t\t\tg_DebugLog("[UiPK] Switch(pk): da-mo-ruong=%d",\n'
+           b'\t\t\t\tg_pCoreShell ? g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0) : -1);'),
+     'in co da-mo-ruong khi bam nut PK')
