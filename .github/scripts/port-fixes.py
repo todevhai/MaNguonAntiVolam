@@ -2080,3 +2080,37 @@ edit_all('Engine/Src/Text.cpp',
      b'\t\t\t\tfNumNextLineChar = 2;',
      b'\t\t\t\tfNumNextLineChar = fRongViet;',
      'do dong: phan day sang dong sau theo be rong that')
+
+# ---------------------------------------------------------------------------
+# Nut PK: ve lai khung NGAY trong luc xu ly su kien, khong doi nhip sau.
+#
+# ini dat Down=0 nen khi nhan engine goi SetFrame(0). Dang o khung 0 (luyen
+# cong) thi khong thay gi, con dang o khung 1 (chien dau) hay 2 (do sat) thi
+# icon nhay ve 0 roi moi tro lai - do 31/08/2026, nguoi choi bao "bam van nhay
+# mot cai". Tha tay thi OnLBtnUp lai SetFrame(m_nUpFrame) = 0, nhay lan nua.
+#
+# Chua bang cach ve lai ngay trong ca hai nhanh su kien, nen mat khong kip thay.
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\tcase WND_N_BUTTON_CLICK:',
+     _crlf(b'\tcase WND_N_BUTTON_DOWN:\n'
+           b'\t\t/* Engine vua SetFrame(m_nDownFrame) - ve lai ngay cho dung. */\n'
+           b'\t\tif (uParam == (unsigned int)(KWndWindow*)&m_PK && g_pCoreShell)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nKhung = g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0);\n'
+           b'\t\t\tm_PK.SetFrame((nKhung < 0 || nKhung > 2) ? 0 : nKhung);\n'
+           b'\t\t}\n'
+           b'\t\tbreak;\n'
+           b'\tcase WND_N_BUTTON_CLICK:'),
+     've lai nut PK ngay khi nhan xuong')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\t\t\ts_nCoPKDaVe = -1;',
+     _crlf(b'\t\t\t/* Tha tay xong OnLBtnUp da SetFrame(m_nUpFrame) - ve lai ngay,\n'
+           b'\t\t\t   va dat lai bien theo doi de nhip sau con chinh theo may chu. */\n'
+           b'\t\t\tif (g_pCoreShell)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tint nKhung = g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0);\n'
+           b'\t\t\t\tm_PK.SetFrame((nKhung < 0 || nKhung > 2) ? 0 : nKhung);\n'
+           b'\t\t\t}\n'
+           b'\t\t\ts_nCoPKDaVe = -1;'),
+     've lai nut PK ngay khi tha tay')
