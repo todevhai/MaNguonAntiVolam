@@ -2019,11 +2019,13 @@ edit('S3Client/Ui/ShortcutKey.cpp',
 # tay, keo icon ve khung "luyen cong" bat ke trang thai that. Dat lai -1 thi
 # nhip ke tiep ve lai cho dung.
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'void KUiToolsControlBar::Breathe()',
-     _crlf(b'static int s_nCoPKDaVe = -1;\t/* khung nut PK da ve; -1 = chua ve lan nao */\n'
+     b'#include "UiAutoPlay.h"',
+     _crlf(b'#include "UiAutoPlay.h"\n'
            b'\n'
-           b'void KUiToolsControlBar::Breathe()'),
-     'bien theo doi khung nut PK o pham vi tep')
+           b'/* Khung nut PK da ve; -1 = chua ve lan nao. Phai o DAU TEP: WndProc dung\n'
+           b'   no nam truoc Breathe trong tep nay. */\n'
+           b'static int s_nCoPKDaVe = -1;'),
+     'bien theo doi khung nut PK o dau tep')
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_PK);',
