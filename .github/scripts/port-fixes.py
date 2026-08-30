@@ -1820,139 +1820,125 @@ open(compat, 'wb').write(b'''/* Nap cuong buc khi dung Core (/FI). Engine khai b
 #endif
 ''')
 print('\ntao %s' % os.path.relpath(compat, ROOT))
-print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
-# Mau neo truot (thuong do CRLF) tung lam CI xanh trong khi Game.exe chua he
-# duoc va. Hong mot cho la hong ca ban dung -> dung han.
-if n_hong:
-    sys.exit(1)
 
 # ---------------------------------------------------------------------------
-# Menu Ctrl + chuot phai tren mot nguoi choi (PopUpContextPeopleMenu).
+# Nhan menu Ctrl+chuot phai va ba nut cua so PK: KHONG va gi ca.
 #
-# Nhan von DA la tieng Viet, nhung go theo bang ma cua font Viet hoa cu:
-# "T\xb8n g\xc9u" = "Tan gau", "C\xf5u s\xb8t" = "Cuu sat". Font dang dung chi ve
-# dung ASCII nen ra chu loi. Doi sang KHONG DAU cho khop voi cac menu khac.
-# Muc "Cuu sat" chinh la duong vao che do PK thu 4.
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"T\xb8n g\xc9u",',
-     b'\t"Tan gau",',
-     'nhan menu nguoi choi: Tan gau')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"H\xb6o h\xf7u",',
-     b'\t"Hao huu",',
-     'nhan menu nguoi choi: Hao huu')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"Giao d\xdech",',
-     b'\t"Giao dich",',
-     'nhan menu nguoi choi: Giao dich')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"Nh\xcbp \xae\xe9i",',
-     b'\t"Nhap doi",',
-     'nhan menu nguoi choi: Nhap doi')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"T\xe6 \xae\xe9i",',
-     b'\t"To doi",',
-     'nhan menu nguoi choi: To doi')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"C\xf5u s\xb8t",',
-     b'\t"Cuu sat",',
-     'nhan menu nguoi choi: Cuu sat')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"Tin t\xf8c",',
-     b'\t"Tin tuc",',
-     'nhan menu nguoi choi: Tin tuc')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"S\xe6 \xaeen",',
-     b'\t"So den",',
-     'nhan menu nguoi choi: So den')
-
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'\t"Bang h\xe9i",',
-     b'\t"Bang hoi",',
-     'nhan menu nguoi choi: Bang hoi')
+# Nguon 8.x von da go san bang TCVN3 ("Luy\xd6n c\xabng", "T\xb8n g\xc9u"). Truoc
+# day chung bi doi sang khong dau vi font chua ve duoc chu Viet, roi lai duoc
+# them dau bang mot bang ma tu che - hai lop chong len nhau tren mot thu von da
+# dung san. Font phu TCVN3 duoi day lo ca hai lop di.
 
 # ---------------------------------------------------------------------------
-# Ba nut cua so PK: nhan van la tieng Viet nhung go theo bang ma cua font Viet
-# hoa cu ("Luy\xd6n c\xabng"), ma font dang dung chi ve dung ASCII nen ra chu
-# loi. Doi sang KHONG DAU cho khop voi cac menu khac.
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'SetText("Luy\xd6n c\xabng")',
-     b'SetText("Luyen cong")',
-     'nhan cua so PK: Luyen cong')
-
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'SetText("Chi\xd5n \xae\xcau")',
-     b'SetText("Chien dau")',
-     'nhan cua so PK: Chien dau')
-
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'SetText("\xa7\xe5 s\xb8t")',
-     b'SetText("Do sat")',
-     'nhan cua so PK: Do sat')
-
-# ---------------------------------------------------------------------------
-# Chu Viet co dau: hai byte, byte dan 0xF9 hoac 0xFA.
+# Chu Viet co dau: bang ma TCVN3 MOT BYTE, ve bang font phu.
 #
-# Glyph nam o vung GBK 0xF9A1-0xF9FE va 0xFAA1-0xFAFE - vung nay BO TRONG o ca
-# ba co font (12/14/16), da do bang cach quet mang offset trong tep .fnt. Sinh
-# glyph bang client/them-chu-viet-vao-font.py, doi chuoi bang
-# client/doi-chu-viet-sang-ma-font.py.
+# Toan bo du lieu hien thi cua ban Viet hoa (settings/, ui/, lang/vn/) deu la
+# TCVN3: "Bach Ho" nam tren dia la 42 B9 63 68 20 48 E6. Engine 2003 doc byte
+# > 0x80 la BYTE DAN cua o hai byte GBK, nen no nuot "B9 63" thanh mot chu Han
+# va hien ra "B<han>h H". Do 31/08/2026 tren ten quai, thanh trang thai va ten
+# ban do.
 #
-# Chu Han van hai byte nguyen o nhu cu, ASCII van mot byte nua o. Chu Viet duoc
-# VE HEP (chi dung nua trai cua o) nen phai di buoc NUA O - khong lam vay thi
-# moi chu co dau rong gap doi chu thuong va hang chu so le.
+# Font chu Viet KHONG phai tu che: font.pak cua ca ban6 lan voz2 deu chua HAI bo
+# moi co - bo 23940 ky tu (chu Han GBK) va bo 512 ky tu (chu Viet mot byte, chi
+# so danh THANG bang ma byte). Bo 512 lau nay bi bo qua vi trung ten. Rut ca hai
+# bang client/rut-font-day-du.py: bo lon vao font/, bo 512 vao font/vn/.
+#
+# Danh doi da biet: mot ma byte chi thuoc ve MOT bang. Ma nao co glyph trong font
+# Viet thi khong con lam byte dan GBK duoc nua, nen chu Han o cac ma do se vo.
+# Chap nhan - do dung la cach ban Viet hoa lam, va du lieu ta dang dung chinh la
+# du lieu cua ho.
+edit('Represent/iRepresent/Font/KFontData.h',
+     b'\tunsigned char*\tGetCharacterData(unsigned char cFirst, unsigned char cNext) const;',
+     _crlf(b'\tunsigned char*\tGetCharacterData(unsigned char cFirst, unsigned char cNext) const;\n'
+           b'\t/* Font Viet mot byte: chi so danh thang bang ma byte. */\n'
+           b'\tunsigned char*\tGetVietCharacterData(unsigned char cCode) const;'),
+     'khai bao tra glyph chu Viet mot byte')
+
+edit('Represent/iRepresent/Font/KFontData.cpp',
+     b'unsigned char*\tKFontData::GetCharacterData(unsigned char cFirst, unsigned char cNext) const',
+     _crlf(b'unsigned char*\tKFontData::GetVietCharacterData(unsigned char cCode) const\n'
+           b'{\n'
+           b'\tif (m_pFontData && (unsigned int)cCode < m_uCharCount && m_pdwOffs[cCode])\n'
+           b'\t\treturn (m_pFontData + m_pdwOffs[cCode]);\n'
+           b'\treturn NULL;\n'
+           b'}\n'
+           b'\n'
+           b'unsigned char*\tKFontData::GetCharacterData(unsigned char cFirst, unsigned char cNext) const'),
+     'tra glyph chu Viet mot byte')
+
+edit('Represent/iRepresent/Font/KFont2.h',
+     b'\tvoid\tDrawCharacter(int x, int y, unsigned char cFirst, unsigned char cNext, int nColor) const;',
+     _crlf(b'\tvoid\tDrawCharacter(int x, int y, unsigned char cFirst, unsigned char cNext, int nColor) const;\n'
+           b'\t/* Ve mot chu Viet TCVN3 (mot byte) tu font phu. */\n'
+           b'\tvoid\tDrawVietCharacter(int x, int y, unsigned char cCode, int nColor) const;'),
+     'khai bao ve chu Viet')
+
+edit('Represent/iRepresent/Font/KFont2.h',
+     b'\tKFontData\t\t\tm_Resources;',
+     _crlf(b'\tKFontData\t\t\tm_ResourcesVn;\t\t/* font chu Viet TCVN3 mot byte */\n'
+           b'\tKFontData\t\t\tm_Resources;'),
+     'them font phu chu Viet')
+
+# Load: nap them font Viet nam trong thu muc con "vn" canh font chinh.
 edit('Represent/iRepresent/Font/KFont2.cpp',
-     b'\t\t\th += m_nOutputWidth;',
-     _crlf(b'\t\t\t/* nPos DA tang 2 o dong tren, nen phai xem lai byte dan tai\n'
-           b'\t\t\t   nPos-2. Kiem lpByte[nPos] la doc byte cua ky tu KE TIEP -\n'
-           b'\t\t\t   do 31/08/2026: chu co dau hien dung nhung sau moi chu lai\n'
-           b'\t\t\t   thua mot khoang, vi buoc van la nguyen o. */\n'
-           b'\t\t\tif (lpByte[nPos - 2] == 0xF9 || lpByte[nPos - 2] == 0xFA)\n'
+     b'\t\t\tm_Resources.GetInfo(m_nFontWidth, m_nFontHeight);',
+     _crlf(b'\t\t\tm_Resources.GetInfo(m_nFontWidth, m_nFontHeight);\n'
+           b'\t\t\t/* Font chu Viet: CUNG TEN, nam trong thu muc con "vn". Thieu no thi\n'
+           b'\t\t\t   chu Viet khong ve duoc nhung font chinh van chay - khong chet. */\n'
            b'\t\t\t{\n'
-           b'\t\t\t\th += m_nFontHalfWidth[nHalfIndex];\n'
-           b'\t\t\t\tnHalfIndex ^= 1;\n'
-           b'\t\t\t}\n'
+           b'\t\t\t\tconst char* pszTen = strrchr(pszFontFile, 0x5C);\n'
+           b'\t\t\t\tif (pszTen == NULL)\n'
+           b'\t\t\t\t\tpszTen = strrchr(pszFontFile, 0x2F);\n'
+           b'\t\t\t\tif (pszTen)\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tchar szViet[260];\n'
+           b'\t\t\t\t\tint nThuMuc = (int)(pszTen - pszFontFile) + 1;\n'
+           b'\t\t\t\t\tif (nThuMuc + 3 + (int)strlen(pszTen + 1) < (int)sizeof(szViet))\n'
+           b'\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\tmemcpy(szViet, pszFontFile, nThuMuc);\n'
+           b'\t\t\t\t\t\tmemcpy(szViet + nThuMuc, "vn", 2);\n'
+           b'\t\t\t\t\t\tszViet[nThuMuc + 2] = 0x5C;\n'
+           b'\t\t\t\t\t\tstrcpy(szViet + nThuMuc + 3, pszTen + 1);\n'
+           b'\t\t\t\t\t\tm_ResourcesVn.Load(szViet);\n'
+           b'\t\t\t\t\t}\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t}'),
+     'nap font chu Viet mot byte')
+
+# OutputText: byte cao ma font Viet co glyph -> mot byte, buoc nua o.
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'\t\tif (lpByte[nPos] > 0x80 && nPos + 1 < nCount)',
+     _crlf(b'\t\t/* Chu Viet TCVN3 di TRUOC: mot byte, ve nua o nhu chu Latin. Chi cac\n'
+           b'\t\t   ma co glyph trong font Viet moi vao day, con lai van la GBK. */\n'
+           b'\t\tif (lpByte[nPos] > 0x80 && m_ResourcesVn.GetVietCharacterData(lpByte[nPos]))\n'
+           b'\t\t{\n'
+           b'\t\t\tDrawVietCharacter(nX + h, nY, lpByte[nPos], sColor);\n'
+           b'\t\t\tnPos++;\n'
+           b'\t\t\th += m_nFontHalfWidth[nHalfIndex];\n'
+           b'\t\t\tnHalfIndex ^= 1;\n'
+           b'\t\t}\n'
+           b'\t\telse if (lpByte[nPos] > 0x80 && nPos + 1 < nCount)'),
+     'chu Viet TCVN3 mot byte, buoc nua o')
+
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'void KFont2::GetFontSize(int* pWidth, int* pHeight)',
+     _crlf(b'void KFont2::DrawVietCharacter(int x, int y, unsigned char cCode, int nColor) const\n'
+           b'{\n'
+           b'\tif (m_pDevice && m_bLoaded)\n'
+           b'\t{\n'
+           b'\t\tunsigned char* pCharacterData = m_ResourcesVn.GetVietCharacterData(cCode);\n'
+           b'\t\tif (pCharacterData)\n'
+           b'\t\t{\n'
+           b'\t\t\tif (m_nDrawBorderWithDeffColor == false)\n'
+           b'\t\t\t\t((KCanvas*)m_pDevice)->DrawFont(x, y, m_nFontWidth, m_nFontHeight, nColor, 31, pCharacterData);\n'
            b'\t\t\telse\n'
-           b'\t\t\t\th += m_nOutputWidth;'),
-     'chu Viet di buoc nua o')
-
-# Nhan ba nut cua so PK - lan nay bang tieng Viet CO DAU that.
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'SetText("Luyen cong")',
-     b'SetText("Luy\xf9\xbdn c\xf9\xc8ng")',
-     'nhan cua so PK: Luyen cong co dau')
-
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'SetText("Chien dau")',
-     b'SetText("Chi\xf9\xb9n \xf9\xb2\xf9\xadu")',
-     'nhan cua so PK: Chien dau co dau')
-
-edit('S3Client/Ui/UiCase/UiPK.cpp',
-     b'SetText("Do sat")',
-     b'SetText("\xf9\xf5\xf9\xca s\xf9\xa1t")',
-     'nhan cua so PK: Do sat co dau')
-
-# Menu Ctrl + chuot phai tren nguoi choi.
-for _cu, _moi, _ghi in (
-        (b'\t"Tan gau",',    b'\t"T\xf9\xa1n g\xf9\xb0u",',            'Tan gau'),
-        (b'\t"Hao huu",',    b'\t"H\xf9\xa3o h\xf9\xddu",',            'Hao huu'),
-        (b'\t"Giao dich",',  b'\t"Giao d\xf9\xc2ch",',                   'Giao dich'),
-        (b'\t"Nhap doi",',   b'\t"Nh\xf9\xb1p \xf9\xb2\xf9\xcdi",',  'Nhap doi'),
-        (b'\t"To doi",',     b'\t"T\xf9\xcb \xf9\xb2\xf9\xcdi",',    'To doi'),
-        (b'\t"Cuu sat",',    b'\t"C\xf9\xdbu s\xf9\xa1t",',            'Cuu sat'),
-        (b'\t"Tin tuc",',    b'\t"Tin t\xf9\xdac",',                     'Tin tuc'),
-        (b'\t"So den",',     b'\t"S\xf9\xcb \xf9\xb2en",',             'So den'),
-        (b'\t"Bang hoi",',   b'\t"Bang h\xf9\xcdi",',                    'Bang hoi'),
-):
-    edit('S3Client/Ui/UiCase/UiGame.cpp', _cu, _moi,
-         'nhan menu nguoi choi co dau: ' + _ghi)
+           b'\t\t\t\t((KCanvas*)m_pDevice)->DrawFontWithBorder(x, y, m_nFontWidth, m_nFontHeight, nColor, 31, pCharacterData, m_nBorderColor);\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'}\n'
+           b'\n'
+           b'void KFont2::GetFontSize(int* pWidth, int* pHeight)'),
+     've mot chu Viet tu font phu')
 
 # ---------------------------------------------------------------------------
 # Nut PK / phim F9 mo cua so PK: LUON mo, khong bat-tat.
@@ -2022,42 +2008,12 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      've lai nut PK sau khi bam')
 
 # ---------------------------------------------------------------------------
-# Do be rong dong cho chu Viet.
+# Do be rong dong trong Text.cpp: CHUA sua o buoc nay.
 #
-# Don vi trong hai vong lap dem cua Text.cpp la NUA O: chu Han cong 2, ASCII
-# cong 1. Chu Viet cua ta la hai byte (byte dan 0xF9/0xFA) nhung duoc VE nua o
-# nhu chu Latin, nen phai cong 1. De nguyen 2 thi dong xuong som hon can va
-# can giua lech - cang ro voi doan van dai.
-#
-# Ca nam neo duoi day chi xuat hien trong hai khoi xu ly chu hai byte (da dem:
-# 2, 2, 4, 2, 2 lan), khong dung toi cho khac.
-edit_all('Engine/Src/Text.cpp',
-     b'\t\tif (cCode > 0x80)',
-     _crlf(b'\t\t/* Chu Viet ve NUA o nhu chu Latin du la hai byte - xem\n'
-           b'\t\t   KFont2::OutputText, nhanh byte dan 0xF9/0xFA. */\n'
-           b'\t\tfloat fRongViet = (cCode == 0xF9 || cCode == 0xFA) ? 1.0f : 2.0f;\n'
-           b'\t\tif (cCode > 0x80)'),
-     'khai be rong that cua ky tu hai byte')
-
-edit_all('Engine/Src/Text.cpp',
-     b'\t\t\tif (fNumChars + 2 < nWrapCharaNum)',
-     b'\t\t\tif (fNumChars + fRongViet < nWrapCharaNum)',
-     'do dong: so sanh theo be rong that')
-
-edit_all('Engine/Src/Text.cpp',
-     b'\t\t\telse if (fNumChars + 2 == nWrapCharaNum || fNumChars == 0)',
-     b'\t\t\telse if (fNumChars + fRongViet == nWrapCharaNum || fNumChars == 0)',
-     'do dong: nhanh vua du theo be rong that')
-
-edit_all('Engine/Src/Text.cpp',
-     b'\t\t\t\tfNumChars += 2;',
-     b'\t\t\t\tfNumChars += fRongViet;',
-     'do dong: cong be rong that')
-
-edit_all('Engine/Src/Text.cpp',
-     b'\t\t\t\tfNumNextLineChar = 2;',
-     b'\t\t\t\tfNumNextLineChar = fRongViet;',
-     'do dong: phan day sang dong sau theo be rong that')
+# Text.cpp dem chu Han la hai byte / mot o day. Chu Viet TCVN3 la MOT byte ve
+# nua o, nen phep dem o day lech - anh huong cho xuong dong va can giua trong
+# hop thoai, khong lam chu sai. Sua sau khi da nhin thay chu hien dung, vi hai
+# khoi dem trong tep thut le khac nhau nen neo de khop nham.
 
 # ---------------------------------------------------------------------------
 # Nut PK: ve lai khung NGAY trong luc xu ly su kien, khong doi nhip sau.
@@ -2093,4 +2049,11 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\ts_nCoPKDaVe = -1;'),
      've lai nut PK ngay khi tha tay')
 
-
+# ---------------------------------------------------------------------------
+# Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
+# do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
+print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
+# Mau neo truot (thuong do CRLF) tung lam CI xanh trong khi Game.exe chua he
+# duoc va. Hong mot cho la hong ca ban dung -> dung han.
+if n_hong:
+    sys.exit(1)
