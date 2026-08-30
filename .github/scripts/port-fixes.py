@@ -1409,8 +1409,12 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
            b'\t\t{\n'
+           b'\t\t\t/* Mo ngay TAI CON TRO, khong theo vi tri nut: GetAbsolutePos tra\n'
+           b'\t\t\t   toa do trong he cua thanh cong cu nen menu bung ra xa nut, va\n'
+           b'\t\t\t   xa con tro thi tha chuot mot cai la menu tu dong (lam no "luc\n'
+           b'\t\t\t   an luc khong"). */\n'
            b'\t\t\tint nX = 0, nY = 0;\n'
-           b'\t\t\tm_PK.GetAbsolutePos(&nX, &nY);\n'
+           b'\t\t\tWnd_GetCursorPos(&nX, &nY);\n'
            b'\t\t\tMoMenuPK(nX, nY);\n'
            b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
@@ -1877,3 +1881,55 @@ print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
 # duoc va. Hong mot cho la hong ca ban dung -> dung han.
 if n_hong:
     sys.exit(1)
+
+# ---------------------------------------------------------------------------
+# Menu Ctrl + chuot phai tren mot nguoi choi (PopUpContextPeopleMenu).
+#
+# Nhan von DA la tieng Viet, nhung go theo bang ma cua font Viet hoa cu:
+# "T\xb8n g\xc9u" = "Tan gau", "C\xf5u s\xb8t" = "Cuu sat". Font dang dung chi ve
+# dung ASCII nen ra chu loi. Doi sang KHONG DAU cho khop voi cac menu khac.
+# Muc "Cuu sat" chinh la duong vao che do PK thu 4.
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"T\xb8n g\xc9u",',
+     b'\t"Tan gau",',
+     'nhan menu nguoi choi: Tan gau')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"H\xb6o h\xf7u",',
+     b'\t"Hao huu",',
+     'nhan menu nguoi choi: Hao huu')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"Giao d\xdech",',
+     b'\t"Giao dich",',
+     'nhan menu nguoi choi: Giao dich')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"Nh\xcbp \xae\xe9i",',
+     b'\t"Nhap doi",',
+     'nhan menu nguoi choi: Nhap doi')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"T\xe6 \xae\xe9i",',
+     b'\t"To doi",',
+     'nhan menu nguoi choi: To doi')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"C\xf5u s\xb8t",',
+     b'\t"Cuu sat",',
+     'nhan menu nguoi choi: Cuu sat')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"Tin t\xf8c",',
+     b'\t"Tin tuc",',
+     'nhan menu nguoi choi: Tin tuc')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"S\xe6 \xaeen",',
+     b'\t"So den",',
+     'nhan menu nguoi choi: So den')
+
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'\t"Bang h\xe9i",',
+     b'\t"Bang hoi",',
+     'nhan menu nguoi choi: Bang hoi')
