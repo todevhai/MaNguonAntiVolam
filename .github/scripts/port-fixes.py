@@ -681,17 +681,17 @@ edit('Core/Src/KNpcSet.cpp',
      'gan gio that vao log hoi NPC')
 
 
-edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
-     b'\tstatic KUiToolsControlBar* GetSelf()',
-     _crlf(b'\tstatic void\tMoMenuPK(int x, int y);\t/* static: dung m_pSelf */\n'
-           b'\tstatic KUiToolsControlBar* GetSelf()'),
-     'khai bao MoMenuPK cho lop ngoai goi duoc')
 
 
 edit('S3Client/Ui/UiShell.cpp',
      b'#include "UiCase/UiChatCentre.h"',
      b'#include "UiCase/UiChatCentre.h"\r\n#include "UiCase/UiToolsControlBar.h"',
      'them UiToolsControlBar.h cho UiShell')
+
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'#include "UiUnlockBox.h"',
+     b'#include "UiUnlockBox.h"\r\n#include "UiPK.h"',
+     'them UiPK.h cho thanh cong cu')
 
 edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      b'\tUpdateData();',
@@ -717,69 +717,7 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
 # nhung chi mo HAI lenh c2s: doi co PK thuong va do sat. Do sat con phai chon
 # nguoi truoc nen khong dat vao menu nay duoc; menu chi co hai muc that su chay.
 
-edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'int KUiToolsControlBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
-     _crlf(b'#define\tMENU_CHON_CHE_DO_PK\t0x50\n'
-           b'\n'
-           b'/* Menu chon che do PK. Hai muc, dung dung mot lenh GOI_PK_SETTING:\n'
-           b'   0 = luyen cong (tat PK thuong), 1 = chien dau (bat PK thuong). */\n'
-           b'void KUiToolsControlBar::MoMenuPK(int x, int y)\n'
-           b'{\n'
-           b'\tif (!m_pSelf)\n'
-           b'\t\treturn;\n'
-           b'\tKPopupMenuData* pMenu = (KPopupMenuData*)malloc(MENU_DATA_SIZE(3));\n'
-           b'\tif (!pMenu)\n'
-           b'\t\treturn;\n'
-           b'\tKPopupMenu::InitMenuData(pMenu, 3);\n'
-           b'\tpMenu->usMenuFlag &= ~PM_F_HAVE_HEAD_TAIL_IMG;\n'
-           b'\tpMenu->usMenuFlag |= (PM_F_AUTO_DEL_WHEN_HIDE | PM_F_CANCEL_BY_CALLER);\n'
-           b'\tpMenu->nItemTitleIndent = 0;\n'
-           b'\tpMenu->byItemTitleUpSpace = 0;\n'
-           b'\tstrcpy(pMenu->Items[0].szData, "Luyen cong");\n'
-           b'\tpMenu->Items[0].uDataLen = strlen(pMenu->Items[0].szData);\n'
-           b'\tstrcpy(pMenu->Items[1].szData, "Chien dau");\n'
-           b'\tpMenu->Items[1].uDataLen = strlen(pMenu->Items[1].szData);\n'
-           b'\tstrcpy(pMenu->Items[2].szData, "Do sat");\n'
-           b'\tpMenu->Items[2].uDataLen = strlen(pMenu->Items[2].szData);\n'
-           b'\tpMenu->nNumItem = 3;\n'
-           b'\t/* Mo LEN TREN nut. Nut nam sat day man hinh (y=701/768) nen menu\n'
-           b'\t   bung xuong se phu ngay len con tro, va cu tha chuot roi luon vao\n'
-           b'\t   mot muc - bam nut la doi co PK ma chua kip chon gi. */\n'
-           b'\tpMenu->nX = x;\n'
-           b'\tpMenu->nY = y - 64;\n'
-           b'\tif (pMenu->nY < 0)\n'
-           b'\t\tpMenu->nY = y + 22;\n'
-           b'\t/* KHONG dat nSelectedItem theo trang thai hien tai: menu bao ve\n'
-           b'\t   chinh muc dang chon ngay khi bung, nen chi mo nut da thay may chu\n'
-           b'\t   nhan lenh doi co (do duoc: 15 lan deu co=1). -1 = chua chon gi. */\n'
-           b'\tpMenu->nSelectedItem = -1;\n'
-           b'\tKPopupMenu::Popup(pMenu, (KWndWindow*)m_pSelf, MENU_CHON_CHE_DO_PK);\n'
-           b'}\n'
-           b'\n'
-           b'int KUiToolsControlBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)'),
-     'ham mo menu PK')
 
-edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
-     b'\tcase WND_N_BUTTON_CLICK:',
-     _crlf(b'\tcase WND_M_MENUITEM_SELECTED:\n'
-           b'\t\tif (uParam == (unsigned int)(KWndWindow*)this &&\n'
-           b'\t\t\tHIWORD(nParam) == MENU_CHON_CHE_DO_PK)\n'
-           b'\t\t{\n'
-           b'\t\t\t/* Dung DUNG duong ma cua so KUiPK co san dang dung:\n'
-           b'\t\t\t   GOI_PKVALUE -> SendClientPKValue -> c2s_pkvalue, nbutton\n'
-           b'\t\t\t   1/2/3 = luyen cong / chien dau / do sat, khop ba case cua\n'
-           b'\t\t\t   KProtocolProcess::c2sPKValue ben may chu.\n'
-           b'\t\t\t   Truoc day menu nay goi GOI_PK_SETTING, ma goi do chi mang\n'
-           b'\t\t\t   MOT BOOL - ba che do bi ep xuong hai va nhan khong con dung\n'
-           b'\t\t\t   voi viec that su xay ra. */\n'
-           b'\t\t\tint nChon = short(LOWORD(nParam));\n'
-           b'\t\t\tif (nChon >= 0 && nChon <= 2 && g_pCoreShell)\n'
-           b'\t\t\t\tg_pCoreShell->OperationRequest(GOI_PKVALUE, nChon + 1, 0);\n'
-           b'\t\t\tKPopupMenu::Cancel();\n'
-           b'\t\t}\n'
-           b'\t\tbreak;\n'
-           b'\tcase WND_N_BUTTON_CLICK:'),
-     'chon muc trong menu PK')
 
 # ---------------------------------------------------------------------------
 # Chon ngu hanh: bam mot lan khong an, phai bam hai lan.
@@ -1409,13 +1347,15 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\tKShortcutKeyCentre::ExcuteScript(SCK_SHORTCUT_TRADE);\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_PK)\n'
            b'\t\t{\n'
-           b'\t\t\t/* Mo ngay TAI CON TRO, khong theo vi tri nut: GetAbsolutePos tra\n'
-           b'\t\t\t   toa do trong he cua thanh cong cu nen menu bung ra xa nut, va\n'
-           b'\t\t\t   xa con tro thi tha chuot mot cai la menu tu dong (lam no "luc\n'
-           b'\t\t\t   an luc khong"). */\n'
-           b'\t\t\tint nX = 0, nY = 0;\n'
-           b'\t\t\tWnd_GetCursorPos(&nX, &nY);\n'
-           b'\t\t\tMoMenuPK(nX, nY);\n'
+           b'\t\t\t/* Mo CUA SO PK co san cua client (KUiPK), khong tu che menu bat\n'
+           b'\t\t\t   len. Menu bat len la doi tuong tam: bam lan hai hay khong an, va\n'
+           b'\t\t\t   bung ra xa nut. Cua so thi engine tu lo, ba nut cua no gui dung\n'
+           b'\t\t\t   GOI_PKVALUE 1/2/3, va bo cuc nam trong ui3/UiPK.ini - sua duoc\n'
+           b'\t\t\t   ma khong phai dung lai client. */\n'
+           b'\t\t\tif (KUiPK::GetIfVisible())\n'
+           b'\t\t\t\tKUiPK::CloseWindow();\n'
+           b'\t\t\telse\n'
+           b'\t\t\t\tKUiPK::OpenWindow();\n'
            b'\t\t}\n'
            b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_Friend)'),
      'noi muoi nut vao kich ban co san cua engine')
