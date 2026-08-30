@@ -2042,3 +2042,41 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\t\t\ts_nCoPKDaVe = -1;\n'
            b'\t\t}'),
      've lai nut PK sau khi bam')
+
+# ---------------------------------------------------------------------------
+# Do be rong dong cho chu Viet.
+#
+# Don vi trong hai vong lap dem cua Text.cpp la NUA O: chu Han cong 2, ASCII
+# cong 1. Chu Viet cua ta la hai byte (byte dan 0xF9/0xFA) nhung duoc VE nua o
+# nhu chu Latin, nen phai cong 1. De nguyen 2 thi dong xuong som hon can va
+# can giua lech - cang ro voi doan van dai.
+#
+# Ca nam neo duoi day chi xuat hien trong hai khoi xu ly chu hai byte (da dem:
+# 2, 2, 4, 2, 2 lan), khong dung toi cho khac.
+edit_all('Engine/Src/Text.cpp',
+     b'\t\tif (cCode > 0x80)',
+     _crlf(b'\t\t/* Chu Viet ve NUA o nhu chu Latin du la hai byte - xem\n'
+           b'\t\t   KFont2::OutputText, nhanh byte dan 0xF9/0xFA. */\n'
+           b'\t\tfloat fRongViet = (cCode == 0xF9 || cCode == 0xFA) ? 1.0f : 2.0f;\n'
+           b'\t\tif (cCode > 0x80)'),
+     'khai be rong that cua ky tu hai byte')
+
+edit_all('Engine/Src/Text.cpp',
+     b'\t\t\tif (fNumChars + 2 < nWrapCharaNum)',
+     b'\t\t\tif (fNumChars + fRongViet < nWrapCharaNum)',
+     'do dong: so sanh theo be rong that')
+
+edit_all('Engine/Src/Text.cpp',
+     b'\t\t\telse if (fNumChars + 2 == nWrapCharaNum || fNumChars == 0)',
+     b'\t\t\telse if (fNumChars + fRongViet == nWrapCharaNum || fNumChars == 0)',
+     'do dong: nhanh vua du theo be rong that')
+
+edit_all('Engine/Src/Text.cpp',
+     b'\t\t\t\tfNumChars += 2;',
+     b'\t\t\t\tfNumChars += fRongViet;',
+     'do dong: cong be rong that')
+
+edit_all('Engine/Src/Text.cpp',
+     b'\t\t\t\tfNumNextLineChar = 2;',
+     b'\t\t\t\tfNumNextLineChar = fRongViet;',
+     'do dong: phan day sang dong sau theo be rong that')
