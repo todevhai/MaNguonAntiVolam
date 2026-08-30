@@ -1934,3 +1934,19 @@ for _cu, _moi, _ghi in (
 ):
     edit('S3Client/Ui/UiCase/UiGame.cpp', _cu, _moi,
          'nhan menu nguoi choi co dau: ' + _ghi)
+
+# ---------------------------------------------------------------------------
+# Nut PK / phim F9 mo cua so PK: LUON mo, khong bat-tat.
+#
+# Ban goc lam toggle: dang hien thi dong, khong thi mo. Nhung sau khi chon mot
+# muc, KUiPK::WndProc goi Hide() - doi tuong con song, chi an di. Lan bam sau
+# GetIfVisible() tra NULL nen goi OpenWindow(), ma ham do chi Show() lai doi
+# tuong cu; neu co WND_S_VISIBLE chua duoc xoa dung cach thi Show() khong lam gi
+# va cua so dung im. Do 31/08/2026: may chu nhan du ba lenh "chon", nhung nguoi
+# choi bao "menu chi hien lan dau".
+#
+# Dong cua so bang cach CHON mot muc la du - bo toggle thi bot han mot lop loi.
+edit('S3Client/Ui/ShortcutKey.cpp',
+     b'\t\t\t\tif (KUiPK::GetIfVisible())',
+     b'\t\t\t\tif (false)\t/* xem ghi chu: khong bat-tat nua, luon mo */',
+     'nut PK / F9 luon mo cua so, khong bat-tat')
