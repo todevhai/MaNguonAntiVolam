@@ -693,24 +693,18 @@ edit('S3Client/Ui/UiShell.cpp',
      b'#include "UiCase/UiChatCentre.h"\r\n#include "UiCase/UiToolsControlBar.h"',
      'them UiToolsControlBar.h cho UiShell')
 
-edit('S3Client/Ui/UiCase/UiToolsControlBar.h',
-     b'\tstatic void\tMoMenuPK(int x, int y);',
-     _crlf(b'\tstatic void\tMoMenuPK(int x, int y);\n'
-           b'\tstatic void\tVeCoPK(int nBat);\t/* goi tu GDCNI_PK_SETTING */'),
-     'khai bao VeCoPK')
-
-edit('S3Client/Ui/GameSpaceChangedNotify.cpp',
-     b'#include "UiCase/UiPlayerBar.h"',
-     b'#include "UiCase/UiPlayerBar.h"\r\n#include "UiCase/UiToolsControlBar.h"',
-     'them UiToolsControlBar.h cho GameSpaceChangedNotify')
-
-edit('S3Client/Ui/GameSpaceChangedNotify.cpp',
-     b'\tcase GDCNI_PK_SETTING:',
-     _crlf(b'\tcase GDCNI_PK_SETTING:\n'
-           b'\t\t/* May chu la nguon duy nhat cua co PK: goi s2c_pksyncnormalflag ve\n'
-           b'\t\t   toi day qua KPlayerPK::SetNormalPKState. Client chi VE theo. */\n'
-           b'\t\tKUiToolsControlBar::VeCoPK(nParam);'),
-     've nut PK theo goi may chu')
+edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
+     b'\tUpdateData();',
+     _crlf(b'\tUpdateData();\n'
+           b'\t/* Ve nut PK theo trang thai MAY CHU o moi nhip, khong doi goi bao.\n'
+           b'\t   Goi s2c_pksyncnormalflag ve ngay luc vao the gioi, co khi truoc ca\n'
+           b'\t   luc thanh cong cu dung xong; ve mot lan luc do thi nut ket o khung\n'
+           b'\t   "luyen cong" du may chu da bat chien dau, va khong ai ve lai nua.\n'
+           b'\t   Lop Player_PK goc cung ve kieu nay (UiShell.cpp UpdateData).\n'
+           b'\t   Nut chi co hai khung Up/Down nen chien dau va do sat trong giong nhau. */\n'
+           b'\tif (g_pCoreShell)\n'
+           b'\t\tm_PK.CheckButton(g_pCoreShell->GetGameData(GDI_PK_SETTING, 0, 0) != 0);'),
+     've nut PK moi nhip theo trang thai may chu')
 
 # ---------------------------------------------------------------------------
 # Nut chon che do PK tren thanh cong cu.
@@ -729,15 +723,6 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
            b'\n'
            b'/* Menu chon che do PK. Hai muc, dung dung mot lenh GOI_PK_SETTING:\n'
            b'   0 = luyen cong (tat PK thuong), 1 = chien dau (bat PK thuong). */\n'
-           b'/* Ve trang thai nut PK theo goi s2c_pksyncnormalflag cua may chu.\n'
-           b'   Client KHONG tu giu co: truoc day nut tu doi hinh khi bam trong khi\n'
-           b'   may chu chua nhan lenh nao, nen hai ben lech nhau va nut nhay loan. */\n'
-           b'void KUiToolsControlBar::VeCoPK(int nBat)\n'
-           b'{\n'
-           b'\tif (m_pSelf)\n'
-           b'\t\tm_pSelf->m_PK.CheckButton(nBat ? 1 : 0);\n'
-           b'}\n'
-           b'\n'
            b'void KUiToolsControlBar::MoMenuPK(int x, int y)\n'
            b'{\n'
            b'\tif (!m_pSelf)\n'
