@@ -1881,3 +1881,56 @@ edit('S3Client/Ui/UiCase/UiPK.cpp',
      b'SetText("\xa7\xe5 s\xb8t")',
      b'SetText("Do sat")',
      'nhan cua so PK: Do sat')
+
+# ---------------------------------------------------------------------------
+# Chu Viet co dau: hai byte, byte dan 0xF9 hoac 0xFA.
+#
+# Glyph nam o vung GBK 0xF9A1-0xF9FE va 0xFAA1-0xFAFE - vung nay BO TRONG o ca
+# ba co font (12/14/16), da do bang cach quet mang offset trong tep .fnt. Sinh
+# glyph bang client/them-chu-viet-vao-font.py, doi chuoi bang
+# client/doi-chu-viet-sang-ma-font.py.
+#
+# Chu Han van hai byte nguyen o nhu cu, ASCII van mot byte nua o. Chu Viet duoc
+# VE HEP (chi dung nua trai cua o) nen phai di buoc NUA O - khong lam vay thi
+# moi chu co dau rong gap doi chu thuong va hang chu so le.
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'\t\t\th += m_nOutputWidth;',
+     _crlf(b'\t\t\tif (lpByte[nPos] == 0xF9 || lpByte[nPos] == 0xFA)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\th += m_nFontHalfWidth[nHalfIndex];\n'
+           b'\t\t\t\tnHalfIndex ^= 1;\n'
+           b'\t\t\t}\n'
+           b'\t\t\telse\n'
+           b'\t\t\t\th += m_nOutputWidth;'),
+     'chu Viet di buoc nua o')
+
+# Nhan ba nut cua so PK - lan nay bang tieng Viet CO DAU that.
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'SetText("Luyen cong")',
+     b'SetText("Luy\xf9\xbdn c\xf9\xc8ng")',
+     'nhan cua so PK: Luyen cong co dau')
+
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'SetText("Chien dau")',
+     b'SetText("Chi\xf9\xb9n \xf9\xb2\xf9\xadu")',
+     'nhan cua so PK: Chien dau co dau')
+
+edit('S3Client/Ui/UiCase/UiPK.cpp',
+     b'SetText("Do sat")',
+     b'SetText("\xf9\xf5\xf9\xca s\xf9\xa1t")',
+     'nhan cua so PK: Do sat co dau')
+
+# Menu Ctrl + chuot phai tren nguoi choi.
+for _cu, _moi, _ghi in (
+        (b'\t"Tan gau",',    b'\t"T\xf9\xa1n g\xf9\xb0u",',            'Tan gau'),
+        (b'\t"Hao huu",',    b'\t"H\xf9\xa3o h\xf9\xddu",',            'Hao huu'),
+        (b'\t"Giao dich",',  b'\t"Giao d\xf9\xc2ch",',                   'Giao dich'),
+        (b'\t"Nhap doi",',   b'\t"Nh\xf9\xb1p \xf9\xb2\xf9\xcdi",',  'Nhap doi'),
+        (b'\t"To doi",',     b'\t"T\xf9\xcb \xf9\xb2\xf9\xcdi",',    'To doi'),
+        (b'\t"Cuu sat",',    b'\t"C\xf9\xdbu s\xf9\xa1t",',            'Cuu sat'),
+        (b'\t"Tin tuc",',    b'\t"Tin t\xf9\xdac",',                     'Tin tuc'),
+        (b'\t"So den",',     b'\t"S\xf9\xcb \xf9\xb2en",',             'So den'),
+        (b'\t"Bang hoi",',   b'\t"Bang h\xf9\xcdi",',                    'Bang hoi'),
+):
+    edit('S3Client/Ui/UiCase/UiGame.cpp', _cu, _moi,
+         'nhan menu nguoi choi co dau: ' + _ghi)
