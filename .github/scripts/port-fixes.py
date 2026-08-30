@@ -2100,11 +2100,16 @@ edit('Represent/iRepresent/Font/KFont2.cpp',
      b'\t\tunsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);',
      _crlf(b'\t\tunsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);\n'
            b'\t\tif (cFirst == 0xF9 || cFirst == 0xFA)\n'
-           b'\t\t\tg_DebugLog("[chuviet] ve %02X%02X -> glyph=%s",\n'
-           b'\t\t\t\tcFirst, cNext, pCharacterData ? "CO" : "KHONG");'),
+           b'\t\t{\n'
+           b'\t\t\t/* Ghi thang ra tep: KDebug.h khai ham nhan HWND nen keo ca\n'
+           b'\t\t\t   windows.h vao du an nay va lam hong build. */\n'
+           b'\t\t\tFILE* fp = fopen("chuviet.log", "a");\n'
+           b'\t\t\tif (fp)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tfprintf(fp, "ve %02X%02X -> glyph=%s\\n", cFirst, cNext,\n'
+           b'\t\t\t\t\tpCharacterData ? "CO" : "KHONG");\n'
+           b'\t\t\t\tfclose(fp);\n'
+           b'\t\t\t}\n'
+           b'\t\t}'),
      'in ket qua tra glyph chu Viet')
 
-edit('Represent/iRepresent/Font/KFont2.cpp',
-     b'#include "KFont2.h"',
-     b'#include "KFont2.h"\r\n#include <windows.h>\r\n#include "KDebug.h"',
-     'them KDebug.h cho KFont2 (kem windows.h vi KDebug.h dung HWND)')
