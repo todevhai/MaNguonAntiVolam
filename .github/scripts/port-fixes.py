@@ -2559,29 +2559,39 @@ edit('S3Client/Ui/UiCase/UiFindPos.cpp',
            b'extern int\tg_nDichSpaceY;'),
      'UiFindPos: dung chung diem cam co voi ban do nho')
 
+# CI checkout ra CRLF, nen mau NHIEU DONG khong bao gio khop - moi neo o day
+# phai la MOT dong. Vi vay khong thay tron than OnDone ma: viet than cho OnOK
+# (da khai trong .h nhung chua he co than) roi goi no ngay truoc OnDone.
 edit('S3Client/Ui/UiCase/UiFindPos.cpp',
-     b'void KUiFindPos::OnDone()\n{\n\tCloseWindow();\n}',
-     b'/* Nguoi choi nhap theo O BAN DO - dung don vi hien o dong "Dang o" khi mo\n'
-     b'   hop thoai - con GotoWhere nhan toa do khong gian: mot o = 32 diem.\n'
-     b'   mode 20 = da la toa do khong gian VA phai tim duong tranh vat can. */\n'
-     b'void KUiFindPos::OnDone()\n'
-     b'{\n'
-     b'\tchar szX[16], szY[16];\n'
-     b'\tszX[0] = 0;\n'
-     b'\tszY[0] = 0;\n'
-     b'\tm_X.GetText(szX, sizeof(szX), true);\n'
-     b'\tm_Y.GetText(szY, sizeof(szY), true);\n'
-     b'\tint nO_X = atoi(szX);\n'
-     b'\tint nO_Y = atoi(szY);\n'
-     b'\tif (nO_X > 0 && nO_Y > 0 && g_pCoreShell)\n'
-     b'\t{\n'
-     b'\t\tg_nDichSpaceX = nO_X * 32;\n'
-     b'\t\tg_nDichSpaceY = nO_Y * 32;\n'
-     b'\t\tg_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 20);\n'
-     b'\t}\n'
-     b'\tCloseWindow();\n'
-     b'}',
-     'UiFindPos: nhap toa do thi cam co va tim duong chay toi')
+     b'void KUiFindPos::OnDone()',
+     _crlf(b'/* Nguoi choi nhap theo O BAN DO - dung don vi hien o dong "Dang o" khi mo\n'
+           b'   hop thoai - con GotoWhere nhan toa do khong gian: mot o = 32 diem.\n'
+           b'   mode 20 = da la toa do khong gian VA phai tim duong tranh vat can. */\n'
+           b'void KUiFindPos::OnOK()\n'
+           b'{\n'
+           b'\tchar szX[16], szY[16];\n'
+           b'\tszX[0] = 0;\n'
+           b'\tszY[0] = 0;\n'
+           b'\tm_X.GetText(szX, sizeof(szX), true);\n'
+           b'\tm_Y.GetText(szY, sizeof(szY), true);\n'
+           b'\tint nO_X = atoi(szX);\n'
+           b'\tint nO_Y = atoi(szY);\n'
+           b'\tif (nO_X > 0 && nO_Y > 0 && g_pCoreShell)\n'
+           b'\t{\n'
+           b'\t\tg_nDichSpaceX = nO_X * 32;\n'
+           b'\t\tg_nDichSpaceY = nO_Y * 32;\n'
+           b'\t\tg_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 20);\n'
+           b'\t}\n'
+           b'}\n'
+           b'\n'
+           b'void KUiFindPos::OnDone()'),
+     'UiFindPos: than cho OnOK - doc toa do, cam co, tim duong')
+
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'\t\t\tOnDone();',
+     _crlf(b'\t\t\tOnOK();\n'
+           b'\t\t\tOnDone();'),
+     'UiFindPos: nut OK goi OnOK truoc khi dong')
 
 # Mo hop thoai thi hien luon vi tri dang dung, de nguoi choi biet don vi ma nhap.
 edit('S3Client/Ui/UiCase/UiFindPos.cpp',
