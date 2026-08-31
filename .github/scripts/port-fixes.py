@@ -2849,6 +2849,40 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
      'log tam chat: khai ham that cho tin den')
 
 # ---------------------------------------------------------------------------
+# Menu chon kenh lay chieu cao moi dong TU CHIEU CAO ANH bieu tuong kenh
+# (GetImageParam cua MenuImage). Anh nao khong doc duoc thi nHei = 0, va neu ca
+# ba kenh deu vay thi nItemHeight = 0 - menu van bung ra nhung cao bang khong,
+# nhin nhu khong co gi. Dat san mot chieu cao toi thieu.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tKPopupMenu::Popup(pMenuData, (KWndWindow*)this, SEL_CHANNEL_MENU);',
+     _crlf(b'\tif (pMenuData->nItemHeight < 16)\n'
+           b'\t\tpMenuData->nItemHeight = 16;\t/* du cho chu 12 diem */\n'
+           b'\tCHAT_Ghi2("[chat] menu kenh: %d muc, cao moi dong %d",\n'
+           b'\t\tnChannelDataCount + m_nRecentPlayerName, (int)pMenuData->nItemHeight);\n'
+           b'\tKPopupMenu::Popup(pMenuData, (KWndWindow*)this, SEL_CHANNEL_MENU);'),
+     'menu kenh: chieu cao dong toi thieu, va log tam')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'extern iCoreShell*\t\tg_pCoreShell;',
+     _crlf(b'extern iCoreShell*\t\tg_pCoreShell;\n'
+           b'\n'
+           b'#include <stdarg.h>\n'
+           b'/* LOG TAM - go khi xong phan chat */\n'
+           b'static void CHAT_Ghi2(const char* pFmt, ...)\n'
+           b'{\n'
+           b'\tFILE* fp = fopen("chat.log", "a");\n'
+           b'\tif (!fp)\n'
+           b'\t\treturn;\n'
+           b'\tva_list va;\n'
+           b'\tva_start(va, pFmt);\n'
+           b'\tvfprintf(fp, pFmt, va);\n'
+           b'\tva_end(va);\n'
+           b'\tfprintf(fp, "\\n");\n'
+           b'\tfclose(fp);\n'
+           b'}'),
+     'log tam chat o thanh nguoi choi')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
