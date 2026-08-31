@@ -2770,10 +2770,16 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'   truoc do. */\n'
            b'void KUiMsgCentrePad::XuLyKenhCho()\n'
            b'{\n'
+           b'\tstatic int s_bDangChay = 0;\n'
+           b'\tif (s_bDangChay)\n'
+           b'\t\treturn;\n'
+           b'\ts_bDangChay = 1;\n'
+           b'\t/* GIU lai danh sach: doi canh thi ReleaseActivateChannelAll xoa\n'
+           b'\t   sach kenh dang ky ma may chu khong gui lai, phai tu dang ky lai. */\n'
            b'\tint nSo = s_nKenhCho;\n'
-           b'\ts_nKenhCho = 0;\t/* xoa truoc, tranh de quy neu lai vao day */\n'
            b'\tfor (int i = 0; i < nSo; i++)\n'
            b'\t\tOpenChannelThat(s_KenhCho[i].szTen, s_KenhCho[i].nId, s_KenhCho[i].cost);\n'
+           b'\ts_bDangChay = 0;\n'
            b'}\n'
            b'\n'
            b'KUiMsgCentrePad* KUiMsgCentrePad::OpenWindow()'),
@@ -2912,7 +2918,17 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\tstatic int s_nLanVe = 0;\n'
            b'\tif (++s_nLanVe <= 3 || (s_nLanVe % 600) == 0)\n'
            b'\t\tCHAT_Ghi2("[chat] ve thanh: so kenh=%d (rieng kenh=%d), kenh dang chon=%d",\n'
-           b'\t\t\tnChannelDataCount, KUiMsgCentrePad::GetChannelCount(), m_nCurChannel);'),
+           b'\t\t\tnChannelDataCount, KUiMsgCentrePad::GetChannelCount(), m_nCurChannel);\n'
+           b'\t/* Doi canh xoa sach kenh dang ky ma may chu khong gui lai; dang ky\n'
+           b'\t   lai tu danh sach da giu. Gioi han so lan de khong thu mai. */\n'
+           b'\tstatic int s_nThuLai = 0;\n'
+           b'\tif (KUiMsgCentrePad::GetChannelCount() > 0)\n'
+           b'\t\ts_nThuLai = 0;\n'
+           b'\telse if (s_nThuLai < 30)\n'
+           b'\t{\n'
+           b'\t\ts_nThuLai++;\n'
+           b'\t\tKUiMsgCentrePad::XuLyKenhCho();\n'
+           b'\t}'),
      'log tam: dem so kenh luc ve thanh nguoi choi')
 
 # ---------------------------------------------------------------------------
