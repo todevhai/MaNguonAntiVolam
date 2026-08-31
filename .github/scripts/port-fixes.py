@@ -2819,7 +2819,7 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
 
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      b'\t\t\tm_pSelf->SendChannelSubscribe(m_pSelf->AddActivateChannel(Info), true);',
-     _crlf(b'\t\t\tCHAT_Ghi("[chat]   KHOP: kenh \"%s\" -> muc ini thu %d, dang ky",\n'
+     _crlf(b'\t\t\tCHAT_Ghi("[chat]   KHOP: kenh \\"%s\\" -> muc ini thu %d, dang ky",\n'
            b'\t\t\t\tchannelName, nChannelIndex);\n'
            b'\t\t\tm_pSelf->SendChannelSubscribe(m_pSelf->AddActivateChannel(Info), true);'),
      'log tam chat: ghi khi khop duoc kenh')
