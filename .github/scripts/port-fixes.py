@@ -2742,12 +2742,21 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      b'void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)',
      _crlf(b'void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)\n'
            b'{\n'
-           b'\tCHAT_Ghi("[chat] may chu mo kenh \\"%s\\" id=%u cost=%d", channelName ? channelName : "(rong)", (unsigned)nChannelID, (int)cost);\n'
+           b'\tCHAT_Ghi("[chat] may chu mo kenh \\"%s\\" id=%u | cua so chat=%s, so kenh tu ini=%d",\n'
+           b'\t\tchannelName ? channelName : "(rong)", (unsigned)nChannelID,\n'
+           b'\t\tm_pSelf ? "da co" : "CHUA CO", m_pSelf ? m_pSelf->m_nChannelsResource : -1);\n'
            b'\tOpenChannelThat(channelName, nChannelID, cost);\n'
            b'}\n'
            b'\n'
            b'void KUiMsgCentrePad::OpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost)'),
      'log tam chat: ghi khi may chu mo kenh')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\tm_nChannelsResource = nCh;',
+     _crlf(b'\tm_nChannelsResource = nCh;\n'
+           b'\tCHAT_Ghi("[chat] nap ini xong: %d kenh trong [Channels]", nCh);'),
+     'log tam chat: so kenh doc duoc tu ini')
+
 
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
      b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);',
