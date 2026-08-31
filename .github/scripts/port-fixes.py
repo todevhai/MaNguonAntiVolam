@@ -2715,6 +2715,70 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      'UiMiniMap: bam Tim thi mo hop nhap toa do')
 
 # ---------------------------------------------------------------------------
+# LOG TAM cho chat: danh sach kenh do MAY CHU gui xuong
+# (NotifyChannelID -> KUiMsgCentrePad::OpenChannel), roi client khop ten do voi
+# khoa FormatName cua tung muc [CH_*] trong ini. Chua ro may chu ta co gui hay
+# khong, va gui ten gi - phai do. GO SAU KHI DO XONG.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'#include "UiMsgCentrePad.h"',
+     _crlf(b'#include "UiMsgCentrePad.h"\n'
+           b'#include <stdarg.h>\n'
+           b'/* LOG TAM - xem chu thich o port-fixes.py */\n'
+           b'static void CHAT_Ghi(const char* pFmt, ...)\n'
+           b'{\n'
+           b'\tFILE* fp = fopen("chat.log", "a");\n'
+           b'\tif (!fp)\n'
+           b'\t\treturn;\n'
+           b'\tva_list va;\n'
+           b'\tva_start(va, pFmt);\n'
+           b'\tvfprintf(fp, pFmt, va);\n'
+           b'\tva_end(va);\n'
+           b'\tfprintf(fp, "\\n");\n'
+           b'\tfclose(fp);\n'
+           b'}'),
+     'log tam chat: ham ghi tep')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)',
+     _crlf(b'void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)\n'
+           b'{\n'
+           b'\tCHAT_Ghi("[chat] may chu mo kenh \\"%s\\" id=%u cost=%d", channelName ? channelName : "(rong)", (unsigned)nChannelID, (int)cost);\n'
+           b'\tOpenChannelThat(channelName, nChannelID, cost);\n'
+           b'}\n'
+           b'\n'
+           b'void KUiMsgCentrePad::OpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost)'),
+     'log tam chat: ghi khi may chu mo kenh')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
+     b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);',
+     b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);\r\n\tstatic void\t\t\t\tOpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost);',
+     'log tam chat: khai ham that')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\t\tif (nChannelIndex >= 0)',
+     _crlf(b'\t\tCHAT_Ghi("[chat]   khop FormatName -> muc thu %d trong %d muc kenh cua ini",\n'
+           b'\t\t\tnChannelIndex, m_pSelf->m_nChannelsResource);\n'
+           b'\t\tif (nChannelIndex >= 0)'),
+     'log tam chat: ghi ket qua khop FormatName')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'int KUiMsgCentrePad::NewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)',
+     _crlf(b'int KUiMsgCentrePad::NewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)\n'
+           b'{\n'
+           b'\tCHAT_Ghi("[chat] NHAN kenh id=%u tu \\"%s\\" dai %d", (unsigned)nChannelID,\n'
+           b'\t\tszSendName ? szSendName : "(rong)", (int)nMsgLength);\n'
+           b'\treturn NewChannelMessageArrivalThat(nChannelID, szSendName, pMsgBuff, nMsgLength);\n'
+           b'}\n'
+           b'\n'
+           b'int KUiMsgCentrePad::NewChannelMessageArrivalThat(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)'),
+     'log tam chat: ghi khi nhan tin kenh')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
+     b'\tstatic int\t\t\t\tNewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);',
+     b'\tstatic int\t\t\t\tNewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);\r\n\tstatic int\t\t\t\tNewChannelMessageArrivalThat(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);',
+     'log tam chat: khai ham that cho tin den')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
