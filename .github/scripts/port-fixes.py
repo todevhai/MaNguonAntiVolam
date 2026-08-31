@@ -2904,6 +2904,17 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\t\t\t\tm_pSelf->m_ChannelSwitchBtn.SetText(buffer, 3);'),
      'nut kenh: anh hong thi ve ten bang chu')
 
+# LOG TAM: nut kenh van trong. Do xem PaintWindow co goi SetCurrentChannel
+# khong, va GetChannelCount tra bao nhieu.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;',
+     _crlf(b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;\n'
+           b'\tstatic int s_nLanVe = 0;\n'
+           b'\tif (++s_nLanVe <= 3 || (s_nLanVe % 600) == 0)\n'
+           b'\t\tCHAT_Ghi2("[chat] ve thanh: so kenh=%d (rieng kenh=%d), kenh dang chon=%d",\n'
+           b'\t\t\tnChannelDataCount, KUiMsgCentrePad::GetChannelCount(), m_nCurChannel);'),
+     'log tam: dem so kenh luc ve thanh nguoi choi')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
