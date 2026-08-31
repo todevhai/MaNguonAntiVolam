@@ -2103,8 +2103,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\t\tMapInfo.nScallH * (nRelX - (int)m_MapSize.cx / 2);\n'
            b'\t\t\t\t\tint nSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV +\n'
            b'\t\t\t\t\t\tMapInfo.nScallV * (nRelY - (int)m_MapSize.cy / 2);\n'
-           b'\t\t\t\t\ts_nDichSpaceX = nSpaceX;\n'
-           b'\t\t\t\t\ts_nDichSpaceY = nSpaceY;\n'
+           b'\t\t\t\t\tg_nDichSpaceX = nSpaceX;\n'
+           b'\t\t\t\t\tg_nDichSpaceY = nSpaceY;\n'
            b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\n'
            b'\t\t\t\t\tbreak;\n'
            b'\t\t\t\t}\n'
@@ -2124,8 +2124,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\n'
            b'/* Diem vua bam tren ban do, theo toa do KHONG GIAN. -1 = chua bam lan nao\n'
            b'   hoac da toi noi. Dung ve duong chi huong trong PaintWindow. */\n'
-           b'static int\ts_nDichSpaceX = -1;\n'
-           b'static int\ts_nDichSpaceY = -1;'),
+           b'int\tg_nDichSpaceX = -1;\n'
+           b'int\tg_nDichSpaceY = -1;'),
      'nho diem dich tren ban do de ve vector')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
@@ -2133,20 +2133,20 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      _crlf(b'\t\t\tg_pRepresentShell->DrawPrimitives(1, &rect, RU_T_RECT, true);\n'
            b'\n'
            b'\t\t\t/* Duong chi huong tu nhan vat (tam ban do) toi diem vua bam. */\n'
-           b'\t\t\tif (s_nDichSpaceX >= 0)\n'
+           b'\t\t\tif (g_nDichSpaceX >= 0)\n'
            b'\t\t\t{\n'
            b'\t\t\t\tKSceneMapInfo MapInfo;\n'
            b'\t\t\t\tif (g_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))\n'
            b'\t\t\t\t{\n'
            b'\t\t\t\t\tint nTamSpaceX = MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH;\n'
            b'\t\t\t\t\tint nTamSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV;\n'
-           b'\t\t\t\t\tint nDX = s_nDichSpaceX - nTamSpaceX;\n'
-           b'\t\t\t\t\tint nDY = s_nDichSpaceY - nTamSpaceY;\n'
+           b'\t\t\t\t\tint nDX = g_nDichSpaceX - nTamSpaceX;\n'
+           b'\t\t\t\t\tint nDY = g_nDichSpaceY - nTamSpaceY;\n'
            b'\t\t\t\t\t/* Toi noi roi thi thoi ve. */\n'
            b'\t\t\t\t\tif (nDX > -MapInfo.nScallH && nDX < MapInfo.nScallH &&\n'
            b'\t\t\t\t\t\tnDY > -MapInfo.nScallV && nDY < MapInfo.nScallV)\n'
            b'\t\t\t\t\t{\n'
-           b'\t\t\t\t\t\ts_nDichSpaceX = -1;\n'
+           b'\t\t\t\t\t\tg_nDichSpaceX = -1;\n'
            b'\t\t\t\t\t}\n'
            b'\t\t\t\t\telse if (MapInfo.nScallH && MapInfo.nScallV)\n'
            b'\t\t\t\t\t{\n'
@@ -2166,6 +2166,29 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\t\t\tline.oEndPos.nY = nDichY;\n'
            b'\t\t\t\t\t\t\tline.oEndPos.nZ = 0;\n'
            b'\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(1, &line, RU_T_LINE, true);\n'
+           b'\n'
+           b'\t\t\t\t\t\t\t/* La co cam o dich: mot cot doc va mot tam giac.\n'
+           b'\t\t\t\t\t\t\t   Engine khong co phan tu "co" nao san (chi co\n'
+           b'\t\t\t\t\t\t\t   PIC/CHARACTER/PARTNER) nen ve bang duong thang. */\n'
+           b'\t\t\t\t\t\t\tKRULine co[5];\n'
+           b'\t\t\t\t\t\t\tint nC;\n'
+           b'\t\t\t\t\t\t\tfor (nC = 0; nC < 5; nC++)\n'
+           b'\t\t\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\t\t\tco[nC].Color.Color_dw = 0xffff3030;\n'
+           b'\t\t\t\t\t\t\t\tco[nC].oPosition.nZ = 0;\n'
+           b'\t\t\t\t\t\t\t\tco[nC].oEndPos.nZ = 0;\n'
+           b'\t\t\t\t\t\t\t}\n'
+           b'\t\t\t\t\t\t\tco[0].oPosition.nX = nDichX;      co[0].oPosition.nY = nDichY;\n'
+           b'\t\t\t\t\t\t\tco[0].oEndPos.nX   = nDichX;      co[0].oEndPos.nY   = nDichY - 9;\n'
+           b'\t\t\t\t\t\t\tco[1].oPosition.nX = nDichX;      co[1].oPosition.nY = nDichY - 9;\n'
+           b'\t\t\t\t\t\t\tco[1].oEndPos.nX   = nDichX + 6;  co[1].oEndPos.nY   = nDichY - 7;\n'
+           b'\t\t\t\t\t\t\tco[2].oPosition.nX = nDichX + 6;  co[2].oPosition.nY = nDichY - 7;\n'
+           b'\t\t\t\t\t\t\tco[2].oEndPos.nX   = nDichX;      co[2].oEndPos.nY   = nDichY - 5;\n'
+           b'\t\t\t\t\t\t\tco[3].oPosition.nX = nDichX;      co[3].oPosition.nY = nDichY - 8;\n'
+           b'\t\t\t\t\t\t\tco[3].oEndPos.nX   = nDichX + 5;  co[3].oEndPos.nY   = nDichY - 7;\n'
+           b'\t\t\t\t\t\t\tco[4].oPosition.nX = nDichX - 2;  co[4].oPosition.nY = nDichY;\n'
+           b'\t\t\t\t\t\t\tco[4].oEndPos.nX   = nDichX + 2;  co[4].oEndPos.nY   = nDichY;\n'
+           b'\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(5, co, RU_T_LINE, true);\n'
            b'\t\t\t\t\t\t}\n'
            b'\t\t\t\t\t}\n'
            b'\t\t\t\t}\n'
@@ -2514,6 +2537,67 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\tAddChild(&m_ChatBar);',
      b'\tAddChild(&m_InputBack);\r\n\tAddChild(&m_ChatBar);',
      'anh nen o nhap chat ve truoc cac nut')
+
+# ---------------------------------------------------------------------------
+# Hop thoai "tim vi tri" (nut co tren ban do nho) von la khung RONG: OnDone()
+# chi dong cua so, con OnOK()/OnCheckInput() khai trong .h ma khong he co than
+# trong .cpp. Header ghi tac gia "Hoang" 2014 - tinh nang nguoi Viet them sau,
+# ban 2003 khong co. Nay noi no vao dung duong da lam cho lenh bam ban do:
+# nhap toa do O BAN DO (32 diem moi o) -> cam co -> tu tim duong chay toi.
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'#include <crtdbg.h>',
+     b'#include <crtdbg.h>\n#include <stdlib.h>\t/* atoi */',
+     'UiFindPos: them stdlib cho atoi')
+
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'extern iCoreShell*\t\tg_pCoreShell;',
+     (b'extern iCoreShell*\t\tg_pCoreShell;\n'
+           b'\n'
+           b'/* Diem dang cam co tren ban do nho, theo toa do KHONG GIAN.\n'
+           b'   Dinh nghia trong UiMiniMap.cpp. */\n'
+           b'extern int\tg_nDichSpaceX;\n'
+           b'extern int\tg_nDichSpaceY;'),
+     'UiFindPos: dung chung diem cam co voi ban do nho')
+
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'void KUiFindPos::OnDone()\n{\n\tCloseWindow();\n}',
+     b'/* Nguoi choi nhap theo O BAN DO - dung don vi hien o dong "Dang o" khi mo\n'
+     b'   hop thoai - con GotoWhere nhan toa do khong gian: mot o = 32 diem.\n'
+     b'   mode 20 = da la toa do khong gian VA phai tim duong tranh vat can. */\n'
+     b'void KUiFindPos::OnDone()\n'
+     b'{\n'
+     b'\tchar szX[16], szY[16];\n'
+     b'\tszX[0] = 0;\n'
+     b'\tszY[0] = 0;\n'
+     b'\tm_X.GetText(szX, sizeof(szX), true);\n'
+     b'\tm_Y.GetText(szY, sizeof(szY), true);\n'
+     b'\tint nO_X = atoi(szX);\n'
+     b'\tint nO_Y = atoi(szY);\n'
+     b'\tif (nO_X > 0 && nO_Y > 0 && g_pCoreShell)\n'
+     b'\t{\n'
+     b'\t\tg_nDichSpaceX = nO_X * 32;\n'
+     b'\t\tg_nDichSpaceY = nO_Y * 32;\n'
+     b'\t\tg_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 20);\n'
+     b'\t}\n'
+     b'\tCloseWindow();\n'
+     b'}',
+     'UiFindPos: nhap toa do thi cam co va tim duong chay toi')
+
+# Mo hop thoai thi hien luon vi tri dang dung, de nguoi choi biet don vi ma nhap.
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'\t\tWnd_GameSpaceHandleInput(false);',
+     (b'\t\tWnd_GameSpaceHandleInput(false);\n'
+           b'\t\tKSceneMapInfo MapInfo;\n'
+           b'\t\tif (g_pCoreShell &&\n'
+           b'\t\t\tg_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))\n'
+           b'\t\t{\n'
+           b'\t\t\tchar szTin[64];\n'
+           b'\t\t\tsprintf(szTin, "Dang o: %d / %d",\n'
+           b'\t\t\t\t(MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH) / 32,\n'
+           b'\t\t\t\t(MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV) / 32);\n'
+           b'\t\t\tm_pSelf->m_InfoText.SetText(szTin);\n'
+           b'\t\t}'),
+     'UiFindPos: hien vi tri hien tai khi mo hop thoai')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
