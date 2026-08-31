@@ -2951,6 +2951,40 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'\t\tm_pSelf->m_Sys.Show();'),
      'khung chat len tren thanh HUD')
 
+# LOG TAM: hang tab chat khong nhan chuot. In ra khung bao THAT cua cua so
+# chat va cua tung nut tab, de biet vung bam nam o dau so voi cho ve.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'void KUiMsgCentrePad::PaintWindow()',
+     _crlf(b'/* LOG TAM - go khi xong phan tab chat */\n'
+           b'void KUiMsgCentrePad::DoViTriTab()\n'
+           b'{\n'
+           b'\tint x = 0, y = 0, w = 0, h = 0;\n'
+           b'\tGetAbsolutePos(&x, &y);\n'
+           b'\tGetSize(&w, &h);\n'
+           b'\tCHAT_Ghi("[tab] khung chat tai (%d,%d) co %dx%d", x, y, w, h);\n'
+           b'\tfor (int i = 0; i < MAX_CHAT_TAB; i++)\n'
+           b'\t{\n'
+           b'\t\tint bx = 0, by = 0, bw = 0, bh = 0;\n'
+           b'\t\tm_TabButton[i].GetAbsolutePos(&bx, &by);\n'
+           b'\t\tm_TabButton[i].GetSize(&bw, &bh);\n'
+           b'\t\tCHAT_Ghi("[tab]   nut %d tai (%d,%d) co %dx%d", i, bx, by, bw, bh);\n'
+           b'\t}\n'
+           b'}\n'
+           b'\n'
+           b'void KUiMsgCentrePad::PaintWindow()'),
+     'log tam: do vi tri that cua hang tab')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
+     b'\tstatic void\t\t\t\tXuLyKenhCho();',
+     b'\tstatic void\t\t\t\tXuLyKenhCho();\r\n\tvoid\t\t\t\tDoViTriTab();',
+     'khai ham do vi tri tab')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\t\tm_pSelf->BringToTop();',
+     _crlf(b'\t\tm_pSelf->BringToTop();\n'
+           b'\t\tm_pSelf->DoViTriTab();'),
+     'goi do vi tri tab khi mo cua so')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
