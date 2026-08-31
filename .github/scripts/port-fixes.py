@@ -2883,6 +2883,28 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      'log tam chat o thanh nguoi choi')
 
 # ---------------------------------------------------------------------------
+# Nut chon kenh o dau thanh nhap lay nhan la ANH INLINE cua kenh dang chon
+# (SetCurrentChannel gan KTC_INLINE_PIC + chi so anh). Anh nap qua
+# AddCustomInlinePic; khong nap duoc thi chi so = 0xffff va nut thanh o trong.
+# Them phuong an du phong: ve TEN kenh bang chu, va ghi lai de biet duong nao.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\t\t\tm_pSelf->m_ChannelSwitchBtn.SetText(buffer, 3);',
+     _crlf(b'\t\t\tchar szTenKenh[64];\n'
+           b'\t\t\tszTenKenh[0] = 0;\n'
+           b'\t\t\tWORD nCaoAnh = 0;\n'
+           b'\t\t\tKRColor uMau1, uMau2;\n'
+           b'\t\t\tshort nCheck = -1;\n'
+           b'\t\t\tKUiMsgCentrePad::GetChannelMenuinfo(m_pSelf->m_nCurChannel,\n'
+           b'\t\t\t\tNULL, &nCaoAnh, &uMau1, &uMau2, szTenKenh, &nCheck);\n'
+           b'\t\t\tCHAT_Ghi2("[chat] nut kenh: muc %d, chi so anh=%u, cao=%u, ten=\\"%s\\"",\n'
+           b'\t\t\t\tm_pSelf->m_nCurChannel, (unsigned)nPicIndex, (unsigned)nCaoAnh, szTenKenh);\n'
+           b'\t\t\tif (nPicIndex == (WORD)-1 && szTenKenh[0])\n'
+           b'\t\t\t\tm_pSelf->m_ChannelSwitchBtn.SetText(szTenKenh);\t/* anh hong -> ve chu */\n'
+           b'\t\t\telse\n'
+           b'\t\t\t\tm_pSelf->m_ChannelSwitchBtn.SetText(buffer, 3);'),
+     'nut kenh: anh hong thi ve ten bang chu')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
