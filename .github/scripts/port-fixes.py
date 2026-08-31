@@ -2818,11 +2818,18 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
      'log tam chat: khai ham that')
 
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\t\tif (nChannelIndex >= 0)',
-     _crlf(b'\t\tCHAT_Ghi("[chat]   khop FormatName -> muc thu %d trong %d muc kenh cua ini",\n'
-           b'\t\t\tnChannelIndex, m_pSelf->m_nChannelsResource);\n'
-           b'\t\tif (nChannelIndex >= 0)'),
-     'log tam chat: ghi ket qua khop FormatName')
+     b'\t\t\tm_pSelf->SendChannelSubscribe(m_pSelf->AddActivateChannel(Info), true);',
+     _crlf(b'\t\t\tCHAT_Ghi("[chat]   KHOP: kenh \"%s\" -> muc ini thu %d, dang ky",\n'
+           b'\t\t\t\tchannelName, nChannelIndex);\n'
+           b'\t\t\tm_pSelf->SendChannelSubscribe(m_pSelf->AddActivateChannel(Info), true);'),
+     'log tam chat: ghi khi khop duoc kenh')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\tint nSo = s_nKenhCho;',
+     _crlf(b'\tCHAT_Ghi("[chat] xu ly %d kenh dang cho, ini co %d muc kenh",\n'
+           b'\t\ts_nKenhCho, m_pSelf ? m_pSelf->m_nChannelsResource : -1);\n'
+           b'\tint nSo = s_nKenhCho;'),
+     'log tam chat: ghi khi xa dem kenh')
 
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      b'int KUiMsgCentrePad::NewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)',
