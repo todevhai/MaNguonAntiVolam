@@ -2050,6 +2050,69 @@ edit('S3Client/Ui/UiCase/UiToolsControlBar.cpp',
      've lai nut PK ngay khi tha tay')
 
 # ---------------------------------------------------------------------------
+# Bam trai tren ban do nho -> nhan vat chay toi diem do.
+#
+# KUiMiniMap::WndProc chuyen NGUYEN XI su kien chuot trai xuong khong gian game
+# bang Wnd_TransmitInputToGameSpace, tuc UiGame hieu do la mot diem trong THE
+# GIOI nam duoi con tro - ma con tro dang o tren khung ban do goc man hinh. Nen
+# lenh di (neu co) tro toi cho nam DUOI khung ban do, khong phai diem vua bam.
+# Khong co buoc doi toa do diem-tren-ban-do sang toa do the gioi o dau ca.
+#
+# Phep doi do thi da co san trong MapScroll (keo chuot PHAI de cuon ban do):
+# lay KSceneMapInfo qua GSMOI_SCENE_MAP_INFO roi
+#     space = nOrigFocus + nFocusOffset + nScall * (diem - tam)
+# Chi viec dung lai dung phep tinh ay cho chuot trai.
+#
+# GotoWhere(x, y, mode) nhan toa do VIEWPORT roi tu goi
+# ViewPortCoordToSpaceCoord. Ta da co san toa do KHONG GIAN nen them mot che do
+# moi: mode >= 10 nghia la "toa do da la khong gian, dung doi nua". Giu nguyen
+# chu ky ham nen khong pha vo iCoreShell hay cho goi nao khac.
+edit('Core/Src/CoreShell.cpp',
+     b'\tif (mode < 0 || mode > 2)',
+     _crlf(b'\t/* mode >= 10: toa do truyen vao DA LA toa do khong gian (ban do nho\n'
+           b'\t   bam de chay toi). Tru 10 ra che do di lai nhu cu. */\n'
+           b'\tbool bDaLaKhongGian = (mode >= 10);\n'
+           b'\tif (bDaLaKhongGian)\n'
+           b'\t\tmode -= 10;\n'
+           b'\tif (mode < 0 || mode > 2)'),
+     'GotoWhere nhan them toa do khong gian (mode >= 10)')
+
+edit('Core/Src/CoreShell.cpp',
+     b'\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);',
+     _crlf(b'\t\tif (!bDaLaKhongGian)\n'
+           b'\t\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);'),
+     'GotoWhere: bo qua phep doi khi toa do da la khong gian')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\tcase WM_LBUTTONDOWN:',
+     _crlf(b'\tcase WM_LBUTTONDOWN:\n'
+           b'\t\t{\n'
+           b'\t\t\t/* Bam trong vung ve ban do -> doi sang toa do khong gian roi chay\n'
+           b'\t\t\t   toi. Cung phep tinh MapScroll dung cho chuot phai. */\n'
+           b'\t\t\tint nAbsX = 0, nAbsY = 0;\n'
+           b'\t\t\tGetAbsolutePos(&nAbsX, &nAbsY);\n'
+           b'\t\t\tint nRelX = (short)LOWORD(nParam) - nAbsX - m_MapPos.x;\n'
+           b'\t\t\tint nRelY = (short)HIWORD(nParam) - nAbsY - m_MapPos.y;\n'
+           b'\t\t\tif (g_pCoreShell && nRelX >= 0 && nRelY >= 0 &&\n'
+           b'\t\t\t\tnRelX < (int)m_MapSize.cx && nRelY < (int)m_MapSize.cy)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tKSceneMapInfo MapInfo;\n'
+           b'\t\t\t\tif (g_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tint nSpaceX = MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH +\n'
+           b'\t\t\t\t\t\tMapInfo.nScallH * (nRelX - (int)m_MapSize.cx / 2);\n'
+           b'\t\t\t\t\tint nSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV +\n'
+           b'\t\t\t\t\t\tMapInfo.nScallV * (nRelY - (int)m_MapSize.cy / 2);\n'
+           b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\n'
+           b'\t\t\t\t\tbreak;\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\t\tWnd_TransmitInputToGameSpace(uMsg, uParam, nParam);\n'
+           b'\t\tbreak;'),
+     'bam trai tren ban do nho -> chay toi diem do')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
