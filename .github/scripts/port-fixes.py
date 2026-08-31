@@ -2219,6 +2219,8 @@ edit('Core/Src/CoreShell.cpp',
            b'#define defTD_MAX_CHANG  40\n'
            b'#define defTD_TOI_NOI    48     /* coi nhu toi chang khi con cach duoi 48 diem */\n'
            b'#define defTD_MAX_XET    1500   /* chan tren so o duoc mo, giu CPU */\n'
+           b'#define defTD_NHIP_KET   40     /* dung yen bao nhieu nhip thi coi la ket */\n'
+           b'#define defTD_MAX_KET    6      /* tinh lai qua nhieu lan thi thoi, tranh lap vo han */\n'
            b'\n'
            b'static int   s_nTDGocX = 0, s_nTDGocY = 0;\n'
            b'static short s_nTDG[defTD_SO_O];\n'
@@ -2231,6 +2233,11 @@ edit('Core/Src/CoreShell.cpp',
            b'static int s_nSoChang  = 0;\n'
            b'static int s_nChangDang = 0;\n'
            b'static int  s_bDoDang = 0;      /* duong chi toi duoc mot phan */\n'
+           b'static int  s_nTruocX = 0;      /* vi tri nhip truoc, de biet co nhich khong */\n'
+           b'static int  s_nTruocY = 0;\n'
+           b'static int  s_nDemKet = 0;      /* so nhip lien tiep dung yen */\n'
+           b'static int  s_nSoLanKet = 0;    /* da tinh lai bao nhieu lan cho mot lenh */\n'
+           b'static int  s_bTinhLai = 0;     /* lenh nay do chinh ta phat lai sau khi ket */\n'
            b'static int  s_nDichCuoiX = 0;   /* diem nguoi choi bam, de tinh tiep */\n'
            b'static int  s_nDichCuoiY = 0;\n'
            b'static int s_nChangMode = 0;\n'
@@ -2386,7 +2393,8 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\treturn 0;\n'
            b'\n'
            b'\t/* Dao lai va CHI GIU diem doi huong, cho so chang it di. */\n'
-           b'\tint nHTruocX = 999, nHTruocY = 999;\n'
+           b'\tint nHTruocX = 999, nHTruocY = 999;\n'           b'\tint nOTruoc = 0;\n'
+
            b'\tfor (i = nSo - 1; i >= 0 && s_nSoChang < defTD_MAX_CHANG; i--)\n'
            b'\t{\n'
            b'\t\tint nCx = s_nTDLan[i] % defTD_CANH;\n'
@@ -2397,19 +2405,38 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\tnHx = nCx - (s_nTDLan[i + 1] % defTD_CANH);\n'
            b'\t\t\tnHy = nCy - (s_nTDLan[i + 1] / defTD_CANH);\n'
            b'\t\t}\n'
-           b'\t\tif (nHx != nHTruocX || nHy != nHTruocY)\n'
+           b'\t\tint nDaDi = i < nSo - 1 ? (nSo - 1 - i) : 0;\n'
+           b'\t\tif (nHx != nHTruocX || nHy != nHTruocY || nDaDi - nOTruoc >= 4)\n'
            b'\t\t{\n'
            b'\t\t\ts_nChangX[s_nSoChang] = s_nTDGocX + nCx * defTD_O + defTD_O / 2;\n'
            b'\t\t\ts_nChangY[s_nSoChang] = s_nTDGocY + nCy * defTD_O + defTD_O / 2;\n'
            b'\t\t\ts_nSoChang++;\n'
            b'\t\t\tnHTruocX = nHx;\n'
-           b'\t\t\tnHTruocY = nHy;\n'
+           b'\t\t\tnHTruocY = nHy;\n'           b'\t\t\tnOTruoc = nDaDi;\n'
+
            b'\t\t}\n'
            b'\t}\n'
            b'\tif (s_nSoChang <= 0)\n'
            b'\t\treturn 0;\n'
            b'\t/* Chang cuoi lay dung diem nguoi choi bam -- chi khi duong di\n'
            b'\t   that su cham dich, khong phai duong do dang. */\n'
+           b'\t/* Chang dau thuong chinh la o dang dung - di toi do thi nhan vat\n'
+           b'\t   dung yen. Bo di, bat dau tu chang thu hai. */\n'
+           b'\tif (s_nSoChang > 1)\n'
+           b'\t{\n'
+           b'\t\tint nBoX = s_nChangX[0] - nTuX; if (nBoX < 0) nBoX = -nBoX;\n'
+           b'\t\tint nBoY = s_nChangY[0] - nTuY; if (nBoY < 0) nBoY = -nBoY;\n'
+           b'\t\tif (nBoX < defTD_O && nBoY < defTD_O)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nK;\n'
+           b'\t\t\tfor (nK = 1; nK < s_nSoChang; nK++)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\ts_nChangX[nK - 1] = s_nChangX[nK];\n'
+           b'\t\t\t\ts_nChangY[nK - 1] = s_nChangY[nK];\n'
+           b'\t\t\t}\n'
+           b'\t\t\ts_nSoChang--;\n'
+           b'\t\t}\n'
+           b'\t}\n'
            b'\tif (!s_bDoDang)\n'
            b'\t{\n'
            b'\t\ts_nChangX[s_nSoChang - 1] = nDenX;\n'
@@ -2430,7 +2457,14 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\tTD_ViTriNguoi(&nTuX, &nTuY);\n'
            b'\t\ts_nChangMode = mode - 20;\n'
            b'\t\ts_nDichCuoiX = x;\n'
-           b'\t\ts_nDichCuoiY = y;\n'
+           b'\t\ts_nDichCuoiY = y;\n'           b'\t\t/* Lenh MOI cua nguoi choi thi xoa so lan ket; con lan tu tinh\n'
+           b'\t\t   lai sau khi ket thi giu nguyen, neu khong se lap vo han. */\n'
+           b'\t\ts_nDemKet = 0;\n'
+           b'\t\tif (s_bTinhLai)\n'
+           b'\t\t\ts_bTinhLai = 0;\n'
+           b'\t\telse\n'
+           b'\t\t\ts_nSoLanKet = 0;\n'
+
            b'\t\tif (TD_TimDuong(nTuX, nTuY, x, y) > 0)\n'
            b'\t\t\tGotoWhere(s_nChangX[0], s_nChangY[0], 10 + s_nChangMode);\n'
            b'\t\telse\n'
@@ -2450,6 +2484,31 @@ edit('Core/Src/CoreShell.cpp',
            b'\t{\n'
            b'\t\tint nHX = 0, nHY = 0;\n'
            b'\t\tTD_ViTriNguoi(&nHX, &nHY);\n'
+           b'\t\t/* Khong nhich duoc bao nhieu trong mot nhip -> dem. Du lau thi\n'
+           b'\t\t   tinh lai duong: co the vuong tuong dai (KNpcFindPath chi queo\n'
+           b'\t\t   mot lan roi bo cuoc) hoac bi mot con quai dung chan. */\n'
+           b'\t\tint nNhichX = nHX - s_nTruocX; if (nNhichX < 0) nNhichX = -nNhichX;\n'
+           b'\t\tint nNhichY = nHY - s_nTruocY; if (nNhichY < 0) nNhichY = -nNhichY;\n'
+           b'\t\ts_nTruocX = nHX;\n'
+           b'\t\ts_nTruocY = nHY;\n'
+           b'\t\tif (nNhichX + nNhichY < 4)\n'
+           b'\t\t\ts_nDemKet++;\n'
+           b'\t\telse\n'
+           b'\t\t\ts_nDemKet = 0;\n'
+           b'\t\tif (s_nDemKet > defTD_NHIP_KET)\n'
+           b'\t\t{\n'
+           b'\t\t\ts_nDemKet = 0;\n'
+           b'\t\t\ts_nSoLanKet++;\n'
+           b'\t\t\tTD_Ghi("[TimDuong] KET tai (%d,%d), lan %d - tinh lai",\n'
+           b'\t\t\t\tnHX, nHY, s_nSoLanKet);\n'
+           b'\t\t\ts_nSoChang = 0;\n'
+           b'\t\t\tif (s_nSoLanKet <= defTD_MAX_KET)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\ts_bTinhLai = 1;\n'
+           b'\t\t\t\tGotoWhere(s_nDichCuoiX, s_nDichCuoiY, 20 + s_nChangMode);\n'
+           b'\t\t\t}\n'
+           b'\t\t\treturn;\n'
+           b'\t\t}\n'
            b'\t\tint nHDx = nHX - s_nChangX[s_nChangDang]; if (nHDx < 0) nHDx = -nHDx;\n'
            b'\t\tint nHDy = nHY - s_nChangY[s_nChangDang]; if (nHDy < 0) nHDy = -nHDy;\n'
            b'\t\tif (nHDx < defTD_TOI_NOI && nHDy < defTD_TOI_NOI)\n'
@@ -2458,6 +2517,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\tif (s_nChangDang >= s_nSoChang)\n'
            b'\t\t\t{\n'
            b'\t\t\t\ts_nSoChang = 0;\n'
+           b'\t\t\t\ts_nSoLanKet = 0;\n'
            b'\t\t\t\t/* Duong moi di duoc mot phan: gio da dung gan hon,\n'
            b'\t\t\t\t   vung quanh do da nap, tinh tiep den dich that. */\n'
            b'\t\t\t\tif (s_bDoDang)\n'
@@ -2565,7 +2625,7 @@ edit('S3Client/Ui/UiCase/UiFindPos.cpp',
 edit('S3Client/Ui/UiCase/UiFindPos.cpp',
      b'void KUiFindPos::OnDone()',
      _crlf(b'/* Nguoi choi nhap theo O BAN DO - dung don vi hien o dong "Dang o" khi mo\n'
-           b'   hop thoai - con GotoWhere nhan toa do khong gian: mot o = 32 diem.\n'
+           b'   hop thoai - con GotoWhere nhan toa do khong gian: x/256 va y/512.\n'
            b'   mode 20 = da la toa do khong gian VA phai tim duong tranh vat can. */\n'
            b'void KUiFindPos::OnOK()\n'
            b'{\n'
@@ -2578,8 +2638,8 @@ edit('S3Client/Ui/UiCase/UiFindPos.cpp',
            b'\tint nO_Y = atoi(szY);\n'
            b'\tif (nO_X > 0 && nO_Y > 0 && g_pCoreShell)\n'
            b'\t{\n'
-           b'\t\tg_nDichSpaceX = nO_X * 32;\n'
-           b'\t\tg_nDichSpaceY = nO_Y * 32;\n'
+           b'\t\tg_nDichSpaceX = nO_X * 256;\n'
+           b'\t\tg_nDichSpaceY = nO_Y * 512;\n'
            b'\t\tg_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 20);\n'
            b'\t}\n'
            b'}\n'
@@ -2597,17 +2657,50 @@ edit('S3Client/Ui/UiCase/UiFindPos.cpp',
 edit('S3Client/Ui/UiCase/UiFindPos.cpp',
      b'\t\tWnd_GameSpaceHandleInput(false);',
      (b'\t\tWnd_GameSpaceHandleInput(false);\n'
-           b'\t\tKSceneMapInfo MapInfo;\n'
+           b'\t\tKUiSceneTimeInfo Info;\n'
            b'\t\tif (g_pCoreShell &&\n'
-           b'\t\t\tg_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))\n'
+           b'\t\t\tg_pCoreShell->SceneMapOperation(GSMOI_SCENE_TIME_INFO, (unsigned int)&Info, 0))\n'
            b'\t\t{\n'
            b'\t\t\tchar szTin[64];\n'
-           b'\t\t\tsprintf(szTin, "Dang o: %d / %d",\n'
-           b'\t\t\t\t(MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH) / 32,\n'
-           b'\t\t\t\t(MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV) / 32);\n'
+           b'\t\t\t/* Dung y het dong toa do duoi ban do nho:\n'
+           b'\t\t\t   m_ScenePos.Set2IntText(nScenePos0 / 8, nScenePos1 / 8, ...) */\n'
+           b'\t\t\tsprintf(szTin, "Dang o: %d / %d", Info.nScenePos0 / 8, Info.nScenePos1 / 8);\n'
            b'\t\t\tm_pSelf->m_InfoText.SetText(szTin);\n'
            b'\t\t}'),
      'UiFindPos: hien vi tri hien tai khi mo hop thoai')
+
+# ---------------------------------------------------------------------------
+# Nut "Tim" ngay canh dong toa do duoi ban do nho, dung cho nguoi choi quen tay
+# nhu ban 8.x: bam vao do moi ra hop nhap toa do, khong phai bam nut co.
+# KWndPureTextBtn la nut ve bang chu thuan, co san trong Elem ma chua ai dung.
+edit('S3Client/Ui/UiCase/UiMiniMap.h',
+     b'#include "../Elem/WndButton.h"',
+     b'#include "../Elem/WndButton.h"\r\n#include "../Elem/WndPureTextBtn.h"',
+     'UiMiniMap: nap nut chu thuan')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.h',
+     b'\tKWndButton\t\tm_BtnFlag;',
+     b'\tKWndButton\t\tm_BtnFlag;\r\n\tKWndPureTextBtn\tm_BtnTim;\t/* mo hop nhap toa do */',
+     'UiMiniMap: khai nut Tim')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\tAddChild(&m_BtnFlag);',
+     b'\tAddChild(&m_BtnFlag);\r\n\tAddChild(&m_BtnTim);',
+     'UiMiniMap: them nut Tim vao cua so')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\tm_BtnFlag.Init(pIni, "BtnFlag");',
+     _crlf(b'\tm_BtnFlag.Init(pIni, "BtnFlag");\n'
+           b'\tm_BtnTim.Init(pIni, "BtnTim");\n'
+           b'\tm_BtnTim.SetText("T\xecm");'),
+     'UiMiniMap: nap nut Tim tu ini')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)',
+     _crlf(b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnTim)\n'
+           b'\t\t\tKUiFindPos::OpenWindow();\n'
+           b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)'),
+     'UiMiniMap: bam Tim thi mo hop nhap toa do')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
