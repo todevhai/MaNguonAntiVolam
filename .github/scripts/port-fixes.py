@@ -2507,7 +2507,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\t\ts_bTinhLai = 1;\n'
            b'\t\t\t\tGotoWhere(s_nDichCuoiX, s_nDichCuoiY, 20 + s_nChangMode);\n'
            b'\t\t\t}\n'
-           b'\t\t\treturn;\n'
+           b'\t\t\treturn true;\t/* Breathe tra int */\n'
            b'\t\t}\n'
            b'\t\tint nHDx = nHX - s_nChangX[s_nChangDang]; if (nHDx < 0) nHDx = -nHDx;\n'
            b'\t\tint nHDy = nHY - s_nChangY[s_nChangDang]; if (nHDy < 0) nHDy = -nHDy;\n'
