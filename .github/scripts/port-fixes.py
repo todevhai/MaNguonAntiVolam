@@ -2751,6 +2751,60 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'void KUiMsgCentrePad::OpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost)'),
      'log tam chat: ghi khi may chu mo kenh')
 
+# May chu bao mo kenh NGAY khi vao game, con cua so chat thi mai sau moi duoc
+# tao (do duoc: "cua so chat=CHUA CO" cho ca bon kenh). Nen moi thong bao deu
+# roi vao hu khong va menu kenh trong rong. Nay giu lai, mo cua so xong thi xu ly.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'KUiMsgCentrePad* KUiMsgCentrePad::OpenWindow()',
+     _crlf(b'#define defCHAT_KENH_CHO\t16\n'
+           b'struct KKenhCho\n'
+           b'{\n'
+           b'\tchar\tszTen[32];\n'
+           b'\tDWORD\tnId;\n'
+           b'\tBYTE\tcost;\n'
+           b'};\n'
+           b'static KKenhCho\ts_KenhCho[defCHAT_KENH_CHO];\n'
+           b'static int\ts_nKenhCho = 0;\n'
+           b'\n'
+           b'/* Goi sau khi cua so chat da san sang: xu ly nhung kenh may chu bao\n'
+           b'   truoc do. */\n'
+           b'void KUiMsgCentrePad::XuLyKenhCho()\n'
+           b'{\n'
+           b'\tint nSo = s_nKenhCho;\n'
+           b'\ts_nKenhCho = 0;\t/* xoa truoc, tranh de quy neu lai vao day */\n'
+           b'\tfor (int i = 0; i < nSo; i++)\n'
+           b'\t\tOpenChannelThat(s_KenhCho[i].szTen, s_KenhCho[i].nId, s_KenhCho[i].cost);\n'
+           b'}\n'
+           b'\n'
+           b'KUiMsgCentrePad* KUiMsgCentrePad::OpenWindow()'),
+     'giu lai kenh may chu bao truoc khi cua so chat kip tao')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\t\tm_pSelf->m_Sys.Show();',
+     _crlf(b'\t\tif (s_nKenhCho > 0)\n'
+           b'\t\t\tm_pSelf->XuLyKenhCho();\n'
+           b'\t\tm_pSelf->m_Sys.Show();'),
+     'mo cua so xong thi xu ly kenh dang cho')
+
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\tOpenChannelThat(channelName, nChannelID, cost);',
+     _crlf(b'\tif (m_pSelf == NULL)\n'
+           b'\t{\n'
+           b'\t\tif (channelName && s_nKenhCho < defCHAT_KENH_CHO)\n'
+           b'\t\t{\n'
+           b'\t\t\tstrncpy(s_KenhCho[s_nKenhCho].szTen, channelName, sizeof(s_KenhCho[0].szTen) - 1);\n'
+           b'\t\t\ts_KenhCho[s_nKenhCho].szTen[sizeof(s_KenhCho[0].szTen) - 1] = 0;\n'
+           b'\t\t\ts_KenhCho[s_nKenhCho].nId = nChannelID;\n'
+           b'\t\t\ts_KenhCho[s_nKenhCho].cost = cost;\n'
+           b'\t\t\ts_nKenhCho++;\n'
+           b'\t\t}\n'
+           b'\t\treturn;\n'
+           b'\t}\n'
+           b'\tOpenChannelThat(channelName, nChannelID, cost);'),
+     'chua co cua so chat thi giu kenh lai')
+
+
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      b'\tm_nChannelsResource = nCh;',
      _crlf(b'\tm_nChannelsResource = nCh;\n'
@@ -2760,7 +2814,7 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
 
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
      b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);',
-     b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);\r\n\tstatic void\t\t\t\tOpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost);',
+     b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);\r\n\tstatic void\t\t\t\tOpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost);\r\n\tstatic void\t\t\t\tXuLyKenhCho();',
      'log tam chat: khai ham that')
 
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
