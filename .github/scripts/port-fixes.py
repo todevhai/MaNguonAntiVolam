@@ -2985,6 +2985,39 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'\t\tm_pSelf->DoViTriTab();'),
      'goi do vi tri tab khi mo cua so')
 
+# BringToTop luc mo cua so khong du: KUiPlayerBar duoc tao SAU khung chat nen
+# lai nam tren va nuot chuot (do duoc: hinh hoc tab dung y cho ve, nhung ro
+# chuot khong doi mau). Giu khung chat o tren, kiem lai moi nhip ve.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'void KUiMsgCentrePad::DoViTriTab()',
+     _crlf(b'/* Dua khung chat len tren cac cua so cung lop. Phai goi lai dinh ky vi\n'
+           b'   KUiPlayerBar duoc tao SAU khung chat nen mac dinh nam tren va nuot\n'
+           b'   chuot cua hang tab. */\n'
+           b'void KUiMsgCentrePad::DuaLenTren()\n'
+           b'{\n'
+           b'\tif (m_pSelf)\n'
+           b'\t\tm_pSelf->BringToTop();\n'
+           b'}\n'
+           b'\n'
+           b'void KUiMsgCentrePad::DoViTriTab()'),
+     'ham dua khung chat len tren')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
+     b'\tvoid\t\t\t\tDoViTriTab();',
+     b'\tvoid\t\t\t\tDoViTriTab();\r\n\tstatic void\t\t\tDuaLenTren();',
+     'khai ham dua khung chat len tren')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;',
+     _crlf(b'\t/* Thanh nay ve moi nhip va anh nen phu tron man hinh, nen no luon\n'
+           b'\t   nam tren khung chat va nuot chuot cua hang tab. Day khung chat len\n'
+           b'\t   lai sau khi ve. */\n'
+           b'\tstatic int s_nNhipVe = 0;\n'
+           b'\tif ((++s_nNhipVe % 30) == 1)\n'
+           b'\t\tKUiMsgCentrePad::DuaLenTren();\n'
+           b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;'),
+     'moi nhip ve thi day khung chat len tren thanh HUD')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
