@@ -2497,6 +2497,24 @@ edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
      b'\t/* chu "Hang" da co san tren anh nen, khong ve de len */',
      'bo nhan Hang ve de len anh nen')
 
+# O nhap chat co InputEdit/Face/SendBtn nhung KHONG co anh nen: nguon chua he
+# co m_InputBack, nen ba nut do treo lo lung tren nen canh. Them anh nen va
+# dat lam con DAU TIEN de no nam duoi cac nut.
+edit('S3Client/Ui/UiCase/UiPlayerBar.h',
+     b'\tKWndButton\t\tm_Face;',
+     b'\tKWndImage\t\tm_InputBack;\t/* anh nen o nhap chat */\r\n\tKWndButton\t\tm_Face;',
+     'khai bao anh nen o nhap chat')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tm_Face    .Init(pIni, "Face");',
+     b'\tm_InputBack.Init(pIni, "InputBack");\r\n\tm_Face    .Init(pIni, "Face");',
+     'nap anh nen o nhap chat tu ini')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\tAddChild(&m_ChatBar);',
+     b'\tAddChild(&m_InputBack);\r\n\tAddChild(&m_ChatBar);',
+     'anh nen o nhap chat ve truoc cac nut')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
