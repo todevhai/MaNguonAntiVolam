@@ -2243,22 +2243,6 @@ edit('Core/Src/CoreShell.cpp',
            b'static int s_nChangMode = 0;\n'
            b'\n'
            b'/* Vi tri nhan vat theo diem ban do (mps). */\n'
-           b'#include <stdarg.h>\n'
-           b'/* LOG TAM: g_DebugLog chi gui WM_COPYDATA cho cua so debug, m_hWndDebug\n'
-           b'   NULL thi im lang -> phai tu ghi ra tep. GO SAU KHI DO XONG. */\n'
-           b'static void TD_Ghi(const char* pFmt, ...)\n'
-           b'{\n'
-           b'\tFILE* fp = fopen("tim-duong.log", "a");\n'
-           b'\tif (!fp)\n'
-           b'\t\treturn;\n'
-           b'\tva_list va;\n'
-           b'\tva_start(va, pFmt);\n'
-           b'\tvfprintf(fp, pFmt, va);\n'
-           b'\tva_end(va);\n'
-           b'\tfprintf(fp, "\\n");\n'
-           b'\tfclose(fp);\n'
-           b'}\n'
-           b'\n'
            b'static void TD_ViTriNguoi(int* pnX, int* pnY)\n'
            b'{\n'
            b'\tint nIdx = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
@@ -2293,16 +2277,12 @@ edit('Core/Src/CoreShell.cpp',
            b'\tint nBatY = (nTuY - s_nTDGocY) / defTD_O;\n'
            b'\tint nDichX = (nDenX - s_nTDGocX) / defTD_O;\n'
            b'\tint nDichY = (nDenY - s_nTDGocY) / defTD_O;\n'
-           b'\tTD_Ghi("[TimDuong] VAO tu(%d,%d) den(%d,%d) o_bat(%d,%d) o_dich(%d,%d)",\n'
-           b'\t\tnTuX, nTuY, nDenX, nDenY, nBatX, nBatY, nDichX, nDichY);\n'
            b'\tif (nBatX < 0 || nBatY < 0 || nBatX >= defTD_CANH || nBatY >= defTD_CANH)\n'
            b'\t{\n'
            b'\t\t/* Ra khoi luoi: xay ra khi TD_ViTriNguoi khong lay duoc vi tri\n'
-           b'\t\t   (tra 0,0). Truoc day thoat o day TRUOC KHI ghi log nen khong\n'
-           b'\t\t   de lai dau vet nao, nhin ra ngoai chi thay nhan vat dung im. */\n'
-           b'\t\tTD_Ghi("[TimDuong] BO: diem xuat phat ngoai luoi");\n'
+           b'\t\t   nhan vat (tra 0,0). Bo cuoc, GotoWhere se di thang. */\n'
            b'\t\treturn 0;\n'
-           b'\t}'
+           b'\t}\n'
            b'\tif (nDichX < 0) nDichX = 0;\n'
            b'\tif (nDichY < 0) nDichY = 0;\n'
            b'\tif (nDichX >= defTD_CANH) nDichX = defTD_CANH - 1;\n'
@@ -2429,10 +2409,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\t}\n'
            b'\t\t}\n'
            b'\t\tif (nGanNhat < 0 || nGanNhat == nBatDau)\n'
-           b'\t\t{\n'
-           b'\t\t\tTD_Ghi("[TimDuong] BO: khong mo duoc o nao ngoai o dang dung");\n'
            b'\t\t\treturn 0;\n'
-           b'\t\t}'
            b'\t\tnKetThuc = nGanNhat;\n'
            b'\t\ts_bDoDang = 1;\n'
            b'\t}\n'
@@ -2585,8 +2562,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\t{\n'
            b'\t\t\t\ts_nDemKet = 0;\n'
            b'\t\t\t\ts_nSoLanKet++;\n'
-           b'\t\t\t\tTD_Ghi("[TimDuong] KET tai (%d,%d) cach chang %d, lan %d",\n'
-           b'\t\t\t\t\tnHX, nHY, nKc, s_nSoLanKet);\n'
            b'\t\t\t\ts_nSoChang = 0;\n'
            b'\t\t\t\tif (s_nSoLanKet <= defTD_MAX_KET)\n'
            b'\t\t\t\t{\n'
@@ -2602,38 +2577,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
      'bam ban do thi TIM DUONG chu khong di thang')
-
-# ---------------------------------------------------------------------------
-# LOG TAM: do xem A* hong o dau.
-#
-# Nghi van: TestBarrier o client tra 0xff khi FindRegion khong thay vung, ma
-# client co the chi giu du lieu chuong ngai quanh nhan vat. Neu dung thi A*
-# nhin ra xa se thay toan "khong di duoc" -> khong ra duong -> roi ve nhanh di
-# thang, tuc hanh vi y het truoc khi sua.
-#
-# In ra: diem bat dau/dich, TestBarrier tai vai diem, so o mo duoc, so chang.
-# GO SAU KHI DO XONG.
-edit('Core/Src/CoreShell.cpp',
-     b'\tif (s_nTDG[nKetThuc] < 0)',
-     _crlf(b'\tTD_Ghi("[TimDuong] tu(%d,%d) den(%d,%d) goc(%d,%d) o_bat(%d,%d) o_dich(%d,%d) so_o_mo=%d",\n'
-           b'\t\tnTuX, nTuY, nDenX, nDenY, s_nTDGocX, s_nTDGocY, nBatX, nBatY, nDichX, nDichY, nSoXet);\n'
-           b'\tTD_Ghi("[TimDuong] GetBarrier: nguoi=%d dich=%d giua=%d | TestBarrier: nguoi=%d dich=%d",\n'
-           b'\t\t(int)SubWorld[0].GetBarrier(nTuX, nTuY),\n'
-           b'\t\t(int)SubWorld[0].GetBarrier(nDenX, nDenY),\n'
-           b'\t\t(int)SubWorld[0].GetBarrier((nTuX + nDenX) / 2, (nTuY + nDenY) / 2),\n'
-           b'\t\t(int)SubWorld[0].TestBarrier(nTuX, nTuY),\n'
-           b'\t\t(int)SubWorld[0].TestBarrier(nDenX, nDenY));\n'
-           b'\tif (s_nTDG[nKetThuc] < 0)'),
-     'log tam: do A* tim duong')
-
-edit('Core/Src/CoreShell.cpp',
-     b'\treturn s_nSoChang;',
-     _crlf(b'\tTD_Ghi("[TimDuong] RA DUONG: %d chang%s, chang dau (%d,%d) chang cuoi (%d,%d)",\n'
-           b'\t\ts_nSoChang, s_bDoDang ? " (do dang, se tinh tiep)" : "",\n'
-           b'\t\ts_nChangX[0], s_nChangY[0],\n'
-           b'\t\ts_nChangX[s_nSoChang - 1], s_nChangY[s_nSoChang - 1]);\n'
-           b'\treturn s_nSoChang;'),
-     'log tam: in duong tim duoc')
 
 # Anh nen thanh trang thai (\Spr\Ui3\...\ *huyet thieu bang* .spr) DA IN SAN
 # chu "Cap" va "Hang" trong chinh anh. Code ve them nhan cung noi dung de
