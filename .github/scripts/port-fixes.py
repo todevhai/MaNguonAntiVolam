@@ -2349,27 +2349,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\treturn s_nSoChang;\n'
            b'}\n'
            b'\n'
-           b'/* Goi moi nhip: toi chang hien tai thi gui chang ke. */\n'
-           b'void TD_TiepChang()\n'
-           b'{\n'
-           b'\tif (s_nSoChang <= 0)\n'
-           b'\t\treturn;\n'
-           b'\tint nX = 0, nY = 0;\n'
-           b'\tTD_ViTriNguoi(&nX, &nY);\n'
-           b'\tint nDx = nX - s_nChangX[s_nChangDang]; if (nDx < 0) nDx = -nDx;\n'
-           b'\tint nDy = nY - s_nChangY[s_nChangDang]; if (nDy < 0) nDy = -nDy;\n'
-           b'\tif (nDx >= defTD_TOI_NOI || nDy >= defTD_TOI_NOI)\n'
-           b'\t\treturn;\n'
-           b'\ts_nChangDang++;\n'
-           b'\tif (s_nChangDang >= s_nSoChang)\n'
-           b'\t{\n'
-           b'\t\ts_nSoChang = 0;\n'
-           b'\t\treturn;\n'
-           b'\t}\n'
-           b'\tif (g_pCoreShell)\n'
-           b'\t\tg_pCoreShell->GotoWhere(s_nChangX[s_nChangDang], s_nChangY[s_nChangDang], 10 + s_nChangMode);\n'
-           b'}\n'
-           b'\n'
            b'void KCoreShell::GotoWhere(int x, int y, int mode)'),
      'A* tim duong cho lenh bam ban do')
 
@@ -2393,7 +2372,24 @@ edit('Core/Src/CoreShell.cpp',
 edit('Core/Src/CoreShell.cpp',
      b'\tg_ScenePlace.Breathe();',
      _crlf(b'\tg_ScenePlace.Breathe();\n'
-           b'\tTD_TiepChang();'),
+           b'\t/* Toi chang hien tai thi gui chang ke. Viet thang o day chu khong\n'
+           b'\t   tach ra ham rieng: ham tu do trong Core khong co g_pCoreShell\n'
+           b'\t   (bien do thuoc S3Client), con o day GotoWhere goi duoc vi cung lop. */\n'
+           b'\tif (s_nSoChang > 0)\n'
+           b'\t{\n'
+           b'\t\tint nHX = 0, nHY = 0;\n'
+           b'\t\tTD_ViTriNguoi(&nHX, &nHY);\n'
+           b'\t\tint nHDx = nHX - s_nChangX[s_nChangDang]; if (nHDx < 0) nHDx = -nHDx;\n'
+           b'\t\tint nHDy = nHY - s_nChangY[s_nChangDang]; if (nHDy < 0) nHDy = -nHDy;\n'
+           b'\t\tif (nHDx < defTD_TOI_NOI && nHDy < defTD_TOI_NOI)\n'
+           b'\t\t{\n'
+           b'\t\t\ts_nChangDang++;\n'
+           b'\t\t\tif (s_nChangDang >= s_nSoChang)\n'
+           b'\t\t\t\ts_nSoChang = 0;\n'
+           b'\t\t\telse\n'
+           b'\t\t\t\tGotoWhere(s_nChangX[s_nChangDang], s_nChangY[s_nChangDang], 10 + s_nChangMode);\n'
+           b'\t\t}\n'
+           b'\t}'),
      'moi nhip kiem xem da toi chang chua')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
