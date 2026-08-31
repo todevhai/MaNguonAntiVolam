@@ -2932,6 +2932,17 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      'log tam: dem so kenh luc ve thanh nguoi choi')
 
 # ---------------------------------------------------------------------------
+# Khung chat nam o lop WL_LOWEST (day), con KUiPlayerBar o WL_NORMAL va anh nen
+# cua no phu TRON 1024x768. Chuot bi thanh do nuot truoc khi toi hang tab, nen
+# ro chuot len tab khong doi mau va bam khong an.
+# Dua khung chat len cung lop: no dung o (0,520) cao 155, con HUD bat dau tu
+# y=686 nen khong che nhau.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\tWnd_AddWindow(this, WL_LOWEST);',
+     b'\tWnd_AddWindow(this, WL_NORMAL);\t/* xem chu thich o port-fixes.py */',
+     'khung chat len lop WL_NORMAL de nhan duoc chuot')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
