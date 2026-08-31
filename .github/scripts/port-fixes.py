@@ -2483,6 +2483,20 @@ edit('Core/Src/CoreShell.cpp',
            b'\treturn s_nSoChang;'),
      'log tam: in duong tim duoc')
 
+# Anh nen thanh trang thai (\Spr\Ui3\...\ *huyet thieu bang* .spr) DA IN SAN
+# chu "Cap" va "Hang" trong chinh anh. Code ve them nhan cung noi dung de
+# ngay canh -> tren man hinh doc ra "Cap Cap" va "HaMang". Bo nhan di, giu
+# chu tren nen.
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     b'\tm_LevelText.SetText("C\xca\x70");',
+     b'\t/* chu "Cap" da co san tren anh nen, khong ve de len */',
+     'bo nhan Cap ve de len anh nen')
+
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     b'\tm_RankWorldText.SetText("H\xb9ng");',
+     b'\t/* chu "Hang" da co san tren anh nen, khong ve de len */',
+     'bo nhan Hang ve de len anh nen')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
