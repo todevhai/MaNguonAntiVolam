@@ -2089,10 +2089,10 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t{\n'
            b'\t\t\t/* Bam trong vung ve ban do -> doi sang toa do khong gian roi chay\n'
            b'\t\t\t   toi. Cung phep tinh MapScroll dung cho chuot phai. */\n'
-           b'\t\t\tint nAbsX = 0, nAbsY = 0;\n'
-           b'\t\t\tGetAbsolutePos(&nAbsX, &nAbsY);\n'
-           b'\t\t\tint nRelX = (short)LOWORD(nParam) - nAbsX - m_MapPos.x;\n'
-           b'\t\t\tint nRelY = (short)HIWORD(nParam) - nAbsY - m_MapPos.y;\n'
+           b'\t\t\t/* Dung DUNG hai bien ma PaintWindow dung de dat goc ve ban do,\n'
+           b'\t\t\t   khong dung GetAbsolutePos - hai thu nay lech nhau. */\n'
+           b'\t\t\tint nRelX = (short)LOWORD(nParam) - m_nAbsoluteLeft - m_MapPos.x;\n'
+           b'\t\t\tint nRelY = (short)HIWORD(nParam) - m_nAbsoluteTop  - m_MapPos.y;\n'
            b'\t\t\tif (g_pCoreShell && nRelX >= 0 && nRelY >= 0 &&\n'
            b'\t\t\t\tnRelX < (int)m_MapSize.cx && nRelY < (int)m_MapSize.cy)\n'
            b'\t\t\t{\n'
@@ -2103,6 +2103,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\t\tMapInfo.nScallH * (nRelX - (int)m_MapSize.cx / 2);\n'
            b'\t\t\t\t\tint nSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV +\n'
            b'\t\t\t\t\t\tMapInfo.nScallV * (nRelY - (int)m_MapSize.cy / 2);\n'
+           b'\t\t\t\t\ts_nDichSpaceX = nSpaceX;\n'
+           b'\t\t\t\t\ts_nDichSpaceY = nSpaceY;\n'
            b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\n'
            b'\t\t\t\t\tbreak;\n'
            b'\t\t\t\t}\n'
@@ -2111,6 +2113,64 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\tWnd_TransmitInputToGameSpace(uMsg, uParam, nParam);\n'
            b'\t\tbreak;'),
      'bam trai tren ban do nho -> chay toi diem do')
+
+
+# Vector chi duong tu nhan vat toi diem vua bam tren ban do, nhu ban goc.
+# Nho theo toa do KHONG GIAN chu khong theo diem anh: nhan vat di thi tam ban do
+# doi theo, moi khung phai chieu lai ra diem anh.
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'static MINIMAP_MODE\ts_eMapMode = MINIMAP_M_NONE;',
+     _crlf(b'static MINIMAP_MODE\ts_eMapMode = MINIMAP_M_NONE;\n'
+           b'\n'
+           b'/* Diem vua bam tren ban do, theo toa do KHONG GIAN. -1 = chua bam lan nao\n'
+           b'   hoac da toi noi. Dung ve duong chi huong trong PaintWindow. */\n'
+           b'static int\ts_nDichSpaceX = -1;\n'
+           b'static int\ts_nDichSpaceY = -1;'),
+     'nho diem dich tren ban do de ve vector')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\t\tg_pRepresentShell->DrawPrimitives(1, &rect, RU_T_RECT, true);',
+     _crlf(b'\t\t\tg_pRepresentShell->DrawPrimitives(1, &rect, RU_T_RECT, true);\n'
+           b'\n'
+           b'\t\t\t/* Duong chi huong tu nhan vat (tam ban do) toi diem vua bam. */\n'
+           b'\t\t\tif (s_nDichSpaceX >= 0)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tKSceneMapInfo MapInfo;\n'
+           b'\t\t\t\tif (g_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tint nTamSpaceX = MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH;\n'
+           b'\t\t\t\t\tint nTamSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV;\n'
+           b'\t\t\t\t\tint nDX = s_nDichSpaceX - nTamSpaceX;\n'
+           b'\t\t\t\t\tint nDY = s_nDichSpaceY - nTamSpaceY;\n'
+           b'\t\t\t\t\t/* Toi noi roi thi thoi ve. */\n'
+           b'\t\t\t\t\tif (nDX > -MapInfo.nScallH && nDX < MapInfo.nScallH &&\n'
+           b'\t\t\t\t\t\tnDY > -MapInfo.nScallV && nDY < MapInfo.nScallV)\n'
+           b'\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\ts_nDichSpaceX = -1;\n'
+           b'\t\t\t\t\t}\n'
+           b'\t\t\t\t\telse if (MapInfo.nScallH && MapInfo.nScallV)\n'
+           b'\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\tint nTamX = nX + m_MapSize.cx / 2;\n'
+           b'\t\t\t\t\t\tint nTamY = nY + m_MapSize.cy / 2;\n'
+           b'\t\t\t\t\t\tint nDichX = nTamX + nDX / MapInfo.nScallH;\n'
+           b'\t\t\t\t\t\tint nDichY = nTamY + nDY / MapInfo.nScallV;\n'
+           b'\t\t\t\t\t\tif (nDichX >= nX && nDichY >= nY &&\n'
+           b'\t\t\t\t\t\t\tnDichX < nX + (int)m_MapSize.cx && nDichY < nY + (int)m_MapSize.cy)\n'
+           b'\t\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\t\tKRULine line;\n'
+           b'\t\t\t\t\t\t\tline.Color.Color_dw = 0xffffff00;\n'
+           b'\t\t\t\t\t\t\tline.oPosition.nX = nTamX;\n'
+           b'\t\t\t\t\t\t\tline.oPosition.nY = nTamY;\n'
+           b'\t\t\t\t\t\t\tline.oPosition.nZ = 0;\n'
+           b'\t\t\t\t\t\t\tline.oEndPos.nX = nDichX;\n'
+           b'\t\t\t\t\t\t\tline.oEndPos.nY = nDichY;\n'
+           b'\t\t\t\t\t\t\tline.oEndPos.nZ = 0;\n'
+           b'\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(1, &line, RU_T_LINE, true);\n'
+           b'\t\t\t\t\t\t}\n'
+           b'\t\t\t\t\t}\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t}'),
+     've duong chi huong tren ban do')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
