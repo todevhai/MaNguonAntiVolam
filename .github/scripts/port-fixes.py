@@ -2210,6 +2210,22 @@ edit('Core/Src/CoreShell.cpp',
            b'static int s_nChangMode = 0;\n'
            b'\n'
            b'/* Vi tri nhan vat theo diem ban do (mps). */\n'
+           b'#include <stdarg.h>\n'
+           b'/* LOG TAM: g_DebugLog chi gui WM_COPYDATA cho cua so debug, m_hWndDebug\n'
+           b'   NULL thi im lang -> phai tu ghi ra tep. GO SAU KHI DO XONG. */\n'
+           b'static void TD_Ghi(const char* pFmt, ...)\n'
+           b'{\n'
+           b'\tFILE* fp = fopen("tim-duong.log", "a");\n'
+           b'\tif (!fp)\n'
+           b'\t\treturn;\n'
+           b'\tva_list va;\n'
+           b'\tva_start(va, pFmt);\n'
+           b'\tvfprintf(fp, pFmt, va);\n'
+           b'\tva_end(va);\n'
+           b'\tfprintf(fp, "\\n");\n'
+           b'\tfclose(fp);\n'
+           b'}\n'
+           b'\n'
            b'static void TD_ViTriNguoi(int* pnX, int* pnY)\n'
            b'{\n'
            b'\tint nIdx = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
@@ -2396,6 +2412,35 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
      'bam ban do thi TIM DUONG chu khong di thang')
+
+# ---------------------------------------------------------------------------
+# LOG TAM: do xem A* hong o dau.
+#
+# Nghi van: TestBarrier o client tra 0xff khi FindRegion khong thay vung, ma
+# client co the chi giu du lieu chuong ngai quanh nhan vat. Neu dung thi A*
+# nhin ra xa se thay toan "khong di duoc" -> khong ra duong -> roi ve nhanh di
+# thang, tuc hanh vi y het truoc khi sua.
+#
+# In ra: diem bat dau/dich, TestBarrier tai vai diem, so o mo duoc, so chang.
+# GO SAU KHI DO XONG.
+edit('Core/Src/CoreShell.cpp',
+     b'\tif (s_nTDG[nKetThuc] < 0)',
+     _crlf(b'\tTD_Ghi("[TimDuong] tu(%d,%d) den(%d,%d) goc(%d,%d) o_bat(%d,%d) o_dich(%d,%d) so_o_mo=%d",\n'
+           b'\t\tnTuX, nTuY, nDenX, nDenY, s_nTDGocX, s_nTDGocY, nBatX, nBatY, nDichX, nDichY, nSoXet);\n'
+           b'\tTD_Ghi("[TimDuong] TestBarrier: tai_nguoi=%d tai_dich=%d giua=%d",\n'
+           b'\t\t(int)SubWorld[0].TestBarrier(nTuX, nTuY),\n'
+           b'\t\t(int)SubWorld[0].TestBarrier(nDenX, nDenY),\n'
+           b'\t\t(int)SubWorld[0].TestBarrier((nTuX + nDenX) / 2, (nTuY + nDenY) / 2));\n'
+           b'\tif (s_nTDG[nKetThuc] < 0)'),
+     'log tam: do A* tim duong')
+
+edit('Core/Src/CoreShell.cpp',
+     b'\treturn s_nSoChang;',
+     _crlf(b'\tTD_Ghi("[TimDuong] RA DUONG: %d chang, chang dau (%d,%d) chang cuoi (%d,%d)",\n'
+           b'\t\ts_nSoChang, s_nChangX[0], s_nChangY[0],\n'
+           b'\t\ts_nChangX[s_nSoChang - 1], s_nChangY[s_nSoChang - 1]);\n'
+           b'\treturn s_nSoChang;'),
+     'log tam: in duong tim duoc')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
