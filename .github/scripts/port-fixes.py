@@ -2942,6 +2942,15 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      b'\tWnd_AddWindow(this, WL_NORMAL);\t/* xem chu thich o port-fixes.py */',
      'khung chat len lop WL_NORMAL de nhan duoc chuot')
 
+# Cung lop thi cua so THEM SAU nam tren. KUiPlayerBar duoc tao sau khung chat
+# nen van phu len; goi BringToTop de khung chat len tren han. No o (0,520) cao
+# 155 con HUD bat dau tu y=686 nen khong che gi.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'\t\tm_pSelf->m_Sys.Show();',
+     _crlf(b'\t\tm_pSelf->BringToTop();\n'
+           b'\t\tm_pSelf->m_Sys.Show();'),
+     'khung chat len tren thanh HUD')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
