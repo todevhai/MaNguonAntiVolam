@@ -3018,6 +3018,54 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;'),
      'moi nhip ve thi day khung chat len tren thanh HUD')
 
+# LOG TAM: chuot o vung hang tab (y 654..674) di vao cua so nao.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\n'
+           b'{\n'
+           b'\tif (uMsg == WM_MOUSEMOVE)\n'
+           b'\t{\n'
+           b'\t\tint mx = (short)LOWORD(nParam), my = (short)HIWORD(nParam);\n'
+           b'\t\tif (my >= 654 && my <= 674 && mx >= 0 && mx <= 360)\n'
+           b'\t\t{\n'
+           b'\t\t\tstatic int s_nDem = 0;\n'
+           b'\t\t\tif (++s_nDem <= 8)\n'
+           b'\t\t\t\tCHAT_Ghi2("[chuot] THANH HUD nhan chuot tai (%d,%d)", mx, my);\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'\treturn WndProcThat(uMsg, uParam, nParam);\n'
+           b'}\n'
+           b'\n'
+           b'int KUiPlayerBar::WndProcThat(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'log tam: xem thanh HUD co nuot chuot vung tab khong')
+
+edit('S3Client/Ui/UiCase/UiPlayerBar.h',
+     b'\tint\t\tWndProc(unsigned int uMsg, unsigned int uParam, int nParam);',
+     b'\tint\t\tWndProc(unsigned int uMsg, unsigned int uParam, int nParam);\r\n\tint\t\tWndProcThat(unsigned int uMsg, unsigned int uParam, int nParam);',
+     'khai ham WndProc that')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     b'int KUiMsgCentrePad::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     _crlf(b'int KUiMsgCentrePad::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\n'
+           b'{\n'
+           b'\tif (uMsg == WM_MOUSEMOVE)\n'
+           b'\t{\n'
+           b'\t\tstatic int s_nDem2 = 0;\n'
+           b'\t\tif (++s_nDem2 <= 8)\n'
+           b'\t\t\tCHAT_Ghi("[chuot] KHUNG CHAT nhan chuot tai (%d,%d)",\n'
+           b'\t\t\t\t(int)(short)LOWORD(nParam), (int)(short)HIWORD(nParam));\n'
+           b'\t}\n'
+           b'\treturn WndProcThat(uMsg, uParam, nParam);\n'
+           b'}\n'
+           b'\n'
+           b'int KUiMsgCentrePad::WndProcThat(unsigned int uMsg, unsigned int uParam, int nParam)'),
+     'log tam: xem khung chat co nhan chuot khong')
+
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
+     b'\tstatic void\t\t\tDuaLenTren();',
+     b'\tstatic void\t\t\tDuaLenTren();\r\n\tint\t\t\tWndProcThat(unsigned int uMsg, unsigned int uParam, int nParam);',
+     'khai WndProcThat cho khung chat')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
