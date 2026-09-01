@@ -3077,6 +3077,164 @@ for _gd in ('Core/Src/GameDataDef.h', 'LINUX/Core/GameDataDef.h',
          'so thanh vien to doi 8 -> 20')
 
 # ---------------------------------------------------------------------------
+# TOOLTIP hien ANH GOC cua vat pham.
+#
+# Bag hien icon da co ve 1 o (spr/item/...); tooltip hien anh GOC day du tu
+# spr/item-goc/... (batch client/co-icon-batch.py luu ca hai). Vi dia de len pak
+# o dung ten, phai giu ban goc duoi ten khac (item-goc) roi nap rieng.
+
+# 1) KItem: getter cong khai lay ten anh icon.
+edit('Core/Src/KItem.h',
+     _crlf(b'class KItem\n{\npublic:\n\tKItem();\n\t~KItem();\n'),
+     _crlf(b'class KItem\n{\npublic:\n\tKItem();\n\t~KItem();\n'
+           b'\tconst char* GetImageName() { return m_CommonAttrib.szImageName; }\n'),
+     'getter ten anh icon vat pham')
+
+# 2) CoreShell: them chi so lay ten anh vat pham.
+edit('Core/Src/CoreShell.h',
+     _crlf(b'GDI_PLAYER_TK_XEPHANG,\n\n};'),
+     _crlf(b'GDI_PLAYER_TK_XEPHANG,\n\n\tGDI_GAME_OBJ_IMAGE,\t//ten anh icon vat pham (tooltip)\n\n};'),
+     'them GDI_GAME_OBJ_IMAGE')
+
+# 3) CoreShell: xu ly chi so do - copy ten anh cua item.
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\n\tcase GDI_GAME_OBJ_DESC:\n'),
+     _crlf(b'\n\tcase GDI_GAME_OBJ_IMAGE:\n'
+           b'\t\tif (nParam && uParam)\n'
+           b'\t\t{\n'
+           b'\t\t\tKUiObjAtContRegion* pObjImg = (KUiObjAtContRegion *)uParam;\n'
+           b'\t\t\tchar* pszImg = (char *)nParam;\n'
+           b'\t\t\tpszImg[0] = 0;\n'
+           b'\t\t\tif (pObjImg->Obj.uGenre == CGOG_ITEM && pObjImg->Obj.uId)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tconst char* pNm = Item[pObjImg->Obj.uId].GetImageName();\n'
+           b'\t\t\t\tint iNm = 0;\n'
+           b'\t\t\t\tfor (; pNm[iNm] && iNm < 79; iNm++) pszImg[iNm] = pNm[iNm];\n'
+           b'\t\t\t\tpszImg[iNm] = 0;\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\t\tbreak;\n'
+           b'\n\tcase GDI_GAME_OBJ_DESC:\n'),
+     'xu ly GDI_GAME_OBJ_IMAGE')
+
+# 4) MouseHover.h: khai bao ham + bien icon.
+edit('S3Client/Ui/Elem/MouseHover.h',
+     _crlf(b'\tvoid\tCancelMouseHoverInfo();\n'),
+     _crlf(b'\tvoid\tCancelMouseHoverInfo();\n'
+           b'\tvoid\tSetMouseHoverIcon(const char* szImage);\n'),
+     'khai bao SetMouseHoverIcon')
+edit('S3Client/Ui/Elem/MouseHover.h',
+     _crlf(b'\tint\t\tm_nObj;\n'),
+     _crlf(b'\tint\t\tm_nObj;\n'
+           b'\tKRUImage m_ItemIcon;\n'
+           b'\tint m_nItemIconW;\n'
+           b'\tint m_nItemIconH;\n'
+           b'\tbool m_bHasItemIcon;\n'),
+     'bien icon anh goc tooltip')
+
+# 5) MouseHover.cpp ctor: khoi tao co icon = false.
+edit('S3Client/Ui/Elem/MouseHover.cpp',
+     _crlf(b'\tm_bFollowCursor = false;\n\tm_bShow = false;\n}'),
+     _crlf(b'\tm_bFollowCursor = false;\n\tm_bHasItemIcon = false;\n\tm_bShow = false;\n}'),
+     'ctor: m_bHasItemIcon = false')
+
+# 6) MouseHover.cpp Cancel: reset icon + dinh nghia SetMouseHoverIcon.
+edit('S3Client/Ui/Elem/MouseHover.cpp',
+     _crlf(b'\tm_nDescLen = 0;\n\tm_bShow = false;\n}\n\n/'),
+     _crlf(b'\tm_nDescLen = 0;\n\tm_bHasItemIcon = false;\n\tm_bShow = false;\n}\n'
+           b'\n'
+           b'void KMouseOver::SetMouseHoverIcon(const char* szImage)\n'
+           b'{\n'
+           b'\tm_bHasItemIcon = false;\n'
+           b'\tm_nItemIconW = 0;\n'
+           b'\tm_nItemIconH = 0;\n'
+           b'\tif (szImage == NULL || szImage[0] == 0 || g_pRepresentShell == NULL)\n'
+           b'\t\treturn;\n'
+           b'\tmemset(&m_ItemIcon, 0, sizeof(KRUImage));\n'
+           b'\tm_ItemIcon.nType = ISI_T_SPR;\n'
+           b'\tm_ItemIcon.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
+           b'\tm_ItemIcon.Color.Color_b.a = 255;\n'
+           b'\tm_ItemIcon.uImage = 0;\n'
+           b'\tm_ItemIcon.nISPosition = IMAGE_IS_POSITION_INIT;\n'
+           b'\tm_ItemIcon.nFrame = 0;\n'
+           b'\tstrncpy(m_ItemIcon.szImage, szImage, sizeof(m_ItemIcon.szImage) - 1);\n'
+           b'\tKImageParam Param;\n'
+           b'\tParam.nWidth = 0;\n'
+           b'\tParam.nHeight = 0;\n'
+           b'\tg_pRepresentShell->GetImageParam(m_ItemIcon.szImage, &Param, m_ItemIcon.nType);\n'
+           b'\tm_nItemIconW = Param.nWidth;\n'
+           b'\tm_nItemIconH = Param.nHeight;\n'
+           b'\tif (m_nItemIconW > 0 && m_nItemIconH > 0)\n'
+           b'\t\tm_bHasItemIcon = true;\n'
+           b'\tUpdate(m_nApplyX, m_nApplyY);\n'
+           b'}\n'
+           b'\n/'),
+     'dinh nghia SetMouseHoverIcon')
+
+# 7) MouseHover.cpp Update: cong chieu cao icon vao cua so.
+edit('S3Client/Ui/Elem/MouseHover.cpp',
+     _crlf(b'\tm_nWndHeight = (m_nFontSize + 1) * nNumLine;\n'
+           b'\tif (m_bHeadTailImg)\n'
+           b'\t\tm_nWndHeight += m_nImgHeight * 2;\n'),
+     _crlf(b'\tm_nWndHeight = (m_nFontSize + 1) * nNumLine;\n'
+           b'\tif (m_bHeadTailImg)\n'
+           b'\t\tm_nWndHeight += m_nImgHeight * 2;\n'
+           b'\tif (m_bHasItemIcon)\n'
+           b'\t{\n'
+           b'\t\tm_nWndHeight += m_nItemIconH;\n'
+           b'\t\tif (m_nItemIconW + m_nIndent * 2 > m_nWndWidth)\n'
+           b'\t\t\tm_nWndWidth = m_nItemIconW + m_nIndent * 2;\n'
+           b'\t}\n'),
+     'Update: cong chieu cao icon')
+
+# 8) MouseHover.cpp Paint: ve icon o dau + day chu xuong.
+edit('S3Client/Ui/Elem/MouseHover.cpp',
+     _crlf(b'\tif (m_bHeadTailImg)\n'
+           b'\t\tShadow.oPosition.nY = m_nTop + m_nImgHeight;\n'
+           b'\telse\n'
+           b'\t\tShadow.oPosition.nY = m_nTop;\n'
+           b'\tShadow.oEndPos.nX = m_nLeft + m_nWndWidth;\n'),
+     _crlf(b'\tif (m_bHeadTailImg)\n'
+           b'\t\tShadow.oPosition.nY = m_nTop + m_nImgHeight;\n'
+           b'\telse\n'
+           b'\t\tShadow.oPosition.nY = m_nTop;\n'
+           b'\tif (m_bHasItemIcon)\n'
+           b'\t{\n'
+           b'\t\tm_ItemIcon.oPosition.nX = m_nLeft + (m_nWndWidth - m_nItemIconW) / 2;\n'
+           b'\t\tm_ItemIcon.oPosition.nY = Shadow.oPosition.nY;\n'
+           b'\t\tg_pRepresentShell->DrawPrimitives(1, &m_ItemIcon, RU_T_IMAGE, true);\n'
+           b'\t\tShadow.oPosition.nY += m_nItemIconH;\n'
+           b'\t}\n'
+           b'\tShadow.oEndPos.nX = m_nLeft + m_nWndWidth;\n'),
+     'Paint: ve icon goc o dau tooltip')
+
+
+# 9) MouseHover.cpp: goi SetMouseHoverIcon sau khi dung xong desc.
+edit('S3Client/Ui/Elem/MouseHover.cpp',
+     _crlf(b'SetMouseHoverDesc(Desc.szDesc, nLenDesc, s_uHoverObjDestTextColor);\n\t\t}\n\t}\t\n}'),
+     _crlf(b'SetMouseHoverDesc(Desc.szDesc, nLenDesc, s_uHoverObjDestTextColor);\n\t\t}\n'
+           b'\t\t// Icon GOC cua vat pham vao tooltip (bag 1 o, tooltip full).\n'
+           b'\t\tif (uId)\n'
+           b'\t\t{\n'
+           b'\t\t\tchar szImg[80];\n'
+           b'\t\t\tszImg[0] = 0;\n'
+           b'\t\t\tg_pCoreShell->GetGameData(GDI_GAME_OBJ_IMAGE, (unsigned int)&Obj, (int)szImg);\n'
+           b'\t\t\tchar* pIt = strstr(szImg, "\\\\item\\\\");\n'
+           b'\t\t\tif (pIt)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tchar szGoc[96];\n'
+           b'\t\t\t\tint nPre = (int)(pIt - szImg) + 5;\n'
+           b'\t\t\t\tmemcpy(szGoc, szImg, nPre);\n'
+           b'\t\t\t\tszGoc[nPre] = 0;\n'
+           b'\t\t\t\tstrcat(szGoc, "-goc");\n'
+           b'\t\t\t\tstrcat(szGoc, pIt + 5);\n'
+           b'\t\t\t\tg_MouseOver.SetMouseHoverIcon(szGoc);\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\t}\t\n}'),
+     'goi SetMouseHoverIcon voi anh goc')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
