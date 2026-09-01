@@ -3057,6 +3057,26 @@ edit('S3Client/Ui/UiCase/UiMsgSelNew.cpp',
      'hop thoai co chan dung: pImage NULL thi thoat, khong doc vao')
 
 # ---------------------------------------------------------------------------
+# So thanh vien to doi (party) 8 -> 20.
+#
+# MAX_TEAM_MEMBER la so DOI VIEN khong ke doi truong, nen 7 = 8 nguoi, 19 = 20.
+# Hang nay nam trong cac struct protocol to doi (PLAYER_TEAM_ADD_MEMBER,
+# KUiPlayerTeam, m_nMember[MAX_TEAM_MEMBER]...) gui giua world server va client.
+# PHAI doi GIONG HET ca hai phia, khong thi struct lech kich thuoc -> client doc
+# nham -> treo. Ban server doi truc tiep o server/linux-server/Core/GameDataDef.h.
+# Ma to doi dung toan MAX_TEAM_MEMBER (khong hard-code 8) nen mang/vong lap tu
+# co gian. UI [MemberList] la danh sach cuon nen chua duoc nhieu hon 8.
+#
+# Doi CA BON ban trong cay client de khong lech noi bo (moi don vi bien dich lay
+# ban nao cung ra 19).
+for _gd in ('Core/Src/GameDataDef.h', 'LINUX/Core/GameDataDef.h',
+            'Engine/Core/GameDataDef.h', 'Kernel/Core/GameDataDef.h'):
+    edit(_gd,
+         b'#define\t\tMAX_TEAM_MEMBER\t\t\t\t\t\t7\t\t',
+         b'#define\t\tMAX_TEAM_MEMBER\t\t\t\t\t\t19\t\t',
+         'so thanh vien to doi 8 -> 20')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
