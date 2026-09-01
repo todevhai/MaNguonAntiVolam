@@ -3129,13 +3129,14 @@ edit('S3Client/Ui/Elem/MouseHover.h',
            b'\tKRUImage m_ItemIcon;\n'
            b'\tint m_nItemIconW;\n'
            b'\tint m_nItemIconH;\n'
+           b'\tint m_nItemIconFrames;\n'
            b'\tbool m_bHasItemIcon;\n'),
      'bien icon anh goc tooltip')
 
 # 5) MouseHover.cpp ctor: khoi tao co icon = false.
 edit('S3Client/Ui/Elem/MouseHover.cpp',
      _crlf(b'\tm_bFollowCursor = false;\n\tm_bShow = false;\n}'),
-     _crlf(b'\tm_bFollowCursor = false;\n\tm_bHasItemIcon = false;\n\tm_bShow = false;\n}'),
+     _crlf(b'\tm_bFollowCursor = false;\n\tm_bHasItemIcon = false;\n\tm_nItemIconFrames = 0;\n\tm_bShow = false;\n}'),
      'ctor: m_bHasItemIcon = false')
 
 # 6) MouseHover.cpp Cancel: reset icon + dinh nghia SetMouseHoverIcon.
@@ -3148,6 +3149,7 @@ edit('S3Client/Ui/Elem/MouseHover.cpp',
            b'\tm_bHasItemIcon = false;\n'
            b'\tm_nItemIconW = 0;\n'
            b'\tm_nItemIconH = 0;\n'
+           b'\tm_nItemIconFrames = 0;\n'
            b'\tif (szImage == NULL || szImage[0] == 0 || g_pRepresentShell == NULL)\n'
            b'\t\treturn;\n'
            b'\tmemset(&m_ItemIcon, 0, sizeof(KRUImage));\n'
@@ -3164,6 +3166,7 @@ edit('S3Client/Ui/Elem/MouseHover.cpp',
            b'\tg_pRepresentShell->GetImageParam(m_ItemIcon.szImage, &Param, m_ItemIcon.nType);\n'
            b'\tm_nItemIconW = Param.nWidth;\n'
            b'\tm_nItemIconH = Param.nHeight;\n'
+           b'\tm_nItemIconFrames = Param.nNumFrames;\n'
            b'\tif (m_nItemIconW > 0 && m_nItemIconH > 0)\n'
            b'\t\tm_bHasItemIcon = true;\n'
            b'\tUpdate(m_nApplyX, m_nApplyY);\n'
@@ -3202,6 +3205,12 @@ edit('S3Client/Ui/Elem/MouseHover.cpp',
            b'\t{\n'
            b'\t\tm_ItemIcon.oPosition.nX = m_nLeft + (m_nWndWidth - m_nItemIconW) / 2;\n'
            b'\t\tm_ItemIcon.oPosition.nY = Shadow.oPosition.nY;\n'
+           b'\t\tif (m_nItemIconFrames > 1)\n'
+           b'\t\t{\n'
+           b'\t\t\tstatic unsigned s_uIconTick = 0;\n'
+           b'\t\t\ts_uIconTick++;\n'
+           b'\t\t\tm_ItemIcon.nFrame = (s_uIconTick / 8) % m_nItemIconFrames;\n'
+           b'\t\t}\n'
            b'\t\tg_pRepresentShell->DrawPrimitives(1, &m_ItemIcon, RU_T_IMAGE, true);\n'
            b'\t\tShadow.oPosition.nY += m_nItemIconH;\n'
            b'\t}\n'
