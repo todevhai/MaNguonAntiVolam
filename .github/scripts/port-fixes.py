@@ -3133,7 +3133,7 @@ edit('S3Client/Ui/Elem/Wnds.cpp',
 edit('S3Client/Ui/Elem/Wnds.cpp',
      b'\t\t\tif (s_WndStation.pFocusWnd && pTopWnd != s_WndStation.pFocusWnd &&',
      _crlf(b'\t\t\t/* LOG TAM - xem chu thich o port-fixes.py */\n'
-           b'\t\t\tif (uMsg == WM_MOUSEMOVE && y >= 640 && y <= 690 && x >= 0 && x < 360)\n'
+           b'\t\t\tif (uMsg == WM_MOUSEMOVE && y >= 655 && y <= 680 && x >= 0 && x < 360)\n'
            b'\t\t\t{\n'
            b'\t\t\t\tstatic int s_nDem = 0;\n'
            b'\t\t\t\tif (++s_nDem <= 2)\n'
@@ -3147,6 +3147,28 @@ edit('S3Client/Ui/Elem/Wnds.cpp',
            b'\t\t\t}\n'
            b'\t\t\tif (s_WndStation.pFocusWnd && pTopWnd != s_WndStation.pFocusWnd &&'),
      'log tam chuot: do cua so nao nhan chuot o vung hang tab')
+
+# ---------------------------------------------------------------------------
+# BAT NHAT THAT: KUiMsgCentrePad::PtInWindow khai vung bam cua khung chat la
+# HOP cua mot danh sach con CUNG CHET - MoveImg, SizeBtn, ChatRoom, Mat, Phong,
+# Bang, Phai, Khac, BgShadowBtn - va QUEN sau nut tab (m_TabButton[0..5]),
+# von cung la cua so con that su, duoc AddChild trong ShowChatTab.
+#
+# Hau qua: con tro nam tren mot nut tab thi PtInWindow tra 0, Wnd_GetActive
+# khong chon khung chat, TopChildFromPoint khong duoc goi, nen nut tab khong
+# he nhan WM_MOUSEMOVE hay WM_LBUTTONDOWN. Nhin ra ngoai: tab ve dung cho,
+# dung kich thuoc, ma ro chuot khong doi mau va bam khong an.
+#
+# Do 01/09/2026: log tai Wnd_ProcessInput cho "active=00000000" ngay tai diem
+# nam GON trong khung chat (0,520)-(360,675).
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     _crlf(b'\t\t\t\tm_BgShadowBtn.PtInWindow(x, y)\n\t\t\t\t);'),
+     _crlf(b'\t\t\t\tm_BgShadowBtn.PtInWindow(x, y)\n'
+           b'\t\t\t\t);\n'
+           b'\t\t/* Hang tab cung la cua so con - thieu no thi tab khong nhan chuot. */\n'
+           b'\t\tfor (int i = 0; !nRet && i < m_ChatTabCount && i < MAX_CHAT_TAB; i++)\n'
+           b'\t\t\tnRet = m_TabButton[i].PtInWindow(x, y);'),
+     'khung chat: vung bam phai gom ca hang tab')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
