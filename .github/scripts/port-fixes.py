@@ -2961,13 +2961,14 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'\tint x = 0, y = 0, w = 0, h = 0;\n'
            b'\tGetAbsolutePos(&x, &y);\n'
            b'\tGetSize(&w, &h);\n'
-           b'\tCHAT_Ghi("[tab] khung chat tai (%d,%d) co %dx%d", x, y, w, h);\n'
+           b'\tCHAT_Ghi("[tab] khung chat %p tai (%d,%d) co %dx%d", (void*)this, x, y, w, h);\n'
            b'\tfor (int i = 0; i < MAX_CHAT_TAB; i++)\n'
            b'\t{\n'
            b'\t\tint bx = 0, by = 0, bw = 0, bh = 0;\n'
            b'\t\tm_TabButton[i].GetAbsolutePos(&bx, &by);\n'
            b'\t\tm_TabButton[i].GetSize(&bw, &bh);\n'
-           b'\t\tCHAT_Ghi("[tab]   nut %d tai (%d,%d) co %dx%d", i, bx, by, bw, bh);\n'
+           b'\t\tCHAT_Ghi("[tab]   nut %d %p tai (%d,%d) co %dx%d hien=%d",\n'
+           b'\t\t\ti, (void*)&m_TabButton[i], bx, by, bw, bh, m_TabButton[i].IsVisible());\n'
            b'\t}\n'
            b'}\n'
            b'\n'
@@ -3065,6 +3066,87 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
      b'\tstatic void\t\t\tDuaLenTren();',
      b'\tstatic void\t\t\tDuaLenTren();\r\n\tint\t\t\tWndProcThat(unsigned int uMsg, unsigned int uParam, int nParam);',
      'khai WndProcThat cho khung chat')
+
+# ---------------------------------------------------------------------------
+# LOG TAM: hang tab chat khong nhan chuot. Do o CHINH cho phan phoi chuot.
+#
+# Wnd_ProcessInput chi gui tin chuot cho MOT cua so duy nhat: pMouseOverWnd,
+# tuc `pActiveWnd->TopChildFromPoint(x, y)` - cua so con SAU CUNG nam duoi con
+# tro. Vay log dat o KUiMsgCentrePad::WndProc khong ghi duoc dong nao la
+# chuyen BINH THUONG khi mot cua so con che diem do; no KHONG chung minh khung
+# chat nam ngoai duong phan phoi. Chi co do ngay tai cho chon moi biet that.
+#
+# Ba so can biet: pActiveWnd (cua so goc duoc chon), pTopWnd (cua so cuoi nhan
+# tin), va danh sach ba lop kem khung bao - de thay ai dang nam tren.
+edit('S3Client/Ui/Elem/Wnds.cpp',
+     b'int WND_SHOW_MOUSE_OVER_WND = false;',
+     _crlf(b'int WND_SHOW_MOUSE_OVER_WND = false;\n'
+           b'\n'
+           b'/* LOG TAM - xem chu thich o port-fixes.py */\n'
+           b'#include <stdio.h>\n'
+           b'#include <stdarg.h>\n'
+           b'static void CHUOT_Ghi(const char* pFmt, ...)\n'
+           b'{\n'
+           b'\tFILE* fp = fopen("chat.log", "a");\n'
+           b'\tif (!fp)\n'
+           b'\t\treturn;\n'
+           b'\tva_list va;\n'
+           b'\tva_start(va, pFmt);\n'
+           b'\tvfprintf(fp, pFmt, va);\n'
+           b'\tva_end(va);\n'
+           b'\tfprintf(fp, "\\n");\n'
+           b'\tfclose(fp);\n'
+           b'}'),
+     'log tam chuot: ham ghi tep trong Wnds.cpp')
+
+edit('S3Client/Ui/Elem/Wnds.cpp',
+     b'static KWndWindow*\tWnd_GetActive(int x, int y, bool bBringToTop);',
+     _crlf(b'static KWndWindow*\tWnd_GetActive(int x, int y, bool bBringToTop);\n'
+           b'\n'
+           b'/* LOG TAM: liet ke ba lop cua so va cho biet cua so nao trum diem (x,y). */\n'
+           b'static void CHUOT_DoLop(int x, int y)\n'
+           b'{\n'
+           b'\tfor (int i = 0; i < 3; i++)\n'
+           b'\t{\n'
+           b'\t\tKWndWindow* pWnd;\n'
+           b'\t\tif (i == 0)\n'
+           b'\t\t\tpWnd = &s_WndStation.TopLayerRoot;\n'
+           b'\t\telse if (i == 1)\n'
+           b'\t\t\tpWnd = &s_WndStation.NormalLayerRoot;\n'
+           b'\t\telse\n'
+           b'\t\t\tpWnd = &s_WndStation.LowLayerRoot;\n'
+           b'\t\tint n = 0;\n'
+           b'\t\twhile ((pWnd = pWnd->GetNextWnd()) != NULL)\n'
+           b'\t\t{\n'
+           b'\t\t\tint wx = 0, wy = 0, ww = 0, wh = 0;\n'
+           b'\t\t\tpWnd->GetAbsolutePos(&wx, &wy);\n'
+           b'\t\t\tpWnd->GetSize(&ww, &wh);\n'
+           b'\t\t\tCHUOT_Ghi("[lop%d] #%d %p tai (%d,%d) co %dx%d hien=%d trum=%d",\n'
+           b'\t\t\t\ti, n, (void*)pWnd, wx, wy, ww, wh,\n'
+           b'\t\t\t\tpWnd->IsVisible(), pWnd->PtInWindow(x, y));\n'
+           b'\t\t\tn++;\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'}'),
+     'log tam chuot: ham liet ke ba lop cua so')
+
+edit('S3Client/Ui/Elem/Wnds.cpp',
+     b'\t\t\tif (s_WndStation.pFocusWnd && pTopWnd != s_WndStation.pFocusWnd &&',
+     _crlf(b'\t\t\t/* LOG TAM - xem chu thich o port-fixes.py */\n'
+           b'\t\t\tif (uMsg == WM_MOUSEMOVE && y >= 640 && y <= 690 && x >= 0 && x < 360)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tstatic int s_nDem = 0;\n'
+           b'\t\t\t\tif (++s_nDem <= 2)\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tCHUOT_Ghi("[chuot] (%d,%d) active=%p top=%p bat=%p docchiem=%p",\n'
+           b'\t\t\t\t\t\tx, y, (void*)pActiveWnd, (void*)pTopWnd,\n'
+           b'\t\t\t\t\t\t(void*)s_WndStation.pCaptureMouseWnd,\n'
+           b'\t\t\t\t\t\t(void*)s_WndStation.pExclusiveWnd[0]);\n'
+           b'\t\t\t\t\tCHUOT_DoLop(x, y);\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t}\n'
+           b'\t\t\tif (s_WndStation.pFocusWnd && pTopWnd != s_WndStation.pFocusWnd &&'),
+     'log tam chuot: do cua so nao nhan chuot o vung hang tab')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
