@@ -2961,6 +2961,44 @@ edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
      'thanh tren: dien so cap va hang xep the gioi')
 
 # ---------------------------------------------------------------------------
+# MAC DINH CUA TUYEN NAY: vao game thi IM TIENG va KHONG hieu ung thoi tiet.
+# Nguon 2003 de nhac 100, tieng dong 100 va ca ba muc bat-tat deu bat.
+# Nguoi choi van chinh duoc va lua chon van duoc ghi vao UserData/UiCommon.ini
+# muc [Options]; day chi la gia tri khi CHUA co lua chon nao.
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'"MusicValue", 100',
+     b'"MusicValue", 0',
+     'mac dinh: khong mo nhac nen')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'"SoundValue", 100',
+     b'"SoundValue", 0',
+     'mac dinh: khong mo am thanh')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'ls_ToggleOptionName[i], true, &bOptionsEnable[i]',
+     b'ls_ToggleOptionName[i], false, &bOptionsEnable[i]',
+     'mac dinh: ba muc bat-tat deu tat')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     _crlf(b'\t\ttrue, true, true\n'),
+     _crlf(b'\t\tfalse, false, false\t/* dung khi khong mo duoc tep cai dat */\n'),
+     'mac dinh khi khong doc duoc tep cai dat')
+
+# BAT NHAT THAT - ba dong gan gia tri vua doc vao bien thanh vien bi COMMENT.
+# Hau qua: mo bang roi dong ma khong dong vao thanh keo thi StoreSetting ghi
+# lai GIA TRI CU cua bien thanh vien (100 tu ham dung), de len gia tri vua doc.
+# Nghia la doi mac dinh thoi khong du - lan dong bang dau tien la no quay ve 100.
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     _crlf(b'\t\t\t//m_pSelf->m_nBrightness = nBrightness;\n'
+           b'\t\t\t//m_pSelf->m_nSoundValue = nSoundValue;\n'
+           b'\t\t\t//m_pSelf->m_nMusicValue = nMusicValue;'),
+     _crlf(b'\t\t\tm_pSelf->m_nBrightness = nBrightness;\n'
+           b'\t\t\tm_pSelf->m_nSoundValue = nSoundValue;\n'
+           b'\t\t\tm_pSelf->m_nMusicValue = nMusicValue;'),
+     'bien thanh vien phai theo gia tri vua doc, khong thi StoreSetting ghi de')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
