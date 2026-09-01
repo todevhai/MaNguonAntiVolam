@@ -3057,6 +3057,99 @@ edit('S3Client/Ui/UiCase/UiMsgSelNew.cpp',
      'hop thoai co chan dung: pImage NULL thi thoat, khong doc vao')
 
 # ---------------------------------------------------------------------------
+# Anh vat pham ve TRAN ra ngoai o.
+#
+# KItem::Paint ve anh dung CO GOC cua no; hai tham so Width/Height ma
+# CoreDrawGameObj nhan chi dung de CAN GIUA, khong he co anh. Truoc day khong
+# ai thay vi khung o luon bang dung so o cua vat pham (ao 2x3 -> o 2x3).
+#
+# Tuyen nay ep moi vat pham xuong 1 o (xem docs/09-vat-pham-va-tui-do/03),
+# nen anh 2x3 bi ve de len cac o ben canh. Do 01/09/2026: sau bo ao giap nam
+# dung sau o lien nhau (0,1)..(5,1) - o thi dung roi, chi anh la tran.
+#
+# Engine da co san kieu ve co anh: RU_T_IMAGE_STRETCH (Represent2 co lam,
+# KRepresentShell2.cpp:546), dat oEndPos la goc duoi phai. Them mot ham ve
+# theo khung, giu nguyen Paint cu cho cac cho khac (do roi duoi dat...).
+edit('Core/Src/KItem.h',
+     b'\tvoid\tPaint(int nX, int nY,BOOL bStack = TRUE);',
+     b'\tvoid\tPaint(int nX, int nY,BOOL bStack = TRUE);\r\n\t/* Ve anh CO vao dung khung (nW x nH diem). Dung cho tui do va rung,\r\n\t   noi mot vat pham chi con chiem mot o ma anh thi to hon o. */\r\n\tvoid\tPaintVuaKhung(int nX, int nY, int nW, int nH, BOOL bStack = TRUE);',
+     'khai ham ve anh vat pham co vua khung o')
+
+edit('Core/Src/KItem.cpp',
+     _crlf(b'void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)\n'),
+     _crlf(b'/* Ve anh vat pham CO cho vua khung nW x nH.\n'
+           b'   Paint() thuong ve anh dung co goc, nen vat pham 1 o ma anh 2x3 o thi\n'
+           b'   tran sang o ben canh. RU_T_IMAGE_STRETCH nhan them oEndPos lam goc\n'
+           b'   duoi phai va co anh vao do. */\n'
+           b'void KItem::PaintVuaKhung(int nX, int nY, int nW, int nH, BOOL bStack/* = TRUE*/)\n'
+           b'{\n'
+           b'\tif (nW <= 0 || nH <= 0)\n'
+           b'\t{\n'
+           b'\t\tPaint(nX, nY, bStack);\n'
+           b'\t\treturn;\n'
+           b'\t}\n'
+           b'\tKRUImage Anh = m_Image;\n'
+           b'\tAnh.oPosition.nX = nX;\n'
+           b'\tAnh.oPosition.nY = nY;\n'
+           b'\tAnh.oEndPos.nX = nX + nW;\n'
+           b'\tAnh.oEndPos.nY = nY + nH;\n'
+           b'\tAnh.oEndPos.nZ = Anh.oPosition.nZ;\n'
+           b'\tAnh.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
+           b'\tg_pRepresent->DrawPrimitives(1, &Anh, RU_T_IMAGE_STRETCH, TRUE);\n'
+           b'\n'
+           b'\tif (m_CommonAttrib.bStack && bStack)\n'
+           b'\t{\n'
+           b'\t\tint nNum = m_CommonAttrib.nStackNum;\n'
+           b'\t\tif (nNum > 1 && nNum < 1000)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nFontSize = 12;\n'
+           b'\t\t\tchar szNum[4];\n'
+           b'\t\t\tint nLen = sprintf(szNum, "%d", nNum);\n'
+           b'\t\t\tszNum[3] = 0;\n'
+           b'\t\t\tg_pRepresent->OutputText(nFontSize, szNum, KRF_ZERO_END,\n'
+           b'\t\t\t\tnX + nW - nLen * nFontSize / 2, nY + nH - nFontSize, 0xFFFFFF00);\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'}\n'
+           b'\n'
+           b'void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)\n'),
+     've anh vat pham co vua khung o')
+
+edit('Core/Src/CoreDrawGameObj.cpp',
+     _crlf(b'\t\telse\n'
+           b'\t\t{\n'
+           b'\t\t\tx += (Width - Item[uId].GetWidth() * ITEM_CELL_WIDTH) / 2;\n'
+           b'\t\t\ty += (Height - Item[uId].GetHeight() * ITEM_CELL_HEIGHT) / 2;\n'
+           b'\t\t}\n'
+           b'\t\tif (uObjGenre == CGOG_IME_ITEM)\n'
+           b'\t\t{\n'
+           b'\t\t\tItem[uId].Paint(x, y,FALSE);\n'
+           b'\t\t} \n'
+           b'\t\telse\n'
+           b'\t\t{\n'
+           b'\t\t\tItem[uId].Paint(x, y);\n'
+           b'\t\t}\t\n'),
+     _crlf(b'\t\telse\n'
+           b'\t\t{\n'
+           b'\t\t\t/* Co anh vao dung khung o duoc giao. Truoc day chi CAN GIUA anh\n'
+           b'\t\t\t   theo co goc, nen vat pham 1 o ma anh 2x3 o thi de len o ben. */\n'
+           b'\t\t\tif (uObjGenre == CGOG_IME_ITEM)\n'
+           b'\t\t\t\tItem[uId].PaintVuaKhung(x, y, Width, Height, FALSE);\n'
+           b'\t\t\telse\n'
+           b'\t\t\t\tItem[uId].PaintVuaKhung(x, y, Width, Height);\n'
+           b'\t\t\tbreak;\n'
+           b'\t\t}\n'
+           b'\t\tif (uObjGenre == CGOG_IME_ITEM)\n'
+           b'\t\t{\n'
+           b'\t\t\tItem[uId].Paint(x, y,FALSE);\n'
+           b'\t\t} \n'
+           b'\t\telse\n'
+           b'\t\t{\n'
+           b'\t\t\tItem[uId].Paint(x, y);\n'
+           b'\t\t}\t\n'),
+     'tui do va rung: ve anh vat pham co vua o')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
