@@ -2999,6 +2999,64 @@ edit('S3Client/Ui/UiCase/UiOptions.cpp',
      'bien thanh vien phai theo gia tri vua doc, khong thi StoreSetting ghi de')
 
 # ---------------------------------------------------------------------------
+# BAT NHAT THAT - bam vao NPC la CHET CLIENT.
+#
+# Khoi ve chan dung NPC trong hop thoai (KPlayer::OnScriptAction) do mot chuoi
+# con tro ma khong chan cho nao:
+#     Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetFileName(...)
+# GetNpcRes() tra &m_DataRes nen khong bao gio NULL, nhung m_pcResNode BEN TRONG
+# no thi co - khi tai nguyen NPC chua nap. Doc vao la chet.
+#
+# Va MaxFrame = GetTotalFrames(...) / GetTotalDirs(...) lay ket qua ham lam MAU
+# SO. Tra 0 la chia cho 0 -> SIGFPE, tien trinh chet ngay.
+#
+# Do 01/09/2026: goi s2c_scriptaction (Msg 122) CO toi client - khong phai mat
+# goi - roi client dung han. Nguoi choi thay "bam vao NPC la dung game".
+#
+# Chan ca hai, va coi chan dung la KHONG BAT BUOC: khong lay duoc anh thi van
+# mo hop thoai qua nhanh KUiMsgSel (nhanh do da co san trong
+# GameSpaceChangedNotify.cpp va co san UiMsgSel.ini).
+edit('Core/Src/KPlayer.cpp',
+     _crlf(b'if (m_nImageNpcID) \n'
+           b'                    { \n'
+           b'                    char szBuffer[128]; \n'),
+     _crlf(b'if (m_nImageNpcID && Npc[m_nImageNpcID].GetNpcRes() &&\n'
+           b'                        Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode) \n'
+           b'                    { \n'
+           b'                    char szBuffer[128]; \n'),
+     'chan dung NPC: khong doc m_pcResNode khi no NULL')
+
+edit_all('Core/Src/KPlayer.cpp',
+     _crlf(b'                            pImage->MaxFrame = (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(i, 3, 0, 16))/ \n'
+           b'                            (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(i, 3, 0, 16)); goto Next; \n'),
+     _crlf(b'                            { \n'
+           b'                            int nHuong = Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(i, 3, 0, 16); \n'
+           b'                            pImage->MaxFrame = nHuong > 0 ? \n'
+           b'                                (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(i, 3, 0, 16)) / nHuong : 1; \n'
+           b'                            } \n'
+           b'                            goto Next; \n'),
+     'chan dung NPC: so huong = 0 la chia cho 0')
+
+edit_all('Core/Src/KPlayer.cpp',
+     _crlf(b'                            pImage->MaxFrame = (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(j, 0, 0, 16))/ \n'
+           b'                            (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(j, 0, 0, 16)); goto Next; \n'),
+     _crlf(b'                            { \n'
+           b'                            int nHuong = Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(j, 0, 0, 16); \n'
+           b'                            pImage->MaxFrame = nHuong > 0 ? \n'
+           b'                                (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(j, 0, 0, 16)) / nHuong : 1; \n'
+           b'                            } \n'
+           b'                            goto Next; \n'),
+     'chan dung NPC: so huong = 0 la chia cho 0 (vong thu hai)')
+
+# KUiMsgSelNew::OpenWindow doc thang pImage->ImageFile ma khong kiem NULL.
+# Cho goi no la nhanh "if (nParam)" nen pImage khong NULL o duong binh thuong,
+# nhung mot lan tay doi la chet ca cua so. Chan cho chac.
+edit('S3Client/Ui/UiCase/UiMsgSelNew.cpp',
+     b'KUiMsgSelNew* KUiMsgSelNew::OpenWindow(KUiQuestionAndAnswer* pContent, KUiNpcSpr *pImage)\r\n{',
+     b'KUiMsgSelNew* KUiMsgSelNew::OpenWindow(KUiQuestionAndAnswer* pContent, KUiNpcSpr *pImage)\r\n{\r\n\tif (pImage == NULL)\t/* nguoi goi da lai NULL sang KUiMsgSel; chan cho chac */\r\n\t\treturn NULL;',
+     'hop thoai co chan dung: pImage NULL thi thoat, khong doc vao')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
