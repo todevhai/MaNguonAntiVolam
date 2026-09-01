@@ -2887,6 +2887,80 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      'tin kenh: doc muc kenh sau khi da kiem tra chi so')
 
 # ---------------------------------------------------------------------------
+# Cua so TUY CHON: hai muc "bong dong" va "xuyen thau" chi Represent3 lam duoc
+# (KUiOptions dat bInvalid = !g_bRepresent3), ma ta chay Represent2 - config.ini
+# ghi Represent=0. Chung bi Enable(false) va ve bang DisableFrame=2 cua
+# \Spr\Ui3\<he thong>\<nut danh dau>.spr, ma khung 2 la o XAM CO DAU TICK MO.
+# Nhin ra ngoai: hai o luon "da tich" va bam khong nha ra duoc.
+#
+# Chi hien nhung muc may nay lam duoc. Bang anh xa cho phep bo qua muc hong ma
+# khong pha thu tu cua m_ToggleItemList; neu sau nay bat Represent3 thi chung
+# tu hien lai vi bInvalid tinh tu g_bRepresent3.
+edit('S3Client/Ui/UiCase/UiOptions.h',
+     b'\tint\t\t\t\t\tm_nToggleBtnValidCount;',
+     _crlf(b'\tint\t\t\t\t\tm_nToggleBtnValidCount;\n'
+           b'\t/* Muc thu i tren man hinh la muc nao trong m_ToggleItemList.\n'
+           b'\t   Muc may nay khong lam duoc thi khong chiem cho. */\n'
+           b'\tint\t\t\t\t\tm_ToggleIndexMap[MAX_TOGGLE_BTN_COUNT];'),
+     'TUY CHON: bang anh xa cho tung o danh dau')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     _crlf(b'\tm_nFirstControlableIndex = 0;\n'
+           b'\tm_nToggleBtnValidCount = (OPTION_INDEX_COUNT <= MAX_TOGGLE_BTN_COUNT) ? OPTION_INDEX_COUNT : MAX_TOGGLE_BTN_COUNT;'),
+     _crlf(b'\tm_nFirstControlableIndex = 0;\n'
+           b'\tm_nToggleBtnValidCount = 0;\n'
+           b'\tfor (i = 0; i < OPTION_INDEX_COUNT && m_nToggleBtnValidCount < MAX_TOGGLE_BTN_COUNT; i++)\n'
+           b'\t{\n'
+           b'\t\tif (m_ToggleItemList[i].bInvalid)\n'
+           b'\t\t\tcontinue;\t/* may nay khong lam duoc - khong chiem cho */\n'
+           b'\t\tm_ToggleIndexMap[m_nToggleBtnValidCount] = i;\n'
+           b'\t\tm_nToggleBtnValidCount++;\n'
+           b'\t}'),
+     'TUY CHON: chi xep cho cho muc may chay duoc')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'\t\tint nIndex = m_nFirstControlableIndex + i;',
+     b'\t\tint nIndex = m_ToggleIndexMap[i];',
+     'TUY CHON: nhan va mau lay theo bang anh xa')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     _crlf(b'\t\tif (m_ToggleItemList[m_nFirstControlableIndex + i].bInvalid == false)\n'
+           b'\t\t{\n'
+           b'\t\t\tnFrame = m_ToggleItemList[m_nFirstControlableIndex + i].bEnable ?'),
+     _crlf(b'\t\tif (m_ToggleItemList[m_ToggleIndexMap[i]].bInvalid == false)\n'
+           b'\t\t{\n'
+           b'\t\t\tnFrame = m_ToggleItemList[m_ToggleIndexMap[i]].bEnable ?'),
+     'TUY CHON: khung anh lay theo bang anh xa')
+
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'\t\t\t\t\tToggleOption(m_nFirstControlableIndex + i);',
+     b'\t\t\t\t\tToggleOption(m_ToggleIndexMap[i]);',
+     'TUY CHON: bam vao o nao thi bat tat dung muc do')
+
+# ---------------------------------------------------------------------------
+# Thanh tren dinh: hai o so CAP va HANG duoc dung, duoc gan lam con, nhung
+# khong noi nao do chu vao - hai o luon rong. Chu "Cap"/"Hang" nam san tren
+# anh nen, hai o nay la CHO DIEN SO.
+edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
+     _crlf(b'\tDatThanh(m_Exp,     m_ExpText,\n'
+           b'\t\tInfo.nExperience - Info.nExperienceFull,\n'
+           b'\t\tInfo.nCurLevelExperience - Info.nExperienceFull);'),
+     _crlf(b'\tDatThanh(m_Exp,     m_ExpText,\n'
+           b'\t\tInfo.nExperience - Info.nExperienceFull,\n'
+           b'\t\tInfo.nCurLevelExperience - Info.nExperienceFull);\n'
+           b'\t/* Cap va hang xep the gioi nam o KUiPlayerAttribute, khong phai\n'
+           b'\t   KUiPlayerRuntimeInfo - phai hoi rieng. */\n'
+           b'\tKUiPlayerAttribute ThuocTinh;\n'
+           b'\tmemset(&ThuocTinh, 0, sizeof(ThuocTinh));\n'
+           b'\tg_pCoreShell->GetGameData(GDI_PLAYER_RT_ATTRIBUTE, (int)&ThuocTinh, 0);\n'
+           b'\tchar szSo[32];\n'
+           b'\tsprintf(szSo, "%d", ThuocTinh.nLevel);\n'
+           b'\tm_LevelText.SetText(szSo);\n'
+           b'\tsprintf(szSo, "%d", ThuocTinh.nRankInWorld);\n'
+           b'\tm_RankWorldText.SetText(szSo);'),
+     'thanh tren: dien so cap va hang xep the gioi')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
