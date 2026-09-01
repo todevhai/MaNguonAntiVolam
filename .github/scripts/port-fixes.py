@@ -2715,41 +2715,21 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      'UiMiniMap: bam Tim thi mo hop nhap toa do')
 
 # ---------------------------------------------------------------------------
-# LOG TAM cho chat: danh sach kenh do MAY CHU gui xuong
-# (NotifyChannelID -> KUiMsgCentrePad::OpenChannel), roi client khop ten do voi
-# khoa FormatName cua tung muc [CH_*] trong ini. Chua ro may chu ta co gui hay
-# khong, va gui ten gi - phai do. GO SAU KHI DO XONG.
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'#include "UiMsgCentrePad.h"',
-     _crlf(b'#include "UiMsgCentrePad.h"\n'
-           b'#include <stdarg.h>\n'
-           b'/* LOG TAM - xem chu thich o port-fixes.py */\n'
-           b'static void CHAT_Ghi(const char* pFmt, ...)\n'
-           b'{\n'
-           b'\tFILE* fp = fopen("chat.log", "a");\n'
-           b'\tif (!fp)\n'
-           b'\t\treturn;\n'
-           b'\tva_list va;\n'
-           b'\tva_start(va, pFmt);\n'
-           b'\tvfprintf(fp, pFmt, va);\n'
-           b'\tva_end(va);\n'
-           b'\tfprintf(fp, "\\n");\n'
-           b'\tfclose(fp);\n'
-           b'}'),
-     'log tam chat: ham ghi tep')
-
+# Kenh chat do MAY CHU cap (NotifyChannelID -> KUiMsgCentrePad::OpenChannel),
+# client khop ten do voi khoa FormatName cua tung muc [CH_*] trong ini.
+#
+# Tach OpenChannel thanh vo boc + OpenChannelThat: vo boc con phai dem lai kenh
+# khi cua so chat chua ton tai (xem ban va ben duoi), con XuLyKenhCho thi goi
+# THANG ham that de khong dem lai lan nua.
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      b'void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)',
      _crlf(b'void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)\n'
            b'{\n'
-           b'\tCHAT_Ghi("[chat] may chu mo kenh \\"%s\\" id=%u | cua so chat=%s, so kenh tu ini=%d",\n'
-           b'\t\tchannelName ? channelName : "(rong)", (unsigned)nChannelID,\n'
-           b'\t\tm_pSelf ? "da co" : "CHUA CO", m_pSelf ? m_pSelf->m_nChannelsResource : -1);\n'
            b'\tOpenChannelThat(channelName, nChannelID, cost);\n'
            b'}\n'
            b'\n'
            b'void KUiMsgCentrePad::OpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost)'),
-     'log tam chat: ghi khi may chu mo kenh')
+     'tach OpenChannel de con dem duoc kenh bao som')
 
 # May chu bao mo kenh NGAY khi vao game, con cua so chat thi mai sau moi duoc
 # tao (do duoc: "cua so chat=CHUA CO" cho ca bon kenh). Nen moi thong bao deu
@@ -2811,48 +2791,10 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      'chua co cua so chat thi giu kenh lai')
 
 
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\tm_nChannelsResource = nCh;',
-     _crlf(b'\tm_nChannelsResource = nCh;\n'
-           b'\tCHAT_Ghi("[chat] nap ini xong: %d kenh trong [Channels]", nCh);'),
-     'log tam chat: so kenh doc duoc tu ini')
-
-
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
      b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);',
      b'\tstatic void\t\t\t\tOpenChannel(char* channelName, DWORD nChannelID, BYTE cost);\r\n\tstatic void\t\t\t\tOpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost);\r\n\tstatic void\t\t\t\tXuLyKenhCho();',
-     'log tam chat: khai ham that')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\t\t\tm_pSelf->SendChannelSubscribe(m_pSelf->AddActivateChannel(Info), true);',
-     _crlf(b'\t\t\tCHAT_Ghi("[chat]   KHOP: kenh \\"%s\\" -> muc ini thu %d, dang ky",\n'
-           b'\t\t\t\tchannelName, nChannelIndex);\n'
-           b'\t\t\tm_pSelf->SendChannelSubscribe(m_pSelf->AddActivateChannel(Info), true);'),
-     'log tam chat: ghi khi khop duoc kenh')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\tint nSo = s_nKenhCho;',
-     _crlf(b'\tCHAT_Ghi("[chat] xu ly %d kenh dang cho, ini co %d muc kenh",\n'
-           b'\t\ts_nKenhCho, m_pSelf ? m_pSelf->m_nChannelsResource : -1);\n'
-           b'\tint nSo = s_nKenhCho;'),
-     'log tam chat: ghi khi xa dem kenh')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'int KUiMsgCentrePad::NewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)',
-     _crlf(b'int KUiMsgCentrePad::NewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)\n'
-           b'{\n'
-           b'\tCHAT_Ghi("[chat] NHAN kenh id=%u tu \\"%s\\" dai %d", (unsigned)nChannelID,\n'
-           b'\t\tszSendName ? szSendName : "(rong)", (int)nMsgLength);\n'
-           b'\treturn NewChannelMessageArrivalThat(nChannelID, szSendName, pMsgBuff, nMsgLength);\n'
-           b'}\n'
-           b'\n'
-           b'int KUiMsgCentrePad::NewChannelMessageArrivalThat(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength)'),
-     'log tam chat: ghi khi nhan tin kenh')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
-     b'\tstatic int\t\t\t\tNewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);',
-     b'\tstatic int\t\t\t\tNewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);\r\n\tstatic int\t\t\t\tNewChannelMessageArrivalThat(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);',
-     'log tam chat: khai ham that cho tin den')
+     'khai OpenChannelThat va XuLyKenhCho')
 
 # ---------------------------------------------------------------------------
 # Menu chon kenh lay chieu cao moi dong TU CHIEU CAO ANH bieu tuong kenh
@@ -2863,30 +2805,8 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\tKPopupMenu::Popup(pMenuData, (KWndWindow*)this, SEL_CHANNEL_MENU);',
      _crlf(b'\tif (pMenuData->nItemHeight < 16)\n'
            b'\t\tpMenuData->nItemHeight = 16;\t/* du cho chu 12 diem */\n'
-           b'\tCHAT_Ghi2("[chat] menu kenh: %d muc, cao moi dong %d",\n'
-           b'\t\tnChannelDataCount + m_nRecentPlayerName, (int)pMenuData->nItemHeight);\n'
            b'\tKPopupMenu::Popup(pMenuData, (KWndWindow*)this, SEL_CHANNEL_MENU);'),
-     'menu kenh: chieu cao dong toi thieu, va log tam')
-
-edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
-     b'extern iCoreShell*\t\tg_pCoreShell;',
-     _crlf(b'extern iCoreShell*\t\tg_pCoreShell;\n'
-           b'\n'
-           b'#include <stdarg.h>\n'
-           b'/* LOG TAM - go khi xong phan chat */\n'
-           b'static void CHAT_Ghi2(const char* pFmt, ...)\n'
-           b'{\n'
-           b'\tFILE* fp = fopen("chat.log", "a");\n'
-           b'\tif (!fp)\n'
-           b'\t\treturn;\n'
-           b'\tva_list va;\n'
-           b'\tva_start(va, pFmt);\n'
-           b'\tvfprintf(fp, pFmt, va);\n'
-           b'\tva_end(va);\n'
-           b'\tfprintf(fp, "\\n");\n'
-           b'\tfclose(fp);\n'
-           b'}'),
-     'log tam chat o thanh nguoi choi')
+     'menu kenh: chieu cao dong toi thieu')
 
 # ---------------------------------------------------------------------------
 # Nut chon kenh o dau thanh nhap lay nhan la ANH INLINE cua kenh dang chon
@@ -2902,23 +2822,18 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\t\t\tshort nCheck = -1;\n'
            b'\t\t\tKUiMsgCentrePad::GetChannelMenuinfo(m_pSelf->m_nCurChannel,\n'
            b'\t\t\t\tNULL, &nCaoAnh, &uMau1, &uMau2, szTenKenh, &nCheck);\n'
-           b'\t\t\tCHAT_Ghi2("[chat] nut kenh: muc %d, chi so anh=%u, cao=%u, ten=\\"%s\\"",\n'
-           b'\t\t\t\tm_pSelf->m_nCurChannel, (unsigned)nPicIndex, (unsigned)nCaoAnh, szTenKenh);\n'
            b'\t\t\tif (nPicIndex == (WORD)-1 && szTenKenh[0])\n'
            b'\t\t\t\tm_pSelf->m_ChannelSwitchBtn.SetText(szTenKenh);\t/* anh hong -> ve chu */\n'
            b'\t\t\telse\n'
            b'\t\t\t\tm_pSelf->m_ChannelSwitchBtn.SetText(buffer, 3);'),
      'nut kenh: anh hong thi ve ten bang chu')
 
-# LOG TAM: nut kenh van trong. Do xem PaintWindow co goi SetCurrentChannel
-# khong, va GetChannelCount tra bao nhieu.
+# Doi canh goi ReleaseActivateChannelAll xoa sach kenh dang ky ma may chu
+# khong gui lai -> GetChannelCount ve 0, menu kenh rong. Thanh nguoi choi ve
+# moi nhip nen dung no lam cho de dang ky lai tu danh sach da giu.
 edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;',
      _crlf(b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;\n'
-           b'\tstatic int s_nLanVe = 0;\n'
-           b'\tif (++s_nLanVe <= 3 || (s_nLanVe % 600) == 0)\n'
-           b'\t\tCHAT_Ghi2("[chat] ve thanh: so kenh=%d (rieng kenh=%d), kenh dang chon=%d",\n'
-           b'\t\t\tnChannelDataCount, KUiMsgCentrePad::GetChannelCount(), m_nCurChannel);\n'
            b'\t/* Doi canh xoa sach kenh dang ky ma may chu khong gui lai; dang ky\n'
            b'\t   lai tu danh sach da giu. Gioi han so lan de khong thu mai. */\n'
            b'\tstatic int s_nThuLai = 0;\n'
@@ -2929,224 +2844,7 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
            b'\t\ts_nThuLai++;\n'
            b'\t\tKUiMsgCentrePad::XuLyKenhCho();\n'
            b'\t}'),
-     'log tam: dem so kenh luc ve thanh nguoi choi')
-
-# ---------------------------------------------------------------------------
-# Khung chat nam o lop WL_LOWEST (day), con KUiPlayerBar o WL_NORMAL va anh nen
-# cua no phu TRON 1024x768. Chuot bi thanh do nuot truoc khi toi hang tab, nen
-# ro chuot len tab khong doi mau va bam khong an.
-# Dua khung chat len cung lop: no dung o (0,520) cao 155, con HUD bat dau tu
-# y=686 nen khong che nhau.
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\tWnd_AddWindow(this, WL_LOWEST);',
-     b'\tWnd_AddWindow(this, WL_NORMAL);\t/* xem chu thich o port-fixes.py */',
-     'khung chat len lop WL_NORMAL de nhan duoc chuot')
-
-# Cung lop thi cua so THEM SAU nam tren. KUiPlayerBar duoc tao sau khung chat
-# nen van phu len; goi BringToTop de khung chat len tren han. No o (0,520) cao
-# 155 con HUD bat dau tu y=686 nen khong che gi.
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\t\tm_pSelf->m_Sys.Show();',
-     _crlf(b'\t\tm_pSelf->BringToTop();\n'
-           b'\t\tm_pSelf->m_Sys.Show();'),
-     'khung chat len tren thanh HUD')
-
-# LOG TAM: hang tab chat khong nhan chuot. In ra khung bao THAT cua cua so
-# chat va cua tung nut tab, de biet vung bam nam o dau so voi cho ve.
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'void KUiMsgCentrePad::PaintWindow()',
-     _crlf(b'/* LOG TAM - go khi xong phan tab chat */\n'
-           b'void KUiMsgCentrePad::DoViTriTab()\n'
-           b'{\n'
-           b'\tint x = 0, y = 0, w = 0, h = 0;\n'
-           b'\tGetAbsolutePos(&x, &y);\n'
-           b'\tGetSize(&w, &h);\n'
-           b'\tCHAT_Ghi("[tab] khung chat %p tai (%d,%d) co %dx%d", (void*)this, x, y, w, h);\n'
-           b'\tfor (int i = 0; i < MAX_CHAT_TAB; i++)\n'
-           b'\t{\n'
-           b'\t\tint bx = 0, by = 0, bw = 0, bh = 0;\n'
-           b'\t\tm_TabButton[i].GetAbsolutePos(&bx, &by);\n'
-           b'\t\tm_TabButton[i].GetSize(&bw, &bh);\n'
-           b'\t\tCHAT_Ghi("[tab]   nut %d %p tai (%d,%d) co %dx%d hien=%d",\n'
-           b'\t\t\ti, (void*)&m_TabButton[i], bx, by, bw, bh, m_TabButton[i].IsVisible());\n'
-           b'\t}\n'
-           b'}\n'
-           b'\n'
-           b'void KUiMsgCentrePad::PaintWindow()'),
-     'log tam: do vi tri that cua hang tab')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
-     b'\tstatic void\t\t\t\tXuLyKenhCho();',
-     b'\tstatic void\t\t\t\tXuLyKenhCho();\r\n\tvoid\t\t\t\tDoViTriTab();',
-     'khai ham do vi tri tab')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'\t\tm_pSelf->BringToTop();',
-     _crlf(b'\t\tm_pSelf->BringToTop();\n'
-           b'\t\tm_pSelf->DoViTriTab();'),
-     'goi do vi tri tab khi mo cua so')
-
-# BringToTop luc mo cua so khong du: KUiPlayerBar duoc tao SAU khung chat nen
-# lai nam tren va nuot chuot (do duoc: hinh hoc tab dung y cho ve, nhung ro
-# chuot khong doi mau). Giu khung chat o tren, kiem lai moi nhip ve.
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'void KUiMsgCentrePad::DoViTriTab()',
-     _crlf(b'/* Dua khung chat len tren cac cua so cung lop. Phai goi lai dinh ky vi\n'
-           b'   KUiPlayerBar duoc tao SAU khung chat nen mac dinh nam tren va nuot\n'
-           b'   chuot cua hang tab. */\n'
-           b'void KUiMsgCentrePad::DuaLenTren()\n'
-           b'{\n'
-           b'\tif (m_pSelf)\n'
-           b'\t\tm_pSelf->BringToTop();\n'
-           b'}\n'
-           b'\n'
-           b'void KUiMsgCentrePad::DoViTriTab()'),
-     'ham dua khung chat len tren')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
-     b'\tvoid\t\t\t\tDoViTriTab();',
-     b'\tvoid\t\t\t\tDoViTriTab();\r\n\tstatic void\t\t\tDuaLenTren();',
-     'khai ham dua khung chat len tren')
-
-edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
-     b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;',
-     _crlf(b'\t/* Thanh nay ve moi nhip va anh nen phu tron man hinh, nen no luon\n'
-           b'\t   nam tren khung chat va nuot chuot cua hang tab. Day khung chat len\n'
-           b'\t   lai sau khi ve. */\n'
-           b'\tstatic int s_nNhipVe = 0;\n'
-           b'\tif ((++s_nNhipVe % 30) == 1)\n'
-           b'\t\tKUiMsgCentrePad::DuaLenTren();\n'
-           b'\tint nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;'),
-     'moi nhip ve thi day khung chat len tren thanh HUD')
-
-# LOG TAM: chuot o vung hang tab (y 654..674) di vao cua so nao.
-edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
-     b'int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
-     _crlf(b'int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\n'
-           b'{\n'
-           b'\tif (uMsg == WM_MOUSEMOVE)\n'
-           b'\t{\n'
-           b'\t\tint mx = (short)LOWORD(nParam), my = (short)HIWORD(nParam);\n'
-           b'\t\tif (my >= 654 && my <= 674 && mx >= 0 && mx <= 360)\n'
-           b'\t\t{\n'
-           b'\t\t\tstatic int s_nDem = 0;\n'
-           b'\t\t\tif (++s_nDem <= 8)\n'
-           b'\t\t\t\tCHAT_Ghi2("[chuot] THANH HUD nhan chuot tai (%d,%d)", mx, my);\n'
-           b'\t\t}\n'
-           b'\t}\n'
-           b'\treturn WndProcThat(uMsg, uParam, nParam);\n'
-           b'}\n'
-           b'\n'
-           b'int KUiPlayerBar::WndProcThat(unsigned int uMsg, unsigned int uParam, int nParam)'),
-     'log tam: xem thanh HUD co nuot chuot vung tab khong')
-
-edit('S3Client/Ui/UiCase/UiPlayerBar.h',
-     b'\tint\t\tWndProc(unsigned int uMsg, unsigned int uParam, int nParam);',
-     b'\tint\t\tWndProc(unsigned int uMsg, unsigned int uParam, int nParam);\r\n\tint\t\tWndProcThat(unsigned int uMsg, unsigned int uParam, int nParam);',
-     'khai ham WndProc that')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
-     b'int KUiMsgCentrePad::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
-     _crlf(b'int KUiMsgCentrePad::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\n'
-           b'{\n'
-           b'\tif (uMsg == WM_MOUSEMOVE)\n'
-           b'\t{\n'
-           b'\t\tstatic int s_nDem2 = 0;\n'
-           b'\t\tif (++s_nDem2 <= 8)\n'
-           b'\t\t\tCHAT_Ghi("[chuot] KHUNG CHAT nhan chuot tai (%d,%d)",\n'
-           b'\t\t\t\t(int)(short)LOWORD(nParam), (int)(short)HIWORD(nParam));\n'
-           b'\t}\n'
-           b'\treturn WndProcThat(uMsg, uParam, nParam);\n'
-           b'}\n'
-           b'\n'
-           b'int KUiMsgCentrePad::WndProcThat(unsigned int uMsg, unsigned int uParam, int nParam)'),
-     'log tam: xem khung chat co nhan chuot khong')
-
-edit('S3Client/Ui/UiCase/UiMsgCentrePad.h',
-     b'\tstatic void\t\t\tDuaLenTren();',
-     b'\tstatic void\t\t\tDuaLenTren();\r\n\tint\t\t\tWndProcThat(unsigned int uMsg, unsigned int uParam, int nParam);',
-     'khai WndProcThat cho khung chat')
-
-# ---------------------------------------------------------------------------
-# LOG TAM: hang tab chat khong nhan chuot. Do o CHINH cho phan phoi chuot.
-#
-# Wnd_ProcessInput chi gui tin chuot cho MOT cua so duy nhat: pMouseOverWnd,
-# tuc `pActiveWnd->TopChildFromPoint(x, y)` - cua so con SAU CUNG nam duoi con
-# tro. Vay log dat o KUiMsgCentrePad::WndProc khong ghi duoc dong nao la
-# chuyen BINH THUONG khi mot cua so con che diem do; no KHONG chung minh khung
-# chat nam ngoai duong phan phoi. Chi co do ngay tai cho chon moi biet that.
-#
-# Ba so can biet: pActiveWnd (cua so goc duoc chon), pTopWnd (cua so cuoi nhan
-# tin), va danh sach ba lop kem khung bao - de thay ai dang nam tren.
-edit('S3Client/Ui/Elem/Wnds.cpp',
-     b'int WND_SHOW_MOUSE_OVER_WND = false;',
-     _crlf(b'int WND_SHOW_MOUSE_OVER_WND = false;\n'
-           b'\n'
-           b'/* LOG TAM - xem chu thich o port-fixes.py */\n'
-           b'#include <stdio.h>\n'
-           b'#include <stdarg.h>\n'
-           b'static void CHUOT_Ghi(const char* pFmt, ...)\n'
-           b'{\n'
-           b'\tFILE* fp = fopen("chat.log", "a");\n'
-           b'\tif (!fp)\n'
-           b'\t\treturn;\n'
-           b'\tva_list va;\n'
-           b'\tva_start(va, pFmt);\n'
-           b'\tvfprintf(fp, pFmt, va);\n'
-           b'\tva_end(va);\n'
-           b'\tfprintf(fp, "\\n");\n'
-           b'\tfclose(fp);\n'
-           b'}'),
-     'log tam chuot: ham ghi tep trong Wnds.cpp')
-
-edit('S3Client/Ui/Elem/Wnds.cpp',
-     b'static KWndWindow*\tWnd_GetActive(int x, int y, bool bBringToTop);',
-     _crlf(b'static KWndWindow*\tWnd_GetActive(int x, int y, bool bBringToTop);\n'
-           b'\n'
-           b'/* LOG TAM: liet ke ba lop cua so va cho biet cua so nao trum diem (x,y). */\n'
-           b'static void CHUOT_DoLop(int x, int y)\n'
-           b'{\n'
-           b'\tfor (int i = 0; i < 3; i++)\n'
-           b'\t{\n'
-           b'\t\tKWndWindow* pWnd;\n'
-           b'\t\tif (i == 0)\n'
-           b'\t\t\tpWnd = &s_WndStation.TopLayerRoot;\n'
-           b'\t\telse if (i == 1)\n'
-           b'\t\t\tpWnd = &s_WndStation.NormalLayerRoot;\n'
-           b'\t\telse\n'
-           b'\t\t\tpWnd = &s_WndStation.LowLayerRoot;\n'
-           b'\t\tint n = 0;\n'
-           b'\t\twhile ((pWnd = pWnd->GetNextWnd()) != NULL)\n'
-           b'\t\t{\n'
-           b'\t\t\tint wx = 0, wy = 0, ww = 0, wh = 0;\n'
-           b'\t\t\tpWnd->GetAbsolutePos(&wx, &wy);\n'
-           b'\t\t\tpWnd->GetSize(&ww, &wh);\n'
-           b'\t\t\tCHUOT_Ghi("[lop%d] #%d %p tai (%d,%d) co %dx%d hien=%d trum=%d",\n'
-           b'\t\t\t\ti, n, (void*)pWnd, wx, wy, ww, wh,\n'
-           b'\t\t\t\tpWnd->IsVisible(), pWnd->PtInWindow(x, y));\n'
-           b'\t\t\tn++;\n'
-           b'\t\t}\n'
-           b'\t}\n'
-           b'}'),
-     'log tam chuot: ham liet ke ba lop cua so')
-
-edit('S3Client/Ui/Elem/Wnds.cpp',
-     b'\t\t\tif (s_WndStation.pFocusWnd && pTopWnd != s_WndStation.pFocusWnd &&',
-     _crlf(b'\t\t\t/* LOG TAM - xem chu thich o port-fixes.py */\n'
-           b'\t\t\tif (uMsg == WM_MOUSEMOVE && y >= 655 && y <= 680 && x >= 0 && x < 360)\n'
-           b'\t\t\t{\n'
-           b'\t\t\t\tstatic int s_nDem = 0;\n'
-           b'\t\t\t\tif (++s_nDem <= 2)\n'
-           b'\t\t\t\t{\n'
-           b'\t\t\t\t\tCHUOT_Ghi("[chuot] (%d,%d) active=%p top=%p bat=%p docchiem=%p",\n'
-           b'\t\t\t\t\t\tx, y, (void*)pActiveWnd, (void*)pTopWnd,\n'
-           b'\t\t\t\t\t\t(void*)s_WndStation.pCaptureMouseWnd,\n'
-           b'\t\t\t\t\t\t(void*)s_WndStation.pExclusiveWnd[0]);\n'
-           b'\t\t\t\t\tCHUOT_DoLop(x, y);\n'
-           b'\t\t\t\t}\n'
-           b'\t\t\t}\n'
-           b'\t\t\tif (s_WndStation.pFocusWnd && pTopWnd != s_WndStation.pFocusWnd &&'),
-     'log tam chuot: do cua so nao nhan chuot o vung hang tab')
+     'dang ky lai kenh sau khi doi canh xoa sach')
 
 # ---------------------------------------------------------------------------
 # BAT NHAT THAT: KUiMsgCentrePad::PtInWindow khai vung bam cua khung chat la
@@ -3160,7 +2858,10 @@ edit('S3Client/Ui/Elem/Wnds.cpp',
 # dung kich thuoc, ma ro chuot khong doi mau va bam khong an.
 #
 # Do 01/09/2026: log tai Wnd_ProcessInput cho "active=00000000" ngay tai diem
-# nam GON trong khung chat (0,520)-(360,675).
+# nam GON trong khung chat (0,520)-(360,675). Luu y Wnd_ProcessInput chi gui
+# tin chuot cho pMouseOverWnd = pActiveWnd->TopChildFromPoint(x,y), nen cua so
+# CHA im lang la binh thuong - dat log o KUiMsgCentrePad::WndProc khong chung
+# minh duoc gi.
 edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
      _crlf(b'\t\t\t\tm_BgShadowBtn.PtInWindow(x, y)\n\t\t\t\t);'),
      _crlf(b'\t\t\t\tm_BgShadowBtn.PtInWindow(x, y)\n'
@@ -3169,6 +2870,21 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'\t\tfor (int i = 0; !nRet && i < m_ChatTabCount && i < MAX_CHAT_TAB; i++)\n'
            b'\t\t\tnRet = m_TabButton[i].PtInWindow(x, y);'),
      'khung chat: vung bam phai gom ca hang tab')
+
+# ---------------------------------------------------------------------------
+# BAT NHAT THAT: NewChannelMessageArrival doc m_pActivateChannel[nChannelIndex]
+# TRUOC khi kiem tra nChannelIndex >= 0. FindActivateChannelIndex tra -1 khi
+# tin den tu mot kenh chua dang ky, luc do day la mot phep doc ngoai mang.
+# Dua phep doc vao trong than if.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     _crlf(b'\t\tint nID = m_pSelf->m_pActivateChannel[nChannelIndex].ResourceIndex;\n'
+           b'\t\tif (nChannelIndex >= 0)\n'
+           b'\t\t{'),
+     _crlf(b'\t\tint nID = -1;\n'
+           b'\t\tif (nChannelIndex >= 0)\n'
+           b'\t\t{\n'
+           b'\t\t\tnID = m_pSelf->m_pActivateChannel[nChannelIndex].ResourceIndex;'),
+     'tin kenh: doc muc kenh sau khi da kiem tra chi so')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
