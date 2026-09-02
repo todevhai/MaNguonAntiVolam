@@ -2586,6 +2586,15 @@ edit('Core/Src/CoreShell.cpp',
            b'\t}'),
      'moi nhip gui lai lenh di, va do ket bang khoang cach')
 
+# TAM THOI: log client nhan goi item sap.
+edit('Core/Src/KSellItem.cpp',
+     _crlf(b'void\tKSellItem::GetData(BYTE* pMsg ,int nUpdate)\n'
+           b'{'),
+     _crlf(b'void\tKSellItem::GetData(BYTE* pMsg ,int nUpdate)\n'
+           b'{\n'
+           b'\tg_DebugLog("[SAP-C] GetData nhan goi m_nProcess=%d m_nId=%d nUpdate=%d id0=%d", m_nProcess, m_nId, nUpdate, pMsg ? ((VIEW_ITEM_SYNC*)pMsg)->m_sInfo[0].m_nID : -1);'),
+     'log client nhan goi item sap (tam thoi)')
+
 # TAM THOI: log client xin xem sap (test 2 box).
 edit('Core/Src/CoreShell.cpp',
      _crlf(b'\tcase GOI_VIEW_PLAYERSELLITEM:\n'
