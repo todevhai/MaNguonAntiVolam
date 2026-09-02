@@ -2096,6 +2096,25 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);'),
      'GotoWhere: bo qua phep doi khi toa do da la khong gian')
 
+# TAM THOI: log chan doan mo/nhan loi moi to doi.
+edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
+     _crlf(b'void KUiSysMsgCentre::ConfirmMsg(KSystemMessage* pMsg, bool bImmedDel)\n'
+           b'{'),
+     _crlf(b'void KUiSysMsgCentre::ConfirmMsg(KSystemMessage* pMsg, bool bImmedDel)\n'
+           b'{\n'
+           b'\tg_DebugLog("[TD-PT] ConfirmMsg type=%d", pMsg ? pMsg->byConfirmType : -1);'),
+     'log ConfirmMsg (tam thoi)')
+
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'int KCoreShell::TeamOperation(unsigned int uOper, unsigned int uParam, int nParam)\n'
+           b'{\n'
+           b'\tint nRet = 0;'),
+     _crlf(b'int KCoreShell::TeamOperation(unsigned int uOper, unsigned int uParam, int nParam)\n'
+           b'{\n'
+           b'\tint nRet = 0;\n'
+           b'\tg_DebugLog("[TD-PT] TeamOperation uOper=%d", uOper);'),
+     'log TeamOperation (tam thoi)')
+
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\tcase WM_LBUTTONDOWN:',
      _crlf(b'\tcase WM_LBUTTONDOWN:\n'
