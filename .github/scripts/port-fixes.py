@@ -2082,7 +2082,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t   moi nhip reset m_nSendMoveFrames ve 0 nen lenh click thuong bi\n'
            b'\t\t   throttle nuot, khong toi SendCommand - huy o SendCommand vo hieu.\n'
            b'\t\t   Lenh noi bo cua duong tu tim luon mode >= 10 nen khong vao nhanh nay. */\n'
-           b'\t\tg_DebugLog("[TD] huy duong: click khung game mode=%d soChang=%d", mode, s_nSoChang);\n'
            b'\t\ts_nSoChang = 0;\n'
            b'\t\ts_nChangDang = 0;\n'
            b'\t\ts_nSoLanKet = 0;\n'
@@ -2591,14 +2590,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
      'bam ban do thi TIM DUONG chu khong di thang')
-
-# Log chan doan tai GotoWhere: biet click khung game co goi vao day khong, mode
-# gi. Doc bang client/xem-log.py (engine-debug.log). Bo sau khi xac nhan.
-edit('Core/Src/CoreShell.cpp',
-     b'\tbool bDaLaKhongGian = (mode >= 10);',
-     _crlf(b'\tg_DebugLog("[TD] GotoWhere x=%d y=%d mode=%d soChang=%d", x, y, mode, s_nSoChang);\n'
-           b'\tbool bDaLaKhongGian = (mode >= 10);'),
-     'GotoWhere: log chan doan (tam thoi)')
 
 # Anh nen thanh trang thai (\Spr\Ui3\...\ *huyet thieu bang* .spr) DA IN SAN
 # chu "Cap" va "Hang" trong chinh anh. Code ve them nhan cung noi dung de
