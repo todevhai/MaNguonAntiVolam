@@ -2074,6 +2074,19 @@ edit('Core/Src/CoreShell.cpp',
            b'\tbool bDaLaKhongGian = (mode >= 10);\n'
            b'\tif (bDaLaKhongGian)\n'
            b'\t\tmode -= 10;\n'
+           b'\telse if (s_nSoChang > 0)\n'
+           b'\t{\n'
+           b'\t\t/* Lenh di TAY cua nguoi choi (click the gioi -> engine goi lai\n'
+           b'\t\t   GotoWhere voi mode 0/1/2, toa do viewport) trong luc dang chay\n'
+           b'\t\t   theo duong tu tim: HUY duong do, nhuong quyen cho lenh moi. Truoc\n'
+           b'\t\t   day Breathe moi nhip lai phat lai chang cu, de len lenh tay, nen\n'
+           b'\t\t   bam di cho khac hay dung lai deu vo hieu. Lenh noi bo cua chinh\n'
+           b'\t\t   duong tu tim luon mode >= 10 nen khong dinh vao nhanh nay. */\n'
+           b'\t\ts_nSoChang = 0;\n'
+           b'\t\ts_nChangDang = 0;\n'
+           b'\t\ts_nSoLanKet = 0;\n'
+           b'\t\ts_bTinhLai = 0;\n'
+           b'\t}\n'
            b'\tif (mode < 0 || mode > 2)'),
      'GotoWhere nhan them toa do khong gian (mode >= 10)')
 
