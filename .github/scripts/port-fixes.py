@@ -2098,6 +2098,20 @@ edit('Core/Src/CoreShell.cpp',
 
 # TAM THOI: log chan doan mo/nhan loi moi to doi.
 edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
+     _crlf(b'bool KUiSysMsgCentre::AMessageArrival(KSystemMessage* pMsg, void* pParam)\n'
+           b'{'),
+     _crlf(b'bool KUiSysMsgCentre::AMessageArrival(KSystemMessage* pMsg, void* pParam)\n'
+           b'{\n'
+           b'\tif (pMsg) g_DebugLog("[TD-PT] AMsgArrival eType=%d confirm=%d", pMsg->eType, pMsg->byConfirmType);'),
+     'log AMessageArrival (tam thoi)')
+
+edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
+     b'\tSYS_MSG_HEAP*\tpHeap = &m_MsgHeap[nHeapIndex];',
+     _crlf(b'\tSYS_MSG_HEAP*\tpHeap = &m_MsgHeap[nHeapIndex];\n'
+           b'\tg_DebugLog("[TD-PT] DeleteMsgInHeap heap=%d msgIdx=%d nValid=%d confirm=%d", nHeapIndex, nMsgIndex, pHeap->nNumValid, bTobeConfirm);'),
+     'log DeleteMsgInHeap (tam thoi)')
+
+edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
      b'\t\t\t\tDeleteMsgInHeap(i, 0, (uMsg == WND_N_BUTTON_MR_DOWN), true);',
      _crlf(b'\t\t\t\tg_DebugLog("[TD-PT] icon click i=%d uMsg=%d", i, uMsg);\n'
            b'\t\t\t\tDeleteMsgInHeap(i, 0, (uMsg == WND_N_BUTTON_MR_DOWN), true);'),
