@@ -2586,6 +2586,15 @@ edit('Core/Src/CoreShell.cpp',
            b'\t}'),
      'moi nhip gui lai lenh di, va do ket bang khoang cach')
 
+# TAM THOI: log client mo cua so sap (bao nhieu mon vao luoi).
+edit('Core/Src/KSellItem.cpp',
+     _crlf(b'\tif (!nUpdate)\n'
+           b'\t\tCoreDataChanged(GDCNI_VIEW_PLAYERSELLITEM, (unsigned int)&sPlayer, 0);'),
+     _crlf(b'\tg_DebugLog("[SAP-C] mo cua so sap: so mon=%d npc=%d nUpdate=%d", m_nId, sPlayer.nIndex, nUpdate);\n'
+           b'\tif (!nUpdate)\n'
+           b'\t\tCoreDataChanged(GDCNI_VIEW_PLAYERSELLITEM, (unsigned int)&sPlayer, 0);'),
+     'log client mo cua so sap (tam thoi)')
+
 # TAM THOI: log client nhan goi item sap.
 edit('Core/Src/KSellItem.cpp',
      _crlf(b'void\tKSellItem::GetData(BYTE* pMsg ,int nUpdate)\n'
