@@ -2586,33 +2586,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\t}'),
      'moi nhip gui lai lenh di, va do ket bang khoang cach')
 
-# TAM THOI: log client mo cua so sap (bao nhieu mon vao luoi).
-edit('Core/Src/KSellItem.cpp',
-     _crlf(b'\tif (!nUpdate)\n'
-           b'\t\tCoreDataChanged(GDCNI_VIEW_PLAYERSELLITEM, (unsigned int)&sPlayer, 0);'),
-     _crlf(b'\tg_DebugLog("[SAP-C] mo cua so sap: so mon=%d npc=%d nUpdate=%d", m_nId, sPlayer.nIndex, nUpdate);\n'
-           b'\tif (!nUpdate)\n'
-           b'\t\tCoreDataChanged(GDCNI_VIEW_PLAYERSELLITEM, (unsigned int)&sPlayer, 0);'),
-     'log client mo cua so sap (tam thoi)')
-
-# TAM THOI: log client nhan goi item sap.
-edit('Core/Src/KSellItem.cpp',
-     _crlf(b'void\tKSellItem::GetData(BYTE* pMsg ,int nUpdate)\n'
-           b'{'),
-     _crlf(b'void\tKSellItem::GetData(BYTE* pMsg ,int nUpdate)\n'
-           b'{\n'
-           b'\tg_DebugLog("[SAP-C] GetData nhan goi m_nProcess=%d m_nId=%d nUpdate=%d id0=%d", m_nProcess, m_nId, nUpdate, pMsg ? ((VIEW_ITEM_SYNC*)pMsg)->m_sInfo[0].m_nID : -1);'),
-     'log client nhan goi item sap (tam thoi)')
-
-# TAM THOI: log client xin xem sap (test 2 box).
-edit('Core/Src/CoreShell.cpp',
-     _crlf(b'\tcase GOI_VIEW_PLAYERSELLITEM:\n'
-           b'\t\tif (!Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan)'),
-     _crlf(b'\tcase GOI_VIEW_PLAYERSELLITEM:\n'
-           b'\t\tg_DebugLog("[SAP-C] xin xem sap npc=%d selfBaiTan=%d", uParam, Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan);\n'
-           b'\t\tif (!Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan)'),
-     'log client xin xem sap (tam thoi)')
-
 # Bay ban: bat buoc dat Loi rao (ten sap) truoc. Mac dinh de RONG thay vi
 # "Cua hang cua toi" san, va chan o GDI_PLAYER_TRADE neu ten rong.
 edit('S3Client/Ui/UiCase/UiItem.cpp',
@@ -2635,23 +2608,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\t}\n'
            b'\t\t\tif (Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_bRideHorse)'),
      'Rao ban: chan neu chua dat Loi rao')
-
-# --- TAM THOI: log chan doan bay ban (Rao ban) ---
-edit('Core/Src/CoreShell.cpp',
-     b'\t\t\tchar* sShopName = (char *)uParam;',
-     _crlf(b'\t\t\tchar* sShopName = (char *)uParam;\n'
-           b'\t\t\tg_DebugLog("[SAP-C] GDI_PLAYER_TRADE: CUnlocked=%d ride=%d fight=%d baitan=%d name=%s",\n'
-           b'\t\t\t\tPlayer[CLIENT_PLAYER_INDEX].m_CUnlocked,\n'
-           b'\t\t\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_bRideHorse,\n'
-           b'\t\t\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_FightMode,\n'
-           b'\t\t\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan, sShopName ? sShopName : "");'),
-     'log chan doan GDI_PLAYER_TRADE (tam thoi)')
-
-edit('Core/Src/CoreShell.cpp',
-     b'\t\tnRet = Player[CLIENT_PLAYER_INDEX].m_CUnlocked;',
-     _crlf(b'\t\tnRet = Player[CLIENT_PLAYER_INDEX].m_CUnlocked;\n'
-           b'\t\tg_DebugLog("[SAP-C] hoi CHEST_UNLOCKED = %d", nRet);'),
-     'log chan doan CHEST_UNLOCKED (tam thoi)')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
