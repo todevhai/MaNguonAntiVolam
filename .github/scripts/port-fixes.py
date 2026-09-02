@@ -3170,6 +3170,41 @@ edit('Core/Src/CoreShell.cpp',
            b'\n\tcase GDI_GAME_OBJ_DESC:\n'),
      'xu ly GDI_GAME_OBJ_IMAGE')
 
+# 3b) Dau "dang bay ban" tren icon vat pham da dinh gia (giong anh mau #14).
+# GDI lay gia theo uId, roi WndObjContainer ve o vuong nho goc tren-phai.
+edit('Core/Src/CoreShell.h',
+     _crlf(b'\tGDI_GAME_OBJ_IMAGE,\t//ten anh icon vat pham (tooltip)\n\n};'),
+     _crlf(b'\tGDI_GAME_OBJ_IMAGE,\t//ten anh icon vat pham (tooltip)\n\n\tGDI_ITEM_SALE_PRICE,\t//gia rao ban (dau tren icon tui)\n\n};'),
+     'them GDI_ITEM_SALE_PRICE')
+
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\n\tcase GDI_GAME_OBJ_IMAGE:\n'),
+     _crlf(b'\n\tcase GDI_ITEM_SALE_PRICE:\n'
+           b'\t\tif (uParam > 0 && uParam < MAX_ITEM)\n'
+           b'\t\t\tnRet = Item[uParam].GetPrice();\n'
+           b'\t\tbreak;\n'
+           b'\n\tcase GDI_GAME_OBJ_IMAGE:\n'),
+     'xu ly GDI_ITEM_SALE_PRICE')
+
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     _crlf(b'\t\tg_pCoreShell->DrawGameObj(pObj->uGenre, pObj->uId,\n'
+           b'\t\t\tShadow.oPosition.nX, Shadow.oPosition.nY, width, height, 0);'),
+     _crlf(b'\t\tg_pCoreShell->DrawGameObj(pObj->uGenre, pObj->uId,\n'
+           b'\t\t\tShadow.oPosition.nX, Shadow.oPosition.nY, width, height, 0);\n'
+           b'\t\t/* Dau dang bay ban: o vuong nho goc tren-phai neu vat pham da dinh gia. */\n'
+           b'\t\tif (pObj->uGenre == CGOG_ITEM &&\n'
+           b'\t\t\tg_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)\n'
+           b'\t\t{\n'
+           b'\t\t\tKRUShadow\tTagBan;\n'
+           b'\t\t\tTagBan.Color.Color_dw = 0xE0FFC000;\n'
+           b'\t\t\tTagBan.oPosition.nX = Shadow.oPosition.nX + width - 6;\n'
+           b'\t\t\tTagBan.oPosition.nY = Shadow.oPosition.nY;\n'
+           b'\t\t\tTagBan.oEndPos.nX = Shadow.oPosition.nX + width;\n'
+           b'\t\t\tTagBan.oEndPos.nY = Shadow.oPosition.nY + 6;\n'
+           b'\t\t\tg_pRepresentShell->DrawPrimitives(1, &TagBan, RU_T_SHADOW, true);\n'
+           b'\t\t}'),
+     've dau dang bay ban tren icon')
+
 # 4) MouseHover.h: khai bao ham + bien icon.
 edit('S3Client/Ui/Elem/MouseHover.h',
      _crlf(b'\tvoid\tCancelMouseHoverInfo();\n'),
