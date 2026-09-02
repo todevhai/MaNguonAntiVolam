@@ -3244,6 +3244,16 @@ edit('S3Client/Ui/Elem/MouseHover.cpp',
      'goi SetMouseHoverIcon voi anh goc')
 
 # ---------------------------------------------------------------------------
+# Gia BAN vat pham 1:1 (bang gia goc), khong chia 4.
+# Tuyen nay KHONG co cho mua (do chi rot tu quai), nen ban lai nua/phan tu gia la
+# thiet. Dat BUY_SELL_SCALE=1: gia ban hien va tien nhan deu = gia goc.
+# Server doi rieng o server/linux-server/Core/KBuySell.h.
+edit('Core/Src/KBuySell.h',
+     b'#define\tBUY_SELL_SCALE\t\t4',
+     b'#define\tBUY_SELL_SCALE\t\t1',
+     'gia ban vat pham 1:1 (khong chia 4)')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
