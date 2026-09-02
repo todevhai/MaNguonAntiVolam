@@ -2241,20 +2241,27 @@ edit('Core/Src/CoreShell.cpp',
            b'static int  s_nDichCuoiX = 0;   /* diem nguoi choi bam, de tinh tiep */\n'
            b'static int  s_nDichCuoiY = 0;\n'
            b'static int s_nChangMode = 0;\n'
-           b'static int s_bTDTuPhat = 0;    /* =1 khi chinh duong tu tim dang phat lenh */\n'
            b'\n'
-           b'/* Goi tu KNpc::SendCommand. nNpcIndex = o Npc[] cua doi tuong nhan lenh.\n'
-           b'   Nguoi choi click khung game chinh thi engine goi THANG SendCommand cho\n'
-           b'   nhan vat (khong qua KCoreShell::GotoWhere), nen truoc day khong cach nao\n'
-           b'   huy duong tu tim dang chay - moi nhip Breathe lai phat lai chang cu, de\n'
-           b'   len lenh tay. Bat ngay tai SendCommand: lenh toi nhan vat chinh, KHONG\n'
-           b'   do duong tu tim phat (s_bTDTuPhat=0), trong luc dang chay => huy duong. */\n'
-           b'void TD_LenhNgoai(int nNpcIndex)\n'
+           b'/* Goi tu KNpc::SendCommand voi lenh gui cho nhan vat chinh. Phan biet\n'
+           b'   lenh do CHINH duong tu tim phat (luon nham dung chang dang di) voi lenh\n'
+           b'   nguoi choi click (nham diem KHAC) bang cach SO DICH - khong dung co, vi\n'
+           b'   ca hai deu di qua GotoWhere->SendCommand nen co khong tach duoc. Lenh\n'
+           b'   nham cho khac => nguoi choi can thiep => huy duong, nhuong quyen. */\n'
+           b'void TD_LenhNgoai(int nNpcIndex, int nCmdKind, int nX, int nY)\n'
            b'{\n'
-           b'\tif (s_bTDTuPhat || s_nSoChang <= 0)\n'
+           b'\tif (s_nSoChang <= 0)\n'
            b'\t\treturn;\n'
            b'\tif (nNpcIndex != Player[CLIENT_PLAYER_INDEX].m_nIndex)\n'
            b'\t\treturn;\n'
+           b'\tif (nCmdKind == do_walk || nCmdKind == do_run)\n'
+           b'\t{\n'
+           b'\t\tint nDx = nX - s_nChangX[s_nChangDang]; if (nDx < 0) nDx = -nDx;\n'
+           b'\t\tint nDy = nY - s_nChangY[s_nChangDang]; if (nDy < 0) nDy = -nDy;\n'
+           b'\t\tif (nDx <= defTD_O && nDy <= defTD_O)\n'
+           b'\t\t\treturn;    /* trung chang dang di -> chinh ta phat, giu duong */\n'
+           b'\t}\n'
+           b'\tg_DebugLog("[TD] huy duong: lenh ngoai cmd=%d (%d,%d) chang=(%d,%d)",\n'
+           b'\t\tnCmdKind, nX, nY, s_nChangX[s_nChangDang], s_nChangY[s_nChangDang]);\n'
            b'\ts_nSoChang = 0;\n'
            b'\ts_nChangDang = 0;\n'
            b'\ts_nSoLanKet = 0;\n'
@@ -2597,35 +2604,27 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
      'bam ban do thi TIM DUONG chu khong di thang')
 
-# Danh dau lenh do duong tu tim phat: bao boc dung hai cho GotoWhere goi
-# SendCommand cho nhan vat chinh. Nho co nay, TD_LenhNgoai phan biet duoc
-# lenh tu-phat (giu duong) voi lenh nguoi choi click (huy duong).
-edit('Core/Src/CoreShell.cpp',
-     b'\t\t\tNpc[nIndex].SendCommand(do_walk, nX, nY);',
-     _crlf(b'\t\t\ts_bTDTuPhat = 1;\n'
-           b'\t\t\tNpc[nIndex].SendCommand(do_walk, nX, nY);\n'
-           b'\t\t\ts_bTDTuPhat = 0;'),
-     'GotoWhere: danh dau lenh di do duong tu tim phat (do_walk)')
-
-edit('Core/Src/CoreShell.cpp',
-     b'\t\t\tNpc[nIndex].SendCommand(do_run, nX, nY);',
-     _crlf(b'\t\t\ts_bTDTuPhat = 1;\n'
-           b'\t\t\tNpc[nIndex].SendCommand(do_run, nX, nY);\n'
-           b'\t\t\ts_bTDTuPhat = 0;'),
-     'GotoWhere: danh dau lenh chay do duong tu tim phat (do_run)')
-
-# Diem hoi tu cua MOI lenh di chuyen nhan vat chinh - ke ca lenh do engine
-# phat khi nguoi choi click khung game. Huy duong tu tim neu lenh khong tu-phat.
+# Chan tai diem hoi tu cua MOI lenh di chuyen nhan vat chinh (KNpc::SendCommand)
+# - ke ca lenh do engine phat khi nguoi choi click khung game. TD_LenhNgoai so
+# dich lenh voi chang dang di de biet co phai nguoi choi can thiep khong.
 edit('Core/Src/KNpc.cpp',
      _crlf(b'void KNpc::SendCommand(NPCCMD cmd,int x,int y, int z)\n'
            b'{\n'
            b'\tm_Command.CmdKind = cmd;'),
      _crlf(b'void KNpc::SendCommand(NPCCMD cmd,int x,int y, int z)\n'
            b'{\n'
-           b'\textern void TD_LenhNgoai(int nNpcIndex);\n'
-           b'\tTD_LenhNgoai(m_Index);\n'
+           b'\textern void TD_LenhNgoai(int nNpcIndex, int nCmdKind, int nX, int nY);\n'
+           b'\tTD_LenhNgoai(m_Index, cmd, x, y);\n'
            b'\tm_Command.CmdKind = cmd;'),
      'SendCommand: lenh tay cua nguoi choi huy duong tu tim dang chay')
+
+# Log chan doan tai GotoWhere: biet click khung game co goi vao day khong, mode
+# gi. Doc bang client/xem-log.py (engine-debug.log). Bo sau khi xac nhan.
+edit('Core/Src/CoreShell.cpp',
+     b'\tbool bDaLaKhongGian = (mode >= 10);',
+     _crlf(b'\tg_DebugLog("[TD] GotoWhere x=%d y=%d mode=%d soChang=%d", x, y, mode, s_nSoChang);\n'
+           b'\tbool bDaLaKhongGian = (mode >= 10);'),
+     'GotoWhere: log chan doan (tam thoi)')
 
 # Anh nen thanh trang thai (\Spr\Ui3\...\ *huyet thieu bang* .spr) DA IN SAN
 # chu "Cap" va "Hang" trong chinh anh. Code ve them nhan cung noi dung de
