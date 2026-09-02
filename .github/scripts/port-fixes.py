@@ -2098,6 +2098,11 @@ edit('Core/Src/CoreShell.cpp',
 
 # TAM THOI: log chan doan mo/nhan loi moi to doi.
 edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
+     b'#include "KIniFile.h"',
+     b'#include "KIniFile.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho g_DebugLog (UiSysMsgCentre)')
+
+edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
      _crlf(b'void KUiSysMsgCentre::ConfirmMsg(KSystemMessage* pMsg, bool bImmedDel)\n'
            b'{'),
      _crlf(b'void KUiSysMsgCentre::ConfirmMsg(KSystemMessage* pMsg, bool bImmedDel)\n'
