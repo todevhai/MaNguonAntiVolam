@@ -2098,6 +2098,12 @@ edit('Core/Src/CoreShell.cpp',
 
 # TAM THOI: log chan doan mo/nhan loi moi to doi.
 edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
+     b'\t\t\t\tDeleteMsgInHeap(i, 0, (uMsg == WND_N_BUTTON_MR_DOWN), true);',
+     _crlf(b'\t\t\t\tg_DebugLog("[TD-PT] icon click i=%d uMsg=%d", i, uMsg);\n'
+           b'\t\t\t\tDeleteMsgInHeap(i, 0, (uMsg == WND_N_BUTTON_MR_DOWN), true);'),
+     'log icon click (tam thoi)')
+
+edit('S3Client/Ui/UiCase/UiSysMsgCentre.cpp',
      b'#include "KIniFile.h"',
      b'#include "KIniFile.h"\r\n#include "KDebug.h"',
      'them KDebug.h cho g_DebugLog (UiSysMsgCentre)')
