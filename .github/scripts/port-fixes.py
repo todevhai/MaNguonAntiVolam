@@ -2074,19 +2074,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\tbool bDaLaKhongGian = (mode >= 10);\n'
            b'\tif (bDaLaKhongGian)\n'
            b'\t\tmode -= 10;\n'
-           b'\telse if (s_nSoChang > 0)\n'
-           b'\t{\n'
-           b'\t\t/* Lenh di TAY cua nguoi choi (click the gioi -> engine goi lai\n'
-           b'\t\t   GotoWhere voi mode 0/1/2, toa do viewport) trong luc dang chay\n'
-           b'\t\t   theo duong tu tim: HUY duong do, nhuong quyen cho lenh moi. Truoc\n'
-           b'\t\t   day Breathe moi nhip lai phat lai chang cu, de len lenh tay, nen\n'
-           b'\t\t   bam di cho khac hay dung lai deu vo hieu. Lenh noi bo cua chinh\n'
-           b'\t\t   duong tu tim luon mode >= 10 nen khong dinh vao nhanh nay. */\n'
-           b'\t\ts_nSoChang = 0;\n'
-           b'\t\ts_nChangDang = 0;\n'
-           b'\t\ts_nSoLanKet = 0;\n'
-           b'\t\ts_bTinhLai = 0;\n'
-           b'\t}\n'
            b'\tif (mode < 0 || mode > 2)'),
      'GotoWhere nhan them toa do khong gian (mode >= 10)')
 
@@ -2254,6 +2241,25 @@ edit('Core/Src/CoreShell.cpp',
            b'static int  s_nDichCuoiX = 0;   /* diem nguoi choi bam, de tinh tiep */\n'
            b'static int  s_nDichCuoiY = 0;\n'
            b'static int s_nChangMode = 0;\n'
+           b'static int s_bTDTuPhat = 0;    /* =1 khi chinh duong tu tim dang phat lenh */\n'
+           b'\n'
+           b'/* Goi tu KNpc::SendCommand. nNpcIndex = o Npc[] cua doi tuong nhan lenh.\n'
+           b'   Nguoi choi click khung game chinh thi engine goi THANG SendCommand cho\n'
+           b'   nhan vat (khong qua KCoreShell::GotoWhere), nen truoc day khong cach nao\n'
+           b'   huy duong tu tim dang chay - moi nhip Breathe lai phat lai chang cu, de\n'
+           b'   len lenh tay. Bat ngay tai SendCommand: lenh toi nhan vat chinh, KHONG\n'
+           b'   do duong tu tim phat (s_bTDTuPhat=0), trong luc dang chay => huy duong. */\n'
+           b'void TD_LenhNgoai(int nNpcIndex)\n'
+           b'{\n'
+           b'\tif (s_bTDTuPhat || s_nSoChang <= 0)\n'
+           b'\t\treturn;\n'
+           b'\tif (nNpcIndex != Player[CLIENT_PLAYER_INDEX].m_nIndex)\n'
+           b'\t\treturn;\n'
+           b'\ts_nSoChang = 0;\n'
+           b'\ts_nChangDang = 0;\n'
+           b'\ts_nSoLanKet = 0;\n'
+           b'\ts_bTinhLai = 0;\n'
+           b'}\n'
            b'\n'
            b'/* Vi tri nhan vat theo diem ban do (mps). */\n'
            b'static void TD_ViTriNguoi(int* pnX, int* pnY)\n'
@@ -2590,6 +2596,36 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
      'bam ban do thi TIM DUONG chu khong di thang')
+
+# Danh dau lenh do duong tu tim phat: bao boc dung hai cho GotoWhere goi
+# SendCommand cho nhan vat chinh. Nho co nay, TD_LenhNgoai phan biet duoc
+# lenh tu-phat (giu duong) voi lenh nguoi choi click (huy duong).
+edit('Core/Src/CoreShell.cpp',
+     b'\t\t\tNpc[nIndex].SendCommand(do_walk, nX, nY);',
+     _crlf(b'\t\t\ts_bTDTuPhat = 1;\n'
+           b'\t\t\tNpc[nIndex].SendCommand(do_walk, nX, nY);\n'
+           b'\t\t\ts_bTDTuPhat = 0;'),
+     'GotoWhere: danh dau lenh di do duong tu tim phat (do_walk)')
+
+edit('Core/Src/CoreShell.cpp',
+     b'\t\t\tNpc[nIndex].SendCommand(do_run, nX, nY);',
+     _crlf(b'\t\t\ts_bTDTuPhat = 1;\n'
+           b'\t\t\tNpc[nIndex].SendCommand(do_run, nX, nY);\n'
+           b'\t\t\ts_bTDTuPhat = 0;'),
+     'GotoWhere: danh dau lenh chay do duong tu tim phat (do_run)')
+
+# Diem hoi tu cua MOI lenh di chuyen nhan vat chinh - ke ca lenh do engine
+# phat khi nguoi choi click khung game. Huy duong tu tim neu lenh khong tu-phat.
+edit('Core/Src/KNpc.cpp',
+     _crlf(b'void KNpc::SendCommand(NPCCMD cmd,int x,int y, int z)\n'
+           b'{\n'
+           b'\tm_Command.CmdKind = cmd;'),
+     _crlf(b'void KNpc::SendCommand(NPCCMD cmd,int x,int y, int z)\n'
+           b'{\n'
+           b'\textern void TD_LenhNgoai(int nNpcIndex);\n'
+           b'\tTD_LenhNgoai(m_Index);\n'
+           b'\tm_Command.CmdKind = cmd;'),
+     'SendCommand: lenh tay cua nguoi choi huy duong tu tim dang chay')
 
 # Anh nen thanh trang thai (\Spr\Ui3\...\ *huyet thieu bang* .spr) DA IN SAN
 # chu "Cap" va "Hang" trong chinh anh. Code ve them nhan cung noi dung de
