@@ -2586,6 +2586,15 @@ edit('Core/Src/CoreShell.cpp',
            b'\t}'),
      'moi nhip gui lai lenh di, va do ket bang khoang cach')
 
+# TAM THOI: log client xin xem sap (test 2 box).
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\tcase GOI_VIEW_PLAYERSELLITEM:\n'
+           b'\t\tif (!Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan)'),
+     _crlf(b'\tcase GOI_VIEW_PLAYERSELLITEM:\n'
+           b'\t\tg_DebugLog("[SAP-C] xin xem sap npc=%d selfBaiTan=%d", uParam, Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan);\n'
+           b'\t\tif (!Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan)'),
+     'log client xin xem sap (tam thoi)')
+
 # Bay ban: bat buoc dat Loi rao (ten sap) truoc. Mac dinh de RONG thay vi
 # "Cua hang cua toi" san, va chan o GDI_PLAYER_TRADE neu ten rong.
 edit('S3Client/Ui/UiCase/UiItem.cpp',
@@ -2599,7 +2608,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\t{\n'
            b'\t\t\t\tKSystemMessage\tsMsg;\n'
            b'\t\t\t\tsprintf(sMsg.szMessage, "Hay dat Loi rao truoc khi bay ban!");\n'
-           b'\t\t\t\tsMsg.eType = SMT_NORMAL;\n'
+           b'\t\t\t\tsMsg.eType = SMT_SYSTEM;\t/* SMT_SYSTEM: popup noi, khong chim vao chat */\n'
            b'\t\t\t\tsMsg.byConfirmType = SMCT_NONE;\n'
            b'\t\t\t\tsMsg.byPriority = 0;\n'
            b'\t\t\t\tsMsg.byParamSize = 0;\n'
@@ -3187,23 +3196,14 @@ edit('Core/Src/CoreShell.cpp',
      'xu ly GDI_ITEM_SALE_PRICE')
 
 edit('S3Client/Ui/Elem/WndObjContainer.cpp',
-     _crlf(b'\t\tg_pCoreShell->DrawGameObj(pObj->uGenre, pObj->uId,\n'
-           b'\t\t\tShadow.oPosition.nX, Shadow.oPosition.nY, width, height, 0);'),
-     _crlf(b'\t\tg_pCoreShell->DrawGameObj(pObj->uGenre, pObj->uId,\n'
-           b'\t\t\tShadow.oPosition.nX, Shadow.oPosition.nY, width, height, 0);\n'
-           b'\t\t/* Dau dang bay ban: o vuong nho goc tren-phai neu vat pham da dinh gia. */\n'
-           b'\t\tif (pObj->uGenre == CGOG_ITEM &&\n'
+     _crlf(b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
+     _crlf(b'\t\t/* To NEN o vat pham dang bay ban (da dinh gia), neu chua co mau\n'
+           b'\t\t   hover/chon de khong de len. Nen ve truoc icon nen nam duoi. */\n'
+           b'\t\tif (Shadow.Color.Color_dw == 0 && pObj->uGenre == CGOG_ITEM &&\n'
            b'\t\t\tg_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)\n'
-           b'\t\t{\n'
-           b'\t\t\tKRUShadow\tTagBan;\n'
-           b'\t\t\tTagBan.Color.Color_dw = 0xE0FFC000;\n'
-           b'\t\t\tTagBan.oPosition.nX = Shadow.oPosition.nX + width - 6;\n'
-           b'\t\t\tTagBan.oPosition.nY = Shadow.oPosition.nY;\n'
-           b'\t\t\tTagBan.oEndPos.nX = Shadow.oPosition.nX + width;\n'
-           b'\t\t\tTagBan.oEndPos.nY = Shadow.oPosition.nY + 6;\n'
-           b'\t\t\tg_pRepresentShell->DrawPrimitives(1, &TagBan, RU_T_SHADOW, true);\n'
-           b'\t\t}'),
-     've dau dang bay ban tren icon')
+           b'\t\t\tShadow.Color.Color_dw = 0x66FFC800;\n'
+           b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
+     'to nen o vat pham dang bay ban')
 
 # 4) MouseHover.h: khai bao ham + bien icon.
 edit('S3Client/Ui/Elem/MouseHover.h',
