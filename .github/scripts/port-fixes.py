@@ -2074,8 +2074,22 @@ edit('Core/Src/CoreShell.cpp',
            b'\tbool bDaLaKhongGian = (mode >= 10);\n'
            b'\tif (bDaLaKhongGian)\n'
            b'\t\tmode -= 10;\n'
+           b'\telse if (s_nSoChang > 0)\n'
+           b'\t{\n'
+           b'\t\t/* Lenh di TAY cua nguoi choi (click khung game -> Mouse_Action ->\n'
+           b'\t\t   GotoWhere mode 0/1/2) trong luc dang chay duong tu tim: HUY duong.\n'
+           b'\t\t   Phai huy O DAY, TRUOC throttle m_nSendMoveFrames ben duoi: auto-path\n'
+           b'\t\t   moi nhip reset m_nSendMoveFrames ve 0 nen lenh click thuong bi\n'
+           b'\t\t   throttle nuot, khong toi SendCommand - huy o SendCommand vo hieu.\n'
+           b'\t\t   Lenh noi bo cua duong tu tim luon mode >= 10 nen khong vao nhanh nay. */\n'
+           b'\t\tg_DebugLog("[TD] huy duong: click khung game mode=%d soChang=%d", mode, s_nSoChang);\n'
+           b'\t\ts_nSoChang = 0;\n'
+           b'\t\ts_nChangDang = 0;\n'
+           b'\t\ts_nSoLanKet = 0;\n'
+           b'\t\ts_bTinhLai = 0;\n'
+           b'\t}\n'
            b'\tif (mode < 0 || mode > 2)'),
-     'GotoWhere nhan them toa do khong gian (mode >= 10)')
+     'GotoWhere: click khung game huy duong tu tim (truoc throttle)')
 
 edit('Core/Src/CoreShell.cpp',
      b'\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);',
@@ -2241,32 +2255,6 @@ edit('Core/Src/CoreShell.cpp',
            b'static int  s_nDichCuoiX = 0;   /* diem nguoi choi bam, de tinh tiep */\n'
            b'static int  s_nDichCuoiY = 0;\n'
            b'static int s_nChangMode = 0;\n'
-           b'\n'
-           b'/* Goi tu KNpc::SendCommand voi lenh gui cho nhan vat chinh. Phan biet\n'
-           b'   lenh do CHINH duong tu tim phat (luon nham dung chang dang di) voi lenh\n'
-           b'   nguoi choi click (nham diem KHAC) bang cach SO DICH - khong dung co, vi\n'
-           b'   ca hai deu di qua GotoWhere->SendCommand nen co khong tach duoc. Lenh\n'
-           b'   nham cho khac => nguoi choi can thiep => huy duong, nhuong quyen. */\n'
-           b'void TD_LenhNgoai(int nNpcIndex, int nCmdKind, int nX, int nY)\n'
-           b'{\n'
-           b'\tif (s_nSoChang <= 0)\n'
-           b'\t\treturn;\n'
-           b'\tif (nNpcIndex != Player[CLIENT_PLAYER_INDEX].m_nIndex)\n'
-           b'\t\treturn;\n'
-           b'\tif (nCmdKind == do_walk || nCmdKind == do_run)\n'
-           b'\t{\n'
-           b'\t\tint nDx = nX - s_nChangX[s_nChangDang]; if (nDx < 0) nDx = -nDx;\n'
-           b'\t\tint nDy = nY - s_nChangY[s_nChangDang]; if (nDy < 0) nDy = -nDy;\n'
-           b'\t\tif (nDx <= defTD_O && nDy <= defTD_O)\n'
-           b'\t\t\treturn;    /* trung chang dang di -> chinh ta phat, giu duong */\n'
-           b'\t}\n'
-           b'\tg_DebugLog("[TD] huy duong: lenh ngoai cmd=%d (%d,%d) chang=(%d,%d)",\n'
-           b'\t\tnCmdKind, nX, nY, s_nChangX[s_nChangDang], s_nChangY[s_nChangDang]);\n'
-           b'\ts_nSoChang = 0;\n'
-           b'\ts_nChangDang = 0;\n'
-           b'\ts_nSoLanKet = 0;\n'
-           b'\ts_bTinhLai = 0;\n'
-           b'}\n'
            b'\n'
            b'/* Vi tri nhan vat theo diem ban do (mps). */\n'
            b'static void TD_ViTriNguoi(int* pnX, int* pnY)\n'
@@ -2603,20 +2591,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
      'bam ban do thi TIM DUONG chu khong di thang')
-
-# Chan tai diem hoi tu cua MOI lenh di chuyen nhan vat chinh (KNpc::SendCommand)
-# - ke ca lenh do engine phat khi nguoi choi click khung game. TD_LenhNgoai so
-# dich lenh voi chang dang di de biet co phai nguoi choi can thiep khong.
-edit('Core/Src/KNpc.cpp',
-     _crlf(b'void KNpc::SendCommand(NPCCMD cmd,int x,int y, int z)\n'
-           b'{\n'
-           b'\tm_Command.CmdKind = cmd;'),
-     _crlf(b'void KNpc::SendCommand(NPCCMD cmd,int x,int y, int z)\n'
-           b'{\n'
-           b'\textern void TD_LenhNgoai(int nNpcIndex, int nCmdKind, int nX, int nY);\n'
-           b'\tTD_LenhNgoai(m_Index, cmd, x, y);\n'
-           b'\tm_Command.CmdKind = cmd;'),
-     'SendCommand: lenh tay cua nguoi choi huy duong tu tim dang chay')
 
 # Log chan doan tai GotoWhere: biet click khung game co goi vao day khong, mode
 # gi. Doc bang client/xem-log.py (engine-debug.log). Bo sau khi xac nhan.
