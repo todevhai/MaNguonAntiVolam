@@ -3190,7 +3190,7 @@ edit('Core/Src/CoreShell.cpp',
      _crlf(b'\n\tcase GDI_GAME_OBJ_IMAGE:\n'),
      _crlf(b'\n\tcase GDI_ITEM_SALE_PRICE:\n'
            b'\t\tif (uParam > 0 && uParam < MAX_ITEM)\n'
-           b'\t\t\tnRet = Item[uParam].GetPrice();\n'
+           b'\t\t\tnRet = Item[uParam].GetSetPrice();\t/* gia NIEM YET (uPrice), khong phai gia goc (nPrice) */\n'
            b'\t\tbreak;\n'
            b'\n\tcase GDI_GAME_OBJ_IMAGE:\n'),
      'xu ly GDI_ITEM_SALE_PRICE')
@@ -3201,7 +3201,7 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
            b'\t\t   hover/chon de khong de len. Nen ve truoc icon nen nam duoi. */\n'
            b'\t\tif (Shadow.Color.Color_dw == 0 && pObj->uGenre == CGOG_ITEM &&\n'
            b'\t\t\tg_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)\n'
-           b'\t\t\tShadow.Color.Color_dw = 0x66FFC800;\n'
+           b'\t\t\tShadow.Color.Color_dw = 0x4DFFFF00;\t/* vang, opacity ~0.3 (ARGB) */\n'
            b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
      'to nen o vat pham dang bay ban')
 
