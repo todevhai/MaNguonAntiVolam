@@ -3201,7 +3201,7 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
            b'\t\t   hover/chon de khong de len. Nen ve truoc icon nen nam duoi. */\n'
            b'\t\tif (Shadow.Color.Color_dw == 0 && pObj->uGenre == CGOG_ITEM &&\n'
            b'\t\t\tg_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)\n'
-           b'\t\t\tShadow.Color.Color_dw = 0x4DFFFF00;\t/* vang, opacity ~0.3 (ARGB) */\n'
+           b'\t\t\tShadow.Color.Color_dw = 0x26FFFF00;\t/* vang, opacity ~0.15 (ARGB) */\n'
            b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
      'to nen o vat pham dang bay ban')
 
