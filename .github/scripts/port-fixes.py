@@ -2586,6 +2586,23 @@ edit('Core/Src/CoreShell.cpp',
            b'\t}'),
      'moi nhip gui lai lenh di, va do ket bang khoang cach')
 
+# --- TAM THOI: log chan doan bay ban (Rao ban) ---
+edit('Core/Src/CoreShell.cpp',
+     b'\t\t\tchar* sShopName = (char *)uParam;',
+     _crlf(b'\t\t\tchar* sShopName = (char *)uParam;\n'
+           b'\t\t\tg_DebugLog("[SAP-C] GDI_PLAYER_TRADE: CUnlocked=%d ride=%d fight=%d baitan=%d name=%s",\n'
+           b'\t\t\t\tPlayer[CLIENT_PLAYER_INDEX].m_CUnlocked,\n'
+           b'\t\t\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_bRideHorse,\n'
+           b'\t\t\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_FightMode,\n'
+           b'\t\t\t\tNpc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan, sShopName ? sShopName : "");'),
+     'log chan doan GDI_PLAYER_TRADE (tam thoi)')
+
+edit('Core/Src/CoreShell.cpp',
+     b'\t\tnRet = Player[CLIENT_PLAYER_INDEX].m_CUnlocked;',
+     _crlf(b'\t\tnRet = Player[CLIENT_PLAYER_INDEX].m_CUnlocked;\n'
+           b'\t\tg_DebugLog("[SAP-C] hoi CHEST_UNLOCKED = %d", nRet);'),
+     'log chan doan CHEST_UNLOCKED (tam thoi)')
+
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
