@@ -2586,6 +2586,29 @@ edit('Core/Src/CoreShell.cpp',
            b'\t}'),
      'moi nhip gui lai lenh di, va do ket bang khoang cach')
 
+# Bay ban: bat buoc dat Loi rao (ten sap) truoc. Mac dinh de RONG thay vi
+# "Cua hang cua toi" san, va chan o GDI_PLAYER_TRADE neu ten rong.
+edit('S3Client/Ui/UiCase/UiItem.cpp',
+     b'\tstrcpy(m_ShopName,"C\xf6a h\xb5ng c\xf1a t\xabi");',
+     b'\tm_ShopName[0] = 0;\t/* rong: bat buoc dat Loi rao truoc khi Rao ban */',
+     'Loi rao mac dinh de rong')
+
+edit('Core/Src/CoreShell.cpp',
+     b'\t\t\tif (Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_bRideHorse)',
+     _crlf(b'\t\t\tif (sShopName == 0 || sShopName[0] == 0)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tKSystemMessage\tsMsg;\n'
+           b'\t\t\t\tsprintf(sMsg.szMessage, "Hay dat Loi rao truoc khi bay ban!");\n'
+           b'\t\t\t\tsMsg.eType = SMT_NORMAL;\n'
+           b'\t\t\t\tsMsg.byConfirmType = SMCT_NONE;\n'
+           b'\t\t\t\tsMsg.byPriority = 0;\n'
+           b'\t\t\t\tsMsg.byParamSize = 0;\n'
+           b'\t\t\t\tCoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);\n'
+           b'\t\t\t\treturn 0;\n'
+           b'\t\t\t}\n'
+           b'\t\t\tif (Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_bRideHorse)'),
+     'Rao ban: chan neu chua dat Loi rao')
+
 # --- TAM THOI: log chan doan bay ban (Rao ban) ---
 edit('Core/Src/CoreShell.cpp',
      b'\t\t\tchar* sShopName = (char *)uParam;',
