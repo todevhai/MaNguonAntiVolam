@@ -3340,6 +3340,30 @@ edit('S3Client/Ui/UiShell.cpp',
      'goi KAutoControl::Tick() moi khung trong game')
 
 # ---------------------------------------------------------------------------
+# Bat lai PHAI CHUOT MAC DO (bi tat khi port). Right-click o tui -> OnClickItem
+# -> GOI_USE_ITEM -> ApplyUseItem, nhung nhanh item_equip bi bo trong nen khong
+# gui gi. Sua CLIENT-ONLY: tra REQUEST_EQUIP_ITEM roi gui mot lenh MOVE tu o tui
+# sang o trang bi (pos_equip). Server ExchangeItem da tu Equip + dong bo (chinh
+# la duong keo-tha dang chay), khong can doi server hay them protocol.
+print('\nBat lai phai chuot mac do (client-only, tai dung duong move):')
+edit('Core/Src/KItemList.cpp',
+     _crlf(b'\tcase item_equip:\n\t\tbreak;\n/*\t\tif (Equip(nNpcIdx, nIdx))\n\t\t\tnRet = REQUEST_EQUIP_ITEM;*/\n\t\tbreak;'),
+     _crlf(b'\tcase item_equip:\n\t\tnRet = REQUEST_EQUIP_ITEM;\t// mac do: de ApplyUseItem gui move len o trang bi\n\t\tbreak;'),
+     'UseItem tra REQUEST_EQUIP_ITEM cho do trang bi')
+edit('Core/Src/KPlayer.cpp',
+     _crlf(b'\tif (nRet == REQUEST_EQUIP_ITEM)\n\t{\n\t}'),
+     _crlf(b'\tif (nRet == REQUEST_EQUIP_ITEM)\n\t{\n'
+           b'\t\t// Mac do: gui lenh move tu o tui (SrcPos) sang o trang bi (pos_equip).\n'
+           b'\t\t// Server ExchangeItem se tu Equip + dong bo; tai dung duong keo-tha.\n'
+           b'\t\tItemPos EquipPos;\n'
+           b'\t\tEquipPos.nPlace = pos_equip;\n'
+           b'\t\tEquipPos.nX = m_ItemList.GetEquipPlace(Item[nItemID].GetDetailType());\n'
+           b'\t\tEquipPos.nY = 0;\n'
+           b'\t\tMoveItem(SrcPos, EquipPos);\n'
+           b'\t}'),
+     'ApplyUseItem gui move len o trang bi khi mac do')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
