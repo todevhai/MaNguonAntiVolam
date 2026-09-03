@@ -11,9 +11,34 @@ SRC  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Sources')
 LIB  = os.path.join(ROOT, 'ClientAnti_JX1', 'SwordOnline', 'Lib')
 n_ok = n_skip = n_hong = 0
 
+# Patch TAM TAT (giu recipe de bat lai sau, KHONG xoa). Bo mot 'why' khoi day la
+# bat lai patch do. Nhom nay = di san "ep vat pham 1 o": tui/o trang bi da tra ve
+# khung DA-O goc (server/ep-vat-pham-ve-mot-o.py --tra + SPR item-goc), nen:
+#  - Anh GOC trong tooltip: khong con can (bag da hien icon day du).
+#  - PaintEquipOriginal (o trang bi ve tu item-goc): khong con can (engine ve
+#    icon da-o goc thang, item/ da la ban goc).
+# GIU LAI: GDI_GAME_OBJ_IMAGE + GDI_ITEM_SALE_PRICE (dau bay ban - tinh nang sap).
+DISABLED = {
+    # -- anh GOC trong tooltip (MouseHover icon) --
+    'khai bao SetMouseHoverIcon',
+    'bien icon anh goc tooltip',
+    'ctor: m_bHasItemIcon = false',
+    'dinh nghia SetMouseHoverIcon',
+    'Update: cong chieu cao icon',
+    'Paint: ve icon goc o dau tooltip',
+    'goi SetMouseHoverIcon voi anh goc',
+    # -- o trang bi ve icon GOC (item-goc) --
+    'khai bao KItem::PaintEquipOriginal',
+    'dinh nghia KItem::PaintEquipOriginal',
+    'CoreDrawGameObj o trang bi ve icon goc',
+    'o trang bi bao ve icon goc (nParam=1)',
+}
+
 def edit(rel, old, new, why):
     """Thay chinh xac mot chuoi byte. Bao 'da vá roi' neu khong tim thay old nhung thay new."""
     global n_ok, n_skip, n_hong
+    if why in DISABLED:
+        print('  [TAT] %-42s %s' % (rel, why)); return
     p = os.path.join(SRC, rel)
     if not os.path.exists(p):
         print('  THIEU FILE %s' % rel); n_hong += 1; return
