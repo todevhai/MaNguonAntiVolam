@@ -15,6 +15,7 @@
 //   lclick <x> <y> bom click TRAI vao cay cua so UI tai toa do CLIENT
 //   rclick <x> <y> bom click PHAI (vd o tui = mac/dung do neu du dieu kien)
 //                  Ca hai qua Wnd_ProcessInput -- KHONG dung con tro macOS.
+//   hover <x> <y>  re con tro UI toi o (WM_MOUSEMOVE) de hien tooltip mon do
 //   ride           len/xuong ngua (PA_RIDE) -- dung hanh dong cua phim M.
 //
 // Day la ma CUA TA (khong phai nguon Kingsoft goc), nen commit thang vao kho.

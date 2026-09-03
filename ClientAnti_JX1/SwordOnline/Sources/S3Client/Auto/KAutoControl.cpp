@@ -72,6 +72,17 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] %s %d,%d", szCmd, x, y);
 		}
 	}
+	else if (!strcmp(szCmd, "hover"))
+	{
+		// Re con tro UI toi (x,y) client -> hien tooltip mon do (xem option) ma
+		// KHONG bam. Dung WM_MOUSEMOVE qua Wnd_ProcessInput (thu dong, khong focus).
+		int x = 0, y = 0;
+		if (sscanf(szArg, "%d %d", &x, &y) == 2)
+		{
+			Wnd_ProcessInput(WM_MOUSEMOVE, 0, (int)MAKELONG((short)x, (short)y));
+			g_DebugLog("[AUTO] hover %d,%d", x, y);
+		}
+	}
 	else if (!strcmp(szCmd, "ride"))
 	{
 		// Dung hanh dong cua phim M: Switch([[horse]]) -> PA_RIDE. Server quyet
