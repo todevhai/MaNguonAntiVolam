@@ -3428,6 +3428,17 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
      'o trang bi bao ve icon goc (nParam=1)')
 
 # ---------------------------------------------------------------------------
+# THANH CUON THOAI: an khi noi dung KHONG tran khung (thay vi chi Enable(false)
+# van ve). KWndMessageListBox::UpdateData - noi dung tran -> Show(); vua -> clear
+# WND_S_VISIBLE (nut truot m_SlideBtn la con nen an theo). Paint() bo qua window
+# khong co WND_S_VISIBLE.
+print('\nAn thanh cuon thoai khi noi dung vua khung:')
+edit('S3Client/Ui/Elem/WndMessageListBox.cpp',
+     _crlf(b'if (nTotalLine > m_nNumMaxShowLine)\n\t{\n\t\tif (m_pScrollbar)\n\t\t{\n\t\t\tm_pScrollbar->Enable(true);\n\t\t\tm_pScrollbar->SetValueRange(0, nTotalLine - m_nNumMaxShowLine);\n\t\t}\n\n\t\tm_nNumVisibleTextLine = m_nNumMaxShowLine;\n\t}\n\telse\n\t{\n\t\tif (m_pScrollbar)\n\t\t{\n\t\t\tm_pScrollbar->Enable(false);\n\t\t\tm_pScrollbar->SetValueRange(0, 0);\n\t\t}\n\n\t\tm_nNumVisibleTextLine = nTotalLine;\n\t}'),
+     _crlf(b'if (nTotalLine > m_nNumMaxShowLine)\n\t{\n\t\tif (m_pScrollbar)\n\t\t{\n\t\t\tm_pScrollbar->Enable(true);\n\t\t\tm_pScrollbar->SetValueRange(0, nTotalLine - m_nNumMaxShowLine);\n\t\t\tm_pScrollbar->Show();\t// noi dung tran -> hien thanh cuon\n\t\t}\n\n\t\tm_nNumVisibleTextLine = m_nNumMaxShowLine;\n\t}\n\telse\n\t{\n\t\tif (m_pScrollbar)\n\t\t{\n\t\t\tm_pScrollbar->Enable(false);\n\t\t\tm_pScrollbar->SetValueRange(0, 0);\n\t\t\t// noi dung vua khung -> AN han thanh cuon (nut truot la con, an theo)\n\t\t\tm_pScrollbar->SetStyle(m_pScrollbar->GetStyle() & ~WND_S_VISIBLE);\n\t\t}\n\n\t\tm_nNumVisibleTextLine = nTotalLine;\n\t}'),
+     'an thanh cuon thoai khi noi dung vua khung')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
