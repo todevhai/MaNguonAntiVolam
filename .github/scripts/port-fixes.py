@@ -3367,6 +3367,63 @@ edit('Core/Src/KPlayer.cpp',
      'ApplyUseItem mac do bang hai buoc move (nhac len tay roi mac vao o)')
 
 # ---------------------------------------------------------------------------
+# ICON O TRANG BI VE TO NHU CU. Ta co icon SPR ve 1-o cho hanh trang (co-icon-
+# batch.py), nhung o trang bi (paperdoll) to hon lai ve dung icon da co -> nho.
+# Ban goc chua co nam o spr/item-goc/. Sua: o trang bi truyen co (nParam=1) ->
+# CoreDrawGameObj ve tu item-goc (doi \spr\item\ -> \spr\item-goc\), native-size.
+print('\nIcon o trang bi ve to (item-goc):')
+# 1) KItem.h: khai bao PaintEquipOriginal
+edit('Core/Src/KItem.h',
+     b'\tvoid\tPaint(int nX, int nY,BOOL bStack = TRUE);',
+     b'\tvoid\tPaint(int nX, int nY,BOOL bStack = TRUE);\r\n\tvoid\tPaintEquipOriginal(int nX, int nY);\t// ve icon GOC (chua co) cho o trang bi',
+     'khai bao KItem::PaintEquipOriginal')
+# 2) KItem.cpp: dinh nghia PaintEquipOriginal (truoc KItem::Paint, trong #ifndef _SERVER)
+edit('Core/Src/KItem.cpp',
+     b'void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)',
+     _crlf(b'void KItem::PaintEquipOriginal(int nX, int nY)\n'
+           b'{\n'
+           b'\t// Ve icon ban GOC (chua bi co 1-o) tu spr/item-goc, de o trang bi hien\n'
+           b'\t// to nhu cu. Cung duong ve nhu Paint nhung doi duong dan sang item-goc.\n'
+           b'\tKRUImage img = m_Image;\n'
+           b'\tconst char* s = m_Image.szImage;\n'
+           b'\tconst char* q = strstr(s, "\\\\item\\\\");\n'
+           b'\tif (q)\n'
+           b'\t{\n'
+           b'\t\tint n = (int)(q - s);\n'
+           b'\t\tif (n >= 0 && n < 100)\n'
+           b'\t\t{\n'
+           b'\t\t\tchar szGoc[128];\n'
+           b'\t\t\tmemcpy(szGoc, s, n);\n'
+           b'\t\t\tstrcpy(szGoc + n, "\\\\item-goc");\n'
+           b'\t\t\tstrcat(szGoc, q + 5);\n'
+           b'\t\t\tstrcpy(img.szImage, szGoc);\n'
+           b'\t\t\timg.uImage = 0;\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'\timg.oPosition.nX = nX;\n'
+           b'\timg.oPosition.nY = nY;\n'
+           b'\timg.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
+           b'\tg_pRepresent->DrawPrimitives(1, &img, RU_T_IMAGE, TRUE);\n'
+           b'}\n\n')
+     + b'void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)',
+     'dinh nghia KItem::PaintEquipOriginal')
+# 3) CoreDrawGameObj.cpp: o trang bi (nParam==1) -> ve icon goc
+edit('Core/Src/CoreDrawGameObj.cpp',
+     _crlf(b'\tcase CGOG_ITEM:\n\t\tif (uId == 0)\n\t\t\tbreak;'),
+     _crlf(b'\tcase CGOG_ITEM:\n\t\tif (uId == 0)\n\t\t\tbreak;\n\n'
+           b'\t\tif (nParam == 1)\t// o trang bi: ve icon ban GOC (to nhu cu), khong dung ban co 1-o\n'
+           b'\t\t{\n'
+           b'\t\t\tItem[uId].PaintEquipOriginal(x, y);\n'
+           b'\t\t\tbreak;\n'
+           b'\t\t}'),
+     'CoreDrawGameObj o trang bi ve icon goc')
+# 4) WndObjContainer.cpp: o trang bi (KWndObjectBox, container UOC_EQUIPTMENT) truyen co 1
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'\t\t\tm_nAbsoluteLeft, m_nAbsoluteTop, m_Width, m_Height, 0);',
+     b'\t\t\tm_nAbsoluteLeft, m_nAbsoluteTop, m_Width, m_Height, (m_nContainerId == UOC_EQUIPTMENT ? 1 : 0));',
+     'o trang bi bao ve icon goc (nParam=1)')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
