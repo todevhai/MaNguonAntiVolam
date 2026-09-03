@@ -3363,6 +3363,10 @@ edit('Core/Src/KPlayer.cpp',
            b'\t\tEquipPos.nX = m_ItemList.GetEquipPlace(Item[nItemID].GetDetailType());\n'
            b'\t\tEquipPos.nY = 0;\n'
            b'\t\tMoveItem(EquipPos, EquipPos);\n'
+           b'\t\t// Buoc 3: neu o trang bi da co do, ExchangeItem day do CU len tay\n'
+           b'\t\t// (m_Hand). Cat no ve o hanh trang cu (SrcPos gio trong) de khong\n'
+           b'\t\t// dinh tren con tro. O trong thi tay rong -> lenh nay vo hai (noop).\n'
+           b'\t\tMoveItem(SrcPos, SrcPos);\n'
            b'\t}'),
      'ApplyUseItem mac do bang hai buoc move (nhac len tay roi mac vao o)')
 
