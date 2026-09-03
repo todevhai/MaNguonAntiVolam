@@ -3353,15 +3353,18 @@ edit('Core/Src/KItemList.cpp',
 edit('Core/Src/KPlayer.cpp',
      _crlf(b'\tif (nRet == REQUEST_EQUIP_ITEM)\n\t{\n\t}'),
      _crlf(b'\tif (nRet == REQUEST_EQUIP_ITEM)\n\t{\n'
-           b'\t\t// Mac do: gui lenh move tu o tui (SrcPos) sang o trang bi (pos_equip).\n'
-           b'\t\t// Server ExchangeItem se tu Equip + dong bo; tai dung duong keo-tha.\n'
+           b'\t\t// Mac do = dung HAI lenh move nhu keo-tha (server giu m_Hand giua hai buoc):\n'
+           b'\t\t//  1) nhac tu o tui len tay: MoveItem(SrcPos, SrcPos)\n'
+           b'\t\t//  2) mac tu tay vao o trang bi: MoveItem(equip, equip) voi nX = itempart\n'
+           b'\t\t// Mot lenh bag->equip KHONG equip (ExchangeItem chi Equip tu m_Hand).\n'
+           b'\t\tMoveItem(SrcPos, SrcPos);\n'
            b'\t\tItemPos EquipPos;\n'
            b'\t\tEquipPos.nPlace = pos_equip;\n'
            b'\t\tEquipPos.nX = m_ItemList.GetEquipPlace(Item[nItemID].GetDetailType());\n'
            b'\t\tEquipPos.nY = 0;\n'
-           b'\t\tMoveItem(SrcPos, EquipPos);\n'
+           b'\t\tMoveItem(EquipPos, EquipPos);\n'
            b'\t}'),
-     'ApplyUseItem gui move len o trang bi khi mac do')
+     'ApplyUseItem mac do bang hai buoc move (nhac len tay roi mac vao o)')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
