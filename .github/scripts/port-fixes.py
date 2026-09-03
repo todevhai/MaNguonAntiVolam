@@ -3316,6 +3316,30 @@ edit('Core/Src/KBuySell.h',
      'gia ban vat pham 1:1 (khong chia 4)')
 
 # ---------------------------------------------------------------------------
+# Noi day module auto CUA TA (S3Client/Auto/KAutoControl.*, commit thang trong
+# kho) vao build va vao vong lap game. File nguon la ma moi cua ta; chi phan
+# CHAM VAO FILE GOC di qua day: them vao vcxproj + 1 dong o UiHeartBeat.
+print('\nNoi day module auto (kenh lenh dieu khien trong game):')
+edit('S3Client/S3Client.vcxproj',
+     b'<ClCompile Include="ErrorCode.cpp" />',
+     b'<ClCompile Include="ErrorCode.cpp" />\r\n    <ClCompile Include="Auto\\KAutoControl.cpp" />',
+     'them KAutoControl.cpp vao build')
+edit('S3Client/S3Client.vcxproj',
+     b'<ClInclude Include="ErrorCode.h" />',
+     b'<ClInclude Include="ErrorCode.h" />\r\n    <ClInclude Include="Auto\\KAutoControl.h" />',
+     'them KAutoControl.h vao project')
+edit('S3Client/Ui/UiShell.cpp',
+     b'#include "UiBase.h"',
+     b'#include "UiBase.h"\r\n#include "../Auto/KAutoControl.h"',
+     'UiShell include KAutoControl')
+# Goi Tick moi khung, chi khi da vao game (s_UiLiveSeed == UI_LIVING_S_INGAME).
+# Wnd_Heartbeat() chay moi nhip khi con ket noi; dat Tick ngay sau no.
+edit('S3Client/Ui/UiShell.cpp',
+     b'Wnd_Heartbeat();',
+     b'Wnd_Heartbeat();\r\n\t\t\tif (s_UiLiveSeed == UI_LIVING_S_INGAME) KAutoControl::Tick();',
+     'goi KAutoControl::Tick() moi khung trong game')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
