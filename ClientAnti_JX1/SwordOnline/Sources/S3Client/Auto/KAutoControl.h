@@ -12,6 +12,10 @@
 //   open <ten>     mo mot bang: status | skills | items
 //   goto <x> <y>   di toi toa do MAN HINH (pixel viewport), dung nguyen thuy
 //                  GotoWhere cua core -- KHONG phai toa do the gioi.
+//   lclick <x> <y> bom click TRAI vao cay cua so UI tai toa do CLIENT
+//   rclick <x> <y> bom click PHAI (vd o tui = mac/dung do neu du dieu kien)
+//                  Ca hai qua Wnd_ProcessInput -- KHONG dung con tro macOS.
+//   ride           len/xuong ngua (PA_RIDE) -- dung hanh dong cua phim M.
 //
 // Day la ma CUA TA (khong phai nguon Kingsoft goc), nen commit thang vao kho.
 // Chi phan noi day (them vao S3Client.vcxproj + 1 dong o UiHeartBeat) di qua

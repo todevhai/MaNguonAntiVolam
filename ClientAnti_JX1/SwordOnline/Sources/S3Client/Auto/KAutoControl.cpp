@@ -7,7 +7,9 @@
 #include "../Ui/UiCase/UiStatus.h"
 #include "../Ui/UiCase/UiSkills.h"
 #include "../Ui/UiCase/UiItem.h"
+#include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../../core/src/coreshell.h"
+#include "../../core/src/gamedatadef.h"	// PA_RIDE
 #include <stdio.h>
 #include <string.h>
 
@@ -50,6 +52,34 @@ void KAutoControl::RunLine(const char* szLine)
 		{
 			g_pCoreShell->GotoWhere(x, y, 0);		// mode 0 = auto
 			g_DebugLog("[AUTO] goto %d,%d", x, y);
+		}
+	}
+	else if (!strcmp(szCmd, "lclick") || !strcmp(szCmd, "rclick"))
+	{
+		// Bom click PASSIVE vao cay cua so UI tai toa do CLIENT (0..1024 x 0..768).
+		// Wnd_ProcessInput doc x=LOWORD, y=HIWORD tu nParam va tu set con tro UI
+		// noi bo -- KHONG dung con tro macOS, khong can frontmost. Dinh tuyen y
+		// het cu click that (vd o tui: WM_RBUTTONDOWN -> mac/dung do).
+		int x = 0, y = 0;
+		if (sscanf(szArg, "%d %d", &x, &y) == 2)
+		{
+			bool bRight = (szCmd[0] == 'r');
+			unsigned int uDown = bRight ? WM_RBUTTONDOWN : WM_LBUTTONDOWN;
+			unsigned int uUp   = bRight ? WM_RBUTTONUP   : WM_LBUTTONUP;
+			int nPos = (int)MAKELONG((short)x, (short)y);
+			Wnd_ProcessInput(uDown, 0, nPos);
+			Wnd_ProcessInput(uUp,   0, nPos);
+			g_DebugLog("[AUTO] %s %d,%d", szCmd, x, y);
+		}
+	}
+	else if (!strcmp(szCmd, "ride"))
+	{
+		// Dung hanh dong cua phim M: Switch([[horse]]) -> PA_RIDE. Server quyet
+		// co ngua (da mac) thi len/xuong. Test M ma khong bam phim (khong focus).
+		if (g_pCoreShell)
+		{
+			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PA_RIDE, 0);
+			g_DebugLog("[AUTO] ride (PA_RIDE)");
 		}
 	}
 	else
