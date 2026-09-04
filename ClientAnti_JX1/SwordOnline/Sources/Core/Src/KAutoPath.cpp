@@ -138,12 +138,15 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
         return 1;
     }
 
-    // Dich khong di duoc (click len tuong): keo ve o di duoc gan nhat trong 2 o.
+    // Dich khong di duoc (bam trung nha/tuong): keo ve o di duoc gan nhat.
+    // Ban kinh 2 o CHUA DU: bam tren minimap thi dich hay roi sau vao giua mot
+    // toa nha, cach mep di duoc chuc o -> khong tim thay -> tra 0 -> nguoi choi
+    // thay "bam khong an gi". Do in-game 04/09. Noi ra 12 o.
     int bGoalMoved = 0;
     if (!CellPassable(gCx, gCy))
     {
         int found = 0, r, ox, oy;
-        for (r = 1; r <= 2 && !found; r++)
+        for (r = 1; r <= 12 && !found; r++)
             for (oy = -r; oy <= r && !found; oy++)
                 for (ox = -r; ox <= r && !found; ox++)
                     if (CellPassable(gCx + ox, gCy + oy))
