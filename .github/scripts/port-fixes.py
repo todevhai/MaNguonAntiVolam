@@ -3464,6 +3464,99 @@ edit('S3Client/Ui/Elem/WndMessageListBox.cpp',
      'an thanh cuon thoai khi noi dung vua khung')
 
 # ---------------------------------------------------------------------------
+# #3 RCLICK CAT DO VAO RUONG (client-only). Khi cua so ruong (KUiStoreBox) dang mo,
+# phai chuot mot mon o tui -> cat sang ruong (thay vi dung/mac). Tai dung duong move
+# GOI_SWITCH_OBJECT (bag UOC_ITEM_TAKE_WITH -> ruong UOC_STORE_BOX) o o trong dau tien.
+print('\n#3 rclick cat do vao ruong:')
+# (a) KWndObjectMatrix: them ham tim o trong fit iw*ih (grid coord, tinh footprint da-o).
+edit('S3Client/Ui/Elem/WndObjContainer.h',
+     b'GetObjectAt(int x, int y);',
+     b'GetObjectAt(int x, int y);\r\n\tBOOL\tFindBlankCell(int iw, int ih, int* px, int* py);\t// tim o trong fit iw*ih',
+     'khai bao FindBlankCell')
+edit('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'int KWndObjectMatrix::GetObjectAt(int x, int y)',
+     _crlf(b'BOOL KWndObjectMatrix::FindBlankCell(int iw, int ih, int* px, int* py)\n'
+           b'{\n'
+           b'\tif (iw <= 0) iw = 1;\n'
+           b'\tif (ih <= 0) ih = 1;\n'
+           b'\tint gx, gy, i;\n'
+           b'\tfor (gy = 0; gy + ih <= m_nNUmUnitVert; gy++)\n'
+           b'\t{\n'
+           b'\t\tfor (gx = 0; gx + iw <= m_nNumUnitHori; gx++)\n'
+           b'\t\t{\n'
+           b'\t\t\tBOOL bFree = TRUE;\n'
+           b'\t\t\tfor (i = 0; i < m_nNumObjects && bFree; i++)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tKUiDraggedObject* p = &m_pObjects[i];\n'
+           b'\t\t\t\tif (gx < p->DataX + p->DataW && gx + iw > p->DataX &&\n'
+           b'\t\t\t\t\tgy < p->DataY + p->DataH && gy + ih > p->DataY)\n'
+           b'\t\t\t\t\tbFree = FALSE;\n'
+           b'\t\t\t}\n'
+           b'\t\t\tif (bFree) { if (px) *px = gx; if (py) *py = gy; return TRUE; }\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'\treturn FALSE;\n'
+           b'}\n'
+           b'\n'
+           b'int KWndObjectMatrix::GetObjectAt(int x, int y)'),
+     'dinh nghia FindBlankCell')
+# (b) KUiStoreBox: ham cat mot mon tu tui vao ruong (tim o trong + GOI_SWITCH_OBJECT).
+edit('S3Client/Ui/UiCase/UiStoreBox.h',
+     b'OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);',
+     b'OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);\r\n\tBOOL\tDepositBagItem(KUiDraggedObject* pBagItem);\t// #3 rclick cat vao ruong',
+     'khai bao DepositBagItem')
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'void KUiStoreBox::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)',
+     _crlf(b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\n'
+           b'{\n'
+           b'\tif (pBagItem == NULL || pBagItem->uGenre == CGOG_NOTHING || g_pCoreShell == NULL)\n'
+           b'\t\treturn FALSE;\n'
+           b'\tint iw = pBagItem->DataW > 0 ? pBagItem->DataW : 1;\n'
+           b'\tint ih = pBagItem->DataH > 0 ? pBagItem->DataH : 1;\n'
+           b'\tint fx = -1, fy = -1;\n'
+           b'\tif (!m_ItemBox.FindBlankCell(iw, ih, &fx, &fy))\n'
+           b'\t\treturn FALSE;\t// ruong het cho\n'
+           b'\tKUiObjAtContRegion Pick, Drop;\n'
+           b'\tPick.Obj.uGenre = pBagItem->uGenre;\n'
+           b'\tPick.Obj.uId = pBagItem->uId;\n'
+           b'\tPick.Region.Width = pBagItem->DataW;\n'
+           b'\tPick.Region.Height = pBagItem->DataH;\n'
+           b'\tPick.Region.h = pBagItem->DataX;\n'
+           b'\tPick.Region.v = pBagItem->DataY;\n'
+           b'\tPick.eContainer = UOC_ITEM_TAKE_WITH;\n'
+           b'\tDrop.Obj.uGenre = pBagItem->uGenre;\n'
+           b'\tDrop.Obj.uId = pBagItem->uId;\n'
+           b'\tDrop.Region.Width = pBagItem->DataW;\n'
+           b'\tDrop.Region.Height = pBagItem->DataH;\n'
+           b'\tDrop.Region.h = fx;\n'
+           b'\tDrop.Region.v = fy;\n'
+           b'\tDrop.eContainer = UOC_STORE_BOX;\n'
+           b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, (unsigned int)&Pick, (int)&Drop);\n'
+           b'\treturn TRUE;\n'
+           b'}\n'
+           b'\n'
+           b'void KUiStoreBox::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)'),
+     'dinh nghia DepositBagItem')
+# (c) UiItem rclick: ruong mo -> cat vao ruong (khong Shift), roi break.
+edit('S3Client/Ui/UiCase/UiItem.cpp',
+     _crlf(b'\tcase WND_N_RIGHT_CLICK_ITEM:\n'
+           b'\t\tif ((GetKeyState(VK_SHIFT) & 0x8000) == 0)\n'
+           b'\t\t\tOnClickItem((KUiDraggedObject*)uParam, true);\n'
+           b'\t\telse\n'
+           b'\t\t\tOnBreakItem((KUiDraggedObject*)uParam);\n'
+           b'\t\tbreak;'),
+     _crlf(b'\tcase WND_N_RIGHT_CLICK_ITEM:\n'
+           b'\t\tif (KUiStoreBox::GetIfVisible() && (GetKeyState(VK_SHIFT) & 0x8000) == 0 &&\n'
+           b'\t\t\tKUiStoreBox::GetIfVisible()->DepositBagItem((KUiDraggedObject*)uParam))\n'
+           b'\t\t\tbreak;\t// #3 ruong mo: rclick cat item vao ruong\n'
+           b'\t\tif ((GetKeyState(VK_SHIFT) & 0x8000) == 0)\n'
+           b'\t\t\tOnClickItem((KUiDraggedObject*)uParam, true);\n'
+           b'\t\telse\n'
+           b'\t\t\tOnBreakItem((KUiDraggedObject*)uParam);\n'
+           b'\t\tbreak;'),
+     '#3 rclick cat vao ruong khi ruong mo')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
