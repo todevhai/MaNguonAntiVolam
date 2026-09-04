@@ -32,6 +32,12 @@ DISABLED = {
     'dinh nghia KItem::PaintEquipOriginal',
     'CoreDrawGameObj o trang bi ve icon goc',
     'o trang bi bao ve icon goc (nParam=1)',
+    # He TD_TimDuong (31/08) bam ban do -> ban tung O MOT qua GotoWhere(10+mode).
+    # Do in-game 04/09: mot cu bam minimap ra 12 lan GotoWhere, moi dich cach 4 o,
+    # nhan vat di 811 Mps trong 63 giay (~13 Mps/giay) trong khi di thang duoc ~60.
+    # Nay de mode 10 nhu goc: GotoWhere da tu chay A* moi cho CA quang, con
+    # AutoWalkSetGoal lo phan dich nam ngoai tam biet -> khong can chat khuc nua.
+    'bam ban do thi TIM DUONG chu khong di thang',
 }
 
 def edit(rel, old, new, why):
@@ -3607,6 +3613,12 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\tif (!bRun)'),
      _crlf(b'\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);\n'
            b'\t\tint nIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
+           b'\n'
+           b'\t\t// Dich co the nam NGOAI tam biet cua client (chi vai vung quanh nguoi\n'
+           b'\t\t// choi duoc nap; ngoai do TestBarrier tra 0xff nen A* bo cuoc roi di\n'
+           b'\t\t// thang, dam tuong dung im). AutoWalkSetGoal ghi nhan dich CUOI va tra\n'
+           b'\t\t// ve nac xa nhat con biet duoc; toi nac do thi AutoWalkTick ra lenh tiep.\n'
+           b'\t\tAutoWalkSetGoal(nX, nY, &nX, &nY);\n'
            b'\n'
            b'\t\t// A* toan cuc: neu giua vi tri va dich co can chan thi tim tuyen vong qua cong.\n'
            b'\t\t// AutoPathFind tra 0 khi di thang duoc / khong co duong -> giu hanh vi cu.\n'

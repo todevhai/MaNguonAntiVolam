@@ -33,8 +33,6 @@
 #define AR_MPS_PER_UNIT	32		// don vi bang -> Mps
 #define AR_WAIT_FRAME	30		// cho sau khi sang map moi roi hay di tiep
 #define AR_ARRIVE_MPS	96		// coi nhu da toi (3 o) -- GetDir dung tu truoc do
-#define AR_STALL_FRAME	150		// khong nhich duoc bay lau thi tinh lai nac
-#define AR_MAX_REISSUE	40		// so nac toi da mot chang, tranh lap vo han
 #define AR_MAX_CHO		3		// so lan bao "dang cho" truoc khi bo (chang di bo)
 #define AR_CHO_FRAME	900		// nhip bao "dang cho" (~30 giay), dung noi qua day
 
@@ -75,9 +73,6 @@ static int	s_nStall	= 0;	// dem khung dung yen trong chang hien tai
 static int	s_bChoXaPhu	= 0;	// dang dung o Xa phu doi nguoi choi tu chon thanh
 static int	s_nGoalX	= 0;	// dich CUOI cua chang hien tai (Mps)
 static int	s_nGoalY	= 0;
-static int	s_nSubGoalX	= 0;	// nac dang nham toi (Mps) -- co the chua phai dich
-static int	s_nSubGoalY	= 0;
-static int	s_nReissue	= 0;	// so nac da di trong chang nay
 static int	s_nCho		= 0;	// so lan da bao "dang cho" sau khi toi dich chang
 static int	s_nToStation= -1;	// tram dich cua chang Xa phu (de goi ten khi toi noi)
 static int	s_bDaNhac	= 0;	// da nhac nguoi choi bam Xa phu chua
@@ -284,53 +279,133 @@ static int ArKhoangCach(int ax, int ay, int bx, int by)
 	return dx + dy;
 }
 
-// -------------------------------------------------------------------------
-//  Nham toi dich cua chang, nhung chi di XA NHAT TRONG TAM BIET.
+// =========================================================================
+//  DI TOI MOT DIEM XA -- co che dung CHUNG cho ca click minimap lan chang
+//  cua tuyen lien ban do.
 //
-//  Client chi nap vai vung quanh nguoi choi. Diem ngoai do thi FindRegion tra
-//  -1 va TestBarrier ra 0xff -- A* doc ra "ngoai ban do" nen bo cuoc (wp=0),
-//  roi GotoWhere di thang, dam tuong dung im. Do duoc in-game 04/09: dung o
-//  1488,3101 ma diem cach 50 o da bao 0xff.
-//  Nen: lui dan tu dich ve phia nguoi choi, lay o XA NHAT ma vua biet vua di
-//  duoc, di toi do truoc. Toi noi thi vung moi da nap -> tinh lai, dich nhich
-//  them mot doan. Cu the cho toi khi cham dich that.
-// -------------------------------------------------------------------------
-static void ArNhamToiDich()
+//  Vi sao phai co: client chi nap vai vung quanh nguoi choi. Diem ngoai do thi
+//  FindRegion tra -1 va TestBarrier ra 0xff, A* doc thanh "ngoai ban do" nen bo
+//  cuoc (wp=0) roi GotoWhere di thang, dam tuong dung im. Do duoc in-game 04/09:
+//  dung o 1488,3101 ma diem cach 50 o da bao 0xff.
+//
+//  Cach lam: giu DICH CUOI, moi lan ra lenh chi nham toi diem XA NHAT ma vua
+//  biet vua di duoc (lui dan tu dich ve phia nguoi choi). Toi nac do thi vung
+//  moi da nap -> ra lenh tiep. Cu the cho toi khi cham dich that.
+// =========================================================================
+#define AW_ARRIVE_MPS	96		// coi nhu da toi (3 o)
+#define AW_STALL_FRAME	150		// khong nhich duoc bay lau thi ra lenh lai
+#define AW_MAX_STEP		200		// so nac toi da, tranh lap vo han
+
+static int	s_bWalkOn	= 0;
+static int	s_nWalkGoalX= 0, s_nWalkGoalY = 0;	// dich CUOI (Mps)
+static int	s_nWalkSubX	= 0, s_nWalkSubY = 0;	// nac dang nham toi (Mps)
+static int	s_nWalkStep	= 0;
+static int	s_nWalkStall= 0;
+
+// Lui dan tu dich ve phia nguoi choi, lay o dau tien vua biet vua di duoc.
+static void ArClampGoal(int nPx, int nPy, int nGx, int nGy, int* pnX, int* pnY)
+{
+	*pnX = nGx; *pnY = nGy;
+	if (SubWorld[0].TestBarrier(nGx, nGy) == 0)
+		return;
+
+	int dx = nGx - nPx, dy = nGy - nPy;
+	int nSteps = (((dx < 0) ? -dx : dx) + ((dy < 0) ? -dy : dy)) / AR_MPS_PER_UNIT;
+	if (nSteps > 2048)
+		nSteps = 2048;
+
+	for (int i = nSteps; i >= 1; i--)
+	{
+		int x = nPx + dx * i / nSteps;
+		int y = nPy + dy * i / nSteps;
+		if (SubWorld[0].TestBarrier(x, y) == 0)
+		{
+			*pnX = x; *pnY = y;
+			return;
+		}
+	}
+}
+
+// GotoWhere goi truoc khi chay A*: ghi nhan dich cuoi, tra ve nac nen di toi.
+// Moi lenh di (nguoi choi click, minimap, hay chang cua tuyen) deu qua day.
+void AutoWalkSetGoal(int nGoalX, int nGoalY, int* pnOutX, int* pnOutY)
 {
 	int nPx = 0, nPy = 0;
 	AutoRouteGetPlayerMps(&nPx, &nPy);
 
-	int nX = s_nGoalX, nY = s_nGoalY;
-	if (SubWorld[0].TestBarrier(nX, nY) != 0)
-	{
-		int dx = s_nGoalX - nPx, dy = s_nGoalY - nPy;
-		int nSteps = (((dx < 0) ? -dx : dx) + ((dy < 0) ? -dy : dy)) / AR_MPS_PER_UNIT;
-		if (nSteps > 2048)
-			nSteps = 2048;
+	// Lenh MOI (dich khac) thi dem lai tu dau; con chinh ArWalkTiep goi lai voi
+	// DUNG dich cu thi giu nguyen so nac -- neu dat lai 0 thi tran AW_MAX_STEP
+	// khong bao gio cham va se lap vo han khi khong toi duoc.
+	if (!s_bWalkOn || nGoalX != s_nWalkGoalX || nGoalY != s_nWalkGoalY)
+		s_nWalkStep = 0;
+	s_bWalkOn    = 1;
+	s_nWalkGoalX = nGoalX; s_nWalkGoalY = nGoalY;
+	s_nWalkStall = 0;
 
-		int i = nSteps;
-		for (; i >= 1; i--)
-		{
-			int x = nPx + dx * i / nSteps;
-			int y = nPy + dy * i / nSteps;
-			if (SubWorld[0].TestBarrier(x, y) == 0)
-			{
-				nX = x; nY = y;
-				break;
-			}
-		}
-		if (i < 1)
-		{
-			AutoRouteCancel("khong thay o nao di duoc ve phia dich");
-			return;
-		}
+	ArClampGoal(nPx, nPy, nGoalX, nGoalY, &s_nWalkSubX, &s_nWalkSubY);
+	*pnOutX = s_nWalkSubX; *pnOutY = s_nWalkSubY;
+
+	if (s_nWalkSubX != nGoalX || s_nWalkSubY != nGoalY)
+		g_DebugLog("[AUTOWALK] dich %d,%d ngoai tam biet -> nham nac %d,%d (con %d)",
+				   nGoalX, nGoalY, s_nWalkSubX, s_nWalkSubY,
+				   ArKhoangCach(nPx, nPy, nGoalX, nGoalY));
+}
+
+void AutoWalkCancel()
+{
+	s_bWalkOn = 0;
+}
+
+// Ra lenh di tiep toi nac ke. Khong goi AutoWalkSetGoal truc tiep: di qua
+// AutoRouteGotoSpace -> GotoWhere -> AutoWalkSetGoal, de A* chay nhu moi lan.
+static void ArWalkTiep()
+{
+	int nGx = s_nWalkGoalX, nGy = s_nWalkGoalY;
+	s_nWalkStep++;
+	g_DebugLog("[AUTOWALK] nac %d -> dich %d,%d", s_nWalkStep, nGx, nGy);
+	AutoRouteGotoSpace(nGx, nGy);
+}
+
+static void AutoWalkTick()
+{
+	if (!s_bWalkOn)
+		return;
+
+	int nPx = 0, nPy = 0;
+	AutoRouteGetPlayerMps(&nPx, &nPy);
+
+	if (ArKhoangCach(nPx, nPy, s_nWalkGoalX, s_nWalkGoalY) <= AW_ARRIVE_MPS)
+	{
+		s_bWalkOn = 0;					// toi dich that
+		g_DebugLog("[AUTOWALK] toi dich %d,%d sau %d nac", s_nWalkGoalX, s_nWalkGoalY, s_nWalkStep);
+		return;
 	}
 
-	s_nSubGoalX = nX; s_nSubGoalY = nY;
-	g_DebugLog("[AUTOROUTE] nac %d: di toi %d,%d (dich chang %d,%d, con %d)",
-			   s_nReissue, nX, nY, s_nGoalX, s_nGoalY,
-			   ArKhoangCach(nPx, nPy, s_nGoalX, s_nGoalY));
-	AutoRouteGotoSpace(nX, nY);
+	// Toi nac trung gian -> di tiep ngay. Khong nhich duoc lau -> cung thu lai
+	// (vung co the vua nap them, hoac A* vua thoat khoi cho ket).
+	if (ArKhoangCach(nPx, nPy, s_nWalkSubX, s_nWalkSubY) <= AW_ARRIVE_MPS
+		|| ++s_nWalkStall > AW_STALL_FRAME)
+	{
+		s_nWalkStall = 0;
+		if (s_nWalkStep >= AW_MAX_STEP)
+		{
+			s_bWalkOn = 0;
+			g_DebugLog("[AUTOWALK] qua %d nac ma khong toi dich -> bo", AW_MAX_STEP);
+			return;
+		}
+		ArWalkTiep();
+
+		// Nac moi van nam ngay cho dang dung ma chua phai dich: khong con duong
+		// nao gan hon de nham toi -> bo ngay, dung ra lenh 200 lan trong 7 giay.
+		if (ArKhoangCach(nPx, nPy, s_nWalkSubX, s_nWalkSubY) <= AW_ARRIVE_MPS
+			&& (s_nWalkSubX != s_nWalkGoalX || s_nWalkSubY != s_nWalkGoalY))
+		{
+			s_bWalkOn = 0;
+			g_DebugLog("[AUTOWALK] khong nhich them duoc ve phia dich %d,%d (con %d) -> bo",
+					   s_nWalkGoalX, s_nWalkGoalY,
+					   ArKhoangCach(nPx, nPy, s_nWalkGoalX, s_nWalkGoalY));
+		}
+	}
 }
 
 // Bat dau chang hien tai.
@@ -350,7 +425,7 @@ static void ArStartLeg()
 		AutoRouteCancel("khong tim thay canh giua hai map");
 		return;
 	}
-	s_nStall = 0; s_nReissue = 0; s_nCho = 0; s_bDaNhac = 0;
+	s_nStall = 0; s_nCho = 0; s_bDaNhac = 0;
 	s_bChoXaPhu = pE->bStation;
 	s_nToStation = pE->nToStation;
 
@@ -383,7 +458,7 @@ static void ArStartLeg()
 	g_DebugLog("[AUTOROUTE] chang %d/%d: map %d -> %d, diem bang %d,%d%s",
 			   s_nRouteIdx + 1, s_nRouteCnt - 1, nFrom, nTo, nX, nY,
 			   pE->bStation ? " (Xa phu)" : "");
-	ArNhamToiDich();
+	AutoRouteGotoSpace(s_nGoalX, s_nGoalY);	// AutoWalk lo phan di tung nac
 }
 
 // -------------------------------------------------------------------------
@@ -423,11 +498,13 @@ void AutoRouteCancel(const char* szWhy)
 	g_DebugLog("[AUTOROUTE] huy tuyen: %s (dang o map %d, chang %d/%d)",
 			   szWhy ? szWhy : "?", SubWorld[0].m_SubWorldID, s_nRouteIdx + 1, s_nRouteCnt - 1);
 	s_nRouteCnt = 0; s_nRouteIdx = 0; s_nWait = 0; s_nStall = 0;
-	s_bChoXaPhu = 0; s_nReissue = 0; s_nCho = 0; s_bDaNhac = 0; s_nToStation = -1;
+	s_bChoXaPhu = 0; s_nCho = 0; s_bDaNhac = 0; s_nToStation = -1;
 }
 
 void AutoRouteTick()
 {
+	AutoWalkTick();			// di tung nac -- chay ca khi khong co tuyen nao
+
 	if (s_nRouteCnt <= 0)
 		return;
 
@@ -442,6 +519,7 @@ void AutoRouteTick()
 
 	if (nCur != s_RouteMap[s_nRouteIdx])	// da doi map
 	{
+		AutoWalkCancel();					// dich cu thuoc map cu, bo di
 		if (s_nRouteIdx + 1 < s_nRouteCnt && nCur == s_RouteMap[s_nRouteIdx + 1])
 		{
 			s_nRouteIdx++;
@@ -461,49 +539,28 @@ void AutoRouteTick()
 
 	int nPx = 0, nPy = 0;
 	AutoRouteGetPlayerMps(&nPx, &nPy);
+	if (ArKhoangCach(nPx, nPy, s_nGoalX, s_nGoalY) > AR_ARRIVE_MPS)
+		return;								// con dang di, AutoWalk lo
 
-	if (ArKhoangCach(nPx, nPy, s_nGoalX, s_nGoalY) <= AR_ARRIVE_MPS)
+	// Da dung dung diem cua chang.
+	if (s_bChoXaPhu && !s_bDaNhac)
 	{
-		// Da dung dung cho.
-		// Menu Xa phu loc theo "nhung thanh thi da di qua" cua tung nguoi choi va
-		// con tru tien -> KHONG tu bam ho. Nhac mot cau NGAY KHI TOI NOI (nhac luc
-		// bat dau chang thi sai: luc do con dang di).
-		if (s_bChoXaPhu && !s_bDaNhac)
-		{
-			s_bDaNhac = 1;
-			char szMsg[128];
-			const char* szTo = (s_nToStation >= 0 && s_nToStation < s_nStation)
-							   ? s_Station[s_nToStation].szName : "";
-			sprintf(szMsg, "Toi Xa phu roi. Hay chon %s de di tiep.", szTo);
-			AutoRouteSay(szMsg);
-		}
+		s_bDaNhac = 1;
+		char szMsg[128];
+		const char* szTo = (s_nToStation >= 0 && s_nToStation < s_nStation)
+						   ? s_Station[s_nToStation].szName : "";
+		sprintf(szMsg, "Toi Xa phu roi. Hay chon %s de di tiep.", szTo);
+		AutoRouteSay(szMsg);
+	}
 
-		// Doi bao lau cung duoc, nhung PHAI keu dinh ky: im hoan toan thi nhin tu
-		// ngoai khong phan biet duoc "dang cho" voi "ket duong".
-		if (++s_nStall % AR_CHO_FRAME)
-			return;
-		s_nCho++;
-		g_DebugLog("[AUTOROUTE] da toi diem chang %d tren map %d, dang cho %s (lan %d)",
-				   s_nRouteIdx + 1, nCur,
-				   s_bChoXaPhu ? "nguoi choi bam Xa phu" : "server chuyen map", s_nCho);
-		// Chang di bo: dung dung cho ma trap khong no thi diem trong bang lech,
-		// cho them cung vo ich -> bo, dung de treo im.
-		if (!s_bChoXaPhu && s_nCho >= AR_MAX_CHO)
-			AutoRouteCancel("dung dung diem chuyen map ma khong sang duoc");
+	// PHAI keu dinh ky: im hoan toan thi nhin tu ngoai khong phan biet duoc
+	// "dang cho" voi "ket duong".
+	if (++s_nStall % AR_CHO_FRAME)
 		return;
-	}
-
-	// Chua toi dich chang: toi nac trung gian thi tinh nac ke; khong nhich duoc
-	// bay lau cung tinh lai (vung co the vua nap them).
-	if (ArKhoangCach(nPx, nPy, s_nSubGoalX, s_nSubGoalY) <= AR_ARRIVE_MPS
-		|| ++s_nStall > AR_STALL_FRAME)
-	{
-		s_nStall = 0;
-		if (++s_nReissue > AR_MAX_REISSUE)
-		{
-			AutoRouteCancel("di qua nhieu nac ma khong toi diem chang");
-			return;
-		}
-		ArNhamToiDich();
-	}
+	s_nCho++;
+	g_DebugLog("[AUTOROUTE] da toi diem chang %d tren map %d, dang cho %s (lan %d)",
+			   s_nRouteIdx + 1, nCur,
+			   s_bChoXaPhu ? "nguoi choi bam Xa phu" : "server chuyen map", s_nCho);
+	if (!s_bChoXaPhu && s_nCho >= AR_MAX_CHO)
+		AutoRouteCancel("dung dung diem chuyen map ma khong sang duoc");
 }

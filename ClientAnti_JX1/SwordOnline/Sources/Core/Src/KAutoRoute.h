@@ -20,6 +20,14 @@ int  AutoRouteStart(int nToMapId);
 // Huy tuyen dang chay (nguoi choi tu click di cho khac, chet, dich chuyen...).
 void AutoRouteCancel(const char* szWhy);
 
+// Ghi nhan dich CUOI cua mot lenh di va tra ve nac nen nham toi (co the chinh
+// la dich neu no nam trong tam biet). GotoWhere goi truoc khi chay A*, nen moi
+// lenh di -- nguoi choi click, bam minimap, hay chang cua tuyen -- deu di qua day.
+void AutoWalkSetGoal(int nGoalX, int nGoalY, int* pnOutX, int* pnOutY);
+
+// Thoi khong bam theo dich nua (doi map, hoac dich khong con nghia).
+void AutoWalkCancel();
+
 // Goi moi khung hinh khi dang trong game. Ve ngay neu khong co tuyen.
 // Chiu trach nhiem: phat hien doi map -> sang chang ke; phat hien treo -> gui lai.
 void AutoRouteTick();
