@@ -3617,7 +3617,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\tnApSx = ((nApSx << 10) + pApMe->m_OffX) >> 10;\n'
            b'\t\t\tnApSy = ((nApSy << 10) + pApMe->m_OffY) >> 10;\n'
            b'\t\t\tint nApWp = AutoPathFind(nApSx, nApSy, nX, nY, pApMe->m_AutoPathX, pApMe->m_AutoPathY, AUTOPATH_MAX_WP);\n'
-           b'\t\t\tg_DebugLog("[AUTOPATH] start=%d,%d goal=%d,%d wp=%d", nApSx, nApSy, nX, nY, nApWp);\n'
+           b'\t\t\tg_DebugLog("[AUTOPATH] start=%d,%d(b%d) goal=%d,%d(b%d) wp=%d", nApSx, nApSy, (int)SubWorld[pApMe->m_SubWorldIndex].TestBarrier(nApSx, nApSy), nX, nY, (int)SubWorld[pApMe->m_SubWorldIndex].TestBarrier(nX, nY), nApWp);\n'
            b'\t\t\tif (nApWp > 0)\n'
            b'\t\t\t{\n'
            b'\t\t\t\tpApMe->m_nAutoPathCnt = nApWp;\n'
