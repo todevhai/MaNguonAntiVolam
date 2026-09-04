@@ -3787,8 +3787,20 @@ edit('Core/Src/CoreShell.cpp',
            b'\tg_CoreShell.GotoWhere(nMpsX, nMpsY, 10);\t// 10 = toa do da la khong gian\n'
            b'}\n'
            b'\n'
+           b'void AutoRouteSay(const char* szMsg)\n'
+           b'{\n'
+           b'\tKSystemMessage\tMsg;\n'
+           b'\tMsg.byConfirmType = SMCT_NONE;\n'
+           b'\tMsg.eType = SMT_NORMAL;\n'
+           b'\tMsg.byPriority = 1;\n'
+           b'\tMsg.byParamSize = 0;\n'
+           b'\tstrncpy(Msg.szMessage, szMsg, sizeof(Msg.szMessage) - 1);\n'
+           b'\tMsg.szMessage[sizeof(Msg.szMessage) - 1] = 0;\n'
+           b'\tCoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, 0);\n'
+           b'}\n'
+           b'\n'
            b'void KCoreShell::Goto(int nDir, int mode)\n'),
-     'them AutoRouteGotoSpace (di toi toa do khong gian)')
+     'them AutoRouteGotoSpace + AutoRouteSay')
 # (e) Nguoi choi tu click di cho khac thi bo tuyen -- neu khong, tuyen va lenh
 #     click danh nhau. Dat TRUOC cong throttle m_nSendMoveFrames (duong thoat im
 #     lang) va chi khi KHONG phai lenh noi bo cua tuyen (mode >= 10 -> da tru 10,
