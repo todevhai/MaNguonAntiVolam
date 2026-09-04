@@ -44,6 +44,7 @@ struct KRouteEdge
 	short	nFrom, nTo;
 	short	nX, nY;				// don vi bang (Mps/32)
 	short	bStation;
+	short	nFromStation;		// chi so tram nguon (-1 neu la canh di bo)
 	short	nToStation;			// chi so tram dich, de goi ten trong loi nhac
 };
 
@@ -74,7 +75,8 @@ static int	s_bChoXaPhu	= 0;	// dang dung o Xa phu doi nguoi choi tu chon thanh
 // -------------------------------------------------------------------------
 //  Nap bang + dung do thi (mot lan, luoi -- goi truoc lan dung dau tien).
 // -------------------------------------------------------------------------
-static void ArAddEdge(int nFrom, int nTo, int nX, int nY, int bStation, int nToStation)
+static void ArAddEdge(int nFrom, int nTo, int nX, int nY, int bStation,
+					  int nFromStation, int nToStation)
 {
 	if (s_nEdge >= AR_MAX_EDGE)
 		return;
@@ -83,6 +85,7 @@ static void ArAddEdge(int nFrom, int nTo, int nX, int nY, int bStation, int nToS
 	s_Edge[s_nEdge].nX			= (short)nX;
 	s_Edge[s_nEdge].nY			= (short)nY;
 	s_Edge[s_nEdge].bStation	= (short)bStation;
+	s_Edge[s_nEdge].nFromStation= (short)nFromStation;
 	s_Edge[s_nEdge].nToStation	= (short)nToStation;
 	s_nEdge++;
 }
@@ -122,8 +125,8 @@ static void ArLoad()
 
 			if (bHavePrev)
 			{
-				ArAddEdge(nPrevMap, nMap, nPrevLx, nPrevLy, 0, -1);	// di: diem ROI cua node truoc
-				ArAddEdge(nMap, nPrevMap, nAx, nAy, 0, -1);			// ve: diem DEN cua node nay
+				ArAddEdge(nPrevMap, nMap, nPrevLx, nPrevLy, 0, -1, -1);	// di: diem ROI cua node truoc
+				ArAddEdge(nMap, nPrevMap, nAx, nAy, 0, -1, -1);			// ve: diem DEN cua node nay
 			}
 			nPrevMap = nMap; nPrevLx = nLx; nPrevLy = nLy; bHavePrev = 1;
 		}
@@ -183,7 +186,7 @@ static void ArLoad()
 			if (s_Station[i].nMap == s_Station[j].nMap)
 				continue;
 			ArAddEdge(s_Station[i].nMap, s_Station[j].nMap,
-					  s_Station[i].nX[0], s_Station[i].nY[0], 1, j);
+					  s_Station[i].nX[0], s_Station[i].nY[0], 1, i, j);
 		}
 
 	g_DebugLog("[AUTOROUTE] nap xong: %d canh di bo + %d canh Xa phu (%d tram)",
@@ -261,6 +264,7 @@ static const KRouteEdge* ArFindEdge(int nFrom, int nTo)
 // -------------------------------------------------------------------------
 extern void AutoRouteGotoSpace(int nMpsX, int nMpsY);
 extern void AutoRouteSay(const char* szMsg);	// nhan mot dong vao khung he thong
+extern void AutoRouteGetPlayerMps(int* pnX, int* pnY);
 
 // Bat dau chang hien tai. KHONG dung toi s_nResend (nguoi goi lo).
 static void ArStartLeg()
@@ -281,10 +285,39 @@ static void ArStartLeg()
 	}
 	s_nStall = 0;
 	s_bChoXaPhu = pE->bStation;
+
+	int nX = pE->nX, nY = pE->nY;
+	if (pE->bStation && pE->nFromStation >= 0 && pE->nFromStation < s_nStation)
+	{
+		// Moi thanh co 1-4 Xa phu. PHAI chon cai GAN NHAT, khong duoc lay bua cai
+		// dau bang: client chi nap vai vung quanh nguoi choi, diem qua xa thi
+		// FindRegion tra -1 -> TestBarrier ra 0xff (coi nhu ngoai ban do) -> A* bo
+		// cuoc -> di thang -> dam tuong dung im.
+		// Do duoc in-game 04/09 o Tuong Duong: SECT1 cach 293 o (ket), SECT3 cach 49 o.
+		int nPx = 0, nPy = 0;
+		AutoRouteGetPlayerMps(&nPx, &nPy);
+		nPx /= AR_MPS_PER_UNIT; nPy /= AR_MPS_PER_UNIT;
+
+		const KRouteStation* pS = &s_Station[pE->nFromStation];
+		int nBest = -1, nBestD = 0;
+		for (int k = 0; k < pS->nCnt; k++)
+		{
+			int dx = pS->nX[k] - nPx, dy = pS->nY[k] - nPy;
+			int d  = dx * dx + dy * dy;
+			if (nBest < 0 || d < nBestD) { nBest = k; nBestD = d; }
+		}
+		if (nBest >= 0)
+		{
+			nX = pS->nX[nBest]; nY = pS->nY[nBest];
+			g_DebugLog("[AUTOROUTE] Xa phu gan nhat: cai %d/%d o %d,%d (nguoi choi %d,%d)",
+					   nBest + 1, pS->nCnt, nX, nY, nPx, nPy);
+		}
+	}
+
 	g_DebugLog("[AUTOROUTE] chang %d/%d: map %d -> %d, diem bang %d,%d%s",
-			   s_nRouteIdx + 1, s_nRouteCnt - 1, nFrom, nTo, pE->nX, pE->nY,
+			   s_nRouteIdx + 1, s_nRouteCnt - 1, nFrom, nTo, nX, nY,
 			   pE->bStation ? " (Xa phu)" : "");
-	AutoRouteGotoSpace(pE->nX * AR_MPS_PER_UNIT, pE->nY * AR_MPS_PER_UNIT);
+	AutoRouteGotoSpace(nX * AR_MPS_PER_UNIT, nY * AR_MPS_PER_UNIT);
 
 	if (pE->bStation)
 	{
@@ -360,7 +393,13 @@ void AutoRouteTick()
 		// Khong gui lai lenh di (se keo nguoi choi ra khoi NPC giua chung hop thoai)
 		// va khong tu huy -- muon bo thi click di cho khac, GotoWhere se huy.
 		if (s_bChoXaPhu)
+		{
+			// Van phai keu dinh ky. Im hoan toan thi nhin tu ngoai chi thay "dung yen"
+			// va khong biet la dang cho nguoi choi hay la ket duong.
+			if (++s_nStall % AR_STALL_FRAME == 0)
+				g_DebugLog("[AUTOROUTE] van dang cho o Xa phu map %d (%d khung)", nCur, s_nStall);
 			return;
+		}
 
 		if (++s_nStall > AR_STALL_FRAME)
 		{

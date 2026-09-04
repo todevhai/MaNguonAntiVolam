@@ -3799,8 +3799,17 @@ edit('Core/Src/CoreShell.cpp',
            b'\tCoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, 0);\n'
            b'}\n'
            b'\n'
+           b'void AutoRouteGetPlayerMps(int* pnX, int* pnY)\n'
+           b'{\n'
+           b'\tKNpc* pMe = &Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex];\n'
+           b'\tint nX = 0, nY = 0;\n'
+           b'\tSubWorld[pMe->m_SubWorldIndex].Map2Mps(pMe->m_RegionIndex, pMe->m_MapX, pMe->m_MapY, 0, 0, &nX, &nY);\n'
+           b'\t*pnX = ((nX << 10) + pMe->m_OffX) >> 10;\n'
+           b'\t*pnY = ((nY << 10) + pMe->m_OffY) >> 10;\n'
+           b'}\n'
+           b'\n'
            b'void KCoreShell::Goto(int nDir, int mode)\n'),
-     'them AutoRouteGotoSpace + AutoRouteSay')
+     'them AutoRouteGotoSpace + AutoRouteSay + AutoRouteGetPlayerMps')
 # (e) Nguoi choi tu click di cho khac thi bo tuyen -- neu khong, tuyen va lenh
 #     click danh nhau. Dat TRUOC cong throttle m_nSendMoveFrames (duong thoat im
 #     lang) va chi khi KHONG phai lenh noi bo cua tuyen (mode >= 10 -> da tru 10,
