@@ -3728,6 +3728,125 @@ edit('Core/Src/KNpc.cpp',
            b'\t}'),
      'ServeMove auto-path: ket theo GetDir==0 + dem-frame-khong-tien (chi player)')
 
+# ===========================================================================
+# TU TIM DUONG LIEN BAN DO (client-only, CoreClient.dll).
+# A* (KAutoPath) chi lo duong trong MOT subworld -> dich o map khac thi chiu.
+# settings/autopathfindroutes.txt (da co san trong client runtime, 76 tuyen,
+# 143 map) cho biet: o map X di toi diem P thi sang map Y. Module KAutoRoute
+# dung do thi tu bang do, BFS ra day chang, moi chang goi A* di toi diem chuyen
+# map; server tu chuyen khi nguoi choi dam vao trap, client thay m_SubWorldID
+# doi thi sang chang ke. File KAutoRoute.cpp/.h da commit trong repo.
+#
+# Cho moc: GOI_FINDPOS da co san trong enum GAMEOPERATION_INDEX va DA duoc
+# dispatch trong OperationRequest nhung than rong -> dung luon, khong phai them
+# gia tri enum moi (doi enum = doi ABI giua CoreClient.dll va S3Client).
+print('\nTu tim duong lien ban do (autopathfindroutes):')
+# (a) them KAutoRoute.cpp/.h vao build Core. Neo vao dong KNpcFindPath goc nen
+#     khong phu thuoc thu tu chay so voi ban va KAutoPath o tren.
+edit('Core/Core.vcxproj',
+     b'<ClCompile Include="Src\\KNpcFindPath.cpp" />',
+     b'<ClCompile Include="Src\\KNpcFindPath.cpp" />\r\n    <ClCompile Include="Src\\KAutoRoute.cpp" />',
+     'them KAutoRoute.cpp vao build Core')
+edit('Core/Core.vcxproj',
+     b'<ClInclude Include="Src\\KNpcFindPath.h" />',
+     b'<ClInclude Include="Src\\KNpcFindPath.h" />\r\n    <ClInclude Include="Src\\KAutoRoute.h" />',
+     'them KAutoRoute.h vao project Core')
+# (b) CoreShell include KAutoRoute.
+edit('Core/Src/CoreShell.cpp',
+     b'#include "KSubWorld.h"',
+     b'#include "KSubWorld.h"\r\n#include "KAutoRoute.h"',
+     'CoreShell include KAutoRoute')
+# (c) GOI_FINDPOS dang la than rong -> noi vao KAutoRoute.
+#     uParam = 0            -> huy tuyen
+#     uParam = 0xFFFFFFFF   -> nhip moi khung (kiem tra doi map / treo)
+#     uParam = mapId        -> bat dau di toi map do
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\tcase GOI_FINDPOS: \n\t\t{\n\t\t} \n        break; '),
+     _crlf(b'\tcase GOI_FINDPOS: \n'
+           b'\t\t{\n'
+           b'\t\t\tif (uParam == 0)\n'
+           b'\t\t\t\tAutoRouteCancel("lenh dung");\n'
+           b'\t\t\telse if (uParam == 0xFFFFFFFF)\n'
+           b'\t\t\t\tAutoRouteTick();\n'
+           b'\t\t\telse\n'
+           b'\t\t\t\tnRet = AutoRouteStart((int)uParam);\n'
+           b'\t\t} \n'
+           b'        break; '),
+     'GOI_FINDPOS goi KAutoRoute (bat dau / nhip / huy)')
+# (d) Helper de KAutoRoute dung lai duong di lai DA CO thay vi tu viet: GotoWhere
+#     nhanh mode >= 10 nghia la "toa do truyen vao DA LA toa do khong gian", va
+#     nhanh do da chay A* + luu waypoint + bao server tung waypoint. Helper phai
+#     nam trong CoreShell.cpp vi g_CoreShell la static o day.
+#     Go luon throttle: lenh dau chang bi m_nSendMoveFrames nuot thi tuyen dung
+#     im, khong log gi, den luc dem treo moi kick -- mat 20 giay moi lan.
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'void KCoreShell::Goto(int nDir, int mode)\n'),
+     _crlf(b'void AutoRouteGotoSpace(int nMpsX, int nMpsY)\n'
+           b'{\n'
+           b'\tPlayer[CLIENT_PLAYER_INDEX].m_nSendMoveFrames = defMAX_PLAYER_SEND_MOVE_FRAME;\n'
+           b'\tg_CoreShell.GotoWhere(nMpsX, nMpsY, 10);\t// 10 = toa do da la khong gian\n'
+           b'}\n'
+           b'\n'
+           b'void KCoreShell::Goto(int nDir, int mode)\n'),
+     'them AutoRouteGotoSpace (di toi toa do khong gian)')
+# (e) Nguoi choi tu click di cho khac thi bo tuyen -- neu khong, tuyen va lenh
+#     click danh nhau. Dat TRUOC cong throttle m_nSendMoveFrames (duong thoat im
+#     lang) va chi khi KHONG phai lenh noi bo cua tuyen (mode >= 10 -> da tru 10,
+#     bDaLaKhongGian = true). Neo phai keo them dong throttle: rieng
+#     "if (mode < 0 || mode > 2)" con xuat hien trong KCoreShell::Goto.
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\tif (mode < 0 || mode > 2)\n'
+           b'\t\treturn;\n'
+           b'\n'
+           b'\tif (Player[CLIENT_PLAYER_INDEX].m_nSendMoveFrames >= defMAX_PLAYER_SEND_MOVE_FRAME)\n'),
+     _crlf(b'\tif (mode < 0 || mode > 2)\n'
+           b'\t\treturn;\n'
+           b'\n'
+           b'\tif (!bDaLaKhongGian)\n'
+           b'\t\tAutoRouteCancel("nguoi choi tu click di cho khac");\n'
+           b'\n'
+           b'\tif (Player[CLIENT_PLAYER_INDEX].m_nSendMoveFrames >= defMAX_PLAYER_SEND_MOVE_FRAME)\n'),
+     'GotoWhere huy tuyen lien ban do khi nguoi choi tu click')
+# (f) KAutoControl: nhip moi khung. PHAI dat TRUOC fopen -- ngay duoi la duong
+#     thoat "khong co file lenh" (return), de sau do thi tuyen khong bao gio chay.
+edit('S3Client/Auto/KAutoControl.cpp',
+     _crlf(b'void KAutoControl::Tick()\n'
+           b'{\n'
+           b'\tFILE* fp = fopen(AUTO_CMD_FILE, "rb");'),
+     _crlf(b'void KAutoControl::Tick()\n'
+           b'{\n'
+           b'\t// Nhip tu-tim-duong lien ban do. PHAI dat TRUOC fopen: ngay duoi la\n'
+           b'\t// duong thoat "khong co file lenh" -> de sau thi tuyen khong bao gio chay.\n'
+           b'\tif (g_pCoreShell)\n'
+           b'\t\tg_pCoreShell->OperationRequest(GOI_FINDPOS, 0xFFFFFFFF, 0);\n'
+           b'\n'
+           b'\tFILE* fp = fopen(AUTO_CMD_FILE, "rb");'),
+     'KAutoControl goi nhip tu tim duong lien ban do')
+# (g) lenh "route <mapId>" / "route stop".
+edit('S3Client/Auto/KAutoControl.cpp',
+     _crlf(b'\telse if (!strcmp(szCmd, "ride"))'),
+     _crlf(b'\telse if (!strcmp(szCmd, "route"))\n'
+           b'\t{\n'
+           b'\t\t// route <mapId> = di bo toi map do theo bang autopathfindroutes.txt\n'
+           b'\t\t// (mapId nhu khoa trong settings/maplist.ini). route stop = huy.\n'
+           b'\t\tint nMap = 0;\n'
+           b'\t\tif (!strncmp(szArg, "stop", 4))\n'
+           b'\t\t{\n'
+           b'\t\t\tif (g_pCoreShell) g_pCoreShell->OperationRequest(GOI_FINDPOS, 0, 0);\n'
+           b'\t\t\tg_DebugLog("[AUTO] route stop");\n'
+           b'\t\t}\n'
+           b'\t\telse if (sscanf(szArg, "%d", &nMap) == 1 && nMap > 0 && g_pCoreShell)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nHop = g_pCoreShell->OperationRequest(GOI_FINDPOS, (unsigned int)nMap, 0);\n'
+           b'\t\t\tg_DebugLog("[AUTO] route %d -> %d chang", nMap, nHop);\n'
+           b'\t\t}\n'
+           b'\t\telse\n'
+           b'\t\t\tg_DebugLog("[AUTO] route: thieu hoac sai mapId (%s)", szArg);\n'
+           b'\t}\n'
+           b'\telse if (!strcmp(szCmd, "ride"))'),
+     'KAutoControl them lenh route')
+
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
