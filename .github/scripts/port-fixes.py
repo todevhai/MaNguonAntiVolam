@@ -3470,9 +3470,9 @@ edit('S3Client/Ui/Elem/WndMessageListBox.cpp',
 print('\n#3 rclick cat do vao ruong:')
 # (a) KWndObjectMatrix: them ham tim o trong fit iw*ih (grid coord, tinh footprint da-o).
 edit('S3Client/Ui/Elem/WndObjContainer.h',
-     b'GetObjectAt(int x, int y);',
-     b'GetObjectAt(int x, int y);\r\n\tBOOL\tFindBlankCell(int iw, int ih, int* px, int* py);\t// tim o trong fit iw*ih',
-     'khai bao FindBlankCell')
+     b'GetObjectById(KUiDraggedObject& Obj, int id);',
+     b'GetObjectById(KUiDraggedObject& Obj, int id);\r\n\tBOOL\tFindBlankCell(int iw, int ih, int* px, int* py);\t// #3 tim o trong fit iw*ih (public)',
+     'khai bao FindBlankCell (public)')
 edit('S3Client/Ui/Elem/WndObjContainer.cpp',
      b'int KWndObjectMatrix::GetObjectAt(int x, int y)',
      _crlf(b'BOOL KWndObjectMatrix::FindBlankCell(int iw, int ih, int* px, int* py)\n'
