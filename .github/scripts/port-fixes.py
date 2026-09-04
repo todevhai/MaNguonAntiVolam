@@ -3502,9 +3502,9 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
      'dinh nghia FindBlankCell')
 # (b) KUiStoreBox: ham cat mot mon tu tui vao ruong (tim o trong + GOI_SWITCH_OBJECT).
 edit('S3Client/Ui/UiCase/UiStoreBox.h',
-     b'OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);',
-     b'OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);\r\n\tBOOL\tDepositBagItem(KUiDraggedObject* pBagItem);\t// #3 rclick cat vao ruong',
-     'khai bao DepositBagItem')
+     b'static KUiStoreBox* GetIfVisible();',
+     b'static KUiStoreBox* GetIfVisible();\r\n\tBOOL\tDepositBagItem(KUiDraggedObject* pBagItem);\t// #3 rclick cat vao ruong (public de UiItem goi)',
+     'khai bao DepositBagItem (public)')
 edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
      b'void KUiStoreBox::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)',
      _crlf(b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\n'
