@@ -3666,15 +3666,18 @@ edit('Core/Src/KNpc.cpp',
            b'\t\tint nApAx = nApMx - m_DesX; if (nApAx < 0) nApAx = -nApAx;\n'
            b'\t\tint nApAy = nApMy - m_DesY; if (nApAy < 0) nApAy = -nApAy;\n'
            b'\t\tint nApDist = nApAx + nApAy;\n'
-           b'\t\tif (nApDist + 2 < m_nAutoPathLastDist)\n'
+           b'\t\t// Do tien do theo CUA SO 30 KHUNG chu khong tung khung. Nguoi choi chi\n'
+           b'\t\t// nhich ~2 Mps moi khung (do duoc in-game: 60 Mps/giay o ~30 khung/giay),\n'
+           b'\t\t// nen phep so cu "moi khung phai tien HON 2 Mps" gan nhu khong bao gio\n'
+           b'\t\t// dat -> cu 21 khung lai bao ket GIA -> nhay waypoint / tinh lai A* ->\n'
+           b'\t\t// giat tai cho. Do duoc 30 Mps/5 giay khi co waypoint, trong khi di\n'
+           b'\t\t// thang (A* tra 0) duoc 300 Mps/5 giay.\n'
+           b'\t\tif (++m_nAutoPathNoProg >= 30)\n'
            b'\t\t{\n'
+           b'\t\t\tm_nAutoPathNoProg = 0;\n'
+           b'\t\t\tif (nApDist + 16 >= m_nAutoPathLastDist)\n'
+           b'\t\t\t\tbApStuck = TRUE;\t// 30 khung ma khong gan them nua o -> ket that\n'
            b'\t\t\tm_nAutoPathLastDist = nApDist;\n'
-           b'\t\t\tm_nAutoPathNoProg = 0;\n'
-           b'\t\t}\n'
-           b'\t\telse if (++m_nAutoPathNoProg > 20)\n'
-           b'\t\t{\n'
-           b'\t\t\tm_nAutoPathNoProg = 0;\n'
-           b'\t\t\tbApStuck = TRUE;\n'
            b'\t\t}\n'
            b'\t}\n'
            b'\tif(nRet == 1 && !bApStuck)\n'
@@ -3726,7 +3729,7 @@ edit('Core/Src/KNpc.cpp',
            b'\t\tDoStand();\n'
            b'\t\treturn;\n'
            b'\t}'),
-     'ServeMove auto-path: ket theo GetDir==0 + dem-frame-khong-tien (chi player)')
+     'ServeMove auto-path: ket theo GetDir==0 + cua-so-30-khung-khong-tien (chi player)')
 
 # ===========================================================================
 # TU TIM DUONG LIEN BAN DO (client-only, CoreClient.dll).
