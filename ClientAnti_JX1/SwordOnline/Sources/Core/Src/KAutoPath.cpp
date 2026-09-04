@@ -2,7 +2,8 @@
 //  KAutoPath.cpp  --  A* toan cuc cho player auto-di (click dich -> di vong tuong)
 //
 //  Toa do lam viec: Mps (map sub-position). Luoi A* buoc defLOGIC_CELL_WIDTH (=32 Mps).
-//  Passable: SubWorld[0].TestBarrier(mpsX, mpsY) == 0 (khac 0 = chan / 0xff = ngoai map).
+//  Passable: g_ScenePlace.GetObstacleInfo(mps) == Obstacle_NULL. KHONG dung
+//  TestBarrier() == 0 -- xem chu thich o CellPassable, no tra DO CAO dia hinh.
 //  Output: waypoint (Mps) da rut gon chi giu diem DOI HUONG (line-of-sight smoothing).
 //  Tra ve so waypoint; 0 = di thang duoc / khong co duong.
 //
@@ -12,6 +13,8 @@
 #include "KWin32.h"
 #include "KCore.h"
 #include "KSubWorld.h"
+#include "Scene/KScenePlaceC.h"      // g_ScenePlace.GetObstacleInfo -> LOAI VAT CAN
+#include "Scene/ObstacleDef.h"       // Obstacle_NULL / Normal / Fly / Jump / JumpFly
 #include "KAutoPath.h"
 #include <stdlib.h>
 
@@ -30,13 +33,38 @@ static int  TestBarrierMps(int nMpsX, int nMpsY)
     return SubWorld[0].TestBarrier(nMpsX, nMpsY);
 }
 
+// -------------------------------------------------------------------------
+//  O NAY CO DI DUOC KHONG.
+//
+//  KHONG dung TestBarrier() == 0 nhu truoc. Doc lai chu thich cua chinh engine:
+//      KRegion::GetBarrier(...)      // 地图高度   = DO CAO dia hinh
+//      KRegion::GetBarrierMin(...)   // 障碍类型 (== Obstacle_NULL la khong can)
+//  ma KSubWorld::TestBarrier phia client lam:
+//      bRet = g_ScenePlace.GetObstacleInfo(mps);
+//      if (bRet != Obstacle_NULL) return bRet;
+//      return m_Region[nRegion].GetBarrier(...);   <-- tra DO CAO
+//  Tuc khong co vat can canh thi no tra DO CAO DIA HINH. Phep so "== 0" cu vi
+//  the coi MOI cho dat co do cao khac 0 la tuong -> A* thay gan nhu ca ban do la
+//  tuong -> tra 0 gan nhu moi lan -> GotoWhere di thang -> gap can la dung.
+//  Do in-game 04/09: trong 17 mau, o nhan vat DANG DUNG chua bao gio la 0.
+//
+//  Nay hoi thang loai vat can. Van giu TestBarrier de biet vung CHUA NAP (0xff).
+// -------------------------------------------------------------------------
+static int  ObstacleKindMps(int nMpsX, int nMpsY)
+{
+    return (int)g_ScenePlace.GetObstacleInfo(nMpsX, nMpsY);
+}
+
 // Tam o luoi (cell) <-> Mps (lay tam o de test barrier on dinh).
 static int CellToMps(int c) { return c * AP_CELL + AP_CELL / 2; }
 static int MpsToCell(int m) { return m / AP_CELL; }
 
 static int CellPassable(int cx, int cy)
 {
-    return TestBarrierMps(CellToMps(cx), CellToMps(cy)) == 0;
+    int nMx = CellToMps(cx), nMy = CellToMps(cy);
+    if (TestBarrierMps(nMx, nMy) == 0xff)
+        return 0;                                   // vung chua nap -> coi nhu khong biet
+    return ObstacleKindMps(nMx, nMy) == Obstacle_NULL;
 }
 
 struct APNode
