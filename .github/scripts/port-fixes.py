@@ -3584,7 +3584,7 @@ edit('Core/Src/CoreShell.cpp',
 edit('Core/Src/KNpc.h',
      b'int\t\t\t\t\tm_SkillParam1, m_SkillParam2;',
      _crlf(b'int\t\t\t\t\tm_AutoPathX[64], m_AutoPathY[64];\t// A* waypoint (Mps) player auto-di\n'
-           b'\tint\t\t\t\t\tm_nAutoPathCnt, m_nAutoPathIdx;\t\t// so waypoint + waypoint dang di toi\n'
+           b'\tint\t\t\t\t\tm_nAutoPathCnt, m_nAutoPathIdx, m_nAutoPathRecalc;\t// so wp + wp dang di + so lan tinh lai\n'
            b'\tint\t\t\t\t\tm_SkillParam1, m_SkillParam2;'),
      'them truong auto-path (A*) vao KNpc')
 # (d) khoi tao truong auto-path trong KNpc::Init (Init khong memset -> phai tu zero).
@@ -3592,7 +3592,8 @@ edit('Core/Src/KNpc.cpp',
      _crlf(b'\tm_SkillParam1 = 0;\n\tm_SkillParam2 = 0;'),
      _crlf(b'\tm_SkillParam1 = 0;\n\tm_SkillParam2 = 0;\n'
            b'\tm_nAutoPathCnt = 0;\t// auto-path (A*) chua co\n'
-           b'\tm_nAutoPathIdx = 0;'),
+           b'\tm_nAutoPathIdx = 0;\n'
+           b'\tm_nAutoPathRecalc = 0;'),
      'khoi tao truong auto-path trong KNpc::Init')
 # (e) GotoWhere: sau khi doi viewport->space (nX,nY = dich Mps), chay A* tu vi tri
 #     player. Co tuyen -> luu waypoint, di toi waypoint[0]. Khong -> giu di thang cu.
@@ -3618,6 +3619,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\t{\n'
            b'\t\t\t\tpApMe->m_nAutoPathCnt = nApWp;\n'
            b'\t\t\t\tpApMe->m_nAutoPathIdx = 0;\n'
+           b'\t\t\t\tpApMe->m_nAutoPathRecalc = 0;\n'
            b'\t\t\t\tnX = pApMe->m_AutoPathX[0];\n'
            b'\t\t\t\tnY = pApMe->m_AutoPathY[0];\n'
            b'\t\t\t}\n'
@@ -3630,9 +3632,16 @@ edit('Core/Src/CoreShell.cpp',
            b'\n'
            b'\t\tif (!bRun)'),
      'GotoWhere goi A* luu waypoint')
-# (f) ServeMove: khi GetDir tra 0 (toi dich hoac ket). Neu player dang auto-path va
-#     con o GAN waypoint hien tai (da toi) + con waypoint ke -> nhay waypoint, bao
-#     server (walk/run theo m_Doing), khong DoStand. Toi dich cuoi / ket -> ket thuc.
+# (f) KNpc.cpp include KAutoPath (de ServeMove tinh lai A* khi ket).
+edit('Core/Src/KNpc.cpp',
+     b'#include "CoreShell.h"',
+     b'#include "CoreShell.h"\r\n#include "KAutoPath.h"',
+     'KNpc.cpp include KAutoPath')
+# (g) ServeMove: khi GetDir tra 0. Neu player dang auto-path:
+#   - con o GAN waypoint (da toi) + con wp ke -> nhay wp, bao server, khong DoStand.
+#   - toi dich cuoi -> ket thuc.
+#   - KET giua doan (xa wp, do luoi 32 coi o-tam di duoc nhung va vat can nho) ->
+#     TINH LAI A* tu vi tri hien tai toi dich (throttle 10 lan) roi di tiep; het -> dung.
 edit('Core/Src/KNpc.cpp',
      _crlf(b'\telse if (nRet == 0)\n'
            b'\t{\n'
@@ -3646,27 +3655,45 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\tint nApCurMx = x >> 10, nApCurMy = y >> 10;\n'
            b'\t\t\tint nApDx = nApCurMx - m_DesX; if (nApDx < 0) nApDx = -nApDx;\n'
            b'\t\t\tint nApDy = nApCurMy - m_DesY; if (nApDy < 0) nApDy = -nApDy;\n'
-           b'\t\t\tif (nApDx <= 48 && nApDy <= 48 && m_nAutoPathIdx + 1 < m_nAutoPathCnt)\n'
+           b'\t\t\textern void SendClientCmdWalk(int nX, int nY);\n'
+           b'\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
+           b'\t\t\tif (nApDx <= 48 && nApDy <= 48)\n'
            b'\t\t\t{\n'
-           b'\t\t\t\tm_nAutoPathIdx++;\n'
-           b'\t\t\t\tm_DesX = m_AutoPathX[m_nAutoPathIdx];\n'
-           b'\t\t\t\tm_DesY = m_AutoPathY[m_nAutoPathIdx];\n'
-           b'\t\t\t\tg_DebugLog("[AUTOPATH] adv %d/%d des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, m_DesX, m_DesY);\n'
-           b'\t\t\t\textern void SendClientCmdWalk(int nX, int nY);\n'
-           b'\t\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
-           b'\t\t\t\tif (m_Doing == do_run)\n'
-           b'\t\t\t\t\tSendClientCmdRun(m_DesX, m_DesY);\n'
-           b'\t\t\t\telse\n'
-           b'\t\t\t\t\tSendClientCmdWalk(m_DesX, m_DesY);\n'
-           b'\t\t\t\treturn;\n'
+           b'\t\t\t\tif (m_nAutoPathIdx + 1 < m_nAutoPathCnt)\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tm_nAutoPathIdx++;\n'
+           b'\t\t\t\t\tm_DesX = m_AutoPathX[m_nAutoPathIdx];\n'
+           b'\t\t\t\t\tm_DesY = m_AutoPathY[m_nAutoPathIdx];\n'
+           b'\t\t\t\t\tif (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);\n'
+           b'\t\t\t\t\tg_DebugLog("[AUTOPATH] adv %d/%d des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, m_DesX, m_DesY);\n'
+           b'\t\t\t\t\treturn;\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t}\n'
+           b'\t\t\telse if (m_nAutoPathRecalc < 10)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tint nApGx = m_AutoPathX[m_nAutoPathCnt - 1];\n'
+           b'\t\t\t\tint nApGy = m_AutoPathY[m_nAutoPathCnt - 1];\n'
+           b'\t\t\t\tint nApWp = AutoPathFind(nApCurMx, nApCurMy, nApGx, nApGy, m_AutoPathX, m_AutoPathY, AUTOPATH_MAX_WP);\n'
+           b'\t\t\t\tif (nApWp > 0)\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tm_nAutoPathCnt = nApWp;\n'
+           b'\t\t\t\t\tm_nAutoPathIdx = 0;\n'
+           b'\t\t\t\t\tm_nAutoPathRecalc++;\n'
+           b'\t\t\t\t\tm_DesX = m_AutoPathX[0];\n'
+           b'\t\t\t\t\tm_DesY = m_AutoPathY[0];\n'
+           b'\t\t\t\t\tif (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);\n'
+           b'\t\t\t\t\tg_DebugLog("[AUTOPATH] recalc %d wp=%d cur=%d,%d", m_nAutoPathRecalc, nApWp, nApCurMx, nApCurMy);\n'
+           b'\t\t\t\t\treturn;\n'
+           b'\t\t\t\t}\n'
            b'\t\t\t}\n'
            b'\t\t\tm_nAutoPathCnt = 0;\n'
            b'\t\t\tm_nAutoPathIdx = 0;\n'
+           b'\t\t\tg_DebugLog("[AUTOPATH] stop cur=%d,%d des=%d,%d", nApCurMx, nApCurMy, m_DesX, m_DesY);\n'
            b'\t\t}\n'
            b'\t\tDoStand();\n'
            b'\t\treturn;\n'
            b'\t}'),
-     'ServeMove nhay waypoint auto-path (chi player)')
+     'ServeMove advance/recalc-on-stuck auto-path (chi player)')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
