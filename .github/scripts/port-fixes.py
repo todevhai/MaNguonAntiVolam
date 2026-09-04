@@ -3556,6 +3556,116 @@ edit('S3Client/Ui/UiCase/UiItem.cpp',
            b'\t\tbreak;'),
      '#3 rclick cat vao ruong khi ruong mo')
 
+# ===========================================================================
+# A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).
+# Van de: click dich (minimap/khung game) -> GotoWhere -> di theo VECTOR, gap tuong
+# dung dam vao khong biet vong cong. Fix: them module KAutoPath (A* luoi 32 Mps,
+# TestBarrier lam passable), GotoWhere tinh tuyen -> luu waypoint tren player NPC,
+# di tung waypoint (moi doan LOS-clear). Moi waypoint deu bao server (SendClientCmdWalk)
+# de server mo phong theo -> khong desync. File KAutoPath.cpp/.h da commit trong repo.
+print('\nA* auto tim duong (click dich -> di vong tuong):')
+# (a) them KAutoPath.cpp/.h vao build Core (neo tag ClCompile/ClInclude, khong newline
+#     -> khop ca LF/CRLF; chen tag moi voi \r\n + 4 space nhu tien le KAutoControl).
+edit('Core/Core.vcxproj',
+     b'<ClCompile Include="Src\\KNpcFindPath.cpp" />',
+     b'<ClCompile Include="Src\\KNpcFindPath.cpp" />\r\n    <ClCompile Include="Src\\KAutoPath.cpp" />',
+     'them KAutoPath.cpp vao build Core')
+edit('Core/Core.vcxproj',
+     b'<ClInclude Include="Src\\KNpcFindPath.h" />',
+     b'<ClInclude Include="Src\\KNpcFindPath.h" />\r\n    <ClInclude Include="Src\\KAutoPath.h" />',
+     'them KAutoPath.h vao project Core')
+# (b) CoreShell include KAutoPath.
+edit('Core/Src/CoreShell.cpp',
+     b'#include "KSubWorld.h"',
+     b'#include "KSubWorld.h"\r\n#include "KAutoPath.h"',
+     'CoreShell include KAutoPath')
+# (c) KNpc.h: them truong auto-path canh m_DesX (chen truoc m_SkillParam1). Kich thuoc
+#     mang = AUTOPATH_MAX_WP (64) -> dung literal de khong phai include header o day.
+edit('Core/Src/KNpc.h',
+     b'int\t\t\t\t\tm_SkillParam1, m_SkillParam2;',
+     _crlf(b'int\t\t\t\t\tm_AutoPathX[64], m_AutoPathY[64];\t// A* waypoint (Mps) player auto-di\n'
+           b'\tint\t\t\t\t\tm_nAutoPathCnt, m_nAutoPathIdx;\t\t// so waypoint + waypoint dang di toi\n'
+           b'\tint\t\t\t\t\tm_SkillParam1, m_SkillParam2;'),
+     'them truong auto-path (A*) vao KNpc')
+# (d) khoi tao truong auto-path trong KNpc::Init (Init khong memset -> phai tu zero).
+edit('Core/Src/KNpc.cpp',
+     _crlf(b'\tm_SkillParam1 = 0;\n\tm_SkillParam2 = 0;'),
+     _crlf(b'\tm_SkillParam1 = 0;\n\tm_SkillParam2 = 0;\n'
+           b'\tm_nAutoPathCnt = 0;\t// auto-path (A*) chua co\n'
+           b'\tm_nAutoPathIdx = 0;'),
+     'khoi tao truong auto-path trong KNpc::Init')
+# (e) GotoWhere: sau khi doi viewport->space (nX,nY = dich Mps), chay A* tu vi tri
+#     player. Co tuyen -> luu waypoint, di toi waypoint[0]. Khong -> giu di thang cu.
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);\n'
+           b'\t\tint nIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
+           b'\n'
+           b'\t\tif (!bRun)'),
+     _crlf(b'\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);\n'
+           b'\t\tint nIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
+           b'\n'
+           b'\t\t// A* toan cuc: neu giua vi tri va dich co can chan thi tim tuyen vong qua cong.\n'
+           b'\t\t// AutoPathFind tra 0 khi di thang duoc / khong co duong -> giu hanh vi cu.\n'
+           b'\t\t{\n'
+           b'\t\t\tKNpc* pApMe = &Npc[nIndex];\n'
+           b'\t\t\tint nApSx, nApSy;\n'
+           b'\t\t\tSubWorld[pApMe->m_SubWorldIndex].Map2Mps(pApMe->m_RegionIndex, pApMe->m_MapX, pApMe->m_MapY, 0, 0, &nApSx, &nApSy);\n'
+           b'\t\t\tnApSx = ((nApSx << 10) + pApMe->m_OffX) >> 10;\n'
+           b'\t\t\tnApSy = ((nApSy << 10) + pApMe->m_OffY) >> 10;\n'
+           b'\t\t\tint nApWp = AutoPathFind(nApSx, nApSy, nX, nY, pApMe->m_AutoPathX, pApMe->m_AutoPathY, AUTOPATH_MAX_WP);\n'
+           b'\t\t\tif (nApWp > 0)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tpApMe->m_nAutoPathCnt = nApWp;\n'
+           b'\t\t\t\tpApMe->m_nAutoPathIdx = 0;\n'
+           b'\t\t\t\tnX = pApMe->m_AutoPathX[0];\n'
+           b'\t\t\t\tnY = pApMe->m_AutoPathY[0];\n'
+           b'\t\t\t}\n'
+           b'\t\t\telse\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tpApMe->m_nAutoPathCnt = 0;\n'
+           b'\t\t\t\tpApMe->m_nAutoPathIdx = 0;\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\n'
+           b'\t\tif (!bRun)'),
+     'GotoWhere goi A* luu waypoint')
+# (f) ServeMove: khi GetDir tra 0 (toi dich hoac ket). Neu player dang auto-path va
+#     con o GAN waypoint hien tai (da toi) + con waypoint ke -> nhay waypoint, bao
+#     server (walk/run theo m_Doing), khong DoStand. Toi dich cuoi / ket -> ket thuc.
+edit('Core/Src/KNpc.cpp',
+     _crlf(b'\telse if (nRet == 0)\n'
+           b'\t{\n'
+           b'\t\tDoStand();\n'
+           b'\t\treturn;\n'
+           b'\t}'),
+     _crlf(b'\telse if (nRet == 0)\n'
+           b'\t{\n'
+           b'\t\tif (IsPlayer() && m_nAutoPathCnt > 0)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nApCurMx = x >> 10, nApCurMy = y >> 10;\n'
+           b'\t\t\tint nApDx = nApCurMx - m_DesX; if (nApDx < 0) nApDx = -nApDx;\n'
+           b'\t\t\tint nApDy = nApCurMy - m_DesY; if (nApDy < 0) nApDy = -nApDy;\n'
+           b'\t\t\tif (nApDx <= 48 && nApDy <= 48 && m_nAutoPathIdx + 1 < m_nAutoPathCnt)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tm_nAutoPathIdx++;\n'
+           b'\t\t\t\tm_DesX = m_AutoPathX[m_nAutoPathIdx];\n'
+           b'\t\t\t\tm_DesY = m_AutoPathY[m_nAutoPathIdx];\n'
+           b'\t\t\t\textern void SendClientCmdWalk(int nX, int nY);\n'
+           b'\t\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
+           b'\t\t\t\tif (m_Doing == do_run)\n'
+           b'\t\t\t\t\tSendClientCmdRun(m_DesX, m_DesY);\n'
+           b'\t\t\t\telse\n'
+           b'\t\t\t\t\tSendClientCmdWalk(m_DesX, m_DesY);\n'
+           b'\t\t\t\treturn;\n'
+           b'\t\t\t}\n'
+           b'\t\t\tm_nAutoPathCnt = 0;\n'
+           b'\t\t\tm_nAutoPathIdx = 0;\n'
+           b'\t\t}\n'
+           b'\t\tDoStand();\n'
+           b'\t\treturn;\n'
+           b'\t}'),
+     'ServeMove nhay waypoint auto-path (chi player)')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
