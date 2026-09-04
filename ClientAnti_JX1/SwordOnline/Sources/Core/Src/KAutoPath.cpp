@@ -97,10 +97,18 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
     int sCx = MpsToCell(nStartMpsX), sCy = MpsToCell(nStartMpsY);
     int gCx = MpsToCell(nGoalMpsX),  gCy = MpsToCell(nGoalMpsY);
 
-    // Di thang thay duoc dich (khong vuong can) -> tra 0 de caller di thang nhu cu,
-    // khong ton A* cho cu click gan/thay ro (khong regression hanh vi cu).
+    // Di thang thay duoc dich (khong vuong can): tra MOT waypoint = dich, KHONG tra 0.
+    // Ly do: caller dat m_nAutoPathCnt theo so waypoint; neu tra 0 thi m_nAutoPathCnt=0
+    // -> phat hien ket theo frame TAT -> neu duong "thang" that ra vuong can (LOS luoi
+    // 32 coi o-tam thong nhung va cham chan, vd cua thanh) thi nhan vat giat vao tuong
+    // ma khong tinh lai duoc. Tra 1 waypoint -> phat hien ket van chay -> ket thi
+    // recompute (full A*) tim duong vong. Van re: khong chay A* cho duong thay ro.
     if (CellPassable(gCx, gCy) && LineClear(sCx, sCy, gCx, gCy))
-        return 0;
+    {
+        pOutX[0] = nGoalMpsX;
+        pOutY[0] = nGoalMpsY;
+        return 1;
+    }
 
     // Dich khong di duoc (click len tuong): keo ve o di duoc gan nhat trong 2 o.
     int bGoalMoved = 0;
