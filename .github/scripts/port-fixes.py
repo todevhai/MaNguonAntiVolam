@@ -3637,6 +3637,51 @@ edit('Core/Src/CoreShell.cpp',
            b'\n'
            b'\t\tif (!bRun)'),
      'GotoWhere goi A* luu waypoint')
+# (e2) NHAY WAYPOINT SOM -- chua GIAT.
+#   Truoc day viec nhay waypoint chi lam trong nhanh DUNG (nRet == 0) roi return,
+#   nen moi waypoint la mot nhip: di toi -> GetDir bao 0 -> DUNG HAN -> khung sau
+#   moi quay huong. Nhieu waypoint = giat tung nac. Do in-game 04/09.
+#   Nay: TRUOC khi goi GetDir, neu con cach waypoint hien tai <= 40 Mps thi doi
+#   dich ngay trong luc dang di, roi de chinh GetDir ben duoi tinh huong toi
+#   waypoint MOI cung khung do -> khong co khung nao dung.
+#   Vong WHILE chu khong IF: waypoint sat nhau bi nuot het trong mot khung thay
+#   vi moi cai ton mot khung, va chi bao server diem CUOI cua chuoi do (it lenh
+#   hon -> it bi server keo chinh lai).
+edit('Core/Src/KNpc.cpp',
+     _crlf(b'\ty = (y << 10) + m_OffY;\n'
+           b'\n'
+           b'\tint nRet = m_PathFinder.GetDir(x, y, m_Dir, m_DesX, m_DesY, MoveSpeed, &m_Dir);'),
+     _crlf(b'\ty = (y << 10) + m_OffY;\n'
+           b'\n'
+           b'#ifndef _SERVER\n'
+           b'\tif (IsPlayer() && m_nAutoPathCnt > 0)\n'
+           b'\t{\n'
+           b'\t\textern void SendClientCmdWalk(int nX, int nY);\n'
+           b'\t\textern void SendClientCmdRun(int nX, int nY);\n'
+           b'\t\tint nApTien = 0;\n'
+           b'\t\twhile (m_nAutoPathIdx + 1 < m_nAutoPathCnt)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nApWx = (x >> 10) - m_DesX; if (nApWx < 0) nApWx = -nApWx;\n'
+           b'\t\t\tint nApWy = (y >> 10) - m_DesY; if (nApWy < 0) nApWy = -nApWy;\n'
+           b'\t\t\tif (nApWx > 40 || nApWy > 40)\n'
+           b'\t\t\t\tbreak;\n'
+           b'\t\t\tm_nAutoPathIdx++;\n'
+           b'\t\t\tm_DesX = m_AutoPathX[m_nAutoPathIdx];\n'
+           b'\t\t\tm_DesY = m_AutoPathY[m_nAutoPathIdx];\n'
+           b'\t\t\tnApTien++;\n'
+           b'\t\t}\n'
+           b'\t\tif (nApTien > 0)\n'
+           b'\t\t{\n'
+           b'\t\t\tm_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;\n'
+           b'\t\t\tif (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);\n'
+           b'\t\t\tg_DebugLog("[AUTOPATH] adv som %d/%d (nuot %d) des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, nApTien, m_DesX, m_DesY);\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'#endif\n'
+           b'\n'
+           b'\tint nRet = m_PathFinder.GetDir(x, y, m_Dir, m_DesX, m_DesY, MoveSpeed, &m_Dir);'),
+     'ServeMove nhay waypoint SOM (chua giat) + nuot waypoint sat nhau')
+
 # (f) KNpc.cpp include KAutoPath (de ServeMove tinh lai A* khi ket).
 edit('Core/Src/KNpc.cpp',
      b'#include "CoreShell.h"',
