@@ -54,6 +54,18 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] goto %d,%d", x, y);
 		}
 	}
+	else if (!strcmp(szCmd, "gotospace"))
+	{
+		// Bom thang toa do KHONG GIAN (world/mps) qua mode 10 -- dung duong ma
+		// mot cu bam ban do lon sinh ra. Cho phep chon dich xa tuy y de test tim
+		// duong (khong bi ke't o ban do nho). Mode 10 -> ServeMove -> AutoPathFindStep.
+		int x = 0, y = 0;
+		if (sscanf(szArg, "%d %d", &x, &y) == 2 && g_pCoreShell)
+		{
+			g_pCoreShell->GotoWhere(x, y, 10);
+			g_DebugLog("[AUTO] gotospace %d,%d", x, y);
+		}
+	}
 	else if (!strcmp(szCmd, "lclick") || !strcmp(szCmd, "rclick"))
 	{
 		// Bom click PASSIVE vao cay cua so UI tai toa do CLIENT (0..1024 x 0..768).
