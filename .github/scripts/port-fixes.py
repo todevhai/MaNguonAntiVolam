@@ -3401,6 +3401,7 @@ edit('Core/Src/KPlayer.cpp',
            b'\t\tEquipPos.nPlace = pos_equip;\n'
            b'\t\tEquipPos.nX = m_ItemList.GetEquipPlace(Item[nItemID].GetDetailType());\n'
            b'\t\tEquipPos.nY = 0;\n'
+           b'\t\tg_DebugLog("[EQUIP] item=%d genre=%d detail=%d slot=%d pos_equip=%d src=%d,%d,%d hand=%d", nItemID, Item[nItemID].GetGenre(), Item[nItemID].GetDetailType(), EquipPos.nX, pos_equip, SrcPos.nPlace, SrcPos.nX, SrcPos.nY, m_ItemList.Hand());\n'
            b'\t\tMoveItem(EquipPos, EquipPos);\n'
            b'\t\t// Buoc 3: neu o trang bi da co do, ExchangeItem day do CU len tay\n'
            b'\t\t// (m_Hand). Cat no ve o hanh trang cu (SrcPos gio trong) de khong\n'
