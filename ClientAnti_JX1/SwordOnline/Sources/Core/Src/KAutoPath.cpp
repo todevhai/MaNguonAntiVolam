@@ -164,7 +164,9 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
                 for (ox = -r; ox <= r && !found; ox++)
                     if (CellPassable(tCx + ox, tCy + oy)) { tCx += ox; tCy += oy; found = 1; }
         if (found) bGoalMoved = 1;
-        else if (!bFar) return 0;
+        /* Khong keo duoc (dich la tuong/ngoai thanh/chua nap): VAN chay A*, dung
+           BIEN gan dich nhat (frontier). Truoc day return 0 o day khi !bFar -> nhan
+           vat dung im khi bam diem ngoai tuong (gan nguong xa). */
     }
     if (sCx == tCx && sCy == tCy) return 0;
 
