@@ -3925,6 +3925,26 @@ edit('S3Client/Auto/KAutoControl.cpp',
 
 
 # ---------------------------------------------------------------------------
+# LOG CHAN DOAN SO SANH DUONG DI (build tam de doi chieu voi jx9tn). Diem nghen
+# duy nhat cho MOI lenh di chuyen la SendClientCmdWalk/Run -> log o day bat het
+# ca hai he A* (khung game mode 0-2 = AutoPathFind moi; minimap mode 20 =
+# TD_TimDuong cu). [MOVE] chinh la tuong duong op76 cua jx9tn.
+print('\nLog chan doan duong di ([MOVE]):')
+edit('Core/Src/KProtocol.cpp',
+     b'#include "KEngine.h"',
+     b'#include "KEngine.h"\r\n#include "KDebug.h"',
+     'KProtocol them KDebug.h cho g_DebugLog')
+edit('Core/Src/KProtocol.cpp',
+     b'\tNetCommand.ProtocolType = (BYTE)c2s_npcrun;',
+     b'\tNetCommand.ProtocolType = (BYTE)c2s_npcrun;\r\n\tg_DebugLog("[MOVE] run %d,%d", nX, nY);',
+     'log [MOVE] run moi lenh npcrun gui di')
+edit('Core/Src/KProtocol.cpp',
+     b'\tNetCommand.ProtocolType = (BYTE)c2s_npcwalk;',
+     b'\tNetCommand.ProtocolType = (BYTE)c2s_npcwalk;\r\n\tg_DebugLog("[MOVE] walk %d,%d", nX, nY);',
+     'log [MOVE] walk moi lenh npcwalk gui di')
+
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))

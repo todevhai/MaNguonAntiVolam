@@ -16,6 +16,7 @@
 #include "Scene/KScenePlaceC.h"      // g_ScenePlace.GetObstacleInfo -> LOAI VAT CAN
 #include "Scene/ObstacleDef.h"       // Obstacle_NULL / Normal / Fly / Jump / JumpFly
 #include "KAutoPath.h"
+#include "KDebug.h"    // g_DebugLog (build chan doan so sanh duong)
 #include <stdlib.h>
 
 #ifndef defLOGIC_CELL_WIDTH
@@ -135,6 +136,7 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
     {
         pOutX[0] = nGoalMpsX;
         pOutY[0] = nGoalMpsY;
+        g_DebugLog("[AP-WP] thang: goal=%d,%d", nGoalMpsX, nGoalMpsY);
         return 1;
     }
 
@@ -278,6 +280,12 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
         if (nOut > 0 && !bGoalMoved) { pOutX[nOut - 1] = nGoalMpsX; pOutY[nOut - 1] = nGoalMpsY; }
     }
 
+    {
+        int _i;
+        g_DebugLog("[AP-WP] N=%d start=%d,%d goal=%d,%d", nOut, nStartMpsX, nStartMpsY, nGoalMpsX, nGoalMpsY);
+        for (_i = 0; _i < nOut; _i++)
+            g_DebugLog("[AP-WP]   %d/%d %d,%d", _i, nOut, pOutX[_i], pOutY[_i]);
+    }
     free(pathC);
     free(g); free(came); free(closed); free(heap);
     #undef AP_IDX
