@@ -7,6 +7,7 @@
 #include "../Ui/UiCase/UiStatus.h"
 #include "../Ui/UiCase/UiSkills.h"
 #include "../Ui/UiCase/UiItem.h"
+#include "../Ui/UiCase/UiMiniMap.h"		// mo ban do lon (WORLD_MAP) de verify tim duong xa
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../../core/src/coreshell.h"
 #include "../../core/src/gamedatadef.h"	// PA_RIDE
@@ -27,6 +28,12 @@ void KAutoControl::OpenByName(const char* szName)
 	if      (!strcmp(szName, "status")) KUiStatus::OpenWindow();
 	else if (!strcmp(szName, "skills")) KUiSkills::OpenWindow();
 	else if (!strcmp(szName, "items"))  KUiItem::OpenWindow();
+	else if (!strcmp(szName, "worldmap"))
+	{
+		// Ban do LON (keo/phong duoc) - dung ca minimap user bam click di xa.
+		KUiMiniMap::OpenWindow();
+		KUiMiniMap::SetMode(MINIMAP_M_WORLD_MAP);
+	}
 	else	{ g_DebugLog("[AUTO] khong biet bang: %s", szName); return; }
 	g_DebugLog("[AUTO] mo bang: %s", szName);
 }
