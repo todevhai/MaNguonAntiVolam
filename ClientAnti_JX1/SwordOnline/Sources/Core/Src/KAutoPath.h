@@ -25,4 +25,9 @@ int AutoPathFindStep(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMps
 void AutoPathMarkStuckMps(int nMpsX, int nMpsY);
 void AutoPathClearStuck();
 
+// Buoc ke tiep di GIUA hanh lang: tien ~3 o ve phia (nTowX,nTowY), do 2 ben vuong
+// goc va don ve trung diem. Goi lien tuc (moi vai khung) -> di muot, khong nem tuong.
+void AutoPathCenteredStep(int nCurX, int nCurY, int nTowX, int nTowY,
+                          int* pOutX, int* pOutY);
+
 #endif

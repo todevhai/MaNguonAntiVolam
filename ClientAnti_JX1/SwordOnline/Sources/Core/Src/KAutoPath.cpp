@@ -22,6 +22,7 @@
 #include "KDebug.h"    // g_DebugLog (build chan doan so sanh duong)
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #ifndef defLOGIC_CELL_WIDTH
 #define defLOGIC_CELL_WIDTH   32
@@ -276,6 +277,44 @@ static int WallNearPenalty(int cx, int cy)
         HardObstacleCell(cx, cy + 1) || HardObstacleCell(cx, cy - 1))
         return AP_WALL_NEAR;
     return 0;
+}
+
+// -------------------------------------------------------------------------
+//  DI GIUA HANH LANG (y tuong cua user): tien mot buoc ngan ve phia dich, nhung
+//  DO 2 BEN vuong goc -> don nhan vat vao TRUNG DIEM giua hai tuong. Goi lien tuc
+//  (server luon co dich gan phia truoc -> di MUOT, khong dung o nga re; va luon o
+//  giua duong -> khong nem than vao goc nha). Diem tra ve la Mps de gui c2s_npcrun.
+// -------------------------------------------------------------------------
+void AutoPathCenteredStep(int nCurX, int nCurY, int nTowX, int nTowY,
+                          int* pOutX, int* pOutY)
+{
+    int dx = nTowX - nCurX, dy = nTowY - nCurY;
+    double d = sqrt((double)dx * dx + (double)dy * dy);
+    if (d < 1.0) { *pOutX = nTowX; *pOutY = nTowY; return; }
+    double ux = dx / d, uy = dy / d;
+    int step = (int)(d < 96.0 ? d : 96.0);              // buoc ~3 o ve phia dich
+    int ax = nCurX + (int)(ux * step);
+    int ay = nCurY + (int)(uy * step);                 // diem truoc mat
+    double px = -uy, py = ux;                            // vuong goc huong di
+    int maxR = 6, R = maxR, L = maxR, i;
+    for (i = 1; i <= maxR; i++)                          // do ben +perp
+    {
+        int cx = MpsToCell(ax + (int)(px * i * AP_CELL));
+        int cy = MpsToCell(ay + (int)(py * i * AP_CELL));
+        if (HardObstacleCell(cx, cy)) { R = i - 1; break; }
+    }
+    for (i = 1; i <= maxR; i++)                          // do ben -perp
+    {
+        int cx = MpsToCell(ax - (int)(px * i * AP_CELL));
+        int cy = MpsToCell(ay - (int)(py * i * AP_CELL));
+        if (HardObstacleCell(cx, cy)) { L = i - 1; break; }
+    }
+    // Lech ve trung diem: (R - L)/2 o ve phia +perp.
+    int off = ((R - L) * AP_CELL) / 2;
+    int cx = ax + (int)(px * off);
+    int cy = ay + (int)(py * off);
+    if (HardObstacleCell(MpsToCell(cx), MpsToCell(cy))) { cx = ax; cy = ay; }
+    *pOutX = cx; *pOutY = cy;
 }
 
 struct APNode
