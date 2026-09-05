@@ -2117,13 +2117,9 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\ts_nChangDang = 0;\n'
            b'\t\ts_nSoLanKet = 0;\n'
            b'\t\ts_bTinhLai = 0;\n'
-           b'\t\t/* He A* moi: huy auto-path tren player VA xoa VECTOR chi huong tren ban\n'
-           b'\t\t   do. Truoc day chi xoa vector khi TOI dich -> can thiep huong di giua\n'
-           b'\t\t   chung thi vector con nguyen. */\n'
-           b'\t\textern int g_nDichSpaceX;\n'
-           b'\t\textern int g_nDichSpaceY;\n'
-           b'\t\tg_nDichSpaceX = -1;\n'
-           b'\t\tg_nDichSpaceY = -1;\n'
+           b'\t\t/* He A* moi: huy auto-path tren player. Vector chi huong (g_nDichSpaceX)\n'
+           b'\t\t   nam ben S3Client (Game.exe) -> KHONG tham chieu duoc tu Core; xoa vector\n'
+           b'\t\t   o phia S3Client (Mouse_Action + UiMiniMap PaintWindow tu tat khi het path). */\n'
            b'\t\tint nApMe = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
            b'\t\tif (nApMe > 0)\n'
            b'\t\t{\n'
@@ -2261,6 +2257,19 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t}\n'
            b'\t\t\t}'),
      've duong chi huong tren ban do')
+
+# Bam KHUNG GAME (di tay, can thiep huong di) -> xoa VECTOR chi huong ban do cu.
+# g_nDichSpaceX nam ben S3Client nen xoa o day (UiGame.cpp), khong xoa duoc tu Core.
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     _crlf(b'\t\t\tif (g_pCoreShell)\n'
+           b'\t\t\t\tg_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);'),
+     _crlf(b'\t\t\tif (g_pCoreShell)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\textern int g_nDichSpaceX; extern int g_nDichSpaceY;\n'
+           b'\t\t\t\tg_nDichSpaceX = -1; g_nDichSpaceY = -1;\t// can thiep huong di -> xoa vector map cu\n'
+           b'\t\t\t\tg_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);\n'
+           b'\t\t\t}'),
+     'bam khung game xoa vector chi huong ban do')
 
 
 # ---------------------------------------------------------------------------
@@ -3949,8 +3958,6 @@ edit('Core/Src/KNpc.cpp',
            b'\t\telse if (++m_nAutoStall >= 12)\n'
            b'\t\t{\n'
            b'\t\t\tm_nAutoPathCnt = 0; m_nAutoPathIdx = 0; m_nAutoStall = 0; m_bAutoFar = 0;\n'
-           b'\t\t\textern int g_nDichSpaceX; extern int g_nDichSpaceY;\n'
-           b'\t\t\tg_nDichSpaceX = -1; g_nDichSpaceY = -1;\t// bo cuoc -> xoa vector\n'
            b'\t\t\tg_DebugLog("[AUTOPATH] stall-stop cur=%d,%d des=%d,%d", nGx, nGy, m_DesX, m_DesY);\n'
            b'\t\t}\n'
            b'\t\tif (m_nAutoPathCnt > 0)\n'
