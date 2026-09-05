@@ -354,7 +354,40 @@ int AutoPathFindStep(int sx, int sy, int gx, int gy,
     int pcx = scx + (int)((double)dcx * probe / dist);
     int pcy = scy + (int)((double)dcy * probe / dist);
     if (TestBarrierMps(CellToMps(pcx), CellToMps(pcy)) != 0xff)
-        return 0;                        // tuong that / da nap ma A* ket -> chiu, dung
+    {
+        // TUONG THAT chan huong dich (da nap ma A* ket = tui cut / cuc tieu cuc bo).
+        // Frontier straight-line khong thoat duoc khi phai di NGANG/LUI de vong tuong.
+        // Bug-algorithm: thu di VONG NGANG - nham diem lech vuong goc huong dich
+        // (hai ben, vai khoang cach), diem nao A* toi duoc + tien that su thi di theo.
+        // Nhip sau tinh lai tu vi tri moi -> lach dan quanh vat can.
+        double len = (double)dist;                 // dist = max(|dcx|,|dcy|) ~ do dai huong
+        double ux = dcx / len, uy = dcy / len;     // huong dich (xap xi)
+        double px = -uy, py = ux;                   // vuong goc
+        static const int OFF[3] = { 32, 64, 96 };  // o lech ngang thu dan
+        int side, oi, bestN = 0;
+        for (oi = 0; oi < 3 && bestN == 0; oi++)
+            for (side = 1; side >= -1 && bestN == 0; side -= 2)
+            {
+                // Lech ngang OFF o + nhich toi truoc 16 o (sidestep-and-advance).
+                int lcx = scx + (int)(side * px * OFF[oi] + ux * 16.0);
+                int lcy = scy + (int)(side * py * OFF[oi] + uy * 16.0);
+                int nl = AutoPathFind(sx, sy, CellToMps(lcx), CellToMps(lcy), pOutX, pOutY, nMaxOut);
+                if (nl <= 0) continue;
+                // Waypoint dau phai roi khoi cho dung (>1 o) moi coi la thoat that.
+                int wdx = MpsToCell(pOutX[0]) - scx; if (wdx < 0) wdx = -wdx;
+                int wdy = MpsToCell(pOutY[0]) - scy; if (wdy < 0) wdy = -wdy;
+                if (wdx + wdy < 2) continue;
+                bestN = nl;
+                g_DebugLog("[AP-WP] vong-ngang side=%d off=%d wp=%d -> %d,%d (dich %d,%d)",
+                           side, OFF[oi], nl, pOutX[0], pOutY[0], gx, gy);
+            }
+        if (bestN > 0)
+        {
+            if (pbFinal) *pbFinal = 0;   // moi lach mot doan, dich xa van con
+            return bestN;
+        }
+        return 0;                        // bi vay kin that su -> chiu, dung
+    }
 
     int hop = dist < 48 ? dist : 48;     // buoc nhay ~48 o (jx9tn nhay toi 57)
     int hx = scx + (int)((double)dcx * hop / dist);
