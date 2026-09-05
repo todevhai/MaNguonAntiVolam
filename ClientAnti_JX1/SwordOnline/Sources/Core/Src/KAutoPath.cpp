@@ -253,6 +253,31 @@ static int CellPassable(int cx, int cy)
     return ObstacleKindMps(nMx, nMy) == Obstacle_NULL;
 }
 
+// O nay CO PHAI vat can cung (tuong/nha/hang rao...) khong -- bat ky loai != NULL,
+// khong tinh vung chua nap. Dung de NOI vat can (phat chi phi o ke ben).
+static int HardObstacleCell(int cx, int cy)
+{
+    int nMx = CellToMps(cx), nMy = CellToMps(cy);
+    int fk = AP_FullObsKind(nMx, nMy);
+    if (fk >= 0)
+        return fk != Obstacle_NULL;
+    if (TestBarrierMps(nMx, nMy) == 0xff)
+        return 0;                                   // chua nap -> khong ket luan la tuong
+    return ObstacleKindMps(nMx, nMy) != Obstacle_NULL;
+}
+
+// NOI VAT CAN (mem): o di-duoc ma KE tuong (4 huong chinh) bi PHAT chi phi -> A*
+// thich di GIUA duong/khoang trong, tranh nem than vao goc nha. Khong CHAN nen loi
+// hep/cong 1 o van qua duoc (chi dat hon) -> khong mat cong, khong hoi quy toi-duoc.
+#define AP_WALL_NEAR  12
+static int WallNearPenalty(int cx, int cy)
+{
+    if (HardObstacleCell(cx + 1, cy) || HardObstacleCell(cx - 1, cy) ||
+        HardObstacleCell(cx, cy + 1) || HardObstacleCell(cx, cy - 1))
+        return AP_WALL_NEAR;
+    return 0;
+}
+
 struct APNode
 {
     int  idx;   // chi so trong mang cua so
@@ -444,7 +469,7 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
                 continue;
             int nIdx = AP_IDX(nx, ny);
             if (closed[nIdx]) continue;
-            int ng = g[cur] + DC[k];
+            int ng = g[cur] + DC[k] + WallNearPenalty(nx, ny);   // noi vat can: tranh ke tuong
             if (g[nIdx] < 0 || ng < g[nIdx])
             {
                 g[nIdx] = ng;
