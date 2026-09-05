@@ -1,5 +1,5 @@
 /*****************************************************************************************
-//	½çÃæ--×´Ì¬½çÃæ
+//	ï¿½ï¿½ï¿½ï¿½--×´Ì¬ï¿½ï¿½ï¿½ï¿½
 //	Copyright : Kingsoft 2002
 //	Author	:   Wooy(Wu yue)
 //	CreateTime:	2002-9-2
@@ -26,25 +26,25 @@ extern iCoreShell*		g_pCoreShell;
 KUiStatus* KUiStatus::m_pSelf = NULL;
 
 // -------------------------------------------------------------------------
-// ---> ½¨Á¢¿Ø¼þÓëUIEP_*ÒÔ¼°¿É½ÓÄÉÎïÆ·µÄÀàÐÍµÄ¶ÔÓ¦¹ØÏµ
+// ---> ï¿½ï¿½ï¿½ï¿½ï¿½Ø¼ï¿½ï¿½ï¿½UIEP_*ï¿½Ô¼ï¿½ï¿½É½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ÍµÄ¶ï¿½Ó¦ï¿½ï¿½Ïµ
 static struct UE_CTRL_MAP
 {
 	int				nPosition;
 	const char*		pIniSection;
 }CtrlItemMap[_ITEM_COUNT] =
 {
-	{ UIEP_HEAD,		"Cap"		},	//×°±¸-Ã±×Ó
-	{ UIEP_HAND,		"Weapon"	},	//×°±¸-ÎäÆ÷
-	{ UIEP_NECK,		"Necklace"	},	//×°±¸-ÏîÁ´
-	{ UIEP_FINESSE,		"Bangle"	},	//×°±¸-ÊÖïí
-	{ UIEP_BODY,		"Cloth"		},	//×°±¸-ÒÂ·þ
-	{ UIEP_WAIST,		"Sash"		},	//×°±¸-Ñü´ø
-	{ UIEP_FINGER1,		"Ring1"		},	//×°±¸-½äÖ¸
-	{ UIEP_FINGER2,		"Ring2"		},	//×°±¸-½äÖ¸
-	{ UIEP_WAIST_DECOR,	"Pendant"	},	//×°±¸-Ñü×º
-	{ UIEP_FOOT,		"Shoes"		},	//×°±¸-Ð¬×Ó
-	{ UIEP_HORSE,		"Horse"		},	//×°±¸-Âí
-	{ UIEP_MASK,		"Mask"		}	//×°±¸-Ãæ¾ß	// mat na
+	{ UIEP_HEAD,		"Cap"		},	//×°ï¿½ï¿½-Ã±ï¿½ï¿½
+	{ UIEP_HAND,		"Weapon"	},	//×°ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+	{ UIEP_NECK,		"Necklace"	},	//×°ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+	{ UIEP_FINESSE,		"Bangle"	},	//×°ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+	{ UIEP_BODY,		"Cloth"		},	//×°ï¿½ï¿½-ï¿½Â·ï¿½
+	{ UIEP_WAIST,		"Sash"		},	//×°ï¿½ï¿½-ï¿½ï¿½ï¿½ï¿½
+	{ UIEP_FINGER1,		"Ring1"		},	//×°ï¿½ï¿½-ï¿½ï¿½Ö¸
+	{ UIEP_FINGER2,		"Ring2"		},	//×°ï¿½ï¿½-ï¿½ï¿½Ö¸
+	{ UIEP_WAIST_DECOR,	"Pendant"	},	//×°ï¿½ï¿½-ï¿½ï¿½×º
+	{ UIEP_FOOT,		"Shoes"		},	//×°ï¿½ï¿½-Ð¬ï¿½ï¿½
+	{ UIEP_HORSE,		"Horse"		},	//×°ï¿½ï¿½-ï¿½ï¿½
+	{ UIEP_MASK,		"Mask"		}	//×°ï¿½ï¿½-ï¿½ï¿½ï¿½	// mat na
 //	{ UIEP_QUANAN,		"QuanAn"	},	//quan an
 //	{ UIEP_TRANGSUC,	"TrangSuc"	},	//trang suc
 //	{ UIEP_PHIPHONG,	"PhiPhong"	}	//phi phong
@@ -52,7 +52,7 @@ static struct UE_CTRL_MAP
 
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£ºÈç¹û´°¿ÚÕý±»ÏÔÊ¾£¬Ôò·µ»ØÊµÀýÖ¸Õë
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ò·µ»ï¿½Êµï¿½ï¿½Ö¸ï¿½ï¿½
 //--------------------------------------------------------------------------
 KUiStatus* KUiStatus::GetIfVisible()
 {
@@ -62,7 +62,7 @@ KUiStatus* KUiStatus::GetIfVisible()
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º´ò¿ª´°¿Ú£¬·µ»ØÎ¨Ò»µÄÒ»¸öÀà¶ÔÏóÊµÀý
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ò¿ª´ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Î¨Ò»ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½
 //--------------------------------------------------------------------------
 KUiStatus* KUiStatus::OpenWindow()
 {
@@ -83,7 +83,7 @@ KUiStatus* KUiStatus::OpenWindow()
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º¹Ø±Õ´°¿Ú£¬Í¬Ê±¿ÉÒÔÑ¡ÔòÊÇ·ñÉ¾³ý¶ÔÏóÊµÀý
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½Ø±Õ´ï¿½ï¿½Ú£ï¿½Í¬Ê±ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½Ç·ï¿½É¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::CloseWindow(bool bDestroy)
 {
@@ -100,7 +100,7 @@ void KUiStatus::CloseWindow(bool bDestroy)
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º³õÊ¼»¯
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::Initialize()
 {
@@ -171,7 +171,7 @@ void KUiStatus::Initialize()
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£ºÔØÈë´°¿ÚµÄ½çÃæ·½°¸
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ë´°ï¿½ÚµÄ½ï¿½ï¿½æ·½ï¿½ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::LoadScheme(const char* pScheme)
 {
@@ -185,7 +185,7 @@ void KUiStatus::LoadScheme(const char* pScheme)
 	}
 }
 
-//ÔØÈë½çÃæ·½°¸
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ·½ï¿½ï¿½
 void KUiStatus::LoadScheme(class KIniFile* pIni)
 {
 	if (g_pCoreShell->GetGameData(GDI_PLAYER_IS_MALE, 0, 0))
@@ -197,7 +197,7 @@ void KUiStatus::LoadScheme(class KIniFile* pIni)
 	}
 	
 	m_AvatarText  .Init(pIni, "AvatarText");	
-	m_AvatarText  .SetText("NhÊn vµo ®©y ®Ó chän ch©n dung nh©n vËt");
+	m_AvatarText  .SetText("Nhï¿½n vï¿½o ï¿½ï¿½y ï¿½ï¿½ chï¿½n chï¿½n dung nhï¿½n vï¿½t");
 	m_Avatar		.Init(pIni, "Avatar");
 	m_Face    .Init(pIni, "Face");
 	m_Agname  .Init(pIni, "Agname");
@@ -258,7 +258,7 @@ void KUiStatus::LoadScheme(class KIniFile* pIni)
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º´°¿Úº¯Êý
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Úºï¿½ï¿½ï¿½
 //--------------------------------------------------------------------------
 int KUiStatus::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
@@ -317,7 +317,7 @@ int KUiStatus::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£ºÉý¼¶Ä³ÏîÊôÐÔ
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::UseRemainPoint(UI_PLAYER_ATTRIBUTE type)
 {
@@ -331,7 +331,7 @@ void KUiStatus::UseRemainPoint(UI_PLAYER_ATTRIBUTE type)
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º¸üÐÂ»ù±¾Êý¾Ý£¨ÈËÃûµÈ²»Ò×±äÊý¾Ý£©
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½Â»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È²ï¿½ï¿½×±ï¿½ï¿½ï¿½ï¿½Ý£ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::UpdateBaseData()
 {
@@ -357,7 +357,7 @@ void KUiStatus::UpdateRuntimeInfo(KUiPlayerRuntimeInfo* pInfo)
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º¸üÐÂÊý¾Ý
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::UpdateData()
 {
@@ -415,7 +415,7 @@ void KUiStatus::UpdateRuntimeAttribute(KUiPlayerAttribute* pInfo)
 		sprintf(TextInfo, "%d%%", pInfo->nPoisonDef);
 		m_PoisonDef.SetText(TextInfo);
 
-		m_Level.SetIntText(pInfo->nLevel);			//µÈ¼¶
+		m_Level.SetIntText(pInfo->nLevel);			//ï¿½È¼ï¿½
 		m_StatusDesc.SetText(pInfo->StatusDesc);
 		m_nPk.SetIntText(pInfo->nPKValue);
 		m_nRepute.SetIntText(pInfo->nRepute);
@@ -426,7 +426,7 @@ void KUiStatus::UpdateRuntimeAttribute(KUiPlayerAttribute* pInfo)
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£ºÏìÓ¦½çÃæ²Ù×÷ÒýÆð×°±¸µÄ¸Ä±ä
+//	ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½Ä¸Ä±ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)
 {
@@ -486,6 +486,12 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 		}
 		
 	}
+	else if (eStatus == UIS_S_TRADE_SALE && pPickPos && !pDropPos)
+	{
+		// Ban: KHONG ban truc tiep trang bi DANG MAC - phai thao ra truoc. Truoc
+		// day click do dang mac o che do Ban roi vao SWITCH_OBJECT -> thao ra
+		// dinh len con tro (lo do). Chan tai day: khong nhac len.
+	}
 	else
 	{
 		//_ASSERT(i < _ITEM_COUNT);
@@ -497,7 +503,7 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 }
 
 //--------------------------------------------------------------------------
-//	¹¦ÄÜ£º×°±¸±ä»¯¸üÐÂ
+//	ï¿½ï¿½ï¿½Ü£ï¿½×°ï¿½ï¿½ï¿½ä»¯ï¿½ï¿½ï¿½ï¿½
 //--------------------------------------------------------------------------
 void KUiStatus::UpdateEquip(KUiObjAtRegion* pEquip, int bAdd)
 {
