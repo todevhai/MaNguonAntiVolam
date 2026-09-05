@@ -126,12 +126,7 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
     int sCx = MpsToCell(nStartMpsX), sCy = MpsToCell(nStartMpsY);
     int gCx = MpsToCell(nGoalMpsX),  gCy = MpsToCell(nGoalMpsY);
 
-    // Di thang thay duoc dich (khong vuong can): tra MOT waypoint = dich, KHONG tra 0.
-    // Ly do: caller dat m_nAutoPathCnt theo so waypoint; neu tra 0 thi m_nAutoPathCnt=0
-    // -> phat hien ket theo frame TAT -> neu duong "thang" that ra vuong can (LOS luoi
-    // 32 coi o-tam thong nhung va cham chan, vd cua thanh) thi nhan vat giat vao tuong
-    // ma khong tinh lai duoc. Tra 1 waypoint -> phat hien ket van chay -> ket thi
-    // recompute (full A*) tim duong vong. Van re: khong chay A* cho duong thay ro.
+    // Di thang thay dich (khong vuong): tra 1 waypoint = dich.
     if (CellPassable(gCx, gCy) && LineClear(sCx, sCy, gCx, gCy))
     {
         pOutX[0] = nGoalMpsX;
@@ -140,32 +135,58 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
         return 1;
     }
 
-    // Dich khong di duoc (bam trung nha/tuong): keo ve o di duoc gan nhat.
-    // Ban kinh 2 o CHUA DU: bam tren minimap thi dich hay roi sau vao giua mot
-    // toa nha, cach mep di duoc chuc o -> khong tim thay -> tra 0 -> nguoi choi
-    // thay "bam khong an gi". Do in-game 04/09. Noi ra 12 o.
-    int bGoalMoved = 0;
-    if (!CellPassable(gCx, gCy))
+    // tCx,tCy = O DICH DE A* NHAM (co the bi keo/kep). Giu (gCx,gCy) lam dich THAT
+    // de chon bien gan dich nhat khi khong toi thang.
+    int tCx = gCx, tCy = gCy;
+    int bFar = 0, bGoalMoved = 0;
+
+    // Dich XA (bbox vuot cua so): kep dich vao cua so quanh NGUOI CHOI. A* se tim
+    // duong toi ria cua so ve huong dich -> di qua CONG neu cong nam trong vung nap.
+    {
+        int bbx = sCx < gCx ? gCx - sCx : sCx - gCx;
+        int bby = sCy < gCy ? gCy - sCy : sCy - gCy;
+        if (bbx + 2 * AP_MARGIN > AP_MAX_WIN || bby + 2 * AP_MARGIN > AP_MAX_WIN)
+        {
+            bFar = 1;
+            int half = AP_MAX_WIN / 2 - AP_MARGIN - 2;
+            if (tCx > sCx + half) tCx = sCx + half; else if (tCx < sCx - half) tCx = sCx - half;
+            if (tCy > sCy + half) tCy = sCy + half; else if (tCy < sCy - half) tCy = sCy - half;
+        }
+    }
+
+    // Keo dich A* ve o di duoc gan nhat. Xa ma khong keo duoc thi VAN chay A*
+    // (dung bien gan dich nhat); gan ma khong keo duoc -> chiu.
+    if (!CellPassable(tCx, tCy))
     {
         int found = 0, r, ox, oy;
         for (r = 1; r <= 12 && !found; r++)
             for (oy = -r; oy <= r && !found; oy++)
                 for (ox = -r; ox <= r && !found; ox++)
-                    if (CellPassable(gCx + ox, gCy + oy))
-                    { gCx += ox; gCy += oy; found = 1; }
-        if (!found) return 0;
-        bGoalMoved = 1;
+                    if (CellPassable(tCx + ox, tCy + oy)) { tCx += ox; tCy += oy; found = 1; }
+        if (found) bGoalMoved = 1;
+        else if (!bFar) return 0;
     }
-    if (sCx == gCx && sCy == gCy) return 0;   // da o dich
+    if (sCx == tCx && sCy == tCy) return 0;
 
-    // Cua so tim = bbox(start,goal) no AP_MARGIN, gioi han AP_MAX_WIN.
-    int minx = (sCx < gCx ? sCx : gCx) - AP_MARGIN;
-    int miny = (sCy < gCy ? sCy : gCy) - AP_MARGIN;
-    int maxx = (sCx > gCx ? sCx : gCx) + AP_MARGIN;
-    int maxy = (sCy > gCy ? sCy : gCy) + AP_MARGIN;
+    // Cua so: xa -> quanh nguoi choi; gan -> bbox(start,target).
+    int minx, miny, maxx, maxy;
+    if (bFar)
+    {
+        minx = sCx - AP_MAX_WIN / 2; miny = sCy - AP_MAX_WIN / 2;
+        maxx = sCx + AP_MAX_WIN / 2; maxy = sCy + AP_MAX_WIN / 2;
+    }
+    else
+    {
+        minx = (sCx < tCx ? sCx : tCx) - AP_MARGIN;
+        miny = (sCy < tCy ? sCy : tCy) - AP_MARGIN;
+        maxx = (sCx > tCx ? sCx : tCx) + AP_MARGIN;
+        maxy = (sCy > tCy ? sCy : tCy) + AP_MARGIN;
+    }
+    if (tCx < minx) tCx = minx; else if (tCx > maxx) tCx = maxx;
+    if (tCy < miny) tCy = miny; else if (tCy > maxy) tCy = maxy;
     int W = maxx - minx + 1;
     int H = maxy - miny + 1;
-    if (W > AP_MAX_WIN || H > AP_MAX_WIN) return 0;   // qua xa -> fallback vector
+    if (W <= 0 || H <= 0 || W > AP_MAX_WIN + 2 || H > AP_MAX_WIN + 2) return 0;
 
     int N = W * H;
     int* g      = (int*)malloc(sizeof(int) * N);
@@ -179,12 +200,16 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
 
     #define AP_IDX(cx,cy)  (((cy) - miny) * W + ((cx) - minx))
     int startIdx = AP_IDX(sCx, sCy);
-    int goalIdx  = AP_IDX(gCx, gCy);
+    int goalIdx  = AP_IDX(tCx, tCy);
     g[startIdx] = 0;
+
+    // Bien tot nhat = o DA XET gan DICH THAT nhat (dung khi khong toi duoc target).
+    int bestNode = startIdx;
+    int bestH    = Heuristic(sCx, sCy, gCx, gCy);
 
     int heapN = 0;
     heap[heapN].idx = startIdx;
-    heap[heapN].f   = Heuristic(sCx, sCy, gCx, gCy);
+    heap[heapN].f   = Heuristic(sCx, sCy, tCx, tCy);
     heapN++;
 
     static const int DX[8] = { 1,-1, 0, 0, 1, 1,-1,-1 };
@@ -209,6 +234,12 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
         if (closed[cur]) continue;
         closed[cur] = 1;
         expanded++;
+        {
+            int ccx = minx + (cur % W);
+            int ccy = miny + (cur / W);
+            int h = Heuristic(ccx, ccy, gCx, gCy);   // do toi DICH THAT
+            if (h < bestH) { bestH = h; bestNode = cur; }
+        }
         if (cur == goalIdx) { foundGoal = 1; break; }
 
         int cx = minx + (cur % W);
@@ -219,7 +250,6 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
             int nx = cx + DX[k], ny = cy + DY[k];
             if (nx < minx || nx > maxx || ny < miny || ny > maxy) continue;
             if (!CellPassable(nx, ny)) continue;
-            // cheo: khong cat goc qua hai tuong ke
             if (DC[k] == 14 && (!CellPassable(cx + DX[k], cy) || !CellPassable(cx, cy + DY[k])))
                 continue;
             int nIdx = AP_IDX(nx, ny);
@@ -231,7 +261,7 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
                 came[nIdx] = cur;
                 if (heapN < AP_MAX_NODES)
                 {
-                    int f = ng + Heuristic(nx, ny, gCx, gCy);
+                    int f = ng + Heuristic(nx, ny, tCx, tCy);
                     heap[heapN].idx = nIdx; heap[heapN].f = f;
                     int c = heapN++;
                     while (c > 0)
@@ -245,18 +275,20 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
         }
     }
 
+    // Dich cua duong: toi target thi lay target; khong thi lay BIEN gan dich that nhat.
+    int endNode = foundGoal ? goalIdx : bestNode;
+
     int nOut = 0;
-    int* pathC = (int*)malloc(sizeof(int) * N);   // du chua duong dai nhat trong cua so
-    if (foundGoal && pathC)
+    int* pathC = (int*)malloc(sizeof(int) * N);
+    if (endNode > 0 && endNode != startIdx && came[endNode] >= 0 && pathC)
     {
-        int pc = 0, node = goalIdx;
+        int pc = 0, node = endNode;
         while (node >= 0 && pc < N)
         {
             pathC[pc++] = node;
             if (node == startIdx) break;
             node = came[node];
         }
-        // pathC[0]=goal ... pathC[pc-1]=start; rut gon: tu start nhay xa nhat con LineClear.
         int curNode = pc - 1;
         while (curNode > 0 && nOut < nMaxOut)
         {
@@ -264,7 +296,7 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
             int c0x = minx + (c0 % W), c0y = miny + (c0 / W);
             int best = curNode - 1;
             int j;
-            for (j = 0; j < curNode; j++)   // j = 0 la goal (xa nhat)
+            for (j = 0; j < curNode; j++)
             {
                 int cj = pathC[j];
                 int cjx = minx + (cj % W), cjy = miny + (cj / W);
@@ -276,62 +308,29 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
             nOut++;
             curNode = best;
         }
-        // waypoint cuoi = dich that (tru khi dich goc nam tren can -> giu o keo ve)
-        if (nOut > 0 && !bGoalMoved) { pOutX[nOut - 1] = nGoalMpsX; pOutY[nOut - 1] = nGoalMpsY; }
+        // Chi dat waypoint cuoi = DICH THAT khi that su toi noi (khong xa/keo).
+        if (nOut > 0 && foundGoal && !bFar && !bGoalMoved)
+        { pOutX[nOut - 1] = nGoalMpsX; pOutY[nOut - 1] = nGoalMpsY; }
     }
 
-    {
-        int _i;
-        g_DebugLog("[AP-WP] N=%d start=%d,%d goal=%d,%d", nOut, nStartMpsX, nStartMpsY, nGoalMpsX, nGoalMpsY);
-        for (_i = 0; _i < nOut; _i++)
-            g_DebugLog("[AP-WP]   %d/%d %d,%d", _i, nOut, pOutX[_i], pOutY[_i]);
-    }
+    g_DebugLog("[AP-WP] N=%d %s start=%d,%d goal=%d,%d", nOut, foundGoal ? "toi-dich" : "bien", nStartMpsX, nStartMpsY, nGoalMpsX, nGoalMpsY);
     free(pathC);
     free(g); free(came); free(closed); free(heap);
     #undef AP_IDX
     return nOut;
 }
 
-
-// -------------------------------------------------------------------------
-//  AutoPathFindStep -- tim duong toi dich co the RAT XA (ngoai vung da nap).
-//  Client chi nap vung quanh nguoi choi; dich xa -> AutoPathFind tra 0 (giua
-//  duong/dich la o 0xff chua nap). Thay vi di thang dam tuong, ta nham toi mot
-//  "nac" = diem gan hon theo huong dich, con nam trong vung nap, A* toi do
-//  (vong qua vat can trong vung nap). Caller di toi nac -> nap them vung -> goi
-//  lai -> tien dan tung nac toi khi dich vao vung nap thi A* binh thuong.
-//  *pbFinal = 1 neu chuoi waypoint toi DUNG dich that; 0 neu chi toi mot nac.
-//  Tra so waypoint; 0 = chiu han (caller di thang fallback nhu cu).
-// -------------------------------------------------------------------------
+// AutoPathFindStep: nay AutoPathFind da tu lo dich xa (cua so quanh nguoi choi +
+// tra duong toi bien gan dich nhat -> qua cong). Chi con dat co "da toi dich that".
 int AutoPathFindStep(int sx, int sy, int gx, int gy,
                      int* pOutX, int* pOutY, int nMaxOut, int* pbFinal)
 {
     if (pbFinal) *pbFinal = 1;
     int n = AutoPathFind(sx, sy, gx, gy, pOutX, pOutY, nMaxOut);
-    if (n > 0) return n;                 // toi thang dich duoc
-
-    int scx = MpsToCell(sx), scy = MpsToCell(sy);
-    int gcx = MpsToCell(gx), gcy = MpsToCell(gy);
-    int dcx = gcx - scx, dcy = gcy - scy;
-    int adx = dcx < 0 ? -dcx : dcx;
-    int ady = dcy < 0 ? -dcy : dcy;
-    int dist = adx > ady ? adx : ady;    // khoang cach o (chebyshev)
-    if (dist <= 0) return 0;
-
-    // Thu nac gan dan: nham diem cach  o theo huong dich. Reach lon truoc
-    // (di duoc nhieu moi nac); A* vong qua vat can trong vung nap toi nac do.
-    // Reach nao cho A* ra tuyen thi dung. Tat ca < AP_MAX_WIN de cua so A* du chua.
-    static const int REACH[4] = { 144, 96, 48, 24 };  // <= AP_MAX_WIN-2*AP_MARGIN-1 (=159) de cua so A* du chua
-    int r;
-    for (r = 0; r < 4; r++)
-    {
-        int reach = REACH[r];
-        if (reach >= dist) continue;     // >= dist thi da thu o AutoPathFind(dich) o tren
-        int ncx = scx + (int)((double)dcx * reach / dist);
-        int ncy = scy + (int)((double)dcy * reach / dist);
-        int nacx = CellToMps(ncx), nacy = CellToMps(ncy);
-        n = AutoPathFind(sx, sy, nacx, nacy, pOutX, pOutY, nMaxOut);
-        if (n > 0) { if (pbFinal) *pbFinal = 0; return n; }
-    }
-    return 0;
+    if (n <= 0) return 0;
+    // Toi dich that neu waypoint cuoi cach dich <= 1 o (32 Mps).
+    int dx = pOutX[n - 1] - gx; if (dx < 0) dx = -dx;
+    int dy = pOutY[n - 1] - gy; if (dy < 0) dy = -dy;
+    if (pbFinal) *pbFinal = (dx <= AP_CELL && dy <= AP_CELL) ? 1 : 0;
+    return n;
 }
