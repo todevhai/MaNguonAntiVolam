@@ -31,8 +31,10 @@ void KAutoControl::OpenByName(const char* szName)
 	else if (!strcmp(szName, "worldmap"))
 	{
 		// Ban do LON (keo/phong duoc) - dung ca minimap user bam click di xa.
+		// MapSetMode la ham tu do trong UiMiniMap.cpp (nut WorldMapBtn goi no).
+		extern void MapSetMode(MINIMAP_MODE eMode);
 		KUiMiniMap::OpenWindow();
-		KUiMiniMap::SetMode(MINIMAP_M_WORLD_MAP);
+		MapSetMode(MINIMAP_M_WORLD_MAP);
 	}
 	else	{ g_DebugLog("[AUTO] khong biet bang: %s", szName); return; }
 	g_DebugLog("[AUTO] mo bang: %s", szName);
