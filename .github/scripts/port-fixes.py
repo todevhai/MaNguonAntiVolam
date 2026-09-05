@@ -3833,6 +3833,53 @@ edit('Core/Src/KNpc.cpp',
            b'\t}'),
      'ServeMove auto-path: ket theo GetDir==0 + cua-so-30-khung-khong-tien (chi player)')
 
+# Kick auto-path khi SERVER ket va nhan vat ve do_stand -> ServeMove ngung chay
+# nen khong ai tinh lai -> do vinh vien. Activate chay MOI khung ke ca dung yen:
+# dung yen 45 khung ma con path -> blacklist o phia truoc + AutoPathFindStep vong qua.
+edit('Core/Src/KNpc.cpp',
+     b'\tProcCommand(m_ProcessAI);\r\n\tProcStatus();',
+     _crlf(b'\tProcCommand(m_ProcessAI);\n'
+           b'\tProcStatus();\n'
+           b'\tif (IsPlayer() && m_nAutoPathCnt > 0 && m_Doing == do_stand)\n'
+           b'\t{\n'
+           b'\t\tif (++m_nAutoPathNoProg >= 45)\n'
+           b'\t\t{\n'
+           b'\t\t\tm_nAutoPathNoProg = 0;\n'
+           b'\t\t\tint nKx = 0, nKy = 0;\n'
+           b'\t\t\tSubWorld[m_SubWorldIndex].Map2Mps(m_RegionIndex, m_MapX, m_MapY, 0, 0, &nKx, &nKy);\n'
+           b'\t\t\tnKx = ((nKx << 10) + m_OffX) >> 10;\n'
+           b'\t\t\tnKy = ((nKy << 10) + m_OffY) >> 10;\n'
+           b'\t\t\tint nKfx = nKx - m_nAutoFarX; if (nKfx < 0) nKfx = -nKfx;\n'
+           b'\t\t\tint nKfy = nKy - m_nAutoFarY; if (nKfy < 0) nKfy = -nKfy;\n'
+           b'\t\t\tif (!m_bAutoFar || m_nAutoPathRecalc >= 40 || (nKfx <= 48 && nKfy <= 48))\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tm_nAutoPathCnt = 0; m_nAutoPathIdx = 0;\n'
+           b'\t\t\t\tg_DebugLog("[AUTOPATH] stand-het cur=%d,%d far=%d,%d recalc=%d", nKx, nKy, m_nAutoFarX, m_nAutoFarY, m_nAutoPathRecalc);\n'
+           b'\t\t\t}\n'
+           b'\t\t\telse\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tint nSdx = m_DesX - nKx, nSdy = m_DesY - nKy;\n'
+           b'\t\t\t\tint nSad = (nSdx < 0 ? -nSdx : nSdx) + (nSdy < 0 ? -nSdy : nSdy);\n'
+           b'\t\t\t\tif (nSad > 0)\n'
+           b'\t\t\t\t\tAutoPathMarkStuckMps(nKx + nSdx * 48 / nSad, nKy + nSdy * 48 / nSad);\n'
+           b'\t\t\t\tint bKfin = 1;\n'
+           b'\t\t\t\tint nKwp = AutoPathFindStep(nKx, nKy, m_nAutoFarX, m_nAutoFarY, m_AutoPathX, m_AutoPathY, AUTOPATH_MAX_WP, &bKfin);\n'
+           b'\t\t\t\tif (nKwp > 0)\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tm_nAutoPathCnt = nKwp; m_nAutoPathIdx = 0; m_nAutoPathRecalc++;\n'
+           b'\t\t\t\t\tm_bAutoFar = bKfin ? 0 : 1;\n'
+           b'\t\t\t\t\tm_DesX = m_AutoPathX[0]; m_DesY = m_AutoPathY[0];\n'
+           b'\t\t\t\t\tm_nAutoPathLastDist = 0x7fffffff;\n'
+           b'\t\t\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
+           b'\t\t\t\t\tSendClientCmdRun(m_DesX, m_DesY);\n'
+           b'\t\t\t\t\tg_DebugLog("[AUTOPATH] kick-stand %d wp=%d cur=%d,%d des=%d,%d", m_nAutoPathRecalc, nKwp, nKx, nKy, m_DesX, m_DesY);\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t\telse { m_nAutoPathCnt = 0; m_nAutoPathIdx = 0; }\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\t}'),
+     'KNpc::Activate: kick auto-path khi server ket + nhan vat dung yen (chi player)')
+
 # ===========================================================================
 # TU TIM DUONG LIEN BAN DO (client-only, CoreClient.dll).
 # A* (KAutoPath) chi lo duong trong MOT subworld -> dich o map khac thi chiu.
