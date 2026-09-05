@@ -1728,25 +1728,6 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 				sMsg.byParamSize = 0;
 				sprintf(sMsg.szMessage, MSG_ITEM_SAME_DETAIL_IN_IMMEDIATE);
 				CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
-				// TRA mon DANG CAM ve TUI. Truoc day chi 'return' -> mon ket tren
-				// tay (con tro) vo hinh, chi hien khi bam ra ngoai tui (rot xuong
-				// dat) -> lo do. Dat vao o trong dau tien cua tui cho khop server
-				// (server tu choi nen mon van o tui phia server).
-				if (m_Hand)
-				{
-					POINT ptBag;
-					int nHw = Item[m_Hand].GetWidth();
-					int nHh = Item[m_Hand].GetHeight();
-					if (m_Room[room_equipment].FindEmptyPlace(nHw, nHh, &ptBag)
-						&& m_Room[room_equipment].PlaceItem(ptBag.x, ptBag.y, m_Hand, nHw, nHh))
-					{
-						int nHli = FindSame(m_Hand);
-						m_Items[nHli].nPlace = pos_equiproom;
-						m_Items[nHli].nX = ptBag.x;
-						m_Items[nHli].nY = ptBag.y;
-						m_Hand = 0;
-					}
-				}
 #endif
 				return;
 			}

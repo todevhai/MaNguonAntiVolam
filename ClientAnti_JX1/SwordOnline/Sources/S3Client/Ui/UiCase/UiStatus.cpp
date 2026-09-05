@@ -6,6 +6,7 @@
 *****************************************************************************************/
 #include "KWin32.h"
 #include "KIniFile.h"
+#include "KEngine.h"				// g_DebugLog (chan doan tam)
 #include "../Elem/WndMessage.h"
 #include "../elem/wnds.h"
 #include "UiStatus.h"
@@ -435,6 +436,8 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 	KWndWindow*			pWnd = NULL;
 
 	UISYS_STATUS	eStatus = g_UiBase.GetStatus();
+	g_DebugLog("[EQUIP-DBG] OnEquiptChanged eStatus=%d pick=%d drop=%d",
+		(int)eStatus, pPickPos ? 1 : 0, pDropPos ? 1 : 0);
 	if (pPickPos)
 	{
 		//_ASSERT(pPickPos->pWnd);
