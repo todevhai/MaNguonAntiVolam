@@ -19,4 +19,10 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
 int AutoPathFindStep(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
                      int* pOutX, int* pOutY, int nMaxOut, int* pbFinal);
 
+// Blacklist o dang KET (khe hep than khong lot / va cham). A* coi vung 3x3 quanh
+// o do la tuong o lan tinh sau -> vong qua thay vi lao vao lai. Goi khi ServeMove
+// phat hien dung yen qua lau. Xoa danh sach khi bat dau lenh di moi.
+void AutoPathMarkStuckMps(int nMpsX, int nMpsY);
+void AutoPathClearStuck();
+
 #endif

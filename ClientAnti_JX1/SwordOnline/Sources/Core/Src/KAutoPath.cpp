@@ -196,8 +196,52 @@ static int  ObstacleKindMps(int nMpsX, int nMpsY)
 static int CellToMps(int c) { return c * AP_CELL + AP_CELL / 2; }
 static int MpsToCell(int m) { return m / AP_CELL; }
 
+// -------------------------------------------------------------------------
+//  BLACKLIST O KET (khe hep / va cham): ServeMove phat hien dung yen qua lau thi
+//  danh dau o phia truoc; A* coi vung 3x3 quanh o do la tuong o lan sau -> vong
+//  qua. Neu khe la duong DUY NHAT thi A* bo cuoc (dung), chap nhan - jx9tn cung
+//  khong luon duoc khe hep. Xoa khi bat dau lenh di moi (AutoPathClearStuck).
+// -------------------------------------------------------------------------
+#define AP_STUCK_MAX 24
+static int g_apStuckX[AP_STUCK_MAX], g_apStuckY[AP_STUCK_MAX];
+static int g_apStuckN = 0;
+static int g_apStuckHead = 0;   // ring buffer khi day
+
+void AutoPathClearStuck() { g_apStuckN = 0; g_apStuckHead = 0; }
+
+void AutoPathMarkStuckMps(int nMpsX, int nMpsY)
+{
+    int cx = nMpsX / AP_CELL, cy = nMpsY / AP_CELL;
+    int i;
+    for (i = 0; i < g_apStuckN; i++)
+        if (g_apStuckX[i] == cx && g_apStuckY[i] == cy) return;   // da co
+    if (g_apStuckN < AP_STUCK_MAX)
+    {
+        g_apStuckX[g_apStuckN] = cx; g_apStuckY[g_apStuckN] = cy; g_apStuckN++;
+    }
+    else
+    {
+        g_apStuckX[g_apStuckHead] = cx; g_apStuckY[g_apStuckHead] = cy;
+        g_apStuckHead = (g_apStuckHead + 1) % AP_STUCK_MAX;   // ghi de cu nhat
+    }
+    g_DebugLog("[AP-STUCK] danh dau o ket %d,%d (tong %d)", cx, cy, g_apStuckN);
+}
+
+static int IsStuckCell(int cx, int cy)
+{
+    int i;
+    for (i = 0; i < g_apStuckN; i++)
+    {
+        int dx = cx - g_apStuckX[i]; if (dx < 0) dx = -dx;
+        int dy = cy - g_apStuckY[i]; if (dy < 0) dy = -dy;
+        if (dx <= 1 && dy <= 1) return 1;    // vung 3x3 quanh o ket
+    }
+    return 0;
+}
+
 static int CellPassable(int cx, int cy)
 {
+    if (IsStuckCell(cx, cy)) return 0;              // o tung ket -> ne ra (vong khe hep)
     int nMx = CellToMps(cx), nMy = CellToMps(cy);
     // Uu tien lop vat can DA NAP TRUOC (thay ca subworld, khong chi vung streaming).
     int fk = AP_FullObsKind(nMx, nMy);
