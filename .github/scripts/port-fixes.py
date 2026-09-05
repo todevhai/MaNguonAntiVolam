@@ -3570,6 +3570,76 @@ edit('S3Client/Ui/UiCase/UiItem.cpp',
            b'\t\tbreak;'),
      '#3 rclick cat vao ruong khi ruong mo')
 
+# #3b RCLICK LAY DO TU RUONG VE TUI (client-only). Doi xung voi #3: rclick mot mon
+# DANG O TRONG RUONG -> tim o trong trong TUI + move cheo UOC_STORE_BOX->UOC_ITEM_TAKE_WITH.
+# Server ServerMoveItem da xu ly move cheo 2 chieu (pick DownPos -> put UpPos), khong sua.
+print('\n#3b rclick lay do tu ruong ve tui:')
+# (a) KUiItem: accessor cong khai tim o trong trong tui (m_ItemBox private).
+edit('S3Client/Ui/UiCase/UiItem.h',
+     b'static KUiItem* GetIfVisible();',
+     b'static KUiItem* GetIfVisible();\r\n\tBOOL\tFindBlankBagCell(int iw, int ih, int* px, int* py);\t// #3b tim o trong tui (public de UiStoreBox lay do)',
+     'khai bao FindBlankBagCell (public)')
+edit('S3Client/Ui/UiCase/UiItem.cpp',
+     b'KUiItem* KUiItem::GetIfVisible()',
+     _crlf(b'BOOL KUiItem::FindBlankBagCell(int iw, int ih, int* px, int* py)\n'
+           b'{\n'
+           b'\treturn m_ItemBox.FindBlankCell(iw, ih, px, py);\n'
+           b'}\n'
+           b'\n'
+           b'KUiItem* KUiItem::GetIfVisible()'),
+     '#3b dinh nghia FindBlankBagCell')
+# (b) KUiStoreBox: ham lay mot mon tu ruong ve tui (tim o trong tui + GOI_SWITCH_OBJECT).
+edit('S3Client/Ui/UiCase/UiStoreBox.h',
+     b'BOOL\tDepositBagItem(KUiDraggedObject* pBagItem);\t// #3 rclick cat vao ruong (public de UiItem goi)',
+     b'BOOL\tDepositBagItem(KUiDraggedObject* pBagItem);\t// #3 rclick cat vao ruong (public de UiItem goi)\r\n\tBOOL\tWithdrawBoxItem(KUiDraggedObject* pBoxItem);\t// #3b rclick lay do tu ruong ve tui',
+     'khai bao WithdrawBoxItem')
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'void KUiStoreBox::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)',
+     _crlf(b'BOOL KUiStoreBox::WithdrawBoxItem(KUiDraggedObject* pBoxItem)\n'
+           b'{\n'
+           b'\tif (pBoxItem == NULL || pBoxItem->uGenre == CGOG_NOTHING || g_pCoreShell == NULL)\n'
+           b'\t\treturn FALSE;\n'
+           b'\tKUiItem* pBag = KUiItem::GetIfVisible();\n'
+           b'\tif (pBag == NULL) return FALSE;\t// tui phai dang mo\n'
+           b'\tint iw = pBoxItem->DataW > 0 ? pBoxItem->DataW : 1;\n'
+           b'\tint ih = pBoxItem->DataH > 0 ? pBoxItem->DataH : 1;\n'
+           b'\tint fx = -1, fy = -1;\n'
+           b'\tif (!pBag->FindBlankBagCell(iw, ih, &fx, &fy))\n'
+           b'\t\treturn FALSE;\t// tui het cho\n'
+           b'\tKUiObjAtContRegion Pick, Drop;\n'
+           b'\tPick.Obj.uGenre = pBoxItem->uGenre;\n'
+           b'\tPick.Obj.uId = pBoxItem->uId;\n'
+           b'\tPick.Region.Width = pBoxItem->DataW;\n'
+           b'\tPick.Region.Height = pBoxItem->DataH;\n'
+           b'\tPick.Region.h = pBoxItem->DataX;\n'
+           b'\tPick.Region.v = pBoxItem->DataY;\n'
+           b'\tPick.eContainer = UOC_STORE_BOX;\n'
+           b'\tDrop.Obj.uGenre = pBoxItem->uGenre;\n'
+           b'\tDrop.Obj.uId = pBoxItem->uId;\n'
+           b'\tDrop.Region.Width = pBoxItem->DataW;\n'
+           b'\tDrop.Region.Height = pBoxItem->DataH;\n'
+           b'\tDrop.Region.h = fx;\n'
+           b'\tDrop.Region.v = fy;\n'
+           b'\tDrop.eContainer = UOC_ITEM_TAKE_WITH;\n'
+           b'\tg_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, (unsigned int)&Pick, (int)&Drop);\n'
+           b'\treturn TRUE;\n'
+           b'}\n'
+           b'\n'
+           b'void KUiStoreBox::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)'),
+     '#3b dinh nghia WithdrawBoxItem')
+# (c) KUiStoreBox::WndProc: rclick mot mon trong ruong -> lay ve tui.
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     _crlf(b'\tcase WND_N_ITEM_PICKDROP:\n'
+           b'\t\tOnItemPickDrop((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);\n'
+           b'\t\tbreak;'),
+     _crlf(b'\tcase WND_N_RIGHT_CLICK_ITEM:\n'
+           b'\t\tWithdrawBoxItem((KUiDraggedObject*)uParam);\t// #3b rclick trong ruong -> lay ve tui\n'
+           b'\t\tbreak;\n'
+           b'\tcase WND_N_ITEM_PICKDROP:\n'
+           b'\t\tOnItemPickDrop((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);\n'
+           b'\t\tbreak;'),
+     '#3b rclick trong ruong lay do ve tui')
+
 # ===========================================================================
 # A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).
 # Van de: click dich (minimap/khung game) -> GotoWhere -> di theo VECTOR, gap tuong
