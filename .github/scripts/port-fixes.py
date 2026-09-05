@@ -3392,23 +3392,20 @@ edit('Core/Src/KItemList.cpp',
 edit('Core/Src/KPlayer.cpp',
      _crlf(b'\tif (nRet == REQUEST_EQUIP_ITEM)\n\t{\n\t}'),
      _crlf(b'\tif (nRet == REQUEST_EQUIP_ITEM)\n\t{\n'
-           b'\t\t// Mac do = dung HAI lenh move nhu keo-tha (server giu m_Hand giua hai buoc):\n'
-           b'\t\t//  1) nhac tu o tui len tay: MoveItem(SrcPos, SrcPos)\n'
-           b'\t\t//  2) mac tu tay vao o trang bi: MoveItem(equip, equip) voi nX = itempart\n'
-           b'\t\t// Mot lenh bag->equip KHONG equip (ExchangeItem chi Equip tu m_Hand).\n'
-           b'\t\tMoveItem(SrcPos, SrcPos);\n'
+           b'\t\t// Mac do = MOT lenh move CHEO tu o tui sang o trang bi.\n'
+           b'\t\t// Truoc day dung 3 MoveItem (pick/equip/putback) NHUNG SendClientCmdMoveItem\n'
+           b'\t\t// return ngay khi IsLockOperation() -> sau goi DAU (pick) item-list bi khoa\n'
+           b'\t\t// -> goi 2 (equip) + 3 KHONG bao gio gui -> item chi len tay, khong mac.\n'
+           b'\t\t// Nay gui MOT goi cheo (giong cat/lay ruong): server ServerMoveItem tach\n'
+           b'\t\t// thanh pick(tui->tay) + put(tay->o trang bi=Equip). 1 goi -> khong dinh lock.\n'
            b'\t\tItemPos EquipPos;\n'
            b'\t\tEquipPos.nPlace = pos_equip;\n'
            b'\t\tEquipPos.nX = m_ItemList.GetEquipPlace(Item[nItemID].GetDetailType());\n'
            b'\t\tEquipPos.nY = 0;\n'
-           b'\t\tg_DebugLog("[EQUIP] item=%d genre=%d detail=%d slot=%d pos_equip=%d src=%d,%d,%d hand=%d", nItemID, Item[nItemID].GetGenre(), Item[nItemID].GetDetailType(), EquipPos.nX, pos_equip, SrcPos.nPlace, SrcPos.nX, SrcPos.nY, m_ItemList.Hand());\n'
-           b'\t\tMoveItem(EquipPos, EquipPos);\n'
-           b'\t\t// Buoc 3: neu o trang bi da co do, ExchangeItem day do CU len tay\n'
-           b'\t\t// (m_Hand). Cat no ve o hanh trang cu (SrcPos gio trong) de khong\n'
-           b'\t\t// dinh tren con tro. O trong thi tay rong -> lenh nay vo hai (noop).\n'
-           b'\t\tMoveItem(SrcPos, SrcPos);\n'
+           b'\t\tg_DebugLog("[EQUIP] item=%d detail=%d slot=%d pos_equip=%d src=%d,%d,%d hand=%d", nItemID, Item[nItemID].GetDetailType(), EquipPos.nX, pos_equip, SrcPos.nPlace, SrcPos.nX, SrcPos.nY, m_ItemList.Hand());\n'
+           b'\t\tMoveItem(SrcPos, EquipPos);\n'
            b'\t}'),
-     'ApplyUseItem mac do bang hai buoc move (nhac len tay roi mac vao o)')
+     'ApplyUseItem mac do bang MOT move cheo (khong dinh IsLockOperation)')
 
 # ---------------------------------------------------------------------------
 # ICON O TRANG BI VE TO NHU CU. Ta co icon SPR ve 1-o cho hanh trang (co-icon-
