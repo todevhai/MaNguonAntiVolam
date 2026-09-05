@@ -2105,7 +2105,7 @@ edit('Core/Src/CoreShell.cpp',
            b'\tbool bDaLaKhongGian = (mode >= 10);\n'
            b'\tif (bDaLaKhongGian)\n'
            b'\t\tmode -= 10;\n'
-           b'\telse if (s_nSoChang > 0)\n'
+           b'\telse\n'
            b'\t{\n'
            b'\t\t/* Lenh di TAY cua nguoi choi (click khung game -> Mouse_Action ->\n'
            b'\t\t   GotoWhere mode 0/1/2) trong luc dang chay duong tu tim: HUY duong.\n'
@@ -2117,9 +2117,24 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\ts_nChangDang = 0;\n'
            b'\t\ts_nSoLanKet = 0;\n'
            b'\t\ts_bTinhLai = 0;\n'
+           b'\t\t/* He A* moi: huy auto-path tren player VA xoa VECTOR chi huong tren ban\n'
+           b'\t\t   do. Truoc day chi xoa vector khi TOI dich -> can thiep huong di giua\n'
+           b'\t\t   chung thi vector con nguyen. */\n'
+           b'\t\textern int g_nDichSpaceX;\n'
+           b'\t\textern int g_nDichSpaceY;\n'
+           b'\t\tg_nDichSpaceX = -1;\n'
+           b'\t\tg_nDichSpaceY = -1;\n'
+           b'\t\tint nApMe = Player[CLIENT_PLAYER_INDEX].m_nIndex;\n'
+           b'\t\tif (nApMe > 0)\n'
+           b'\t\t{\n'
+           b'\t\t\tNpc[nApMe].m_nAutoPathCnt = 0;\n'
+           b'\t\t\tNpc[nApMe].m_nAutoPathIdx = 0;\n'
+           b'\t\t\tNpc[nApMe].m_bAutoFar = 0;\n'
+           b'\t\t\tNpc[nApMe].m_nAutoStall = 0;\n'
+           b'\t\t}\n'
            b'\t}\n'
            b'\tif (mode < 0 || mode > 2)'),
-     'GotoWhere: click khung game huy duong tu tim (truoc throttle)')
+     'GotoWhere: click khung game huy duong tu tim + xoa vector (truoc throttle)')
 
 edit('Core/Src/CoreShell.cpp',
      b'\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);',
@@ -3669,6 +3684,7 @@ edit('Core/Src/KNpc.h',
            b'\tint\t\t\t\t\tm_nAutoPathCnt, m_nAutoPathIdx, m_nAutoPathRecalc;\t// so wp + wp dang di + so lan tinh lai\n'
            b'\tint\t\t\t\t\tm_nAutoPathNoProg, m_nAutoPathLastDist;\t// dem frame khong tien + khoang cach frame truoc (bat ket khi GetDir==1 ma va cham)\n'
            b'\tint\t\t\t\t\tm_nAutoFarX, m_nAutoFarY, m_bAutoFar;\t// dich XA that (nac-stepping toi dich ngoai vung nap)\n'
+           b'\tint\t\t\t\t\tm_nAutoLastX, m_nAutoLastY, m_nAutoStall;\t// vi tri lan truoc + dem ke't tuyet doi (chong giat khi ke't)\n'
            b'\tint\t\t\t\t\tm_SkillParam1, m_SkillParam2;'),
      'them truong auto-path (A*) vao KNpc')
 # (d) khoi tao truong auto-path trong KNpc::Init (Init khong memset -> phai tu zero).
@@ -3682,7 +3698,10 @@ edit('Core/Src/KNpc.cpp',
            b'\tm_nAutoPathLastDist = 0x7fffffff;\n'
            b'\tm_nAutoFarX = 0;\n'
            b'\tm_nAutoFarY = 0;\n'
-           b'\tm_bAutoFar = 0;'),
+           b'\tm_bAutoFar = 0;\n'
+           b'\tm_nAutoLastX = 0;\n'
+           b'\tm_nAutoLastY = 0;\n'
+           b'\tm_nAutoStall = 0;'),
      'khoi tao truong auto-path trong KNpc::Init')
 # (e) GotoWhere: sau khi doi viewport->space (nX,nY = dich Mps), chay A* tu vi tri
 #     player. Co tuyen -> luu waypoint, di toi waypoint[0]. Khong -> giu di thang cu.
@@ -3918,10 +3937,29 @@ edit('Core/Src/KNpc.cpp',
            b'\t\tSubWorld[m_SubWorldIndex].Map2Mps(m_RegionIndex, m_MapX, m_MapY, 0, 0, &nGx, &nGy);\n'
            b'\t\tnGx = ((nGx << 10) + m_OffX) >> 10;\n'
            b'\t\tnGy = ((nGy << 10) + m_OffY) >> 10;\n'
-           b'\t\tint nGsx = 0, nGsy = 0;\n'
-           b'\t\tAutoPathCenteredStep(nGx, nGy, m_DesX, m_DesY, &nGsx, &nGsy);\n'
-           b'\t\textern void SendClientCmdRun(int nX, int nY);\n'
-           b'\t\tSendClientCmdRun(nGsx, nGsy);\n'
+           b'\t\t// CHONG GIAT: theo doi vi tri THAT. Neu KHONG nhich (>8 Mps) qua ~48 khung\n'
+           b'\t\t// (12 lan check) -> KET that -> DUNG HAN thay vi gui lien tuc (nhan vat\n'
+           b'\t\t// dung yen ma cu ban lenh -> giat giat). Con nhich thi reset dem.\n'
+           b'\t\tint nMvx = nGx - m_nAutoLastX; if (nMvx < 0) nMvx = -nMvx;\n'
+           b'\t\tint nMvy = nGy - m_nAutoLastY; if (nMvy < 0) nMvy = -nMvy;\n'
+           b'\t\tif (nMvx + nMvy > 8)\n'
+           b'\t\t{\n'
+           b'\t\t\tm_nAutoLastX = nGx; m_nAutoLastY = nGy; m_nAutoStall = 0;\n'
+           b'\t\t}\n'
+           b'\t\telse if (++m_nAutoStall >= 12)\n'
+           b'\t\t{\n'
+           b'\t\t\tm_nAutoPathCnt = 0; m_nAutoPathIdx = 0; m_nAutoStall = 0; m_bAutoFar = 0;\n'
+           b'\t\t\textern int g_nDichSpaceX; extern int g_nDichSpaceY;\n'
+           b'\t\t\tg_nDichSpaceX = -1; g_nDichSpaceY = -1;\t// bo cuoc -> xoa vector\n'
+           b'\t\t\tg_DebugLog("[AUTOPATH] stall-stop cur=%d,%d des=%d,%d", nGx, nGy, m_DesX, m_DesY);\n'
+           b'\t\t}\n'
+           b'\t\tif (m_nAutoPathCnt > 0)\n'
+           b'\t\t{\n'
+           b'\t\t\tint nGsx = 0, nGsy = 0;\n'
+           b'\t\t\tAutoPathCenteredStep(nGx, nGy, m_DesX, m_DesY, &nGsx, &nGsy);\n'
+           b'\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
+           b'\t\t\tSendClientCmdRun(nGsx, nGsy);\n'
+           b'\t\t}\n'
            b'\t}\n'
            b'\tif (IsPlayer() && m_nAutoPathCnt > 0 && m_Doing == do_stand)\n'
            b'\t{\n'
