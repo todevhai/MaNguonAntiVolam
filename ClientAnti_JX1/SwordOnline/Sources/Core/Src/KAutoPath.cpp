@@ -290,7 +290,9 @@ void AutoPathCenteredStep(int nCurX, int nCurY, int nTowX, int nTowY,
 {
     int dx = nTowX - nCurX, dy = nTowY - nCurY;
     double d = sqrt((double)dx * dx + (double)dy * dy);
-    if (d < 1.0) { *pOutX = nTowX; *pOutY = nTowY; return; }
+    // Gan dich/waypoint (<2 o): di THANG toi dung diem, KHONG don-giua nua -- neu con
+    // don-giua o doan cuoi thi diem gui bi lech khoi dich -> dung cach dich vai o.
+    if (d < 64.0) { *pOutX = nTowX; *pOutY = nTowY; return; }
     double ux = dx / d, uy = dy / d;
     int step = (int)(d < 96.0 ? d : 96.0);              // buoc ~3 o ve phia dich
     int ax = nCurX + (int)(ux * step);
