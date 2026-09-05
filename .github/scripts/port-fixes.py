@@ -2128,6 +2128,10 @@ edit('Core/Src/CoreShell.cpp',
      'GotoWhere: bo qua phep doi khi toa do da la khong gian')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'#include "UiMiniMap.h"',
+     b'#include "UiMiniMap.h"\r\n#include "KDebug.h"',
+     'UiMiniMap them KDebug.h cho [MAPCLICK] log')
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\tcase WM_LBUTTONDOWN:',
      _crlf(b'\tcase WM_LBUTTONDOWN:\n'
            b'\t\t{\n'
@@ -2149,6 +2153,7 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\t\tMapInfo.nScallV * (nRelY - (int)m_MapSize.cy / 2);\n'
            b'\t\t\t\t\tg_nDichSpaceX = nSpaceX;\n'
            b'\t\t\t\t\tg_nDichSpaceY = nSpaceY;\n'
+           b'\t\t\t\t\tg_DebugLog("[MAPCLICK] rel=%d,%d size=%d,%d scall=%d,%d orig=%d,%d foff=%d,%d -> %d,%d", nRelX, nRelY, (int)m_MapSize.cx, (int)m_MapSize.cy, MapInfo.nScallH, MapInfo.nScallV, MapInfo.nOrigFocusH, MapInfo.nOrigFocusV, MapInfo.nFocusOffsetH, MapInfo.nFocusOffsetV, nSpaceX, nSpaceY);\n'
            b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\n'
            b'\t\t\t\t\tbreak;\n'
            b'\t\t\t\t}\n'
