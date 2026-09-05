@@ -3684,7 +3684,7 @@ edit('Core/Src/KNpc.h',
            b'\tint\t\t\t\t\tm_nAutoPathCnt, m_nAutoPathIdx, m_nAutoPathRecalc;\t// so wp + wp dang di + so lan tinh lai\n'
            b'\tint\t\t\t\t\tm_nAutoPathNoProg, m_nAutoPathLastDist;\t// dem frame khong tien + khoang cach frame truoc (bat ket khi GetDir==1 ma va cham)\n'
            b'\tint\t\t\t\t\tm_nAutoFarX, m_nAutoFarY, m_bAutoFar;\t// dich XA that (nac-stepping toi dich ngoai vung nap)\n'
-           b'\tint\t\t\t\t\tm_nAutoLastX, m_nAutoLastY, m_nAutoStall;\t// vi tri lan truoc + dem ke't tuyet doi (chong giat khi ke't)\n'
+           b'\tint\t\t\t\t\tm_nAutoLastX, m_nAutoLastY, m_nAutoStall;\t// vi tri lan truoc + dem ket tuyet doi (chong giat khi ket)\n'
            b'\tint\t\t\t\t\tm_SkillParam1, m_SkillParam2;'),
      'them truong auto-path (A*) vao KNpc')
 # (d) khoi tao truong auto-path trong KNpc::Init (Init khong memset -> phai tu zero).
