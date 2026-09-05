@@ -2642,7 +2642,7 @@ edit('Core/Src/CoreShell.cpp',
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
-     b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 20);',
+     b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);',
      'bam ban do thi TIM DUONG chu khong di thang')
 
 # Anh nen thanh trang thai (\Spr\Ui3\...\ *huyet thieu bang* .spr) DA IN SAN
@@ -2719,7 +2719,7 @@ edit('S3Client/Ui/UiCase/UiFindPos.cpp',
            b'\t{\n'
            b'\t\tg_nDichSpaceX = nO_X * 256;\n'
            b'\t\tg_nDichSpaceY = nO_Y * 512;\n'
-           b'\t\tg_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 20);\n'
+           b'\t\tg_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 10);\n'
            b'\t}\n'
            b'}\n'
            b'\n'
@@ -3592,6 +3592,7 @@ edit('Core/Src/KNpc.h',
      _crlf(b'int\t\t\t\t\tm_AutoPathX[64], m_AutoPathY[64];\t// A* waypoint (Mps) player auto-di\n'
            b'\tint\t\t\t\t\tm_nAutoPathCnt, m_nAutoPathIdx, m_nAutoPathRecalc;\t// so wp + wp dang di + so lan tinh lai\n'
            b'\tint\t\t\t\t\tm_nAutoPathNoProg, m_nAutoPathLastDist;\t// dem frame khong tien + khoang cach frame truoc (bat ket khi GetDir==1 ma va cham)\n'
+           b'\tint\t\t\t\t\tm_nAutoFarX, m_nAutoFarY, m_bAutoFar;\t// dich XA that (nac-stepping toi dich ngoai vung nap)\n'
            b'\tint\t\t\t\t\tm_SkillParam1, m_SkillParam2;'),
      'them truong auto-path (A*) vao KNpc')
 # (d) khoi tao truong auto-path trong KNpc::Init (Init khong memset -> phai tu zero).
@@ -3602,7 +3603,10 @@ edit('Core/Src/KNpc.cpp',
            b'\tm_nAutoPathIdx = 0;\n'
            b'\tm_nAutoPathRecalc = 0;\n'
            b'\tm_nAutoPathNoProg = 0;\n'
-           b'\tm_nAutoPathLastDist = 0x7fffffff;'),
+           b'\tm_nAutoPathLastDist = 0x7fffffff;\n'
+           b'\tm_nAutoFarX = 0;\n'
+           b'\tm_nAutoFarY = 0;\n'
+           b'\tm_bAutoFar = 0;'),
      'khoi tao truong auto-path trong KNpc::Init')
 # (e) GotoWhere: sau khi doi viewport->space (nX,nY = dich Mps), chay A* tu vi tri
 #     player. Co tuyen -> luu waypoint, di toi waypoint[0]. Khong -> giu di thang cu.
@@ -3622,7 +3626,10 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\tSubWorld[pApMe->m_SubWorldIndex].Map2Mps(pApMe->m_RegionIndex, pApMe->m_MapX, pApMe->m_MapY, 0, 0, &nApSx, &nApSy);\n'
            b'\t\t\tnApSx = ((nApSx << 10) + pApMe->m_OffX) >> 10;\n'
            b'\t\t\tnApSy = ((nApSy << 10) + pApMe->m_OffY) >> 10;\n'
-           b'\t\t\tint nApWp = AutoPathFind(nApSx, nApSy, nX, nY, pApMe->m_AutoPathX, pApMe->m_AutoPathY, AUTOPATH_MAX_WP);\n'
+           b'\t\t\tint bApFin = 1;\n'
+           b'\t\t\tint nApWp = AutoPathFindStep(nApSx, nApSy, nX, nY, pApMe->m_AutoPathX, pApMe->m_AutoPathY, AUTOPATH_MAX_WP, &bApFin);\n'
+           b'\t\t\tpApMe->m_nAutoFarX = nX; pApMe->m_nAutoFarY = nY;\t// dich XA that (co the ngoai vung nap)\n'
+           b'\t\t\tpApMe->m_bAutoFar = (nApWp > 0 && !bApFin) ? 1 : 0;\t// wp moi toi mot nac -> con phai di tiep\n'
            b'\t\t\t/* In LOAI VAT CAN (o=obstacle kind), khong in TestBarrier: TestBarrier tra\n'
            b'\t\t\t   DO CAO dia hinh khi khong co vat can canh, doc ra tuong nham. */\n'
            b'\t\t\tg_DebugLog("[AUTOPATH] start=%d,%d(o%d) goal=%d,%d(o%d) wp=%d", nApSx, nApSy, (int)g_ScenePlace.GetObstacleInfo(nApSx, nApSy), nX, nY, (int)g_ScenePlace.GetObstacleInfo(nX, nY), nApWp);\n'
@@ -3757,7 +3764,7 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\t\tg_DebugLog("[AUTOPATH] adv %d/%d des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, m_DesX, m_DesY);\n'
            b'\t\t\t\treturn;\n'
            b'\t\t\t}\n'
-           b'\t\t\tif (!(nApDx <= 48 && nApDy <= 48) && m_nAutoPathRecalc < 10)\n'
+           b'\t\t\tif (!(nApDx <= 48 && nApDy <= 48) && m_nAutoPathRecalc < 40)\n'
            b'\t\t\t{\n'
            b'\t\t\t\tint nApGx = m_AutoPathX[m_nAutoPathCnt - 1];\n'
            b'\t\t\t\tint nApGy = m_AutoPathY[m_nAutoPathCnt - 1];\n'
@@ -3774,6 +3781,28 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\t\t\tg_DebugLog("[AUTOPATH] recalc %d wp=%d cur=%d,%d stuck=%d", m_nAutoPathRecalc, nApWp, nApCurMx, nApCurMy, (int)bApStuck);\n'
            b'\t\t\t\t\treturn;\n'
            b'\t\t\t\t}\n'
+           b'\t\t\t}\n'
+           b'\t\t\t// Toi het waypoint (nac) ma dich XA that van con -> di tiep tung nac.\n'
+           b'\t\t\tif (m_bAutoFar && m_nAutoPathRecalc < 40)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tint nFdx = nApCurMx - m_nAutoFarX; if (nFdx < 0) nFdx = -nFdx;\n'
+           b'\t\t\t\tint nFdy = nApCurMy - m_nAutoFarY; if (nFdy < 0) nFdy = -nFdy;\n'
+           b'\t\t\t\tif (nFdx > 48 || nFdy > 48)\n'
+           b'\t\t\t\t{\n'
+           b'\t\t\t\t\tint bApFin2 = 1;\n'
+           b'\t\t\t\t\tint nApWp2 = AutoPathFindStep(nApCurMx, nApCurMy, m_nAutoFarX, m_nAutoFarY, m_AutoPathX, m_AutoPathY, AUTOPATH_MAX_WP, &bApFin2);\n'
+           b'\t\t\t\t\tif (nApWp2 > 0)\n'
+           b'\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\tm_nAutoPathCnt = nApWp2; m_nAutoPathIdx = 0; m_nAutoPathRecalc++;\n'
+           b'\t\t\t\t\t\tm_bAutoFar = bApFin2 ? 0 : 1;\n'
+           b'\t\t\t\t\t\tm_DesX = m_AutoPathX[0]; m_DesY = m_AutoPathY[0];\n'
+           b'\t\t\t\t\t\tm_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;\n'
+           b'\t\t\t\t\t\tif (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);\n'
+           b'\t\t\t\t\t\tg_DebugLog("[AUTOPATH] nac %d wp=%d cur=%d,%d far=%d,%d fin=%d", m_nAutoPathRecalc, nApWp2, nApCurMx, nApCurMy, m_nAutoFarX, m_nAutoFarY, bApFin2);\n'
+           b'\t\t\t\t\t\treturn;\n'
+           b'\t\t\t\t\t}\n'
+           b'\t\t\t\t}\n'
+           b'\t\t\t\tm_bAutoFar = 0;\n'
            b'\t\t\t}\n'
            b'\t\t\tm_nAutoPathCnt = 0;\n'
            b'\t\t\tm_nAutoPathIdx = 0;\n'

@@ -14,4 +14,9 @@
 int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
                  int* pOutX, int* pOutY, int nMaxOut);
 
+// Nhu tren nhung di toi dich XA (ngoai vung nap) theo tung nac. *pbFinal=1 neu
+// toi dung dich, 0 neu moi toi mot nac trung gian (caller goi lai khi toi nac).
+int AutoPathFindStep(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
+                     int* pOutX, int* pOutY, int nMaxOut, int* pbFinal);
+
 #endif

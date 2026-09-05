@@ -291,3 +291,47 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
     #undef AP_IDX
     return nOut;
 }
+
+
+// -------------------------------------------------------------------------
+//  AutoPathFindStep -- tim duong toi dich co the RAT XA (ngoai vung da nap).
+//  Client chi nap vung quanh nguoi choi; dich xa -> AutoPathFind tra 0 (giua
+//  duong/dich la o 0xff chua nap). Thay vi di thang dam tuong, ta nham toi mot
+//  "nac" = diem gan hon theo huong dich, con nam trong vung nap, A* toi do
+//  (vong qua vat can trong vung nap). Caller di toi nac -> nap them vung -> goi
+//  lai -> tien dan tung nac toi khi dich vao vung nap thi A* binh thuong.
+//  *pbFinal = 1 neu chuoi waypoint toi DUNG dich that; 0 neu chi toi mot nac.
+//  Tra so waypoint; 0 = chiu han (caller di thang fallback nhu cu).
+// -------------------------------------------------------------------------
+int AutoPathFindStep(int sx, int sy, int gx, int gy,
+                     int* pOutX, int* pOutY, int nMaxOut, int* pbFinal)
+{
+    if (pbFinal) *pbFinal = 1;
+    int n = AutoPathFind(sx, sy, gx, gy, pOutX, pOutY, nMaxOut);
+    if (n > 0) return n;                 // toi thang dich duoc
+
+    int scx = MpsToCell(sx), scy = MpsToCell(sy);
+    int gcx = MpsToCell(gx), gcy = MpsToCell(gy);
+    int dcx = gcx - scx, dcy = gcy - scy;
+    int adx = dcx < 0 ? -dcx : dcx;
+    int ady = dcy < 0 ? -dcy : dcy;
+    int dist = adx > ady ? adx : ady;    // khoang cach o (chebyshev)
+    if (dist <= 0) return 0;
+
+    // Thu nac gan dan: nham diem cach  o theo huong dich. Reach lon truoc
+    // (di duoc nhieu moi nac); A* vong qua vat can trong vung nap toi nac do.
+    // Reach nao cho A* ra tuyen thi dung. Tat ca < AP_MAX_WIN de cua so A* du chua.
+    static const int REACH[4] = { 144, 96, 48, 24 };  // <= AP_MAX_WIN-2*AP_MARGIN-1 (=159) de cua so A* du chua
+    int r;
+    for (r = 0; r < 4; r++)
+    {
+        int reach = REACH[r];
+        if (reach >= dist) continue;     // >= dist thi da thu o AutoPathFind(dich) o tren
+        int ncx = scx + (int)((double)dcx * reach / dist);
+        int ncy = scy + (int)((double)dcy * reach / dist);
+        int nacx = CellToMps(ncx), nacy = CellToMps(ncy);
+        n = AutoPathFind(sx, sy, nacx, nacy, pOutX, pOutY, nMaxOut);
+        if (n > 0) { if (pbFinal) *pbFinal = 0; return n; }
+    }
+    return 0;
+}
