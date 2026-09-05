@@ -12,12 +12,16 @@
 // -------------------------------------------------------------------------
 #include "KWin32.h"
 #include "KCore.h"
+#include "KEngine.h"                 // KPakFile (dinh nghia day du) de doc file region
 #include "KSubWorld.h"
 #include "Scene/KScenePlaceC.h"      // g_ScenePlace.GetObstacleInfo -> LOAI VAT CAN
 #include "Scene/ObstacleDef.h"       // Obstacle_NULL / Normal / Fly / Jump / JumpFly
+#include "Scene/KScenePlaceRegionC.h" // RWPP_AREGION_*, RWP_OBSTACLE_*, m_ObstacleInfo layout
+#include "Scene/SceneDataDef.h"      // KCombinFileSection, REGION_OBSTACLE_FILE_INDEX
 #include "KAutoPath.h"
 #include "KDebug.h"    // g_DebugLog (build chan doan so sanh duong)
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef defLOGIC_CELL_WIDTH
 #define defLOGIC_CELL_WIDTH   32
@@ -32,6 +36,138 @@
 static int  TestBarrierMps(int nMpsX, int nMpsY)
 {
     return SubWorld[0].TestBarrier(nMpsX, nMpsY);
+}
+
+// =========================================================================
+//  NAP TRUOC TOAN BO LOP VAT CAN CUA SUBWORLD (client von streaming tung vung).
+//
+//  Ly do: client chi giu vung quanh nhan vat, vung xa tra 0xff (chua nap) ->
+//  A* coi la tuong -> ket o bien nap / cuc tieu cuc bo -> "khong di het".
+//  Lop vat can rat nhe (moi region 16x32 o = 2KB), va o vat can = 32x32 Mps =
+//  DUNG mot o A*. Nap truoc ca subworld -> A* thay het tuong + cong -> di tron.
+//  Chi doc muc OBSTACLE trong Region_C.dat (bo do hoa) nen re. Cross-map van
+//  dung bang tuyen autopathfindroutes.txt.
+// =========================================================================
+#define AP_OBS_RX   16     // ban kinh quet region theo x (region rong 512 Mps)
+#define AP_OBS_RY   10     // ban kinh quet region theo y (region cao 1024 Mps)
+#define AP_RG_W     (KScenePlaceRegionC::RWPP_AREGION_WIDTH)   // 512
+#define AP_RG_H     (KScenePlaceRegionC::RWPP_AREGION_HEIGHT)  // 1024
+#define AP_RG_CW    16     // o vat can moi region theo x (512/32)
+#define AP_RG_CH    32     // o vat can moi region theo y (1024/32)
+
+static long* g_apObs   = 0;   // luoi vat can da nap: [g_apObsCH][g_apObsCW], raw lInfo; -1 = trong
+static int   g_apObsCX0 = 0, g_apObsCY0 = 0;   // goc luoi theo o vat can (toan cuc)
+static int   g_apObsCW  = 0, g_apObsCH  = 0;
+static int   g_apObsCRX = -9999, g_apObsCRY = -9999;  // tam (region) cua lan nap
+static char  g_apObsMap[96] = { 0 };           // root path map da nap (doi map thi nap lai)
+
+// Doc rieng muc OBSTACLE (2KB) cua mot region tu Region_C.dat. true neu co.
+static bool AP_ReadRegionObstacle(const char* root, int rx, int ry, long out[AP_RG_CW][AP_RG_CH])
+{
+    char file[260];
+    sprintf(file, "%s\\v_%03d\\%03d_" REGION_COMBIN_FILE_NAME_CLIENT, root, ry, rx);
+    KPakFile f;
+    if (!f.Open(file)) return false;
+    unsigned int uMax = 0;
+    f.Read(&uMax, sizeof(unsigned int));
+    if (uMax == 0 || uMax > 64) { f.Close(); return false; }
+    KCombinFileSection elem[REGION_ELEM_FILE_COUNT];
+    memset(elem, 0, sizeof(elem));
+    if (uMax > REGION_ELEM_FILE_COUNT)
+    {
+        f.Read(elem, sizeof(KCombinFileSection) * REGION_ELEM_FILE_COUNT);
+        f.Seek(sizeof(KCombinFileSection) * (uMax - REGION_ELEM_FILE_COUNT), FILE_CURRENT);
+    }
+    else
+        f.Read(elem, sizeof(KCombinFileSection) * uMax);
+    unsigned int ahead = sizeof(unsigned int) + sizeof(KCombinFileSection) * uMax;
+    bool ok = false;
+    if (elem[REGION_OBSTACLE_FILE_INDEX].uLength >= sizeof(long) * AP_RG_CW * AP_RG_CH)
+    {
+        f.Seek(ahead + elem[REGION_OBSTACLE_FILE_INDEX].uOffset, FILE_BEGIN);
+        f.Read(out, sizeof(long) * AP_RG_CW * AP_RG_CH);
+        ok = true;
+    }
+    f.Close();
+    return ok;
+}
+
+// Nap truoc lop vat can quanh (centerMpsX,Y) trong ban kinh AP_OBS_R*.
+static void AP_BuildFullObs(const char* root, int cMpsX, int cMpsY)
+{
+    if (g_apObs) { free(g_apObs); g_apObs = 0; }
+    int crx = cMpsX / AP_RG_W, cry = cMpsY / AP_RG_H;
+    int rx0 = crx - AP_OBS_RX; if (rx0 < 0) rx0 = 0;
+    int ry0 = cry - AP_OBS_RY; if (ry0 < 0) ry0 = 0;
+    int rx1 = crx + AP_OBS_RX;
+    int ry1 = cry + AP_OBS_RY;
+    g_apObsCX0 = rx0 * AP_RG_CW;
+    g_apObsCY0 = ry0 * AP_RG_CH;
+    g_apObsCW  = (rx1 - rx0 + 1) * AP_RG_CW;
+    g_apObsCH  = (ry1 - ry0 + 1) * AP_RG_CH;
+    int N = g_apObsCW * g_apObsCH;
+    g_apObs = (long*)malloc(sizeof(long) * N);
+    if (!g_apObs) { g_apObsCW = g_apObsCH = 0; return; }
+    int i;
+    for (i = 0; i < N; i++) g_apObs[i] = -1;
+
+    int nLoaded = 0, rx, ry, lx, ly;
+    for (ry = ry0; ry <= ry1; ry++)
+        for (rx = rx0; rx <= rx1; rx++)
+        {
+            long ob[AP_RG_CW][AP_RG_CH];
+            if (!AP_ReadRegionObstacle(root, rx, ry, ob)) continue;
+            nLoaded++;
+            for (lx = 0; lx < AP_RG_CW; lx++)
+                for (ly = 0; ly < AP_RG_CH; ly++)
+                {
+                    int gcx = rx * AP_RG_CW + lx - g_apObsCX0;
+                    int gcy = ry * AP_RG_CH + ly - g_apObsCY0;
+                    g_apObs[gcy * g_apObsCW + gcx] = ob[lx][ly];
+                }
+        }
+    strncpy(g_apObsMap, root, sizeof(g_apObsMap) - 1);
+    g_apObsMap[sizeof(g_apObsMap) - 1] = 0;
+    g_apObsCRX = crx; g_apObsCRY = cry;
+    g_DebugLog("[AP-OBS] nap %d region quanh r(%d,%d) luoi %dx%d o = %d KB",
+               nLoaded, crx, cry, g_apObsCW, g_apObsCH, (int)(sizeof(long) * N / 1024));
+}
+
+// Nap lai neu doi map hoac nhan vat ra gan ria vung da nap.
+static void AP_EnsureFullObs(int mpsX, int mpsY)
+{
+    const char* root = g_ScenePlace.GetPlaceRootPath();
+    if (!root || !root[0]) return;
+    int crx = mpsX / AP_RG_W, cry = mpsY / AP_RG_H;
+    int dcx = crx - g_apObsCRX; if (dcx < 0) dcx = -dcx;
+    int dcy = cry - g_apObsCRY; if (dcy < 0) dcy = -dcy;
+    if (g_apObs && strcmp(g_apObsMap, root) == 0 && dcx <= AP_OBS_RX - 6 && dcy <= AP_OBS_RY - 4)
+        return;                                  // con trong vung da nap -> thoi
+    AP_BuildFullObs(root, mpsX, mpsY);
+}
+
+// Loai vat can tu luoi da nap truoc. -1 = ngoai vung nap / region trong.
+static int AP_FullObsKind(int mpsX, int mpsY)
+{
+    if (!g_apObs || mpsX < 0 || mpsY < 0) return -1;
+    int cx = mpsX / AP_CELL - g_apObsCX0;
+    int cy = mpsY / AP_CELL - g_apObsCY0;
+    if (cx < 0 || cy < 0 || cx >= g_apObsCW || cy >= g_apObsCH) return -1;
+    long info = g_apObs[cy * g_apObsCW + cx];
+    if (info < 0) return -1;
+    int kind = (int)(info & 0x0f);
+    int type = (int)((info >> 4) & 0x0f);
+    int mx = mpsX - (mpsX / AP_CELL) * AP_CELL;
+    int my = mpsY - (mpsY / AP_CELL) * AP_CELL;
+    switch (type)
+    {
+    case Obstacle_LT: if (mx + my > AP_CELL) kind = Obstacle_NULL; break;
+    case Obstacle_RT: if (mx < my)          kind = Obstacle_NULL; break;
+    case Obstacle_LB: if (mx > my)          kind = Obstacle_NULL; break;
+    case Obstacle_RB: if (mx + my < AP_CELL) kind = Obstacle_NULL; break;
+    default: break;
+    }
+    return kind;
 }
 
 // -------------------------------------------------------------------------
@@ -63,6 +199,11 @@ static int MpsToCell(int m) { return m / AP_CELL; }
 static int CellPassable(int cx, int cy)
 {
     int nMx = CellToMps(cx), nMy = CellToMps(cy);
+    // Uu tien lop vat can DA NAP TRUOC (thay ca subworld, khong chi vung streaming).
+    int fk = AP_FullObsKind(nMx, nMy);
+    if (fk >= 0)
+        return fk == Obstacle_NULL;
+    // Ngoai vung nap truoc -> quay ve du lieu streaming.
     if (TestBarrierMps(nMx, nMy) == 0xff)
         return 0;                                   // vung chua nap -> coi nhu khong biet
     return ObstacleKindMps(nMx, nMy) == Obstacle_NULL;
@@ -122,6 +263,9 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
                  int* pOutX, int* pOutY, int nMaxOut)
 {
     if (!pOutX || !pOutY || nMaxOut <= 0) return 0;
+
+    // Nap truoc lop vat can ca subworld (lazy, nap lai khi doi map / ra ria vung).
+    AP_EnsureFullObs(nStartMpsX, nStartMpsY);
 
     int sCx = MpsToCell(nStartMpsX), sCy = MpsToCell(nStartMpsY);
     int gCx = MpsToCell(nGoalMpsX),  gCy = MpsToCell(nGoalMpsY);
