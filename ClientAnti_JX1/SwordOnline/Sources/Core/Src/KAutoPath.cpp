@@ -24,9 +24,9 @@
 #endif
 
 #define AP_CELL          defLOGIC_CELL_WIDTH   // Mps moi o luoi
-#define AP_MAX_WIN       256                   // canh cua so tim toi da (o luoi)
-#define AP_MAX_NODES     20000                 // cap so node mo -> tranh treo
-#define AP_MARGIN        48                    // no cua so quanh bbox(start,goal) (o luoi)
+#define AP_MAX_WIN       416                   // canh cua so tim toi da (o luoi) - lon de thay cong lech ngoai tam
+#define AP_MAX_NODES     60000                 // cap so node mo -> tranh treo (cua so lon hon)
+#define AP_MARGIN        64                    // no cua so quanh bbox(start,goal) (o luoi)
 
 // SubWorld[] la global khai bao extern trong KSubWorld.h -> khong khai lai.
 static int  TestBarrierMps(int nMpsX, int nMpsY)
