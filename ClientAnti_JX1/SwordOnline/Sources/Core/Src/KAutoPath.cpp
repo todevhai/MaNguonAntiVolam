@@ -93,32 +93,51 @@ static bool AP_ReadRegionObstacle(const char* root, int rx, int ry, long out[AP_
     return ok;
 }
 
-// Nap truoc lop vat can quanh (centerMpsX,Y) trong ban kinh AP_OBS_R*.
-static void AP_BuildFullObs(const char* root, int cMpsX, int cMpsY)
+// Vung region can nap + con tro doc DAN (tang dan theo lo moi khung -> khong freeze).
+static int  g_apObsRx0 = 0, g_apObsRy0 = 0, g_apObsRx1 = -1, g_apObsRy1 = -1;
+static int  g_apObsCurRx = 0, g_apObsCurRy = 0;   // con tro region dang doc
+static int  g_apObsLoading = 0;                   // dang nap dan
+static int  g_apObsNLoaded = 0;                   // dem da nap
+static char g_apObsRoot[96] = { 0 };
+
+// BAT DAU nap: cap phat luoi + dat con tro. KHONG doc file o day (tranh freeze ~573
+// file mot luc). Near-cell van co tu du lieu STREAMING nen A* dung ngay duoc; far-cell
+// dien dan qua AutoPathObsTick moi khung (~0.4s xong), khong dung hinh.
+static void AP_StartFullObs(const char* root, int cMpsX, int cMpsY)
 {
     if (g_apObs) { free(g_apObs); g_apObs = 0; }
     int crx = cMpsX / AP_RG_W, cry = cMpsY / AP_RG_H;
-    int rx0 = crx - AP_OBS_RX; if (rx0 < 0) rx0 = 0;
-    int ry0 = cry - AP_OBS_RY; if (ry0 < 0) ry0 = 0;
-    int rx1 = crx + AP_OBS_RX;
-    int ry1 = cry + AP_OBS_RY;
-    g_apObsCX0 = rx0 * AP_RG_CW;
-    g_apObsCY0 = ry0 * AP_RG_CH;
-    g_apObsCW  = (rx1 - rx0 + 1) * AP_RG_CW;
-    g_apObsCH  = (ry1 - ry0 + 1) * AP_RG_CH;
-    int N = g_apObsCW * g_apObsCH;
+    g_apObsRx0 = crx - AP_OBS_RX; if (g_apObsRx0 < 0) g_apObsRx0 = 0;
+    g_apObsRy0 = cry - AP_OBS_RY; if (g_apObsRy0 < 0) g_apObsRy0 = 0;
+    g_apObsRx1 = crx + AP_OBS_RX;
+    g_apObsRy1 = cry + AP_OBS_RY;
+    g_apObsCX0 = g_apObsRx0 * AP_RG_CW;
+    g_apObsCY0 = g_apObsRy0 * AP_RG_CH;
+    g_apObsCW  = (g_apObsRx1 - g_apObsRx0 + 1) * AP_RG_CW;
+    g_apObsCH  = (g_apObsRy1 - g_apObsRy0 + 1) * AP_RG_CH;
+    int N = g_apObsCW * g_apObsCH, i;
     g_apObs = (long*)malloc(sizeof(long) * N);
-    if (!g_apObs) { g_apObsCW = g_apObsCH = 0; return; }
-    int i;
+    if (!g_apObs) { g_apObsCW = g_apObsCH = 0; g_apObsLoading = 0; return; }
     for (i = 0; i < N; i++) g_apObs[i] = -1;
+    g_apObsCurRx = g_apObsRx0; g_apObsCurRy = g_apObsRy0;
+    g_apObsLoading = 1; g_apObsNLoaded = 0;
+    strncpy(g_apObsMap, root, sizeof(g_apObsMap) - 1); g_apObsMap[sizeof(g_apObsMap) - 1] = 0;
+    strncpy(g_apObsRoot, root, sizeof(g_apObsRoot) - 1); g_apObsRoot[sizeof(g_apObsRoot) - 1] = 0;
+    g_apObsCRX = crx; g_apObsCRY = cry;
+}
 
-    int nLoaded = 0, rx, ry, lx, ly;
-    for (ry = ry0; ry <= ry1; ry++)
-        for (rx = rx0; rx <= rx1; rx++)
+// Doc mot LO toi da nBatch region tu con tro. Goi moi khung (tu KNpc::Activate).
+void AutoPathObsTick(int nBatch)
+{
+    if (!g_apObsLoading || !g_apObs) return;
+    int n = 0, lx, ly;
+    while (g_apObsLoading && n < nBatch)
+    {
+        int rx = g_apObsCurRx, ry = g_apObsCurRy;
+        long ob[AP_RG_CW][AP_RG_CH];
+        if (AP_ReadRegionObstacle(g_apObsRoot, rx, ry, ob))
         {
-            long ob[AP_RG_CW][AP_RG_CH];
-            if (!AP_ReadRegionObstacle(root, rx, ry, ob)) continue;
-            nLoaded++;
+            g_apObsNLoaded++;
             for (lx = 0; lx < AP_RG_CW; lx++)
                 for (ly = 0; ly < AP_RG_CH; ly++)
                 {
@@ -127,14 +146,21 @@ static void AP_BuildFullObs(const char* root, int cMpsX, int cMpsY)
                     g_apObs[gcy * g_apObsCW + gcx] = ob[lx][ly];
                 }
         }
-    strncpy(g_apObsMap, root, sizeof(g_apObsMap) - 1);
-    g_apObsMap[sizeof(g_apObsMap) - 1] = 0;
-    g_apObsCRX = crx; g_apObsCRY = cry;
-    g_DebugLog("[AP-OBS] nap %d region quanh r(%d,%d) luoi %dx%d o = %d KB",
-               nLoaded, crx, cry, g_apObsCW, g_apObsCH, (int)(sizeof(long) * N / 1024));
+        n++;
+        if (++g_apObsCurRx > g_apObsRx1)
+        {
+            g_apObsCurRx = g_apObsRx0;
+            if (++g_apObsCurRy > g_apObsRy1)
+            {
+                g_apObsLoading = 0;   // xong
+                g_DebugLog("[AP-OBS] nap XONG %d region quanh r(%d,%d) luoi %dx%d o",
+                           g_apObsNLoaded, g_apObsCRX, g_apObsCRY, g_apObsCW, g_apObsCH);
+            }
+        }
+    }
 }
 
-// Nap lai neu doi map hoac nhan vat ra gan ria vung da nap.
+// Nap lai neu doi map hoac nhan vat ra gan ria vung da nap (chi BAT DAU, doc dan sau).
 static void AP_EnsureFullObs(int mpsX, int mpsY)
 {
     const char* root = g_ScenePlace.GetPlaceRootPath();
@@ -144,7 +170,8 @@ static void AP_EnsureFullObs(int mpsX, int mpsY)
     int dcy = cry - g_apObsCRY; if (dcy < 0) dcy = -dcy;
     if (g_apObs && strcmp(g_apObsMap, root) == 0 && dcx <= AP_OBS_RX - 6 && dcy <= AP_OBS_RY - 4)
         return;                                  // con trong vung da nap -> thoi
-    AP_BuildFullObs(root, mpsX, mpsY);
+    AP_StartFullObs(root, mpsX, mpsY);
+    AutoPathObsTick(64);                          // doc ngay mot lo nho cho lan tim duong nay
 }
 
 // Loai vat can tu luoi da nap truoc. -1 = ngoai vung nap / region trong.

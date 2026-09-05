@@ -3936,6 +3936,8 @@ edit('Core/Src/KNpc.cpp',
      b'\tProcCommand(m_ProcessAI);\r\n\tProcStatus();',
      _crlf(b'\tProcCommand(m_ProcessAI);\n'
            b'\tProcStatus();\n'
+           b'\tif (IsPlayer())\n'
+           b'\t\tAutoPathObsTick(16);\t// nap DAN lop vat can subworld -> khong dung hinh khi doi map\n'
            b'\t// DI GIUA HANH LANG + LIEN TUC (y tuong user): moi ~4 khung, gui mot buoc\n'
            b'\t// ngan ve phia waypoint nhung DON VAO GIUA hai tuong. Server luon co dich\n'
            b'\t// gan phia truoc -> di MUOT khong dung o nga re; luon giua duong -> khong\n'

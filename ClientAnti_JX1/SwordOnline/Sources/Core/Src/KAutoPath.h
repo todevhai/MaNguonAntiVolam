@@ -30,4 +30,8 @@ void AutoPathClearStuck();
 void AutoPathCenteredStep(int nCurX, int nCurY, int nTowX, int nTowY,
                           int* pOutX, int* pOutY);
 
+// Doc DAN lop vat can subworld (tang dan theo lo, tranh freeze ~573 file/luc). Goi
+// moi khung tu KNpc::Activate; khong nap thi ve ngay (re).
+void AutoPathObsTick(int nBatch);
+
 #endif
