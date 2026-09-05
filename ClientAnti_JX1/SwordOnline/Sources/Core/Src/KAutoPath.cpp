@@ -327,10 +327,39 @@ int AutoPathFindStep(int sx, int sy, int gx, int gy,
 {
     if (pbFinal) *pbFinal = 1;
     int n = AutoPathFind(sx, sy, gx, gy, pOutX, pOutY, nMaxOut);
-    if (n <= 0) return 0;
-    // Toi dich that neu waypoint cuoi cach dich <= 1 o (32 Mps).
-    int dx = pOutX[n - 1] - gx; if (dx < 0) dx = -dx;
-    int dy = pOutY[n - 1] - gy; if (dy < 0) dy = -dy;
-    if (pbFinal) *pbFinal = (dx <= AP_CELL && dy <= AP_CELL) ? 1 : 0;
-    return n;
+    if (n > 0)
+    {
+        int dx = pOutX[n - 1] - gx; if (dx < 0) dx = -dx;
+        int dy = pOutY[n - 1] - gy; if (dy < 0) dy = -dy;
+        if (pbFinal) *pbFinal = (dx <= AP_CELL && dy <= AP_CELL) ? 1 : 0;
+        return n;
+    }
+
+    // A* ket o BIEN vung nap (bestNode == start). Bat chuoc ban hoan chinh jx9tn:
+    // no khong dung o bien ma NHAY THANG ve phia dich vao ca vung chua nap - server
+    // (co du lieu day du) se di + client nap vung doc duong, roi tinh lai. Chi lam
+    // khi huong dich la vung CHUA NAP (0xff), khong phai tuong THAT (da nap ma chan).
+    int scx = MpsToCell(sx), scy = MpsToCell(sy);
+    int gcx = MpsToCell(gx), gcy = MpsToCell(gy);
+    int dcx = gcx - scx, dcy = gcy - scy;
+    int adx = dcx < 0 ? -dcx : dcx;
+    int ady = dcy < 0 ? -dcy : dcy;
+    int dist = adx > ady ? adx : ady;
+    if (dist <= 0) return 0;
+
+    // Tham do o cach ~4 o ve phia dich: chua nap thi moi nhay (tin server).
+    int probe = dist < 4 ? dist : 4;
+    int pcx = scx + (int)((double)dcx * probe / dist);
+    int pcy = scy + (int)((double)dcy * probe / dist);
+    if (TestBarrierMps(CellToMps(pcx), CellToMps(pcy)) != 0xff)
+        return 0;                        // tuong that / da nap ma A* ket -> chiu, dung
+
+    int hop = dist < 48 ? dist : 48;     // buoc nhay ~48 o (jx9tn nhay toi 57)
+    int hx = scx + (int)((double)dcx * hop / dist);
+    int hy = scy + (int)((double)dcy * hop / dist);
+    pOutX[0] = CellToMps(hx);
+    pOutY[0] = CellToMps(hy);
+    if (pbFinal) *pbFinal = (hop >= dist) ? 1 : 0;
+    g_DebugLog("[AP-WP] nhay-nap %d,%d (dich %d,%d dist %d o)", pOutX[0], pOutY[0], gx, gy, dist);
+    return 1;
 }
