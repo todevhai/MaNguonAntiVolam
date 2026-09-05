@@ -3142,11 +3142,15 @@ void	KPlayer::MoveItem(ItemPos DownPos, ItemPos UpPos)
 				sMsg.byParamSize = 0;
 				sprintf(sMsg.szMessage, MSG_ITEM_SAME_DETAIL_IN_IMMEDIATE);
 				CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
+				// Tha trung loai bi tu choi: tra mon ve tui thay vi de ket vo hinh
+				// tren con tro (truoc day chi return -> click ra ngoai moi roi dat).
+				BOOL bReturned = m_ItemList.ReturnHandToBag();
+				g_DebugLog("[MOVE-DBG] dup immediacy -> ReturnHandToBag=%d", (int)bReturned);
 				return;
 			}
 		}
 	}
-	
+
 	SendClientCmdMoveItem(&DownPos, &UpPos);
 }
 #endif

@@ -2772,6 +2772,52 @@ void	KItemList::MenuSetMouseItem()
 }
 #endif
 
+#ifndef	_SERVER
+//---------------------------------------------------------------------
+//	Tra mon dang tren tay ve o trong dau tien cua tui (room_equipment) va
+//	xoa khoi con tro. Dung khi mot thao tac keo-tha bi tu choi tai client
+//	(vd tha trung loai vao o phim tat) - truoc day chi return nen mon ket
+//	vo hinh tren tay, click ra ngoai moi roi dat.
+//---------------------------------------------------------------------
+BOOL	KItemList::ReturnHandToBag()
+{
+	if (!m_Hand)
+		return FALSE;
+
+	int	nIdx = m_Hand;
+	int	nListIdx = FindSame(nIdx);
+	if (nListIdx <= 0)
+		return FALSE;
+
+	int	nW = Item[nIdx].GetWidth();
+	int	nH = Item[nIdx].GetHeight();
+	POINT	pt;
+	if (!m_Room[room_equipment].FindRoom(nW, nH, &pt))
+		return FALSE;	// tui day -> giu nguyen tren tay
+	if (!m_Room[room_equipment].PlaceItem(pt.x, pt.y, nIdx, nW, nH))
+		return FALSE;
+
+	m_Items[nListIdx].nPlace = pos_equiproom;
+	m_Items[nListIdx].nX = pt.x;
+	m_Items[nListIdx].nY = pt.y;
+	m_Hand = 0;
+
+	// Thong bao UI: hien mon o o tui moi + xoa mon khoi con tro.
+	KUiObjAtContRegion	sDestInfo;
+	sDestInfo.Obj.uGenre	= CGOG_ITEM;
+	sDestInfo.Obj.uId		= nIdx;
+	sDestInfo.Region.Width	= nW;
+	sDestInfo.Region.Height	= nH;
+	sDestInfo.Region.h		= pt.x;
+	sDestInfo.Region.v		= pt.y;
+	sDestInfo.eContainer	= UOC_ITEM_TAKE_WITH;
+	CoreDataChanged(GDCNI_OBJECT_CHANGED, (DWORD)&sDestInfo, 1);
+	MenuSetMouseItem();		// m_Hand=0 -> GDCNI_HOLD_OBJECT(0,0) xoa con tro
+
+	return TRUE;
+}
+#endif
+
 #ifdef _SERVER
 BOOL KItemList::EatMecidine(int nPlace, int nX, int nY)
 {

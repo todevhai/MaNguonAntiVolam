@@ -31,14 +31,14 @@ private:
 	int			m_PlayerIdx;
 	int			m_Hand;
 	int			m_nBackHand;
-	int			m_EquipItem[itempart_num];						// Íæ¼Ò×°±¸µÄµÀ¾ß£¨¶ÔÓ¦ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄË÷Òý£©
-	PlayerItem	m_Items[MAX_PLAYER_ITEM];						// Íæ¼ÒÓµÓÐµÄËùÓÐµÀ¾ß£¨°üÀ¨×°±¸×ÅµÄºÍÏä×ÓÀï·ÅµÄ£¬¶ÔÓ¦ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄË÷Òý£©
-	PlayerItem	m_sBackItems[MAX_PLAYER_ITEM];					// ½»Ò×¹ý³ÌÖÐ m_Items µÄ±¸·Ý
-	static int	ms_ActiveEquip[itempart_num][MAX_ITEM_ACTIVE];	// Ä³¸ö²¿·ÖµÄ×°±¸Ëù¼¤»îµÄ×°±¸
-	static int	ms_ActivedEquip[itempart_num][MAX_ITEM_ACTIVE];	// Ä³¸ö²¿·ÖµÄ×°±¸±»Ê²Ã´×°±¸¼¤»î
+	int			m_EquipItem[itempart_num];						// ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½Äµï¿½ï¿½ß£ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	PlayerItem	m_Items[MAX_PLAYER_ITEM];						// ï¿½ï¿½ï¿½Óµï¿½Ðµï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ß£ï¿½ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ÅµÄºï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÅµÄ£ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	PlayerItem	m_sBackItems[MAX_PLAYER_ITEM];					// ï¿½ï¿½ï¿½×¹ï¿½ï¿½ï¿½ï¿½ï¿½ m_Items ï¿½Ä±ï¿½ï¿½ï¿½
+	static int	ms_ActiveEquip[itempart_num][MAX_ITEM_ACTIVE];	// Ä³ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½
+	static int	ms_ActivedEquip[itempart_num][MAX_ITEM_ACTIVE];	// Ä³ï¿½ï¿½ï¿½ï¿½ï¿½Öµï¿½×°ï¿½ï¿½ï¿½ï¿½Ê²Ã´×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	KLinkArray	m_FreeIdx;
 	KLinkArray	m_UseIdx;
-	int			m_nListCurIdx;									// ÓÃÓÚ GetFirstItem ºÍ GetNextItem
+	int			m_nListCurIdx;									// ï¿½ï¿½ï¿½ï¿½ GetFirstItem ï¿½ï¿½ GetNextItem
 
 	BOOL		m_bActiveSet;
 	BOOL		m_nMaskLock;	// mat na
@@ -50,14 +50,14 @@ public:
 
 private:
 	int			FindFree();
-	int			FindSame(int nGameIdx);							// nGameIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
-	int			GetEquipPlace(int nType);						// È¡µÃÄ³ÀàÐÍ×°±¸Ó¦¸Ã·ÅµÄÎ»ÖÃ
-	BOOL		Fit(int nIdx, int nPlace);						// ¼ì²éÊÇ·ñ¿ÉÒÔ×°±¸ÉÏ
+	int			FindSame(int nGameIdx);							// nGameIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
+	int			GetEquipPlace(int nType);						// È¡ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½Ó¦ï¿½Ã·Åµï¿½Î»ï¿½ï¿½
+	BOOL		Fit(int nIdx, int nPlace);						// ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½
 	BOOL		Fit(KItem* pItem, int nPlace);
-	int			GetEquipEnhance(int nPlace);					// È¡µÃ×°±¸µÄ¼¤»îÊôÐÔÊýÁ¿
-	int			GetActiveEquipPlace(int nPlace, int nCount);	// È¡µÃnPlaceµÄ×°±¸¼¤»îµÄµÚnCount¸ö×°±¸Î»ÖÃ
+	int			GetEquipEnhance(int nPlace);					// È¡ï¿½ï¿½×°ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	int			GetActiveEquipPlace(int nPlace, int nCount);	// È¡ï¿½ï¿½nPlaceï¿½ï¿½×°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äµï¿½nCountï¿½ï¿½×°ï¿½ï¿½Î»ï¿½ï¿½
 	void		InfectionNextEquip(int nPlace, BOOL bEquip = FALSE);
-	// ÔÚroom_equipmentÖÐ²éÕÒÖ¸¶¨GenreºÍDetailTypeµÄÎïÆ·£¬µÃµ½ItemIdxºÍÎ»ÖÃ
+	// ï¿½ï¿½room_equipmentï¿½Ð²ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Genreï¿½ï¿½DetailTypeï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½Ãµï¿½ItemIdxï¿½ï¿½Î»ï¿½ï¿½
 	BOOL		FindSameDetailTypeInEquipment(int nGenre, int nDetail, int *pnIdx, int *pnX, int *pnY);
 	friend	class KPlayer;
 
@@ -66,32 +66,32 @@ public:
 	~KItemList();
 	int			Init(int nIdx);
 	int			GetEquipment(int nIdx) { return m_EquipItem[nIdx]; }
-	int			GetActiveAttribNum(int nIdx);					// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
-	int			GetWeaponType();								// È¡µÃÎäÆ÷µÄÀàÐÍ£¬½ü³ÌÎäÆ÷(equip_meleeweapon)»¹ÊÇÔ¶³ÌÎäÆ÷(equip_rangeweapon)
-	int			GetWeaponParticular();							// È¡µÃÎäÆ÷µÄ¾ßÌåÀàÐÍ£¬ÓÃÓÚ¼ÆËã²»Í¬µÄÉËº¦¼ÓÇ¿
-	void		GetWeaponDamage(int* nMin, int* nMax);			// È¡µÃÎäÆ÷µÄÉËº¦
-	int			Add(int nIdx, int nPlace, int nX, int nY, BOOL bInit = FALSE);		// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
-	BOOL		Remove(int nIdx);								// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
+	int			GetActiveAttribNum(int nIdx);					// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
+	int			GetWeaponType();								// È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(equip_meleeweapon)ï¿½ï¿½ï¿½ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(equip_rangeweapon)
+	int			GetWeaponParticular();							// È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í£ï¿½ï¿½ï¿½ï¿½Ú¼ï¿½ï¿½ã²»Í¬ï¿½ï¿½ï¿½Ëºï¿½ï¿½ï¿½Ç¿
+	void		GetWeaponDamage(int* nMin, int* nMax);			// È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ëºï¿½
+	int			Add(int nIdx, int nPlace, int nX, int nY, BOOL bInit = FALSE);		// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
+	BOOL		Remove(int nIdx);								// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
 	void		RemoveAll();
-	BOOL		CanEquip(int nIdx, int nPlace = -1);			// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
+	BOOL		CanEquip(int nIdx, int nPlace = -1);			// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
 	BOOL		CanEquip(KItem* pItem, int nPlace = -1);
 	BOOL		EnoughAttrib(void* pData);
-	BOOL		Equip(int nIdx, int nPlace = -1);				// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
-	BOOL		UnEquip(int nIdx, int nPlace = -1);				// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
-	BOOL		EatMecidine(int nIdx);							// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
+	BOOL		Equip(int nIdx, int nPlace = -1);				// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
+	BOOL		UnEquip(int nIdx, int nPlace = -1);				// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
+	BOOL		EatMecidine(int nIdx);							// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
 	PlayerItem*	GetFirstItem();
 	PlayerItem*	GetNextItem();
 	int			SearchID(int nID);
 	void		ExchangeMoney(int nSrcRoom, int DesRoom, int nMoney);
 	void		ExchangeItem(ItemPos* SrcPos,ItemPos* DesPos);
-	int			GetMoneyAmount();					// µÃµ½ÎïÆ·À¸ºÍ´¢ÎïÏäµÄ×ÜÇ®Êý
-	int			GetEquipmentMoney();				// µÃµ½ÎïÆ·À¸ºÍ´¢ÎïÏäµÄÇ®Êý
+	int			GetMoneyAmount();					// ï¿½Ãµï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç®ï¿½ï¿½
+	int			GetEquipmentMoney();				// ï¿½Ãµï¿½ï¿½ï¿½Æ·ï¿½ï¿½ï¿½Í´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç®ï¿½ï¿½
 	BOOL		AddMoney(int nRoom, int nMoney);
 	BOOL		CostMoney(int nMoney);
 	BOOL		DecMoney(int nMoney);
 	void		SetMoney(int nMoney1, int nMoney2, int nMoney3);
 	void		SetRoomMoney(int nRoom, int nMoney);
-	int			GetMoney(int nRoom) { return m_Room[nRoom].GetMoney(); }	// È¡µÃ¿Õ¼äµÄÇ®
+	int			GetMoney(int nRoom) { return m_Room[nRoom].GetMoney(); }	// È¡ï¿½Ã¿Õ¼ï¿½ï¿½Ç®
 	//Xu
 	int			GetXu(int nRoom) { return m_Room[nRoom].GetXu(); }
 	void		SetXu(int nXu);
@@ -102,7 +102,7 @@ public:
 	int			GetXuAmount();					
 	int			GetEquipmentXu();
 	/////////////////////////////////
-	void		SetPlayerIdx(int nIdx);				// Éè¶¨Íæ¼ÒË÷Òý
+	void		SetPlayerIdx(int nIdx);				// ï¿½è¶¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	int			Hand() { return m_Hand; };
 	void		ClearRoom(int nRoom);
 	void		BackupTrade();
@@ -120,8 +120,8 @@ public:
 	void		SetMaskLock(BOOL bFlag);// mat na
 #ifdef	_SERVER
 	void		Abrade(int nType);
-	void		TradeMoveMoney(int nMoney);			// µ÷ÓÃ´Ë½Ó¿Ú±ØÐë±£Ö¤´«ÈëµÄnMoneyÊÇÒ»¸öÓÐÐ§Êý(ÕýÊýÇÒ²»³¬¹ýËùÓÐÇ®Êý)
-	void		SendMoneySync();					// ·þÎñÆ÷·¢moneyÍ¬²½ÐÅÏ¢¸ø¿Í»§¶Ë
+	void		TradeMoveMoney(int nMoney);			// ï¿½ï¿½ï¿½Ã´Ë½Ó¿Ú±ï¿½ï¿½ë±£Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½nMoneyï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½Ò²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç®ï¿½ï¿½)
+	void		SendMoneySync();					// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½moneyÍ¬ï¿½ï¿½ï¿½ï¿½Ï¢ï¿½ï¿½ï¿½Í»ï¿½ï¿½ï¿½
 	void		SendXuSync();
 	BOOL		IsItemExist(int nGern,int nDetailType,int nPar,int nSerise = 5,int nLevel = 0);
 	BOOL		DelExistItem(int nGern,int nDetailType,int nPar,int nSerise = 5,int nLevel = 0);
@@ -131,15 +131,15 @@ public:
 	BOOL		RemoveMineItem(int nDetailType);
 	BOOL		RemoveGoldItem(int nDetailType);
 	BOOL		IsGoldItemExist(int nDetailType);
-	void		GetTradeRoomItemInfo();			// ½»Ò×ÖÐ°Ñ trade room ÖÐµÄ item µÄ idx width height ÐÅÏ¢Ð´Èë itemset ÖÐµÄ m_psItemInfo ÖÐÈ¥
-	BOOL		TradeCheckCanPlace();				// ½»Ò×ÖÐÅÐ¶ÏÂò½øµÄÎïÆ·ÄÜ²»ÄÜÍêÈ«·Å½ø×Ô¼ºµÄÎïÆ·À¸
-	BOOL		CheckCanPlaceInEquipment(int nWidth, int nHeight, int *pnX, int *pnY);// ÅÐ¶ÏÒ»¶¨³¤¿íµÄÎïÆ·ÄÜ·ñ·Å½øÎïÆ·À¸
-	BOOL		EatMecidine(int nPlace, int nX, int nY);		// ³ÔÊ²Ã´µØ·½µÄÒ©
-	// ×Ô¶¯°ÑÒ»¸öÒ©Æ·´Óroom_equipmentÒÆ¶¯µ½room_immediacy
+	void		GetTradeRoomItemInfo();			// ï¿½ï¿½ï¿½ï¿½ï¿½Ð°ï¿½ trade room ï¿½Ðµï¿½ item ï¿½ï¿½ idx width height ï¿½ï¿½Ï¢Ð´ï¿½ï¿½ itemset ï¿½Ðµï¿½ m_psItemInfo ï¿½ï¿½È¥
+	BOOL		TradeCheckCanPlace();				// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ü²ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½Å½ï¿½ï¿½Ô¼ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½
+	BOOL		CheckCanPlaceInEquipment(int nWidth, int nHeight, int *pnX, int *pnY);// ï¿½Ð¶ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ü·ï¿½Å½ï¿½ï¿½ï¿½Æ·ï¿½ï¿½
+	BOOL		EatMecidine(int nPlace, int nX, int nY);		// ï¿½ï¿½Ê²Ã´ï¿½Ø·ï¿½ï¿½ï¿½Ò©
+	// ï¿½Ô¶ï¿½ï¿½ï¿½Ò»ï¿½ï¿½Ò©Æ·ï¿½ï¿½room_equipmentï¿½Æ¶ï¿½ï¿½ï¿½room_immediacy
 	BOOL		AutoMoveMedicine(int nItemIdx, int nSrcX, int nSrcY, int nDestX, int nDestY);
-	// ¶ªÊ§ËæÉíÎïÆ·
+	// ï¿½ï¿½Ê§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·
 	void		AutoLoseItemFromEquipmentRoom(int nRate);
-	// ¶ªÊ§Ò»¸ö´©ÔÚÉíÉÏµÄ×°±¸(Âí²»»áµô)
+	// ï¿½ï¿½Ê§Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ïµï¿½×°ï¿½ï¿½(ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 	void		AutoLoseEquip();
 
 	void		SetPrice(int nIdx, int nPrice);
@@ -149,12 +149,16 @@ public:
 #endif
 
 #ifndef	_SERVER
-	int			UseItem(int nIdx);					// nIdxÖ¸ÓÎÏ·ÊÀ½çÖÐµÀ¾ßÊý×éµÄ±àºÅ
+	int			UseItem(int nIdx);					// nIdxÖ¸ï¿½ï¿½Ï·ï¿½ï¿½ï¿½ï¿½ï¿½Ðµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½
 	BOOL		SearchPosition(int nWidth, int nHeight, ItemPos* pPos);
 	BOOL		AutoMoveItem(ItemPos SrcPos,ItemPos DesPos);
+	// Tra mon dang cam tren tay (m_Hand) ve o trong dau tien cua tui. Dung khi
+	// mot thao tac bi tu choi (vd tha trung loai vao o phim tat) de mon khong ket
+	// vo hinh tren con tro. FALSE neu tui khong con cho (giu nguyen tren tay).
+	BOOL		ReturnHandToBag();
 	void		MenuSetMouseItem();
 	void		RemoveAllInOneRoom(int nRoom);
-	void		LockOperation();										// Ëø¶¨¿Í»§¶Ë¶Ô×°±¸µÄ²Ù×÷
+	void		LockOperation();										// ï¿½ï¿½ï¿½ï¿½ï¿½Í»ï¿½ï¿½Ë¶ï¿½×°ï¿½ï¿½ï¿½Ä²ï¿½ï¿½ï¿½
 	void		UnlockOperation();
 	BOOL		IsLockOperation() { return m_bLockOperation; };
 	int			GetSameDetailItemNum(int nImmediatePos);

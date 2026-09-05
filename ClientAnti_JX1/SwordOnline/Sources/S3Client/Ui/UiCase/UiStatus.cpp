@@ -303,6 +303,11 @@ int KUiStatus::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		break;
 	case WND_N_ITEM_PICKDROP:
+		g_DebugLog("[EQUIP-GATE] chest=%d status=%d moveEnable=%d pick=%d drop=%d",
+			g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0),
+			(int)g_UiBase.GetStatus(),
+			(int)g_UiBase.IsOperationEnable(UIS_O_MOVE_ITEM),
+			uParam ? 1 : 0, nParam ? 1 : 0);
 		if (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0))
 		{
 		if (g_UiBase.IsOperationEnable(UIS_O_MOVE_ITEM) || g_UiBase.GetStatus() == UIS_S_TRADE_REPAIR)
