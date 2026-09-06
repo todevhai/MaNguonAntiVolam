@@ -93,6 +93,9 @@ private:
 	int				m_nRightSkillID;
 	int				m_nRightSkillLevel;
 	BOOL			m_MouseDown[2];
+	// Chan dung may chu bao ve (s2c_setavatar). Chi co ben CLIENT: may chu
+	// giu no trong bien nhiem vu luu-dai chu khong trong KPlayer.
+	int				m_nAvatar;		// 0 = chua chon, 1..defMAX_AVATAR
 #endif
 
 #ifdef _SERVER
@@ -101,7 +104,6 @@ private:
 	PLAYER_TOWNPORTAL_POS	m_sPortalPos;		// 传送门位置
 	BOOL			m_bUseReviveIdWhenLogin;
 	int				m_nExtPoint;				// 活动点数
-	int				m_nAvatar;	// chan dung (0 = chua chon, 1..defMAX_AVATAR); may chu gui ve
 	int				m_nChangeExtPoint;			// 变动的点数
 	int 			m_nChestPW;
 #endif
