@@ -3105,9 +3105,6 @@ void	KPlayer::ObjMouseClick(int nObjIndex)
 // DownPos ������ϵ���Ʒ�ĵ�ǰ���꣬UpPos ������������Ʒ�ŵ�����ϵ�����
 void	KPlayer::MoveItem(ItemPos DownPos, ItemPos UpPos)
 {
-	g_DebugLog("[MOVE-DBG] Down.place=%d(x%d,y%d) Up.place=%d(x%d,y%d) Hand=%d",
-		DownPos.nPlace, DownPos.nX, DownPos.nY, UpPos.nPlace, UpPos.nX, UpPos.nY,
-		m_ItemList.Hand());
 	if (this->CheckTrading() && DownPos.nPlace == pos_traderoom)
 	{
 		if (this->m_cTrade.m_nTradeLock)
@@ -3144,8 +3141,7 @@ void	KPlayer::MoveItem(ItemPos DownPos, ItemPos UpPos)
 				CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
 				// Tha trung loai bi tu choi: tra mon ve tui thay vi de ket vo hinh
 				// tren con tro (truoc day chi return -> click ra ngoai moi roi dat).
-				BOOL bReturned = m_ItemList.ReturnHandToBag();
-				g_DebugLog("[MOVE-DBG] dup immediacy -> ReturnHandToBag=%d", (int)bReturned);
+				m_ItemList.ReturnHandToBag();
 				return;
 			}
 		}

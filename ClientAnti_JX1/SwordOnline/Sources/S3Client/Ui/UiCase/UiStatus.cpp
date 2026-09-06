@@ -6,7 +6,6 @@
 *****************************************************************************************/
 #include "KWin32.h"
 #include "KIniFile.h"
-#include "KEngine.h"				// g_DebugLog (chan doan tam)
 #include "../Elem/WndMessage.h"
 #include "../elem/wnds.h"
 #include "UiStatus.h"
@@ -19,7 +18,6 @@
 #include "../../../core/src/gamedatadef.h"
 #include "../UiBase.h"
 #include "UiTradeConfirmWnd.h"
-#include "UiSysMsgCentre.h"			// KUiSysMsgCentre::AMessageArrival (bao cho nguoi choi)
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -306,12 +304,10 @@ int KUiStatus::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 	case WND_N_ITEM_PICKDROP:
 		if (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0))
 		{
-		// Cho ca che do BAN vao OnEquiptChanged de bao "thao ra truoc" (truoc day
-		// cong chan im -> nguoi choi khong biet vi sao click do mac khong an gi).
-		if (g_UiBase.IsOperationEnable(UIS_O_MOVE_ITEM)
-			|| g_UiBase.GetStatus() == UIS_S_TRADE_REPAIR
-			|| g_UiBase.GetStatus() == UIS_S_TRADE_SALE)
-			OnEquiptChanged((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);
+		// Cho moi che do vao OnEquiptChanged de no tu quyet (IDLE nhac len; SUA mo
+		// gia; BAN va cac che do trade khac im lang). Truoc day chi cho IDLE/REPAIR
+		// nen BAN roi vao duong khac -> co luc do dang mac dinh con tro.
+		OnEquiptChanged((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);
 		break;
 		}
 		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, CN_GH, 0);
@@ -482,52 +478,24 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 	}
 	if (eStatus == UIS_S_TRADE_REPAIR)
 	{
-		// Sua do DANG MAC: mo hop xac nhan neu con sua duoc (do ben chua day).
-		// GetGameData tra ve CanBeRepaired() va dien gia sua vao Price.
+		// SUA do DANG MAC: mo hop xac nhan CHI khi con sua duoc (do ben da hao).
+		// GetGameData tra ve CanBeRepaired(); do ben con day -> im lang (y user).
 		KUiItemBuySelInfo	Price = { 0 };
-		int	nCanRepair = g_pCoreShell->GetGameData(GDI_REPAIR_ITEM_PRICE,
-			(unsigned int)(&Pick), (int)(&Price));
-		g_DebugLog("[REPAIR-DBG] uId=%d canRepair=%d price=%d",
-			(int)Pick.Obj.uId, nCanRepair, Price.nPrice);
-		if (nCanRepair)
+		if (g_pCoreShell->GetGameData(GDI_REPAIR_ITEM_PRICE,
+			(unsigned int)(&Pick), (int)(&Price)))
 		{
 			KUiTradeConfirm::OpenWindow(&Pick, &Price, TCA_REPAIR);
 		}
-		else
-		{
-			// Do ben con day (hoac do khong co do ben) -> bao, dung im lang.
-			KSystemMessage	Msg;
-			Msg.eType = SMT_NORMAL;
-			Msg.byConfirmType = SMCT_NONE;
-			Msg.byPriority = 0;
-			Msg.byParamSize = 0;
-			strcpy(Msg.szMessage, "Trang bi con nguyen do ben, khong can sua.");
-			KUiSysMsgCentre::AMessageArrival(&Msg, NULL);
-		}
 	}
-	else if (eStatus == UIS_S_TRADE_SALE)
+	else if (eStatus == UIS_S_IDLE)
 	{
-		// Ban: KHONG ban truc tiep trang bi DANG MAC - phai thao ra truoc. Truoc
-		// day click do dang mac o che do Ban roi vao SWITCH_OBJECT -> thao ra
-		// dinh len con tro (lo do). Chan tai day (khong SWITCH_OBJECT) + bao.
-		if (pPickPos && !pDropPos)
-		{
-			KSystemMessage	Msg;
-			Msg.eType = SMT_NORMAL;
-			Msg.byConfirmType = SMCT_NONE;
-			Msg.byPriority = 0;
-			Msg.byParamSize = 0;
-			strcpy(Msg.szMessage, "Phai thao trang bi ra truoc khi ban.");
-			KUiSysMsgCentre::AMessageArrival(&Msg, NULL);
-		}
-	}
-	else
-	{
-		//_ASSERT(i < _ITEM_COUNT);
+		// Chi khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
 		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
 		pPickPos ? (unsigned int)&Pick : 0,
 		pDropPos ? (int)&Drop : 0);
 	}
+	// Cac che do trade khac (BAN, MUA, dat gia, giao dich...): im lang - KHONG
+	// nhac do dang mac len con tro. Muon ban thi phai thao ra truoc.
 
 }
 
