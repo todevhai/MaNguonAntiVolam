@@ -18,6 +18,8 @@
 #include "../../../core/src/gamedatadef.h"
 #include "../UiBase.h"
 #include "UiTradeConfirmWnd.h"
+#include "UiShop.h"					// KUiShop::GetIfVisible (biet shop dang mo)
+#include "KEngine.h"				// g_DebugLog (chan doan tam)
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -437,6 +439,9 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 	KWndWindow*			pWnd = NULL;
 
 	UISYS_STATUS	eStatus = g_UiBase.GetStatus();
+	g_DebugLog("[EQUIP-DBG] eStatus=%d shop=%d pick=%d drop=%d",
+		(int)eStatus, KUiShop::GetIfVisible() ? 1 : 0,
+		pPickPos ? 1 : 0, pDropPos ? 1 : 0);
 	if (pPickPos)
 	{
 		//_ASSERT(pPickPos->pWnd);
@@ -487,15 +492,18 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 			KUiTradeConfirm::OpenWindow(&Pick, &Price, TCA_REPAIR);
 		}
 	}
-	else if (eStatus == UIS_S_IDLE)
+	else if (!KUiShop::GetIfVisible())
 	{
-		// Chi khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
+		// CHI khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
+		// Dung GetIfVisible thay vi eStatus==IDLE vi shop van co the o trang thai
+		// IDLE (nhieu cho SetStatus(IDLE) khi shop dang mo) -> truoc day do mac
+		// bi nhac len con tro (dinh). Con shop mo thi im lang.
 		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
 		pPickPos ? (unsigned int)&Pick : 0,
 		pDropPos ? (int)&Drop : 0);
 	}
-	// Cac che do trade khac (BAN, MUA, dat gia, giao dich...): im lang - KHONG
-	// nhac do dang mac len con tro. Muon ban thi phai thao ra truoc.
+	// Shop dang mo, khong phai che do Sua: im lang - KHONG nhac do dang mac len
+	// con tro. Muon ban thi phai thao ra truoc.
 
 }
 
