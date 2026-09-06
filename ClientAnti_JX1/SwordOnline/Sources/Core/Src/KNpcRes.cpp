@@ -95,6 +95,15 @@ BOOL	KNpcRes::Init(char *lpszNpcName, KNpcResList *pNpcResList)
 		}
 	}
 
+	// PHI PHONG chua noi vao engine. Bang bo phan cua du lieu khai NAM nhom,
+	// nhom thu nam la Mantle (chi so 16) - nhung khong co bien nao giu "dang
+	// mac phi phong nao": ba ham SetHelm/SetArmor/SetWeapon/SetHorse chi phu
+	// bon nhom dau. Vong tren vua nap nhom nam voi kieu trang bi 0, tuc mot
+	// cai ao choang MAC DINH, va no se dinh tren lung moi nhan vat.
+	// Nha ra cho toi khi that su lam phi phong (can them kieu + duong dong bo).
+	for (i = MAX_BODY_PART_SECT * 4; i < MAX_PART; i++)
+		m_cNpcImage[i].Release();
+
 	int		nShadowFrame, nShadowDir, nShadowInterval, nShadowCgX, nShadowCgY;
 	if ( m_pcResNode->m_cShadowInfo.GetFile(
 		m_nAction,
