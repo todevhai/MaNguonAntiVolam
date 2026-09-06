@@ -18,7 +18,6 @@
 #include "../../../core/src/gamedatadef.h"
 #include "../UiBase.h"
 #include "UiTradeConfirmWnd.h"
-#include "UiShop.h"
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -305,10 +304,19 @@ int KUiStatus::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 	case WND_N_ITEM_PICKDROP:
 		if (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0))
 		{
-		// Cho moi che do vao OnEquiptChanged de no tu quyet (IDLE nhac len; SUA mo
-		// gia; BAN va cac che do trade khac im lang). Truoc day chi cho IDLE/REPAIR
-		// nen BAN roi vao duong khac -> co luc do dang mac dinh con tro.
-		OnEquiptChanged((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);
+		// Chi khi ranh (IDLE) moi duoc thao/xep do dang mac. Rieng che do SUA van
+		// chay de con hoi gia sua. Cac che do giao dich khac (ban, mua, doi, dat
+		// gia) khong dung toi o trang bi.
+		bool bRanh = g_UiBase.IsOperationEnable(UIS_O_MOVE_ITEM) != 0;
+		if (bRanh || g_UiBase.GetStatus() == UIS_S_TRADE_REPAIR)
+			OnEquiptChanged((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);
+		// O trang bi da nhac mon len con tro o tang UI (KWndObjectBox) TRUOC khi
+		// bao len day. Ngoai luc ranh thi khong ai nhan mon do nua, phai nha ra -
+		// khong nha thi mon ket tren con tro.
+		// Chi xet cu NHAC thuan (uParam co, nParam khong): luc dang cam san mot mon
+		// thi mon do nam trong tay cua core, nha hinh ve di se thanh ket vo hinh.
+		if (!bRanh && uParam && !nParam)
+			Wnd_DragFinished();
 		break;
 		}
 		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, CN_GH, 0);
@@ -488,15 +496,13 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 			KUiTradeConfirm::OpenWindow(&Pick, &Price, TCA_REPAIR);
 		}
 	}
-	else if (!KUiShop::GetIfVisible())
+	else
 	{
-		// Chi khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
+		// Chi den day khi ranh: thao do ra / xep lai (cong o WndProc da loc).
 		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
 		pPickPos ? (unsigned int)&Pick : 0,
 		pDropPos ? (int)&Drop : 0);
 	}
-	// Cac che do trade khac (BAN, MUA, dat gia, giao dich...): im lang - KHONG
-	// nhac do dang mac len con tro. Muon ban thi phai thao ra truoc.
 
 }
 
