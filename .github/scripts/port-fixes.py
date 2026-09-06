@@ -2204,6 +2204,7 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\telse if (++s_nDungYen >= 15)\n'
            b'\t\t\t\t{\n'
            b'\t\t\t\t\ts_nDungYen = 0;\n'
+           b'\t\t\t\t\tg_DebugLog("[VECTOR] tat: dung yen 15 khung ma chua toi (dich %d,%d)", g_nDichSpaceX, g_nDichSpaceY);\n'
            b'\t\t\t\t\tg_nDichSpaceX = -1;\n'
            b'\t\t\t\t\tg_nDichSpaceY = -1;\n'
            b'\t\t\t\t}\n'
@@ -2223,6 +2224,7 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\tif (nDX > -MapInfo.nScallH && nDX < MapInfo.nScallH &&\n'
            b'\t\t\t\t\t\tnDY > -MapInfo.nScallV && nDY < MapInfo.nScallV)\n'
            b'\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\tg_DebugLog("[VECTOR] tat: da toi noi (dich %d,%d)", g_nDichSpaceX, g_nDichSpaceY);\n'
            b'\t\t\t\t\t\tg_nDichSpaceX = -1;\n'
            b'\t\t\t\t\t}\n'
            b'\t\t\t\t\telse if (MapInfo.nScallH && MapInfo.nScallV)\n'
@@ -2277,12 +2279,19 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
 
 # Bam KHUNG GAME (di tay, can thiep huong di) -> xoa VECTOR chi huong ban do cu.
 # g_nDichSpaceX nam ben S3Client nen xoa o day (UiGame.cpp), khong xoa duoc tu Core.
+# UiGame.cpp chua tung goi g_DebugLog -> phai keo header vao truoc.
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     b'#include "KWin32.h"',
+     b'#include "KWin32.h"\r\n#include "KDebug.h"',
+     'them KDebug.h cho UiGame')
+
 edit('S3Client/Ui/UiCase/UiGame.cpp',
      _crlf(b'\t\t\tif (g_pCoreShell)\n'
            b'\t\t\t\tg_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);'),
      _crlf(b'\t\t\tif (g_pCoreShell)\n'
            b'\t\t\t{\n'
            b'\t\t\t\textern int g_nDichSpaceX; extern int g_nDichSpaceY;\n'
+           b'\t\t\t\tif (g_nDichSpaceX >= 0) g_DebugLog("[VECTOR] tat: bam khung game (dich %d,%d)", g_nDichSpaceX, g_nDichSpaceY);\n'
            b'\t\t\t\tg_nDichSpaceX = -1; g_nDichSpaceY = -1;\t// can thiep huong di -> xoa vector map cu\n'
            b'\t\t\t\tg_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);\n'
            b'\t\t\t}'),
