@@ -2164,7 +2164,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\t\tMapInfo.nScallV * (nRelY - (int)m_MapSize.cy / 2);\n'
            b'\t\t\t\t\tg_nDichSpaceX = nSpaceX;\n'
            b'\t\t\t\t\tg_nDichSpaceY = nSpaceY;\n'
-           b'\t\t\t\t\tg_DebugLog("[MAPCLICK] rel=%d,%d size=%d,%d scall=%d,%d orig=%d,%d foff=%d,%d -> %d,%d", nRelX, nRelY, (int)m_MapSize.cx, (int)m_MapSize.cy, MapInfo.nScallH, MapInfo.nScallV, MapInfo.nOrigFocusH, MapInfo.nOrigFocusV, MapInfo.nFocusOffsetH, MapInfo.nFocusOffsetV, nSpaceX, nSpaceY);\n'
            b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\n'
            b'\t\t\t\t\tbreak;\n'
            b'\t\t\t\t}\n'
@@ -2204,7 +2203,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\telse if (++s_nDungYen >= 15)\n'
            b'\t\t\t\t{\n'
            b'\t\t\t\t\ts_nDungYen = 0;\n'
-           b'\t\t\t\t\tg_DebugLog("[VECTOR] tat: dung yen 15 khung ma chua toi (dich %d,%d)", g_nDichSpaceX, g_nDichSpaceY);\n'
            b'\t\t\t\t\tg_nDichSpaceX = -1;\n'
            b'\t\t\t\t\tg_nDichSpaceY = -1;\n'
            b'\t\t\t\t}\n'
@@ -2224,7 +2222,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\tif (nDX > -MapInfo.nScallH && nDX < MapInfo.nScallH &&\n'
            b'\t\t\t\t\t\tnDY > -MapInfo.nScallV && nDY < MapInfo.nScallV)\n'
            b'\t\t\t\t\t{\n'
-           b'\t\t\t\t\t\tg_DebugLog("[VECTOR] tat: da toi noi (dich %d,%d)", g_nDichSpaceX, g_nDichSpaceY);\n'
            b'\t\t\t\t\t\tg_nDichSpaceX = -1;\n'
            b'\t\t\t\t\t}\n'
            b'\t\t\t\t\telse if (MapInfo.nScallH && MapInfo.nScallV)\n'
@@ -2279,19 +2276,12 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
 
 # Bam KHUNG GAME (di tay, can thiep huong di) -> xoa VECTOR chi huong ban do cu.
 # g_nDichSpaceX nam ben S3Client nen xoa o day (UiGame.cpp), khong xoa duoc tu Core.
-# UiGame.cpp chua tung goi g_DebugLog -> phai keo header vao truoc.
-edit('S3Client/Ui/UiCase/UiGame.cpp',
-     b'#include "KWin32.h"',
-     b'#include "KWin32.h"\r\n#include "KDebug.h"',
-     'them KDebug.h cho UiGame')
-
 edit('S3Client/Ui/UiCase/UiGame.cpp',
      _crlf(b'\t\t\tif (g_pCoreShell)\n'
            b'\t\t\t\tg_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);'),
      _crlf(b'\t\t\tif (g_pCoreShell)\n'
            b'\t\t\t{\n'
            b'\t\t\t\textern int g_nDichSpaceX; extern int g_nDichSpaceY;\n'
-           b'\t\t\t\tif (g_nDichSpaceX >= 0) g_DebugLog("[VECTOR] tat: bam khung game (dich %d,%d)", g_nDichSpaceX, g_nDichSpaceY);\n'
            b'\t\t\t\tg_nDichSpaceX = -1; g_nDichSpaceY = -1;\t// can thiep huong di -> xoa vector map cu\n'
            b'\t\t\t\tg_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);\n'
            b'\t\t\t}'),
@@ -3763,7 +3753,6 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\t\tpApMe->m_bAutoFar = (nApWp > 0 && !bApFin) ? 1 : 0;\t// wp moi toi mot nac -> con phai di tiep\n'
            b'\t\t\t/* In LOAI VAT CAN (o=obstacle kind), khong in TestBarrier: TestBarrier tra\n'
            b'\t\t\t   DO CAO dia hinh khi khong co vat can canh, doc ra tuong nham. */\n'
-           b'\t\t\tg_DebugLog("[AUTOPATH] start=%d,%d(o%d) goal=%d,%d(o%d) wp=%d", nApSx, nApSy, (int)g_ScenePlace.GetObstacleInfo(nApSx, nApSy), nX, nY, (int)g_ScenePlace.GetObstacleInfo(nX, nY), nApWp);\n'
            b'\t\t\tif (nApWp > 0)\n'
            b'\t\t\t{\n'
            b'\t\t\t\tpApMe->m_nAutoPathCnt = nApWp;\n'
@@ -3820,7 +3809,6 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t{\n'
            b'\t\t\tm_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;\n'
            b'\t\t\tif (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);\n'
-           b'\t\t\tg_DebugLog("[AUTOPATH] adv som %d/%d (nuot %d) des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, nApTien, m_DesX, m_DesY);\n'
            b'\t\t}\n'
            b'\t}\n'
            b'#endif\n'
@@ -3893,7 +3881,6 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\t\tm_DesY = m_AutoPathY[m_nAutoPathIdx];\n'
            b'\t\t\t\tm_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;\n'
            b'\t\t\t\tif (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);\n'
-           b'\t\t\t\tg_DebugLog("[AUTOPATH] adv %d/%d des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, m_DesX, m_DesY);\n'
            b'\t\t\t\treturn;\n'
            b'\t\t\t}\n'
            b'\t\t\t// KET THAT (khe hep / va cham): danh dau o phia truoc la tuong roi\n'
@@ -3948,7 +3935,6 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\t}\n'
            b'\t\t\tm_nAutoPathCnt = 0;\n'
            b'\t\t\tm_nAutoPathIdx = 0;\n'
-           b'\t\t\tg_DebugLog("[AUTOPATH] stop cur=%d,%d des=%d,%d stuck=%d", nApCurMx, nApCurMy, m_DesX, m_DesY, (int)bApStuck);\n'
            b'\t\t}\n'
            b'\t\tDoStand();\n'
            b'\t\treturn;\n'
@@ -4000,10 +3986,7 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\t// khong cho 45 khung cua nhanh kick-stand ben duoi. Hai ben cung di\n'
            b'\t\t\t// thi dong bo chi con la chinh li nho.\n'
            b'\t\t\tif (m_Doing == do_stand)\n'
-           b'\t\t\t{\n'
            b'\t\t\t\tSendCommand(do_run, m_DesX, m_DesY);\n'
-           b'\t\t\t\tg_DebugLog("[AUTOPATH] chay-lai (bi chan dung) cur=%d,%d des=%d,%d stall=%d", nGx, nGy, m_DesX, m_DesY, m_nAutoStall);\n'
-           b'\t\t\t}\n'
            b'\t\t\tint nGsx = 0, nGsy = 0;\n'
            b'\t\t\tAutoPathCenteredStep(nGx, nGy, m_DesX, m_DesY, &nGsx, &nGsy);\n'
            b'\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
@@ -4027,7 +4010,6 @@ edit('Core/Src/KNpc.cpp',
            b'\t\t\tm_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;\n'
            b'\t\t\textern void SendClientCmdRun(int nX, int nY);\n'
            b'\t\t\tSendClientCmdRun(m_DesX, m_DesY);\n'
-           b'\t\t\tg_DebugLog("[AUTOPATH] adv-stand %d/%d des=%d,%d", m_nAutoPathIdx, m_nAutoPathCnt, m_DesX, m_DesY);\n'
            b'\t\t}\n'
            b'\t\telse if (++m_nAutoPathNoProg >= 45)\n'
            b'\t\t{\n'

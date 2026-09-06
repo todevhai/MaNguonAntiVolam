@@ -413,7 +413,6 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
     {
         pOutX[0] = nGoalMpsX;
         pOutY[0] = nGoalMpsY;
-        g_DebugLog("[AP-WP] thang: goal=%d,%d", nGoalMpsX, nGoalMpsY);
         return 1;
     }
 
@@ -597,7 +596,6 @@ int AutoPathFind(int nStartMpsX, int nStartMpsY, int nGoalMpsX, int nGoalMpsY,
         { pOutX[nOut - 1] = nGoalMpsX; pOutY[nOut - 1] = nGoalMpsY; }
     }
 
-    g_DebugLog("[AP-WP] N=%d %s start=%d,%d goal=%d,%d", nOut, foundGoal ? "toi-dich" : "bien", nStartMpsX, nStartMpsY, nGoalMpsX, nGoalMpsY);
     free(pathC);
     free(g); free(came); free(closed); free(heap);
     #undef AP_IDX
@@ -638,7 +636,6 @@ int AutoPathFindStep(int sx, int sy, int gx, int gy,
     // vat "tele" tung nac giua hai diem (do 06/09: lech 1540 Mps roi quay lai, 5 vong).
     if (dist <= AP_GOAL_NEAR)
     {
-        g_DebugLog("[AP-WP] sat-dich %d o, dich bi chan -> dung (dich %d,%d)", dist, gx, gy);
         return 0;
     }
 
@@ -697,6 +694,5 @@ int AutoPathFindStep(int sx, int sy, int gx, int gy,
     pOutX[0] = CellToMps(hx);
     pOutY[0] = CellToMps(hy);
     if (pbFinal) *pbFinal = (hop >= dist) ? 1 : 0;
-    g_DebugLog("[AP-WP] nhay-nap %d,%d (dich %d,%d dist %d o)", pOutX[0], pOutY[0], gx, gy, dist);
     return 1;
 }
