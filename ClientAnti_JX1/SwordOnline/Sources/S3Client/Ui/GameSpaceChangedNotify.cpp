@@ -70,10 +70,11 @@ void CoreDataChangedCallback(unsigned int uDataId, unsigned int uParam, int nPar
 	{
 	case GDCNI_HOLD_OBJECT:
 		if (uParam)
-			g_DebugLog("[HOLD-DBG] genre=%d id=%d cont=%d nParam=%d",
+			g_DebugLog("[HOLD-DBG] genre=%d id=%d rH=%d rV=%d nParam=%d",
 				(int)((KUiObjAtRegion*)uParam)->Obj.uGenre,
 				(int)((KUiObjAtRegion*)uParam)->Obj.uId,
-				(int)((KUiObjAtRegion*)uParam)->eContainer, nParam);
+				(int)((KUiObjAtRegion*)uParam)->Region.h,
+				(int)((KUiObjAtRegion*)uParam)->Region.v, nParam);
 		else
 			g_DebugLog("[HOLD-DBG] clear cursor (uParam=0)");
 		Wnd_DragFinished();
