@@ -93,9 +93,6 @@ private:
 	int				m_nRightSkillID;
 	int				m_nRightSkillLevel;
 	BOOL			m_MouseDown[2];
-	// Chan dung may chu bao ve (s2c_setavatar). Chi co ben CLIENT: may chu
-	// giu no trong bien nhiem vu luu-dai chu khong trong KPlayer.
-	int				m_nAvatar;		// 0 = chua chon, 1..defMAX_AVATAR
 #endif
 
 #ifdef _SERVER
@@ -161,6 +158,11 @@ public:
 	DWORD			m_dwID;						// 玩家的32位ID
 	int				m_nIndex;					// 玩家的Npc编号
 	int				m_nNetConnectIdx;			// 第几个网络连接
+#ifndef _SERVER
+	// Chan dung may chu bao ve (s2c_setavatar). Chi co ben CLIENT: may chu giu
+	// no trong bien nhiem vu luu-dai chu khong trong KPlayer.
+	int				m_nAvatar;					// 0 = chua chon, 1..defMAX_AVATAR
+#endif
 	KItemList		m_ItemList;					// 玩家的装备列表
 	BuySellInfo		m_BuyInfo;					// 进行的交易列表
 	KPlayerMenuState	m_cMenuState;			// 是否处于交易或队伍开放状态
