@@ -20,7 +20,14 @@ enum
 	MAX_NPC_RES_KIND,
 };
 
-#define	MAX_BODY_PART			4		// 整个npc分为几个大部分
+// Bang bo phan cua du lieu game co NAM nhom: (0) dau+toc, (1) trang bi,
+// (2) vu khi, (3) ngua, (4) PHI PHONG. Nguon 2003 chi doc BON nhom nen:
+//  - bo phan Mantle (chi so 16) khong bao gio duoc nap;
+//  - m_nPartNum chi con 11, ma SortStrToNum chi doc m_nPartNum+1 = 12 so,
+//    trong khi moi dong Dir cua bang thu tu ve co 13 so -> so CUOI bi cat.
+//    O huong Dir1/Dir2 (nhin chinh dien) so cuoi dung la 0 = phan DAU
+//    -> nhan vat mat dau khi quay mat vao camera. Do 06/09/2026.
+#define	MAX_BODY_PART			5		// 整个npc分为几个大部分
 #define	MAX_BODY_PART_SECT		4		// 每个大部分分为几个小部分
 #define	MAX_PART				(MAX_BODY_PART*MAX_BODY_PART_SECT)
 #define MAX_NPC_IMAGE_NUM		(1 + MAX_PART + 6 + 1 + 1)			// 部件加阴影加状态加特殊加menustate
