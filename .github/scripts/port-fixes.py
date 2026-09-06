@@ -4208,6 +4208,20 @@ edit('Core/Src/KProtocol.cpp',
      'log [MOVE] walk moi lenh npcwalk gui di')
 
 
+# DOI HANH VI: mot bang du lieu hong khong duoc giet ca he vat pham.
+# KLibOfBPT::Init nap 18 bang theo thu tu va `return FALSE` ngay bang dau tien
+# hong. Bang magicattrib (sinh option cho do xanh) nam CUOI mang, nen chi can
+# questkey.txt thieu cot (bang do co 10 cot, LoadRecord doi 15) la bang option
+# khong bao gio duoc nap -> MOI trang bi client dung lai deu 0 option, ma khong
+# mot dong log nao. Do 06/09/2026: may chu gui ML=3,3,3,3,3,3 nhung tooltip
+# khong co dong option nao.
+# Neo mot dong (khong chua xuong dong) vi repo checkout CRLF tren CI, LF tren macOS.
+edit('Core/Src/KBasPropTbl.CPP',
+     b'{ _ASSERT(FALSE); return FALSE; }',
+     b'{ g_DebugLog("[bang vat pham] bang thu %d nap HONG - bo qua, nap tiep", i); continue; }',
+     'mot bang hong khong lam chet ca he vat pham')
+
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
