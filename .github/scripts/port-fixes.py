@@ -4226,6 +4226,76 @@ edit('Core/Src/KBasPropTbl.CPP',
 
 
 # ---------------------------------------------------------------------------
+# NUT "+" CONG DIEM CHIEU. Ban goc co mot nut nho o goc duoi phai moi o chieu.
+# Ban va tren da bo "click vao o chieu = cong diem" (de danh cu click cho viec
+# nhac chieu ra o phim tat) va hen lam nut rieng - day la nut do. Khong co no
+# thi co diem ky nang cung khong cong duoc.
+#
+# Kieu chu/mau lay tu MOT muc chung [ConDiemBtn] trong UiSkillFightSub.ini; vi
+# tri tinh theo chinh o chieu (goc duoi phai) nen khong phai khai 25 muc toa do
+# va khong bao gio lech voi o.
+print('\nNut "+" cong diem chieu trong bang vo cong:')
+edit('S3Client/Ui/UiCase/UiSkills.h',
+     b'#include "../elem/wndtext.h"',
+     _crlf(b'#include "../elem/wndtext.h"\n#include "../Elem/WndPureTextBtn.h"'),
+     'UiSkills.h them WndPureTextBtn')
+
+edit('S3Client/Ui/UiCase/UiSkills.h',
+     b'\tKWndObjectBox\tm_FightSkills[FIGHT_SKILL_COUNT_PER_PAGE];',
+     _crlf(b'\tKWndObjectBox\tm_FightSkills[FIGHT_SKILL_COUNT_PER_PAGE];\n'
+           b'\t// Nut "+" rieng cho tung o chieu: cu click vao O chieu da danh cho viec\n'
+           b'\t// nhac chieu ra o phim tat, nen cong diem phai co nut rieng.\n'
+           b'\tKWndPureTextBtn\tm_ConDiemBtn[FIGHT_SKILL_COUNT_PER_PAGE];'),
+     'UiSkills.h khai bao nut cong diem')
+
+edit('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'\t\tm_FightSkills[i].SetContainerId((int)UOC_SKILL_LIST);',
+     _crlf(b'\t\tm_FightSkills[i].SetContainerId((int)UOC_SKILL_LIST);\n'
+           b'\t\tAddChild(&m_ConDiemBtn[i]);\n'
+           b'\t\tm_ConDiemBtn[i].SetText("+");'),
+     'them nut + vao tung o chieu')
+
+edit('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'\t\t\tm_FightSkills[i].EnablePickPut(false);',
+     _crlf(b'\t\t\tm_FightSkills[i].EnablePickPut(false);\n'
+           b'\t\t\tm_ConDiemBtn[i].Init(&Ini, "ConDiemBtn");\n'
+           b'\t\t\tm_ConDiemBtn[i].SetText("+");\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tint nL = 0, nT = 0, nW = 0, nH = 0;\n'
+           b'\t\t\t\tm_FightSkills[i].GetPosition(&nL, &nT);\n'
+           b'\t\t\t\tm_FightSkills[i].GetSize(&nW, &nH);\n'
+           b'\t\t\t\tm_ConDiemBtn[i].SetSize(11, 11);\n'
+           b'\t\t\t\tm_ConDiemBtn[i].SetPosition(nL + nW - 11, nT + nH - 11);\n'
+           b'\t\t\t}'),
+     'dat nut + o goc duoi phai o chieu')
+
+# Chi trang CHIEN DAU: dung edit_after de khong dinh trang ky nang song (cung
+# co dong "if (0)" do edit_all o tren tao ra).
+edit_after('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'int\tKUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
+     b'\tif (0)\t/* cong diem chuyen sang nut dau cong rieng, xem ghi chu tren */',
+     _crlf(b'\t/* Nut "+" cua o nao thi cong diem cho chieu dang nam o do. */\n'
+           b'\tif (uMsg == WND_N_BUTTON_CLICK && uParam)\n'
+           b'\t{\n'
+           b'\t\tfor (int nO = 0; nO < FIGHT_SKILL_COUNT_PER_PAGE; nO++)\n'
+           b'\t\t{\n'
+           b'\t\t\tif ((KWndWindow*)uParam != (KWndWindow*)&m_ConDiemBtn[nO])\n'
+           b'\t\t\t\tcontinue;\n'
+           b'\t\t\tKUiDraggedObject Obj;\n'
+           b'\t\t\tm_FightSkills[nO].GetObject(Obj);\n'
+           b'\t\t\tif (Obj.uGenre == CGOG_NOTHING || m_nRemainSkillPoint <= 0)\n'
+           b'\t\t\t\treturn 0;\n'
+           b'\t\t\tm_nRemainSkillPoint--;\n'
+           b'\t\t\tg_pCoreShell->OperationRequest(GOI_TONE_UP_SKILL, CGOG_SKILL_FIGHT, Obj.uId);\n'
+           b'\t\t\treturn 0;\n'
+           b'\t\t}\n'
+           b'\t\treturn 0;\n'
+           b'\t}\n'
+           b'\tif (0)\t/* cong diem chuyen sang nut dau cong rieng, xem ghi chu tren */'),
+     'nut + goi GOI_TONE_UP_SKILL cho chieu trong o', 600)
+
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
