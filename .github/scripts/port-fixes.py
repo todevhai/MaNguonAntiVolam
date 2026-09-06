@@ -4222,6 +4222,19 @@ edit('Core/Src/KBasPropTbl.CPP',
      'mot bang hong khong lam chet ca he vat pham')
 
 
+# DOI HANH VI: vat pham NHIEM VU bam chuot phai thi GUI LENH DUNG len may chu.
+# Nguon 2003 de nhanh nay trong (chi thuoc va phi tieu gui gi do), nen moi vat
+# pham loai nay bam vao la cam. May chu cua ta nay chay
+# \script\vat-pham\<DetailType>.lua khi nhan lenh dung - do la duong cua "lenh
+# bai GM": mot vat pham mo bang chon, them chuc nang chi phai sua Lua.
+# Dung lai duong c2s_playereatitem co san (REQUEST_EAT_MEDICINE); may chu doc
+# genre nen khong nham voi thuoc, va no KHONG tieu hao vat pham nhiem vu.
+edit('Core/Src/KItemList.cpp',
+     b'\tcase item_townportal:\r\n\tcase item_medicine:',
+     b'\tcase item_task:\t\t// vat pham chay kich ban (lenh bai GM)\r\n\t\tnRet = REQUEST_EAT_MEDICINE;\r\n\t\tbreak;\r\n\tcase item_townportal:\r\n\tcase item_medicine:',
+     'chuot phai vat pham nhiem vu thi gui lenh dung')
+
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
