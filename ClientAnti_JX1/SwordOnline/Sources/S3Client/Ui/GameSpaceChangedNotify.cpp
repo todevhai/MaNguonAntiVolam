@@ -77,7 +77,7 @@ void CoreDataChangedCallback(unsigned int uDataId, unsigned int uParam, int nPar
 			Obj.uId = ((KUiObjAtRegion*)uParam)->Obj.uId;
 			Obj.DataW = ((KUiObjAtRegion*)uParam)->Region.Width;
 			Obj.DataH = ((KUiObjAtRegion*)uParam)->Region.Height;			
-			g_DebugLog("[HOLD-DBG] genre=%d id=%d", (int)Obj.uGenre, (int)Obj.uId); Wnd_DragBegin(&Obj, DrawDraggingGameObjFunc);
+			Wnd_DragBegin(&Obj, DrawDraggingGameObjFunc);
 		}
 		break;
 	case GDCNI_PLAYER_BASE_INFO:	//主角的一些不易变的数据
@@ -199,7 +199,7 @@ void CoreDataChangedCallback(unsigned int uDataId, unsigned int uParam, int nPar
 					Obj.uId = pObject->Obj.uId;
 					Obj.DataW = pObject->Region.Width;
 					Obj.DataH = pObject->Region.Height;			
-					g_DebugLog("[HOLD-DBG] genre=%d id=%d", (int)Obj.uGenre, (int)Obj.uId); Wnd_DragBegin(&Obj, DrawDraggingGameObjFunc);
+					Wnd_DragBegin(&Obj, DrawDraggingGameObjFunc);
 				}
 			}
 			else if (pObject->eContainer == UOC_IMMEDIA_ITEM)

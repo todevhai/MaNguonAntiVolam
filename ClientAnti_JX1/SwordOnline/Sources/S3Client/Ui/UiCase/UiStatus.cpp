@@ -18,8 +18,6 @@
 #include "../../../core/src/gamedatadef.h"
 #include "../UiBase.h"
 #include "UiTradeConfirmWnd.h"
-#include "UiShop.h"					// KUiShop::GetIfVisible (biet shop dang mo)
-#include "KEngine.h"				// g_DebugLog (chan doan tam)
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -439,11 +437,6 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 	KWndWindow*			pWnd = NULL;
 
 	UISYS_STATUS	eStatus = g_UiBase.GetStatus();
-	{ KUiDraggedObject dbgO; int dbgD = Wnd_GetDragObj(&dbgO);
-	g_DebugLog("[EQUIP-DBG] eStatus=%d shop=%d pick=%d drop=%d dragging=%d dragGenre=%d dragId=%d",
-		(int)eStatus, KUiShop::GetIfVisible() ? 1 : 0,
-		pPickPos ? 1 : 0, pDropPos ? 1 : 0,
-		dbgD, (int)dbgO.uGenre, (int)dbgO.uId); }
 	if (pPickPos)
 	{
 		//_ASSERT(pPickPos->pWnd);
@@ -483,16 +476,7 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 			break;
 		}
 	}
-	KUiDraggedObject holdObj;
-	if (Wnd_GetDragObj(&holdObj))
-	{
-		// Dang cam mot mon tren con tro -> cho dat/mac lai (du dang mo shop) de
-		// mon khong bi ket vinh vien. Truoc day o shop im lang -> khong go duoc.
-		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
-			pPickPos ? (unsigned int)&Pick : 0,
-			pDropPos ? (int)&Drop : 0);
-	}
-	else if (eStatus == UIS_S_TRADE_REPAIR)
+	if (eStatus == UIS_S_TRADE_REPAIR)
 	{
 		// SUA do DANG MAC: mo hop xac nhan CHI khi con sua duoc (do ben da hao).
 		// GetGameData tra ve CanBeRepaired(); do ben con day -> im lang (y user).
@@ -503,18 +487,15 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 			KUiTradeConfirm::OpenWindow(&Pick, &Price, TCA_REPAIR);
 		}
 	}
-	else if (!KUiShop::GetIfVisible())
+	else if (eStatus == UIS_S_IDLE)
 	{
-		// CHI khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
-		// Dung GetIfVisible thay vi eStatus==IDLE vi shop van co the o trang thai
-		// IDLE (nhieu cho SetStatus(IDLE) khi shop dang mo) -> truoc day do mac
-		// bi nhac len con tro (dinh). Con shop mo thi im lang.
+		// Chi khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
 		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
 		pPickPos ? (unsigned int)&Pick : 0,
 		pDropPos ? (int)&Drop : 0);
 	}
-	// Shop dang mo, khong phai che do Sua: im lang - KHONG nhac do dang mac len
-	// con tro. Muon ban thi phai thao ra truoc.
+	// Cac che do trade khac (BAN, MUA, dat gia, giao dich...): im lang - KHONG
+	// nhac do dang mac len con tro. Muon ban thi phai thao ra truoc.
 
 }
 
