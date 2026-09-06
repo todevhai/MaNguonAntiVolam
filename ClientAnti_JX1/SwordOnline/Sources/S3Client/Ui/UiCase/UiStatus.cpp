@@ -483,7 +483,16 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 			break;
 		}
 	}
-	if (eStatus == UIS_S_TRADE_REPAIR)
+	KUiDraggedObject holdObj;
+	if (Wnd_GetDragObj(&holdObj))
+	{
+		// Dang cam mot mon tren con tro -> cho dat/mac lai (du dang mo shop) de
+		// mon khong bi ket vinh vien. Truoc day o shop im lang -> khong go duoc.
+		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
+			pPickPos ? (unsigned int)&Pick : 0,
+			pDropPos ? (int)&Drop : 0);
+	}
+	else if (eStatus == UIS_S_TRADE_REPAIR)
 	{
 		// SUA do DANG MAC: mo hop xac nhan CHI khi con sua duoc (do ben da hao).
 		// GetGameData tra ve CanBeRepaired(); do ben con day -> im lang (y user).
