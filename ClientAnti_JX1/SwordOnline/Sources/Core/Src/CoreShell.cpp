@@ -658,6 +658,10 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 		}
 		break;
 
+	case GDI_PLAYER_AVATAR:
+		nRet = Player[CLIENT_PLAYER_INDEX].m_nAvatar;
+		break;
+
 	case GDI_PLAYER_IS_BAITAN:
 		nRet = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan;
 		break;
@@ -1741,6 +1745,17 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 		break;
 	case GOI_PKVALUE:
 		SendClientPKValue(uParam);
+		break;
+	case GOI_SET_AVATAR:
+		{
+			// Khong tu doi m_nAvatar o day: cho may chu bao lai bang s2c_setavatar.
+			// Nhu vay bang F3 luon ve dung thu may chu that su dang luu.
+			SET_AVATAR Msg;
+			Msg.ProtocolType = (BYTE)c2s_setavatar;
+			Msg.nAvatar = (BYTE)uParam;
+			if (g_pClient)
+				g_pClient->SendPackToServer((BYTE*)&Msg, sizeof(SET_AVATAR));
+		}
 		break;
 	case GOI_LIXIAN:
 		SendClientCmdLiXian();

@@ -125,6 +125,7 @@ public:
 	void	ServerReplyClientPing(BYTE* pMsg);
 	void	s2cNpcGoldChange(BYTE* pMsg);
 	void	ItemChangeDurability(BYTE* pMsg);
+	void	SetAvatar(BYTE* pMsg);
 	void	OpenTremble(BYTE* pMsg);
 	void	NetCommandSetRankFF(BYTE* pMsg);
 

@@ -22,6 +22,12 @@
 #define PROTOCOL_MSG_SIZE	(sizeof(PROTOCOL_MSG_TYPE))
 #define	MAX_PROTOCOL_NUM	203
 
+// Chan dung nhan vat: 35 anh 70x70 o \spr\ui3\chan-dung\NNN.spr.
+// May chu luu vao o bien nhiem vu luu-dai 990 (xem server SendAvatarToClient).
+#ifndef defMAX_AVATAR
+#define	defMAX_AVATAR		35
+#endif
+
 typedef struct
 {
 	BYTE	ProtocolType;
@@ -2200,6 +2206,15 @@ typedef struct
 	DWORD	dwItemID;
 	int		nNum;
 } ITEM_BREAK;
+
+// Chon chan dung nhan vat. Dung CHUNG cho ca hai chieu:
+//   client -> server (c2s_setavatar): xin dat chan dung nAvatar
+//   server -> client (s2c_setavatar): bao chan dung dang luu
+typedef struct
+{
+	BYTE	ProtocolType;
+	BYTE	nAvatar;		// 0 = chua chon; 1..defMAX_AVATAR
+} SET_AVATAR;
 
 typedef struct
 {

@@ -32,6 +32,12 @@ x¡¢yÖ¸³ö»æÖÆ·¶Î§µÄ×óÉÏ½Ç×ø±ê£¬Width¡¢HeightnÖ¸³öÁË»æÖÆ·¶Î§µÄ´óÐ¡£¬ParamÓÃÓÚ¶îÍâµ
 
 #pragma once
 
+// So chan dung nhan vat (anh o \spr\ui3\chan-dung\NNN.spr). Khai o day de
+// tang giao dien dung duoc ma khong phai keo KProtocol.h cua Core vao.
+#ifndef defMAX_AVATAR
+#define	defMAX_AVATAR		35
+#endif
+
 //=========================================================
 // CoreÍâ²¿¿Í»§Ïòcore»ñÈ¡ÓÎÏ·Êý¾ÝµÄÊý¾ÝÏîÄÚÈÝË÷Òý¶¨Òå
 //=========================================================
@@ -233,6 +239,8 @@ enum GAMEDATA_INDEX
 	GDI_TRADE_PLAYER_UPDATE,
 	
 	GDI_PLAYER_IS_BAITAN,
+
+	GDI_PLAYER_AVATAR,		// chan dung dang chon: 0 = chua chon, 1..defMAX_AVATAR
 
 	GDI_PLAYER_GOING_TO_DEST,	// con dang tren duong toi dich vua chon?
 	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi
@@ -713,6 +721,9 @@ enum GAMEOPERATION_INDEX
 	GOI_FINDPOS,
 	
 	GOI_PKVALUE,
+
+	GOI_SET_AVATAR,		// chon chan dung; uParam = so hieu 1..defMAX_AVATAR,
+						// 0 = chi HOI may chu chan dung dang luu
 };
 
 //=========================================================

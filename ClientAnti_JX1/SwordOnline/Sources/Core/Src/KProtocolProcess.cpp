@@ -146,6 +146,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_replyclientping] = ServerReplyClientPing;
 	ProcessFunc[s2c_npcgoldchange] = s2cNpcGoldChange;
 	ProcessFunc[s2c_itemdurabilitychange] = ItemChangeDurability;
+	ProcessFunc[s2c_setavatar] = SetAvatar;
 	ProcessFunc[s2c_opentremble] = OpenTremble;
 	ProcessFunc[s2c_rankname] = NetCommandSetRankFF;
 
@@ -3504,6 +3505,15 @@ void	KProtocolProcess::s2cNpcGoldChange(BYTE* pMsg)
 	{
 		Npc[nIdx].m_cGold.SetGoldCurrentType((int)pSync->m_wGoldFlag);
 	}
+}
+
+// May chu bao chan dung dang luu cua nhan vat. Chi cat vao KPlayer;
+// bang F3 doc lai qua GDI_PLAYER_AVATAR moi khung khi ve.
+void	KProtocolProcess::SetAvatar(BYTE* pMsg)
+{
+	SET_AVATAR* pSet = (SET_AVATAR*)pMsg;
+	if (pSet->nAvatar <= defMAX_AVATAR)
+		Player[CLIENT_PLAYER_INDEX].m_nAvatar = (int)pSet->nAvatar;
 }
 
 void	KProtocolProcess::ItemChangeDurability(BYTE* pMsg)

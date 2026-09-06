@@ -17,6 +17,7 @@ File        : UiChangeAvatar.h
 #include "../elem/wndimage.h"
 #include "../elem/wndbutton.h"
 #include "../elem/wndlabeledbutton.h"
+#include "../../../core/src/coreshell.h"	// defMAX_AVATAR qua KProtocol.h
 
 /*---------------------------------------------------------*/
 class KUiChangeAvatar : KWndImage
@@ -40,8 +41,10 @@ private:
 
 private:
 
-	KWndButton	m_Avatar1, m_Avatar2, m_Avatar3, m_Avatar4, m_Avatar5, m_Avatar6, m_Avatar7, m_Avatar8, m_Avatar9, m_Avatar10,
-			  m_Avatar11, m_Avatar12, m_Avatar13, m_Avatar14 ,m_Avatar15, m_DoneBtn, m_DongBtn;
+	// Mot o cho moi chan dung. Truoc day la 15 bien roi va tach nam/nu; nay dung
+	// mang vi bo anh la CHUNG cho ca hai phai (35 anh 70x70, xem defMAX_AVATAR).
+	KWndButton	m_Cell[defMAX_AVATAR];
+	KWndButton	m_DoneBtn, m_DongBtn;
 };
 
 

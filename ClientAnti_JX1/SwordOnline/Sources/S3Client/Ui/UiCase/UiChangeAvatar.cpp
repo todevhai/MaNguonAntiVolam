@@ -75,21 +75,8 @@ void KUiChangeAvatar::Initialize()
 {
 	AddChild(&m_DoneBtn);
 	AddChild(&m_DongBtn);
-	AddChild(&m_Avatar1);
-	AddChild(&m_Avatar2);
-	AddChild(&m_Avatar3);
-	AddChild(&m_Avatar4);
-	AddChild(&m_Avatar5);
-	AddChild(&m_Avatar6);
-	AddChild(&m_Avatar7);
-	AddChild(&m_Avatar8);
-	AddChild(&m_Avatar9);
-	AddChild(&m_Avatar10);
-	AddChild(&m_Avatar11);
-	AddChild(&m_Avatar12);
-	AddChild(&m_Avatar13);
-	AddChild(&m_Avatar14);
-	AddChild(&m_Avatar15);
+	for (int i = 0; i < defMAX_AVATAR; i++)
+		AddChild(&m_Cell[i]);
 
 
 	char Scheme[256];
@@ -115,43 +102,18 @@ void KUiChangeAvatar::LoadScheme(const char* pScheme)
 
 void KUiChangeAvatar::LoadScheme(class KIniFile* pIni)
 {
-		    Init(pIni, "Main");
-			m_DongBtn.Init(pIni, "DongBtn");
-			m_DoneBtn.Init(pIni, "DoneBtn");			
-	if (g_pCoreShell->GetGameData(GDI_PLAYER_IS_MALE, 0, 0))
-	{	
-			m_Avatar1.Init(pIni, "AvatarNam1");
-			m_Avatar2.Init(pIni, "AvatarNam2");
-			m_Avatar3.Init(pIni, "AvatarNam3");
-			m_Avatar4.Init(pIni, "AvatarNam4");
-			m_Avatar5.Init(pIni, "AvatarNam5");
-			m_Avatar6.Init(pIni, "AvatarNam6");
-			m_Avatar7.Init(pIni, "AvatarNam7");
-			m_Avatar8.Init(pIni, "AvatarNam8");
-			m_Avatar9.Init(pIni, "AvatarNam9");
-			m_Avatar10.Init(pIni, "AvatarNam10");
-			m_Avatar11.Init(pIni, "AvatarNam11");
-			m_Avatar12.Init(pIni, "AvatarNam12");
-	}
-	else
+	Init(pIni, "Main");
+	m_DongBtn.Init(pIni, "DongBtn");
+	m_DoneBtn.Init(pIni, "DoneBtn");
+	// Mot muc [Avatar1]..[AvatarNN] cho moi anh. Bo anh CHUNG cho nam va nu nen
+	// khong con tach hai bo muc theo phai nhu ban cu.
+	for (int i = 0; i < defMAX_AVATAR; i++)
 	{
-			m_Avatar1.Init(pIni, "AvatarNu1");
-			m_Avatar2.Init(pIni, "AvatarNu2");
-			m_Avatar3.Init(pIni, "AvatarNu3");
-			m_Avatar4.Init(pIni, "AvatarNu4");
-			m_Avatar5.Init(pIni, "AvatarNu5");
-			m_Avatar6.Init(pIni, "AvatarNu6");
-			m_Avatar7.Init(pIni, "AvatarNu7");
-			m_Avatar8.Init(pIni, "AvatarNu8");
-			m_Avatar9.Init(pIni, "AvatarNu9");
-			m_Avatar10.Init(pIni, "AvatarNu10");
-			m_Avatar11.Init(pIni, "AvatarNu11");
-			m_Avatar12.Init(pIni, "AvatarNu12");
-			m_Avatar13.Init(pIni, "AvatarNu13");
-			m_Avatar14.Init(pIni, "AvatarNu14");
-			m_Avatar15.Init(pIni, "AvatarNu15");
-		}
+		char szSect[32];
+		sprintf(szSect, "Avatar%d", i + 1);
+		m_Cell[i].Init(pIni, szSect);
 	}
+}
 
 
 int KUiChangeAvatar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
@@ -159,11 +121,25 @@ int KUiChangeAvatar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 	switch(uMsg)
 	{
 	case WND_N_BUTTON_CLICK:
-		if (uParam == (unsigned int)&m_DongBtn)
-			Hide();
-		else if (uParam == (unsigned int)&m_DoneBtn)
+		if (uParam == (unsigned int)&m_DongBtn || uParam == (unsigned int)&m_DoneBtn)
+		{
 			Hide();
 			break;
+		}
+		// Bam vao mot o chan dung: gui len may chu, KHONG tu doi tai cho.
+		// May chu luu roi bao lai bang s2c_setavatar, bang F3 ve theo cai do -
+		// nen thu hien tren man hinh luon la thu that su duoc luu.
+		for (int i = 0; i < defMAX_AVATAR; i++)
+		{
+			if (uParam == (unsigned int)&m_Cell[i])
+			{
+				if (g_pCoreShell)
+					g_pCoreShell->OperationRequest(GOI_SET_AVATAR, (unsigned int)(i + 1), 0);
+				Hide();
+				break;
+			}
+		}
+		break;
 	default:
 		return KWndImage::WndProc(uMsg, uParam, nParam);
 		break;

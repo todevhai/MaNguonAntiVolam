@@ -146,6 +146,8 @@ void KUiStatus::Initialize()
 	AddChild(&m_nRepute);
 	AddChild(&m_nFuYuan);
 	AddChild(&m_nPaiMing);
+	AddChild(&m_Face);		// phai them thi moi duoc ve
+	m_nAvatarVe = -1;
 	AddChild(&m_AvatarText);	
 	AddChild(&m_Avatar);
 	AddChild(&m_UnlockBtn);
@@ -439,6 +441,41 @@ void KUiStatus::UpdateRuntimeAttribute(KUiPlayerAttribute* pInfo)
 //--------------------------------------------------------------------------
 //	���ܣ���Ӧ�����������װ���ĸı�
 //--------------------------------------------------------------------------
+// Doc chan dung may chu dang luu va doi anh khi khac cai dang ve.
+// So 0 = chua chon: khong ve gi, chi con dong chu "bam vao day de chon".
+void KUiStatus::UpdateAvatar()
+{
+	int nAvatar = 0;
+	if (g_pCoreShell)
+		nAvatar = g_pCoreShell->GetGameData(GDI_PLAYER_AVATAR, 0, 0);
+	if (nAvatar < 0 || nAvatar > defMAX_AVATAR)
+		nAvatar = 0;
+	if (nAvatar == m_nAvatarVe)
+		return;
+	m_nAvatarVe = nAvatar;
+
+	char szAnh[128];
+	if (nAvatar > 0)
+		sprintf(szAnh, "\\spr\\ui3\\chan-dung\\%03d.spr", nAvatar);
+	else
+		szAnh[0] = 0;
+	m_Face.SetImage(ISI_T_SPR, szAnh);
+	// Con chua chon thi moi hien loi moi; da co chan dung thi de anh noi thay.
+	if (nAvatar == 0)
+		m_AvatarText.Show();
+	else
+		m_AvatarText.Hide();
+}
+
+// May chu tra chan dung ve bang goi rieng (s2c_setavatar) chu khong nam trong
+// goi thong tin nhan vat, nen khong co cho nao "bao cho bang F3 biet". Doi chieu
+// moi khung khi ve: chi la so sanh mot so nguyen, chi doi anh khi that su khac.
+void KUiStatus::PaintWindow()
+{
+	UpdateAvatar();
+	KWndShowAnimate::PaintWindow();
+}
+
 void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)
 {
 	KUiObjAtContRegion	Drop, Pick;

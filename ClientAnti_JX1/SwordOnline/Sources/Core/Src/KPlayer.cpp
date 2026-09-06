@@ -177,6 +177,7 @@ void	KPlayer::Release()
 	m_nPrePayXu = 0;
 	m_nForbiddenFlag = 0;
 	m_nExtPoint = 0;
+	m_nAvatar = 0;		// chua chon chan dung; may chu se gui s2c_setavatar khi vao game
 	m_nChangeExtPoint = 0;
 	m_nLiXian = 0;
 	//	ZeroMemory(m_SaveBuffer, sizeof(m_SaveBuffer));

@@ -101,6 +101,7 @@ private:
 	PLAYER_TOWNPORTAL_POS	m_sPortalPos;		// 传送门位置
 	BOOL			m_bUseReviveIdWhenLogin;
 	int				m_nExtPoint;				// 活动点数
+	int				m_nAvatar;	// chan dung (0 = chua chon, 1..defMAX_AVATAR); may chu gui ve
 	int				m_nChangeExtPoint;			// 变动的点数
 	int 			m_nChestPW;
 #endif

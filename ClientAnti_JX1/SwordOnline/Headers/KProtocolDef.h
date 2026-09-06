@@ -188,6 +188,7 @@ enum s2c_PROTOCOL
 	s2c_opengive,
 	s2c_npcsecmove,
 	s2c_pkvalue,
+	s2c_setavatar,	// chan dung hien tai (server -> client)
 //	s2c_gmgateway2relaysvr,		//GM登陆后网关通知中转服务器有合法连接的协议
 
 	s2c_extend = 250,
@@ -327,6 +328,7 @@ enum c2s_PROTOCOL
 
 	c2s_playergiveback,
 	c2s_pkvalue,
+	c2s_setavatar,	// chon chan dung (client -> server)
 	_c2s_begin_relay = 250,
 	c2s_extend = _c2s_begin_relay,
 	c2s_extendchat,
