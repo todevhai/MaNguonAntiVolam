@@ -18,6 +18,7 @@
 #include "../../../core/src/gamedatadef.h"
 #include "../UiBase.h"
 #include "UiTradeConfirmWnd.h"
+#include "UiShop.h"
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -487,7 +488,7 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 			KUiTradeConfirm::OpenWindow(&Pick, &Price, TCA_REPAIR);
 		}
 	}
-	else if (eStatus == UIS_S_IDLE)
+	else if (!KUiShop::GetIfVisible())
 	{
 		// Chi khi KHONG mo shop moi nhac do dang mac len con tro (thao/sap xep).
 		g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
