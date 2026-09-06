@@ -75,6 +75,11 @@ KUiStatus* KUiStatus::OpenWindow()
 	if (m_pSelf)
 	{
 		UiSoundPlay(UI_SI_WND_OPENCLOSE);
+		// HOI may chu chan dung dang luu (so 0 = hoi, xem GOI_SET_AVATAR).
+		// Khong the chi trong cho cu day luc vao the gioi: luc do client con
+		// dang dung canh, goi den thuong bi bo (xem m_nConBaoNpc ben may chu).
+		if (g_pCoreShell)
+			g_pCoreShell->OperationRequest(GOI_SET_AVATAR, 0, 0);
 		m_pSelf->UpdateData();
 		m_pSelf->BringToTop();
 		m_pSelf->Show();
