@@ -204,7 +204,9 @@ void KUiStatus::LoadScheme(class KIniFile* pIni)
 	}
 	
 	m_AvatarText  .Init(pIni, "AvatarText");	
-	m_AvatarText  .SetText("Nh�n v�o ��y �� ch�n ch�n dung nh�n v�t");
+	// Chuoi nay von la GBK bi hong (moi byte co dau thanh U+FFFD) nen ve ra rac.
+	// Viet lai KHONG DAU: nguon chi giu ASCII, chu co dau thi de ben .ini.
+	m_AvatarText  .SetText("Bam vao day de chon chan dung");
 	m_Avatar		.Init(pIni, "Avatar");
 	m_Face    .Init(pIni, "Face");
 	m_Agname  .Init(pIni, "Agname");
