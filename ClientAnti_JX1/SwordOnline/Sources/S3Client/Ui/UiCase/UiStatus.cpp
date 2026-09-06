@@ -439,9 +439,11 @@ void KUiStatus::OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLA
 	KWndWindow*			pWnd = NULL;
 
 	UISYS_STATUS	eStatus = g_UiBase.GetStatus();
-	g_DebugLog("[EQUIP-DBG] eStatus=%d shop=%d pick=%d drop=%d",
+	{ KUiDraggedObject dbgO; int dbgD = Wnd_GetDragObj(&dbgO);
+	g_DebugLog("[EQUIP-DBG] eStatus=%d shop=%d pick=%d drop=%d dragging=%d dragGenre=%d dragId=%d",
 		(int)eStatus, KUiShop::GetIfVisible() ? 1 : 0,
-		pPickPos ? 1 : 0, pDropPos ? 1 : 0);
+		pPickPos ? 1 : 0, pDropPos ? 1 : 0,
+		dbgD, (int)dbgO.uGenre, (int)dbgO.uId); }
 	if (pPickPos)
 	{
 		//_ASSERT(pPickPos->pWnd);
