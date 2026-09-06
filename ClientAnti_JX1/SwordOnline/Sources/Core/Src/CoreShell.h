@@ -233,6 +233,11 @@ enum GAMEDATA_INDEX
 	GDI_TRADE_PLAYER_UPDATE,
 	
 	GDI_PLAYER_IS_BAITAN,
+
+	GDI_PLAYER_GOING_TO_DEST,	// con dang tren duong toi dich vua chon?
+	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi
+	//         da dung han (toi noi, ket, bo cuoc). Ban do dung de tat vector.
+	// Dat o DAY chu khong o cuoi enum: cuoi enum la moc neo cua port-fixes.py.
 	
 	GDI_PLAYER_TK_TIME,
 	
@@ -243,10 +248,6 @@ enum GAMEDATA_INDEX
 	GDI_PLAYER_TK_NPC,
 	
 	GDI_PLAYER_TK_XEPHANG,
-
-	GDI_PLAYER_GOING_TO_DEST,	// con dang tren duong toi dich vua chon?
-	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi da
-	//         dung han (toi noi, ket, hoac bo cuoc). Ban do dung de tat vector.
 
 };
 
