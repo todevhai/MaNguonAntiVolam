@@ -244,6 +244,10 @@ enum GAMEDATA_INDEX
 	
 	GDI_PLAYER_TK_XEPHANG,
 
+	GDI_PLAYER_GOING_TO_DEST,	// con dang tren duong toi dich vua chon?
+	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi da
+	//         dung han (toi noi, ket, hoac bo cuoc). Ban do dung de tat vector.
+
 };
 
 //=========================================================

@@ -662,6 +662,20 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 		nRet = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan;
 		break;
 
+	// Con dang tren duong toi dich khong? Ban do nho hoi de biet luc nao tat
+	// vector chi huong: duong tu tim bo cuoc (ket / dich nam trong tuong) thi
+	// nhan vat dung han, khong bao gio toi noi -> vector phai tat theo.
+	// Ke ca khi KHONG co duong tu tim: di thang cung tinh la dang toi dich.
+	case GDI_PLAYER_GOING_TO_DEST:
+		{
+			int nGtdIdx = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+			if (nGtdIdx > 0)
+				nRet = (Npc[nGtdIdx].m_nAutoPathCnt > 0 ||
+						Npc[nGtdIdx].m_Doing == do_walk ||
+						Npc[nGtdIdx].m_Doing == do_run) ? 1 : 0;
+		}
+		break;
+
 	//主角随身携带的钱
 	//nRet = 主角随身携带的钱
 	case GDI_PLAYER_HOLD_MONEY:	

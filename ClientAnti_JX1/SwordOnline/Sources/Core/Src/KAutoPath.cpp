@@ -32,6 +32,7 @@
 #define AP_MAX_WIN       416                   // canh cua so tim toi da (o luoi) - lon de thay cong lech ngoai tam
 #define AP_MAX_NODES     60000                 // cap so node mo -> tranh treo (cua so lon hon)
 #define AP_MARGIN        64                    // no cua so quanh bbox(start,goal) (o luoi)
+#define AP_GOAL_NEAR     3                     // dich cach duoi bay nhieu o thi coi nhu da toi sat nhat
 
 // SubWorld[] la global khai bao extern trong KSubWorld.h -> khong khai lai.
 static int  TestBarrierMps(int nMpsX, int nMpsY)
@@ -630,6 +631,17 @@ int AutoPathFindStep(int sx, int sy, int gx, int gy,
     int dist = adx > ady ? adx : ady;
     if (dist <= 0) return 0;
 
+    // DICH NAM TRONG VAT CAN (nguoi choi bam vao tuong/nha tren ban do): A* tac ma
+    // dich chi con vai o -> ta DA dung sat nhat co the. Dung han.
+    // Khong duoc lach ngang o day: lach xong, tu cho moi A* lai tim ve duoc, roi
+    // toi noi lai tac -> lach tiep. Vong ping-pong vo han, nhin ra ngoai la nhan
+    // vat "tele" tung nac giua hai diem (do 06/09: lech 1540 Mps roi quay lai, 5 vong).
+    if (dist <= AP_GOAL_NEAR)
+    {
+        g_DebugLog("[AP-WP] sat-dich %d o, dich bi chan -> dung (dich %d,%d)", dist, gx, gy);
+        return 0;
+    }
+
     // Tham do o cach ~4 o ve phia dich: chua nap thi moi nhay (tin server).
     int probe = dist < 4 ? dist : 4;
     int pcx = scx + (int)((double)dcx * probe / dist);
@@ -650,17 +662,26 @@ int AutoPathFindStep(int sx, int sy, int gx, int gy,
             for (side = 1; side >= -1 && bestN == 0; side -= 2)
             {
                 // Lech ngang OFF o + nhich toi truoc 16 o (sidestep-and-advance).
-                int lcx = scx + (int)(side * px * OFF[oi] + ux * 16.0);
-                int lcy = scy + (int)(side * py * OFF[oi] + uy * 16.0);
+                int nOff = OFF[oi];
+                int lcx = scx + (int)(side * px * nOff + ux * 16.0);
+                int lcy = scy + (int)(side * py * nOff + uy * 16.0);
                 int nl = AutoPathFind(sx, sy, CellToMps(lcx), CellToMps(lcy), pOutX, pOutY, nMaxOut);
                 if (nl <= 0) continue;
                 // Waypoint dau phai roi khoi cho dung (>1 o) moi coi la thoat that.
                 int wdx = MpsToCell(pOutX[0]) - scx; if (wdx < 0) wdx = -wdx;
                 int wdy = MpsToCell(pOutY[0]) - scy; if (wdy < 0) wdy = -wdy;
                 if (wdx + wdy < 2) continue;
+                // Va khong duoc LUI qua xa. Lach ngang de vong tuong thi co the
+                // tam thoi xa dich hon - nhieu nhat la bang chinh doan lech ngang.
+                // Xa hon the nua thi khong phai loi thoat, do la nua vong cua mot
+                // cai ping-pong: toi do xong A* lai tim ve, ve toi lai tac.
+                int ecx = MpsToCell(pOutX[nl - 1]) - gcx; if (ecx < 0) ecx = -ecx;
+                int ecy = MpsToCell(pOutY[nl - 1]) - gcy; if (ecy < 0) ecy = -ecy;
+                if ((ecx > ecy ? ecx : ecy) > dist + nOff)
+                    continue;
                 bestN = nl;
                 g_DebugLog("[AP-WP] vong-ngang side=%d off=%d wp=%d -> %d,%d (dich %d,%d)",
-                           side, OFF[oi], nl, pOutX[0], pOutY[0], gx, gy);
+                           side, nOff, nl, pOutX[0], pOutY[0], gx, gy);
             }
         if (bestN > 0)
         {
