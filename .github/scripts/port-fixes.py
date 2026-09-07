@@ -359,6 +359,24 @@ edit('Core/Src/KPlayer.cpp',
      b'\tif ((Key & MK_SHIFT) || (nButton == button_right) || bChieuTayTrai)\r\n',
      'chuot trai phat duoc chieu o o tay trai')
 
+# DOI HANH VI (nua CLIENT cua cung mot luat): KNpc::DoSkill bo lenh im lang khi
+# nguoi choi dang o TU THE HOA BINH. Client chay chinh ham nay TRUOC khi gui
+# lenh len may chu, nen chi va ben may chu thi van khong ra chieu - client da
+# nuot lenh tu truoc. Ban goc chi bat lai tu the chien dau bang cach di qua
+# diem bao ve o cong thanh (ta chua ve cong nao), nen moi cu danh trong thanh
+# deu roi vao khoang khong. Nay TU RUT VU KHI roi danh tiep.
+# Vung hoa binh van cam PK nguoi choi - luat do o KPlayerPK, khong phai o day.
+edit('Core/Src/KNpc.cpp',
+     b'\tif (IsPlayer())\r\n'
+     b'\t{\r\n'
+     b'\t\tif (!m_FightMode)\r\n'
+     b'\t\t\treturn;\r\n',
+     b'\tif (IsPlayer())\r\n'
+     b'\t{\r\n'
+     b'\t\tif (!m_FightMode)\r\n'
+     b'\t\t\tSetFightMode(TRUE);\t/* tu rut vu khi thay vi bo lenh */\r\n',
+     'dang hoa binh thi tu rut vu khi, khong bo lenh danh')
+
 
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
