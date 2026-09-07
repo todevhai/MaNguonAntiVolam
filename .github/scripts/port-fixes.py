@@ -346,9 +346,15 @@ edit('Core/Src/KPlayer.cpp',
      b'\tif (nButton == button_left && !(Key & MK_SHIFT)\r\n'
      b'\t\t&& m_nLeftSkillID > 0 && m_nLeftSkillID != g_nHandSkill)\r\n'
      b'\t{\r\n'
+     b'\t\t/* FindSelectNpc XOA m_nPeapleIdx khi bam truot, nen phai cat giu roi\r\n'
+     b'\t\t   tra lai - khong thi moi cu bam xuong dat trong deu lam mat muc tieu\r\n'
+     b'\t\t   dang chon va nhanh di-roi-danh ben duoi hong theo. */\r\n'
+     b'\t\tint nMucTieuCu = m_nPeapleIdx;\r\n'
      b'\t\tFindSelectNpc(x, y, relation_enemy);\r\n'
      b'\t\tif (m_nPeapleIdx)\r\n'
      b'\t\t\tbChieuTayTrai = TRUE;\r\n'
+     b'\t\telse\r\n'
+     b'\t\t\tm_nPeapleIdx = nMucTieuCu;\r\n'
      b'\t}\r\n'
      b'\tif ((Key & MK_SHIFT) || (nButton == button_right) || bChieuTayTrai)\r\n',
      'chuot trai phat duoc chieu o o tay trai')
