@@ -416,6 +416,32 @@ edit('Core/Src/KSkills.cpp',
      b'\t\t\tint nWeapoinSkill = Npc[nLauncher].GetCurActiveWeaponSkill();\r\n',
      'chi don danh thuong moi phai trung chieu vu khi')
 
+# DON DANH THUONG khong nam trong danh sach chon chieu cho tay trai/tay phai:
+# no la don mac dinh cua vu khi, client tu gan vao o tay khi o do trong
+# (CoreShell.cpp -> SetLeftSkill(g_nMeleeWeaponSkill[...])). De no trong danh
+# sach thi nguoi choi thay mot o thua, dung icon y het o tay dang co san.
+edit('Core/Src/KSkillList.cpp',
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == leftOnlySkill)\r\n',
+     b'\t\t\t\t\textern BOOL LaChieuVuKhi(int nSkillId);\r\n'
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t!LaChieuVuKhi(m_Skills[i].SkillId) &&\r\n'
+     b'\t\t\t\t\t\t((pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == leftOnlySkill))\r\n',
+     'danh sach tay trai bo don danh thuong')
+
+edit('Core/Src/KSkillList.cpp',
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == RightOnlySkill)\r\n',
+     b'\t\t\t\t\textern BOOL LaChieuVuKhi(int nSkillId);\r\n'
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t!LaChieuVuKhi(m_Skills[i].SkillId) &&\r\n'
+     b'\t\t\t\t\t\t((pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == RightOnlySkill))\r\n',
+     'danh sach tay phai bo don danh thuong')
+
 
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
