@@ -4232,7 +4232,7 @@ edit('Core/Src/KBasPropTbl.CPP',
 # thi co diem ky nang cung khong cong duoc.
 #
 # Kieu chu/mau lay tu MOT muc chung [ConDiemBtn] trong UiSkillFightSub.ini; vi
-# tri tinh theo chinh o chieu (khe trong ngay duoi) nen khong phai khai 25 muc toa do
+# tri tinh theo chinh o chieu (goc duoi phai) nen khong phai khai 25 muc toa do
 # va khong bao gio lech voi o.
 print('\nNut "+" cong diem chieu trong bang vo cong:')
 edit('S3Client/Ui/UiCase/UiSkills.h',
@@ -4264,18 +4264,68 @@ edit('S3Client/Ui/UiCase/UiSkills.cpp',
            b'\t\t\t\tint nL = 0, nT = 0, nW = 0, nH = 0;\n'
            b'\t\t\t\tm_FightSkills[i].GetPosition(&nL, &nT);\n'
            b'\t\t\t\tm_FightSkills[i].GetSize(&nW, &nH);\n'
-           b'\t\t\t\t/* Nut nam trong KHE 15px duoi moi hang o (Skill_0 Top=3,\n'
-           b'\t\t\t\t   Skill_5 Top=54 => o cao 36, buoc 51). Ban dau nut la 11x11\n'
-           b'\t\t\t\t   nhet o goc duoi phai o chieu: de len ca icon ma van kho bam.\n'
-           b'\t\t\t\t   Nay chiem het be ngang o, 36x13 = gap 3,9 lan dien tich cu,\n'
-           b'\t\t\t\t   lai nam NGOAI o nen khong che icon hay so cap. */\n'
-           b'\t\t\t\tm_ConDiemBtn[i].SetSize(nW, 13);\n'
-           b'\t\t\t\tm_ConDiemBtn[i].SetPosition(nL, nT + nH + 1);\n'
+           b'\t\t\t\t/* O vuong 16x16 de len GOC DUOI PHAI icon chieu. Ban dau\n'
+           b'\t\t\t\t   11x11 khong nen, chi mot dau + vang lot thom: kho thay va\n'
+           b'\t\t\t\t   kho bam. Nen do + vien den do KUiFightSkillSubPage::\n'
+           b'\t\t\t\t   PaintWindow ve (xem ban va ben duoi) vi KWndPureTextBtn chi\n'
+           b'\t\t\t\t   biet ve chu con KWndWindow khong co nen mau. */\n'
+           b'\t\t\t\tm_ConDiemBtn[i].SetSize(16, 16);\n'
+           b'\t\t\t\tm_ConDiemBtn[i].SetPosition(nL + nW - 16, nT + nH - 16);\n'
            b'\t\t\t}'),
      'dat nut + o goc duoi phai o chieu')
 
 # Chi trang CHIEN DAU: dung edit_after de khong dinh trang ky nang song (cung
 # co dong "if (0)" do edit_all o tren tao ra).
+edit('S3Client/Ui/UiCase/UiSkills.cpp',
+     b'\t\t\t\tg_pRepresentShell->OutputText(m_SkillTextParam.nFont, szLevel, nLen, nLeft, nTop,\r\n'
+     b'\t\t\t\t\tdwColor, 0);\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t}\r\n'
+     b'\t}\r\n'
+     b'}',
+     _crlf(b'\t\t\t\tg_pRepresentShell->OutputText(m_SkillTextParam.nFont, szLevel, nLen, nLeft, nTop,\n'
+           b'\t\t\t\t\tdwColor, 0);\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'\t/* Nen cho nut "+": o vuong DO, vien DEN, o goc duoi phai moi o chieu.\n'
+           b'\t   Ve o day chu khong trong nut vi KWndPureTextBtn chi ve duoc CHU va\n'
+           b'\t   KWndWindow khong co nen mau. Trang duoc ve TRUOC cac cua so con nen\n'
+           b'\t   dau "+" trang cua nut nam de len nen nay. Ke bang KRULine ngang chu\n'
+           b'\t   khong dung anh: khong phai them tai nguyen vao pak. */\n'
+           b'\tfor (int nN = 0; nN < FIGHT_SKILL_COUNT_PER_PAGE; nN++)\n'
+           b'\t{\n'
+           b'\t\tint nBL = 0, nBT = 0, nBW = 0, nBH = 0;\n'
+           b'\t\tm_ConDiemBtn[nN].GetAbsolutePos(&nBL, &nBT);\n'
+           b'\t\tm_ConDiemBtn[nN].GetSize(&nBW, &nBH);\n'
+           b'\t\tif (nBW <= 2 || nBH <= 2)\n'
+           b'\t\t\tcontinue;\n'
+           b'\t\tKRULine To[32];\n'
+           b'\t\tint nSo = 0;\n'
+           b'\t\tfor (int nY = 1; nY < nBH - 1 && nSo < 30; nY++, nSo++)\n'
+           b'\t\t{\n'
+           b'\t\t\tTo[nSo].Color.Color_dw = 0xffb02020;\n'
+           b'\t\t\tTo[nSo].oPosition.nX = nBL + 1;\n'
+           b'\t\t\tTo[nSo].oEndPos.nX = nBL + nBW - 1;\n'
+           b'\t\t\tTo[nSo].oPosition.nY = To[nSo].oEndPos.nY = nBT + nY;\n'
+           b'\t\t}\n'
+           b'\t\tif (nSo > 0)\n'
+           b'\t\t\tg_pRepresentShell->DrawPrimitives(nSo, To, RU_T_LINE, true);\n'
+           b'\t\tfor (int nV = 0; nV < 4; nV++)\n'
+           b'\t\t\tTo[nV].Color.Color_dw = 0xff100808;\n'
+           b'\t\tTo[0].oPosition.nX = To[0].oEndPos.nX = nBL;\n'
+           b'\t\tTo[0].oPosition.nY = nBT;  To[0].oEndPos.nY = nBT + nBH;\n'
+           b'\t\tTo[1].oPosition.nX = To[1].oEndPos.nX = nBL + nBW - 1;\n'
+           b'\t\tTo[1].oPosition.nY = nBT;  To[1].oEndPos.nY = nBT + nBH;\n'
+           b'\t\tTo[2].oPosition.nY = To[2].oEndPos.nY = nBT;\n'
+           b'\t\tTo[2].oPosition.nX = nBL; To[2].oEndPos.nX = nBL + nBW;\n'
+           b'\t\tTo[3].oPosition.nY = To[3].oEndPos.nY = nBT + nBH - 1;\n'
+           b'\t\tTo[3].oPosition.nX = nBL; To[3].oEndPos.nX = nBL + nBW;\n'
+           b'\t\tg_pRepresentShell->DrawPrimitives(4, To, RU_T_LINE, true);\n'
+           b'\t}\n'
+           b'}'),
+     've nen do vien den cho nut +')
+
 edit_after('S3Client/Ui/UiCase/UiSkills.cpp',
      b'int\tKUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)',
      b'\tif (0)\t/* cong diem chuyen sang nut dau cong rieng, xem ghi chu tren */',
