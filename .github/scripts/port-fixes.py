@@ -332,6 +332,28 @@ edit('Core/Src/KSkillList.cpp',
      b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n',
      'tay phai nhan ca chieu vat ly')
 
+# DOI HANH VI: chuot TRAI cung phat duoc chieu da gan vao o tay trai.
+# Engine 2003 chi chay nhanh phat chieu khi `nButton == button_right` (hoac
+# Shift+trai), nen o tay trai chi con y nghia "don danh thuong cua vu khi" -
+# gan chieu vao do bam mai khong ra. Ban 8.x co gan chieu ca hai tay: cot
+# LRSkill trong skills.txt khai 0 = ca hai / 1 = chi trai / 2 = chi phai.
+# Giu nguyen duong di chuyen: chi phat khi o tay trai giu MOT CHIEU THAT
+# (khac don danh thuong g_nHandSkill) VA cu bam trung ke dich; bam xuong dat
+# trong van la lenh di.
+edit('Core/Src/KPlayer.cpp',
+     b'\tif ((Key & MK_SHIFT) || (nButton == button_right))\r\n',
+     b'\tBOOL bChieuTayTrai = FALSE;\r\n'
+     b'\tif (nButton == button_left && !(Key & MK_SHIFT)\r\n'
+     b'\t\t&& m_nLeftSkillID > 0 && m_nLeftSkillID != g_nHandSkill)\r\n'
+     b'\t{\r\n'
+     b'\t\tFindSelectNpc(x, y, relation_enemy);\r\n'
+     b'\t\tif (m_nPeapleIdx)\r\n'
+     b'\t\t\tbChieuTayTrai = TRUE;\r\n'
+     b'\t}\r\n'
+     b'\tif ((Key & MK_SHIFT) || (nButton == button_right) || bChieuTayTrai)\r\n',
+     'chuot trai phat duoc chieu o o tay trai')
+
+
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
 # pSkill->GetSkillName() ma khong kiem NULL. Do 07/09/2026 bang kenh lenh
@@ -4401,7 +4423,10 @@ edit('S3Client/Ui/UiCase/UiSkills.cpp',
            b'\t{\n'
            b'\t\tKUiDraggedObject ObjN;\n'
            b'\t\tm_FightSkills[nN].GetObject(ObjN);\n'
-           b'\t\tint bCo = (ObjN.uGenre != CGOG_NOTHING);\n'
+           b'\t\t/* O DON DANH THUONG khong co nut "+": no la don co ban cua vu khi\n'
+           b'\t\t   (settings/vukhi-kynang-vatly.txt tra ve 53 cho moi loai), khong\n'
+           b'\t\t   phai chieu de nuoi diem ky nang. */\n'
+           b'\t\tint bCo = (ObjN.uGenre != CGOG_NOTHING) && ((int)ObjN.uId != 53);\n'
            b'\t\tm_ConDiemBtn[nN].DatCoChieu(bCo);\n'
            b'\t\tm_ConDiemBtn[nN].SetText(bCo ? "+" : "");\n'
            b'\t}\n'
