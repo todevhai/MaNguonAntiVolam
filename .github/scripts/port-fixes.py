@@ -4232,7 +4232,7 @@ edit('Core/Src/KBasPropTbl.CPP',
 # thi co diem ky nang cung khong cong duoc.
 #
 # Kieu chu/mau lay tu MOT muc chung [ConDiemBtn] trong UiSkillFightSub.ini; vi
-# tri tinh theo chinh o chieu (goc duoi phai) nen khong phai khai 25 muc toa do
+# tri tinh theo chinh o chieu (khe trong ngay duoi) nen khong phai khai 25 muc toa do
 # va khong bao gio lech voi o.
 print('\nNut "+" cong diem chieu trong bang vo cong:')
 edit('S3Client/Ui/UiCase/UiSkills.h',
@@ -4264,8 +4264,13 @@ edit('S3Client/Ui/UiCase/UiSkills.cpp',
            b'\t\t\t\tint nL = 0, nT = 0, nW = 0, nH = 0;\n'
            b'\t\t\t\tm_FightSkills[i].GetPosition(&nL, &nT);\n'
            b'\t\t\t\tm_FightSkills[i].GetSize(&nW, &nH);\n'
-           b'\t\t\t\tm_ConDiemBtn[i].SetSize(11, 11);\n'
-           b'\t\t\t\tm_ConDiemBtn[i].SetPosition(nL + nW - 11, nT + nH - 11);\n'
+           b'\t\t\t\t/* Nut nam trong KHE 15px duoi moi hang o (Skill_0 Top=3,\n'
+           b'\t\t\t\t   Skill_5 Top=54 => o cao 36, buoc 51). Ban dau nut la 11x11\n'
+           b'\t\t\t\t   nhet o goc duoi phai o chieu: de len ca icon ma van kho bam.\n'
+           b'\t\t\t\t   Nay chiem het be ngang o, 36x13 = gap 3,9 lan dien tich cu,\n'
+           b'\t\t\t\t   lai nam NGOAI o nen khong che icon hay so cap. */\n'
+           b'\t\t\t\tm_ConDiemBtn[i].SetSize(nW, 13);\n'
+           b'\t\t\t\tm_ConDiemBtn[i].SetPosition(nL, nT + nH + 1);\n'
            b'\t\t\t}'),
      'dat nut + o goc duoi phai o chieu')
 
