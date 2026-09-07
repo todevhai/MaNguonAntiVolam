@@ -442,6 +442,21 @@ edit('Core/Src/KSkillList.cpp',
      b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == RightOnlySkill))\r\n',
      'danh sach tay phai bo don danh thuong')
 
+# DOI HANH VI: bat lai duong ve SPR co ALPHA trong Represent2. Ban port de trong
+# hai nhanh IMAGE_RENDER_STYLE_ALPHA / _ALPHA_NOT_BE_LIT (code goc bi dong
+# ngoac lai, chi con `break`), nen hieu ung chieu roi sang duong ve DAC va lo
+# ca nen den cua sprite - nguoi choi thay "quang den" quanh chieu.
+# m_Canvas.DrawSpriteAlpha da co san va dang duoc dung o nhanh
+# ALPHA_COLOR_ADJUST ngay ben duoi, nen chi la mo lai.
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'\t\t\t\t\t\t/*\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
+     b'\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);*/\r\n'
+     b'\t\t\t\t\t\t\tbreak;\r\n',
+     b'\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
+     b'\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
+     b'\t\t\t\t\t\t\tbreak;\r\n',
+     've SPR co alpha thay vi bo trong (het quang den quanh hieu ung)')
+
 
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
