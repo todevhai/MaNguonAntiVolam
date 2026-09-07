@@ -528,9 +528,15 @@ edit('Core/Src/KNpcResNode.cpp',
      'bang trang thai ghi tieng Anh: Loop = lap vo han')
 
 # 3) VONG TRON PHAM VI mau vang khi phat chieu (quanh nhan vat, chi trong luc
-# phat). Toa do la khong gian canh, DrawPrimitives voi bSinglePlaneCoord = 0 tu
-# chieu sang man hinh - nen vong tron thanh hinh bau dung kieu isometric.
-# Dung g_DirCos/g_DirSin (thang 1024) de khoi keo math.h vao Core.
+# phat). Ve bang toa do MAN HINH (bSinglePlaneCoord = 1) va mau DAC:
+#   - duong ve theo toa do khong gian (co = 0) khong hien ra gi. Do 08/09:
+#     log [vong] chay 28 lan ma man hinh trong tron.
+#   - alpha < 248 roi vao nhanh DrawLineAlpha, khong cho nao trong ca kho dung
+#     nhanh do; moi cho ve duong (ban do nho, o chon) deu dung alpha 0xff.
+# De "mo" ma van chac an: NET DUT - ve mot cung, bo mot cung.
+# Toa do man hinh = khong gian tru goc khung nhin; lay goc bang phep doi
+# NGUOC san co (ViewPortCoordToSpaceCoord(0,0,z)), co ke ca do cao dia hinh
+# m_Height nen vong nam dung duoi chan chu khong phai mat dat z = 0.
 edit('Core/Src/KNpc.cpp',
      b'void KNpc::Paint()\r\n'
      b'{\r\n',
@@ -544,26 +550,33 @@ edit('Core/Src/KNpc.cpp',
      b'\t\tint nBanKinh = pChieuVong ? pChieuVong->GetAttackRadius() : 0;\r\n'
      b'\t\tif (nBanKinh > 0)\r\n'
      b'\t\t{\r\n'
-     b'\t\t\tKRULine Vong[32];\r\n'
-     b'\t\t\t/* m_DataRes.m_nXpos la private; GetMpsPos cho dung toa do khong gian. */\r\n'
      b'\t\t\tint nGocX = 0, nGocY = 0;\r\n'
      b'\t\t\tGetMpsPos(&nGocX, &nGocY);\r\n'
-     b'\t\t\tfor (int nK = 0; nK < 32; nK++)\r\n'
+     b'\t\t\tint nO_X = 0, nO_Y = 0;\r\n'
+     b'\t\t\tg_pRepresent->ViewPortCoordToSpaceCoord(nO_X, nO_Y, m_Height);\r\n'
+     b'\t\t\tKRULine Vong[16];\r\n'
+     b'\t\t\tint nSo = 0;\r\n'
+     b'\t\t\tfor (int nK = 0; nK < 32; nK += 2)\r\n'
      b'\t\t\t{\r\n'
      b'\t\t\t\tint nD1 = nK * 2;\r\n'
-     b'\t\t\t\tint nD2 = (nK + 1) * 2;\r\n'
+     b'\t\t\t\tint nD2 = nD1 + 2;\r\n'
      b'\t\t\t\tif (nD2 >= 64)\r\n'
      b'\t\t\t\t\tnD2 -= 64;\r\n'
-     b'\t\t\t\tVong[nK].oPosition.nX = nGocX + ((g_DirCos(nD1, 64) * nBanKinh) >> 10);\r\n'
-     b'\t\t\t\tVong[nK].oPosition.nY = nGocY + ((g_DirSin(nD1, 64) * nBanKinh) >> 10);\r\n'
-     b'\t\t\t\tVong[nK].oPosition.nZ = 0;\r\n'
-     b'\t\t\t\tVong[nK].oEndPos.nX = nGocX + ((g_DirCos(nD2, 64) * nBanKinh) >> 10);\r\n'
-     b'\t\t\t\tVong[nK].oEndPos.nY = nGocY + ((g_DirSin(nD2, 64) * nBanKinh) >> 10);\r\n'
-     b'\t\t\t\tVong[nK].oEndPos.nZ = 0;\r\n'
-     b'\t\t\t\tVong[nK].Color.Color_dw = 0xa0ffd040;\r\n'
+     b'\t\t\t\tint nX1 = nGocX + ((g_DirCos(nD1, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tint nY1 = nGocY + ((g_DirSin(nD1, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tint nX2 = nGocX + ((g_DirCos(nD2, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tint nY2 = nGocY + ((g_DirSin(nD2, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tVong[nSo].oPosition.nX = nX1 - nO_X;\r\n'
+     b'\t\t\t\tVong[nSo].oPosition.nY = (nY1 - nO_Y) / 2;\r\n'
+     b'\t\t\t\tVong[nSo].oPosition.nZ = 0;\r\n'
+     b'\t\t\t\tVong[nSo].oEndPos.nX = nX2 - nO_X;\r\n'
+     b'\t\t\t\tVong[nSo].oEndPos.nY = (nY2 - nO_Y) / 2;\r\n'
+     b'\t\t\t\tVong[nSo].oEndPos.nZ = 0;\r\n'
+     b'\t\t\t\tVong[nSo].Color.Color_dw = 0xffffd040;\r\n'
+     b'\t\t\t\tnSo++;\r\n'
      b'\t\t\t}\r\n'
-     b'\t\t\tg_DebugLog("[vong] chieu=%d bk=%d lam=%d goc=%d,%d", m_ActiveSkillID, nBanKinh, m_Doing, nGocX, nGocY);\r\n'
-     b'\t\t\tg_pRepresent->DrawPrimitives(32, Vong, RU_T_LINE, 0);\r\n'
+     b'\t\t\tg_DebugLog("[vong] chieu=%d bk=%d man=%d,%d goc=%d,%d", m_ActiveSkillID, nBanKinh, Vong[0].oPosition.nX, Vong[0].oPosition.nY, nGocX, nGocY);\r\n'
+     b'\t\t\tg_pRepresent->DrawPrimitives(nSo, Vong, RU_T_LINE, 1);\r\n'
      b'\t\t}\r\n'
      b'\t}\r\n',
      've vong tron pham vi mau vang khi phat chieu')
