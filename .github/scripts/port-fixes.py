@@ -497,6 +497,36 @@ edit('Core/Src/KNpcRes.cpp',
      b'\t\t\t\tbreak;\r\n',
      'log tam: ten spr hieu ung trang thai + nhom (dau/than/chan)')
 
+# DOI HANH VI: bang "trang thai hinh anh" cua BO DU LIEU TA DANG DUNG ghi kieu
+# bang TIENG ANH (Head / Body / Foot / MiniMap va Loop), con nguon 2003 chi so
+# voi chu Han "dau" / "chan" / "tuan hoan". Khong khop nao het -> nhanh else:
+# 104 hieu ung CHAN + 89 hieu ung DAU deu bi xep vao nhom THAN, va moi hieu ung
+# thanh CHAY MOT LAN thay vi lap.
+# Hau qua nhin thay: vong sang duoi chan (vd sl_07 La Han Tran) bi cong 38 khi
+# cuoi ngua nen noi len giua than ngua - dung loi user bao 07/09.
+# Do 08/09/2026: settings/npcres/<bang>.txt dong 45 ghi ro cot 3 = "Foot".
+edit('Core/Src/KNpcResNode.cpp',
+     b'\t\tif (strcmp(szBuffer, "\xcd\xb7\xb6\xa5") == 0)\r\n'
+     b'\t\t\tm_nType[i] = STATE_MAGIC_HEAD;\r\n'
+     b'\t\telse if (strcmp(szBuffer, "\xbd\xc5\xb5\xd7") == 0)\r\n'
+     b'\t\t\tm_nType[i] = STATE_MAGIC_FOOT;\r\n'
+     b'\t\telse\r\n'
+     b'\t\t\tm_nType[i] = STATE_MAGIC_BODY;\r\n',
+     b'\t\tif (strcmp(szBuffer, "\xcd\xb7\xb6\xa5") == 0 || !_stricmp(szBuffer, "Head"))\r\n'
+     b'\t\t\tm_nType[i] = STATE_MAGIC_HEAD;\r\n'
+     b'\t\telse if (strcmp(szBuffer, "\xbd\xc5\xb5\xd7") == 0 || !_stricmp(szBuffer, "Foot"))\r\n'
+     b'\t\t\tm_nType[i] = STATE_MAGIC_FOOT;\r\n'
+     b'\t\telse\r\n'
+     b'\t\t\tm_nType[i] = STATE_MAGIC_BODY;\r\n',
+     'bang trang thai ghi tieng Anh: nhan ca Head/Foot')
+
+edit('Core/Src/KNpcResNode.cpp',
+     b'\t\tif (strcmp(szBuffer, "\xd1\xad\xbb\xb7") == 0)\r\n'
+     b'\t\t\tm_nPlayType[i] = 0;\r\n',
+     b'\t\tif (strcmp(szBuffer, "\xd1\xad\xbb\xb7") == 0 || !_stricmp(szBuffer, "Loop"))\r\n'
+     b'\t\t\tm_nPlayType[i] = 0;\r\n',
+     'bang trang thai ghi tieng Anh: Loop = lap vo han')
+
 # 3) VONG TRON PHAM VI mau vang khi phat chieu (quanh nhan vat, chi trong luc
 # phat). Toa do la khong gian canh, DrawPrimitives voi bSinglePlaneCoord = 0 tu
 # chieu sang man hinh - nen vong tron thanh hinh bau dung kieu isometric.
@@ -532,6 +562,7 @@ edit('Core/Src/KNpc.cpp',
      b'\t\t\t\tVong[nK].oEndPos.nZ = 0;\r\n'
      b'\t\t\t\tVong[nK].Color.Color_dw = 0xa0ffd040;\r\n'
      b'\t\t\t}\r\n'
+     b'\t\t\tg_DebugLog("[vong] chieu=%d bk=%d lam=%d goc=%d,%d", m_ActiveSkillID, nBanKinh, m_Doing, nGocX, nGocY);\r\n'
      b'\t\t\tg_pRepresent->DrawPrimitives(32, Vong, RU_T_LINE, 0);\r\n'
      b'\t\t}\r\n'
      b'\t}\r\n',
