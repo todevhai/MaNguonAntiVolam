@@ -296,27 +296,27 @@ edit('Core/Src/KSkillList.cpp',
 # szMsg cung tang 32 -> 128: rieng phan trang tri "<color=HGreen>[  ]<color>"
 # da 25 byte, ten chieu tieng Viet dai hon 6 byte la tran ngan xep.
 edit('Core/Src/KMagicDesc.cpp',
-     _crlf(b'\t\t\t\t\tchar\tszMsg[32];\n'
-     b'\t\t\t\t\tif (nValue > 0)\n'
-     b'\t\t\t\t\t{\n'
-     b'\t\t\t\t\t\tISkill* pSkill =  g_SkillManager.GetSkill(nValue, 1);\n'
-     b'\t\t\t\t\t\tsprintf(szMsg, "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());\n'
-     b'\t\t\t\t\t}\n'
-     b'\t\t\t\t\telse\n'),
-     _crlf(b'\t\t\t\t\tchar\tszMsg[128];\n'
-     b'\t\t\t\t\tISkill* pSkill = NULL;\n'
-     b'\t\t\t\t\tif (nValue > 0)\n'
-     b'\t\t\t\t\t{\n'
-     b'\t\t\t\t\t\tpSkill = g_SkillManager.GetSkill(nValue, 1);\n'
-     b'\t\t\t\t\t\tif (!pSkill && nValue > 255)\n'
-     b'\t\t\t\t\t\t\tpSkill = g_SkillManager.GetSkill(nValue >> 8, 1);\n'
-     b'\t\t\t\t\t}\n'
-     b'\t\t\t\t\tif (pSkill && pSkill->GetSkillName())\n'
-     b'\t\t\t\t\t{\n'
-     b'\t\t\t\t\t\t_snprintf(szMsg, sizeof(szMsg), "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());\n'
-     b'\t\t\t\t\t\tszMsg[sizeof(szMsg) - 1] = 0;\n'
-     b'\t\t\t\t\t}\n'
-     b'\t\t\t\t\telse\n'),
+     b'\t\t\t\t\tchar\tszMsg[32];\r\n'
+     b'\t\t\t\t\tif (nValue > 0)\r\n'
+     b'\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\tISkill* pSkill =  g_SkillManager.GetSkill(nValue, 1);\r\n'
+     b'\t\t\t\t\t\tsprintf(szMsg, "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());\r\n'
+     b'\t\t\t\t\t}\r\n'
+     b'\t\t\t\t\telse\r\n',
+     b'\t\t\t\t\tchar\tszMsg[128];\r\n'
+     b'\t\t\t\t\tISkill* pSkill = NULL;\r\n'
+     b'\t\t\t\t\tif (nValue > 0)\r\n'
+     b'\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\tpSkill = g_SkillManager.GetSkill(nValue, 1);\r\n'
+     b'\t\t\t\t\t\tif (!pSkill && nValue > 255)\r\n'
+     b'\t\t\t\t\t\t\tpSkill = g_SkillManager.GetSkill(nValue >> 8, 1);\r\n'
+     b'\t\t\t\t\t}\r\n'
+     b'\t\t\t\t\tif (pSkill && pSkill->GetSkillName())\r\n'
+     b'\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\t_snprintf(szMsg, sizeof(szMsg), "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());\r\n'
+     b'\t\t\t\t\t\tszMsg[sizeof(szMsg) - 1] = 0;\r\n'
+     b'\t\t\t\t\t}\r\n'
+     b'\t\t\t\t\telse\r\n',
      'hover chieu co ma #l khong con chet: kiem NULL + dem 128 byte')
 
 # CANH BAO — day la cho DUY NHAT doi hanh vi, khong chi la cu phap:
