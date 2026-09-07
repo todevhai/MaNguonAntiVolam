@@ -466,6 +466,89 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'\t\t\t\t\t\t\tbreak;\r\n',
      've SPR co alpha thay vi bo trong (het quang den quanh hieu ung)')
 
+# 1) HIEU UNG DAC BIET cua chieu (vong sang duoi chan) khong duoc nang len 38
+# khi cuoi ngua: no dat tren MAT DAT, khong bam theo nguoi ngoi tren lung ngua.
+# Cong 38 lam vong sang noi len giua than ngua. Cac hieu ung bam than/dau
+# (m_cStateSpr nhom 0..11) van giu +38 nhu cu.
+edit('Core/Src/KNpcRes.cpp',
+     b'\t\tm_cDrawFile[nPos].nFrame = m_cSpecialSpr.m_nCurFrame;\r\n'
+     b'\t\tm_cDrawFile[nPos].oPosition.nX = nScreenX;\r\n'
+     b'\t\tm_cDrawFile[nPos].oPosition.nY = nScreenY;\r\n'
+     b'\t\tint nHeightOff = 0;\r\n'
+     b'\t\tif (m_bRideHorse)\r\n'
+     b'\t\t\tnHeightOff += 38;\r\n'
+     b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ + nHeightOff;\r\n',
+     b'\t\tm_cDrawFile[nPos].nFrame = m_cSpecialSpr.m_nCurFrame;\r\n'
+     b'\t\tm_cDrawFile[nPos].oPosition.nX = nScreenX;\r\n'
+     b'\t\tm_cDrawFile[nPos].oPosition.nY = nScreenY;\r\n'
+     b'\t\t/* KHONG cong 38 khi cuoi ngua: hieu ung nay nam tren mat dat. */\r\n'
+     b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n',
+     'hieu ung dac biet nam duoi dat ke ca khi cuoi ngua')
+
+# 2) GIAT LUI khi danh quai: moi lan trung don, client keo nhan vat ve dung vi
+# tri may chu gui kem (m_sSyncPos). Client di truoc may chu mot vai o la moi cu
+# trung don thanh mot nac giat lui. Chi keo khi lech DANG KE (> 1 o); lech nho
+# thi de nguyen, buoc di sau se tu khop.
+edit('Core/Src/KNpc.cpp',
+     b'\tnFrames = m_Frames.nTotalFrame - m_Frames.nCurrentFrame;\r\n'
+     b'\tif (nFrames <= 1)\r\n'
+     b'\t{\r\n'
+     b'\t\tif ((DWORD)SubWorld[0].m_Region[m_RegionIndex].m_RegionID == m_sSyncPos.m_dwRegionID)\r\n'
+     b'\t\t{\r\n',
+     b'\tnFrames = m_Frames.nTotalFrame - m_Frames.nCurrentFrame;\r\n'
+     b'\tif (nFrames <= 1)\r\n'
+     b'\t{\r\n'
+     b'\t\tif ((DWORD)SubWorld[0].m_Region[m_RegionIndex].m_RegionID == m_sSyncPos.m_dwRegionID)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\t/* Lech duoi mot o thi BO QUA: keo ve moi lan trung don lam nhan vat\r\n'
+     b'\t\t\t   giat lui tung nac. Lech lon (bi day lui, dich chuyen) thi van keo. */\r\n'
+     b'\t\t\tint nLechX = m_MapX - m_sSyncPos.m_nMapX;\r\n'
+     b'\t\t\tint nLechY = m_MapY - m_sSyncPos.m_nMapY;\r\n'
+     b'\t\t\tif (nLechX >= -1 && nLechX <= 1 && nLechY >= -1 && nLechY <= 1)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tmemset(&m_sSyncPos, 0, sizeof(m_sSyncPos));\r\n'
+     b'\t\t\t\treturn;\r\n'
+     b'\t\t\t}\r\n',
+     'trung don khong keo vi tri khi lech duoi mot o')
+
+# 3) VONG TRON PHAM VI mau vang khi phat chieu (quanh nhan vat, chi trong luc
+# phat). Toa do la khong gian canh, DrawPrimitives voi bSinglePlaneCoord = 0 tu
+# chieu sang man hinh - nen vong tron thanh hinh bau dung kieu isometric.
+# Dung g_DirCos/g_DirSin (thang 1024) de khoi keo math.h vao Core.
+edit('Core/Src/KNpc.cpp',
+     b'void KNpc::Paint()\r\n'
+     b'{\r\n',
+     b'void KNpc::Paint()\r\n'
+     b'{\r\n'
+     b'\tif (m_Index == Player[CLIENT_PLAYER_INDEX].m_nIndex && m_Doing == do_skill\r\n'
+     b'\t\t&& g_pRepresent && m_ActiveSkillID > 0)\r\n'
+     b'\t{\r\n'
+     b'\t\tISkill* pChieuVong = g_SkillManager.GetSkill(m_ActiveSkillID, 1);\r\n'
+     b'\t\tint nBanKinh = pChieuVong ? pChieuVong->GetAttackRadius() : 0;\r\n'
+     b'\t\tif (nBanKinh > 0)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tKRULine Vong[32];\r\n'
+     b'\t\t\tint nGocX = m_DataRes.m_nXpos;\r\n'
+     b'\t\t\tint nGocY = m_DataRes.m_nYpos;\r\n'
+     b'\t\t\tfor (int nK = 0; nK < 32; nK++)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tint nD1 = nK * 2;\r\n'
+     b'\t\t\t\tint nD2 = (nK + 1) * 2;\r\n'
+     b'\t\t\t\tif (nD2 >= 64)\r\n'
+     b'\t\t\t\t\tnD2 -= 64;\r\n'
+     b'\t\t\t\tVong[nK].oPosition.nX = nGocX + ((g_DirCos(nD1, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tVong[nK].oPosition.nY = nGocY + ((g_DirSin(nD1, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tVong[nK].oPosition.nZ = 0;\r\n'
+     b'\t\t\t\tVong[nK].oEndPos.nX = nGocX + ((g_DirCos(nD2, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tVong[nK].oEndPos.nY = nGocY + ((g_DirSin(nD2, 64) * nBanKinh) >> 10);\r\n'
+     b'\t\t\t\tVong[nK].oEndPos.nZ = 0;\r\n'
+     b'\t\t\t\tVong[nK].Color.Color_dw = 0x60ffd040;\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t\tg_pRepresent->DrawPrimitives(32, Vong, RU_T_LINE, 0);\r\n'
+     b'\t\t}\r\n'
+     b'\t}\r\n',
+     've vong tron pham vi mau vang khi phat chieu')
+
 
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
