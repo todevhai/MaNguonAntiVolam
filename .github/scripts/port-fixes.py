@@ -285,6 +285,32 @@ edit('Core/Src/KSkillList.cpp',
      b'for(i = 0;i < MAX_NPCSKILL;i++)', b'for(int i = 0;i < MAX_NPCSKILL;i++)',
      'khai bao lai bien dem')
 
+# DOI HANH VI: bang vo cong (F5) khong giau chieu danh bang vu khi nua.
+# Ban goc bo moi chieu co IsPhysical o CA HAI ham liet ke, nen Thieu Lam duoc
+# cap 27 chieu ma bang chi hien 13 - 14 chieu cong kich chinh (Kim Cang Phuc Ma,
+# Hang Long Bat Hoi, Vi Da Ho Phap...) khong bao gio thay va khong cong diem
+# duoc, du nguoi choi du diem ky nang. Tuyen cua ta cho cong diem tat ca.
+# PHAI sua CA HAI: GetSkillSortList dung de VE danh sach, GetSkillPosition dung
+# de tra vi tri mot chieu trong danh sach do; lech mot ham la nut "+" cong nham
+# chieu ben canh.
+edit('Core/Src/KSkillList.cpp',
+     b'\t\t\t\t\tpOrdinSkill = (KSkill * ) pSkill;\r\n'
+     b'\t\t\t\t\tif (pOrdinSkill->IsPhysical())\r\n'
+     b'\t\t\t\t\t\tcontinue;\r\n',
+     b'\t\t\t\t\tpOrdinSkill = (KSkill * ) pSkill;\r\n'
+     b'\t\t\t\t\t(void)pOrdinSkill;\t/* khong con loc IsPhysical */\r\n',
+     'bang vo cong liet ke ca chieu vat ly')
+
+edit('Core/Src/KSkillList.cpp',
+     b'\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t(!m_Skills[i].SkillId) || \r\n'
+     b'\t\t\t\t\t(pOrdinSkill->IsPhysical())\r\n'
+     b'\t\t\t\t\t)\r\n',
+     b'\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t(!m_Skills[i].SkillId)\r\n'
+     b'\t\t\t\t\t)\r\n',
+     'vi tri chieu tinh theo cung danh sach vua noi')
+
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
 # pSkill->GetSkillName() ma khong kiem NULL. Do 07/09/2026 bang kenh lenh
