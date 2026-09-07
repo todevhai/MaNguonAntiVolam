@@ -285,6 +285,40 @@ edit('Core/Src/KSkillList.cpp',
      b'for(i = 0;i < MAX_NPCSKILL;i++)', b'for(int i = 0;i < MAX_NPCSKILL;i++)',
      'khai bao lai bien dem')
 
+# DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
+# (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
+# pSkill->GetSkillName() ma khong kiem NULL. Do 07/09/2026 bang kenh lenh
+# `hover`: chieu 709 "Dai Thua Nhu Lai Chu" -> thuoc tinh autoreplyskill ->
+# magicdesc.ini co "#lA-" -> GetSkill(5121,1) tra NULL -> doc dia chi 0
+# (KMagicDesc::GetDesc +0x51b, doi chieu bang CoreClient.map).
+# 5121 = 20*256+1: du lieu goi (id chieu * 256 + cap) chu khong phai id tran,
+# nen thu ca hai kieu roi moi bo cuoc. 15 muc trong magicdesc.ini dung "#l".
+# szMsg cung tang 32 -> 128: rieng phan trang tri "<color=HGreen>[  ]<color>"
+# da 25 byte, ten chieu tieng Viet dai hon 6 byte la tran ngan xep.
+edit('Core/Src/KMagicDesc.cpp',
+     b'\t\t\t\t\tchar\tszMsg[32];\n'
+     b'\t\t\t\t\tif (nValue > 0)\n'
+     b'\t\t\t\t\t{\n'
+     b'\t\t\t\t\t\tISkill* pSkill =  g_SkillManager.GetSkill(nValue, 1);\n'
+     b'\t\t\t\t\t\tsprintf(szMsg, "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());\n'
+     b'\t\t\t\t\t}\n'
+     b'\t\t\t\t\telse\n',
+     b'\t\t\t\t\tchar\tszMsg[128];\n'
+     b'\t\t\t\t\tISkill* pSkill = NULL;\n'
+     b'\t\t\t\t\tif (nValue > 0)\n'
+     b'\t\t\t\t\t{\n'
+     b'\t\t\t\t\t\tpSkill = g_SkillManager.GetSkill(nValue, 1);\n'
+     b'\t\t\t\t\t\tif (!pSkill && nValue > 255)\n'
+     b'\t\t\t\t\t\t\tpSkill = g_SkillManager.GetSkill(nValue >> 8, 1);\n'
+     b'\t\t\t\t\t}\n'
+     b'\t\t\t\t\tif (pSkill && pSkill->GetSkillName())\n'
+     b'\t\t\t\t\t{\n'
+     b'\t\t\t\t\t\t_snprintf(szMsg, sizeof(szMsg), "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());\n'
+     b'\t\t\t\t\t\tszMsg[sizeof(szMsg) - 1] = 0;\n'
+     b'\t\t\t\t\t}\n'
+     b'\t\t\t\t\telse\n',
+     'hover chieu co ma #l khong con chet: kiem NULL + dem 128 byte')
+
 # CANH BAO — day la cho DUY NHAT doi hanh vi, khong chi la cu phap:
 # vong lap tim vi tri co thoi gian nho nhat va luu vao n_mMin, nhung hai dong sau
 # vong lai dung j. Sau vong j == 15, ma mang chi co 15 phan tu [0..14] -> ghi
