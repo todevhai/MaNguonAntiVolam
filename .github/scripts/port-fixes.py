@@ -377,6 +377,45 @@ edit('Core/Src/KNpc.cpp',
      b'\t\t\tSetFightMode(TRUE);\t/* tu rut vu khi thay vi bo lenh */\r\n',
      'dang hoa binh thi tu rut vu khi, khong bo lenh danh')
 
+# DOI HANH VI: chieu VAT LY cua mon phai bi chan het, chi con don danh thuong.
+# KSkill::CanCastSkill bat moi chieu IsPhysical phai TRUNG ID voi chieu vu khi
+# dang cam (GetCurActiveWeaponSkill -> settings/vukhi-kynang-vatly.txt). Bang do
+# cua ta tra ve cung chieu 53 cho MOI loai vu khi, ma du lieu 8.x danh dau
+# IsPhysical = 1 cho ca chieu mon phai => Hang Long Bat Hoi, Vo Tuong Tram...
+# khong bao gio phat duoc, do bang log: "trong-tam=0".
+# Phep kiem do sinh ra cho DON DANH THUONG; rang buoc vu khi cua chieu mon phai
+# nam o cot EqtLimit, duoc kiem ngay ben duoi trong chinh ham nay.
+edit('Core/Src/KCore.cpp',
+     b'int\t\t\t\tg_nHandSkill;\r\n',
+     b'int\t\t\t\tg_nHandSkill;\r\n'
+     b'\r\n'
+     b'/* Chieu nay co phai don danh thuong cua mot loai vu khi khong? */\r\n'
+     b'BOOL LaChieuVuKhi(int nSkillId)\r\n'
+     b'{\r\n'
+     b'\tif (nSkillId <= 0)\r\n'
+     b'\t\treturn FALSE;\r\n'
+     b'\tif (nSkillId == g_nHandSkill)\r\n'
+     b'\t\treturn TRUE;\r\n'
+     b'\tfor (int i = 0; i < MAX_MELEEWEAPON_PARTICULARTYPE_NUM; i++)\r\n'
+     b'\t\tif (g_nMeleeWeaponSkill[i] == nSkillId)\r\n'
+     b'\t\t\treturn TRUE;\r\n'
+     b'\tfor (int j = 0; j < MAX_RANGEWEAPON_PARTICULARTYPE_NUM; j++)\r\n'
+     b'\t\tif (g_nRangeWeaponSkill[j] == nSkillId)\r\n'
+     b'\t\t\treturn TRUE;\r\n'
+     b'\treturn FALSE;\r\n'
+     b'}\r\n',
+     'them phep tra chieu vu khi')
+
+edit('Core/Src/KSkills.cpp',
+     b'\t\tif (IsPhysical())\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tint nWeapoinSkill = Npc[nLauncher].GetCurActiveWeaponSkill();\r\n',
+     b'\t\textern BOOL LaChieuVuKhi(int nSkillId);\r\n'
+     b'\t\tif (IsPhysical() && LaChieuVuKhi((int)m_nId))\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tint nWeapoinSkill = Npc[nLauncher].GetCurActiveWeaponSkill();\r\n',
+     'chi don danh thuong moi phai trung chieu vu khi')
+
 
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
