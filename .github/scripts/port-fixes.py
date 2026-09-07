@@ -485,31 +485,17 @@ edit('Core/Src/KNpcRes.cpp',
      b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n',
      'hieu ung dac biet nam duoi dat ke ca khi cuoi ngua')
 
-# 2) GIAT LUI khi danh quai: moi lan trung don, client keo nhan vat ve dung vi
-# tri may chu gui kem (m_sSyncPos). Client di truoc may chu mot vai o la moi cu
-# trung don thanh mot nac giat lui. Chi keo khi lech DANG KE (> 1 o); lech nho
-# thi de nguyen, buoc di sau se tu khop.
-edit('Core/Src/KNpc.cpp',
-     b'\tnFrames = m_Frames.nTotalFrame - m_Frames.nCurrentFrame;\r\n'
-     b'\tif (nFrames <= 1)\r\n'
-     b'\t{\r\n'
-     b'\t\tif ((DWORD)SubWorld[0].m_Region[m_RegionIndex].m_RegionID == m_sSyncPos.m_dwRegionID)\r\n'
-     b'\t\t{\r\n',
-     b'\tnFrames = m_Frames.nTotalFrame - m_Frames.nCurrentFrame;\r\n'
-     b'\tif (nFrames <= 1)\r\n'
-     b'\t{\r\n'
-     b'\t\tif ((DWORD)SubWorld[0].m_Region[m_RegionIndex].m_RegionID == m_sSyncPos.m_dwRegionID)\r\n'
-     b'\t\t{\r\n'
-     b'\t\t\t/* Lech duoi mot o thi BO QUA: keo ve moi lan trung don lam nhan vat\r\n'
-     b'\t\t\t   giat lui tung nac. Lech lon (bi day lui, dich chuyen) thi van keo. */\r\n'
-     b'\t\t\tint nLechX = m_MapX - m_sSyncPos.m_nMapX;\r\n'
-     b'\t\t\tint nLechY = m_MapY - m_sSyncPos.m_nMapY;\r\n'
-     b'\t\t\tif (nLechX >= -1 && nLechX <= 1 && nLechY >= -1 && nLechY <= 1)\r\n'
-     b'\t\t\t{\r\n'
-     b'\t\t\t\tmemset(&m_sSyncPos, 0, sizeof(m_sSyncPos));\r\n'
-     b'\t\t\t\treturn;\r\n'
-     b'\t\t\t}\r\n',
-     'trung don khong keo vi tri khi lech duoi mot o')
+# TAM THOI (do dac): in ra spr hieu ung trang thai vua duoc gan va NHOM cua no.
+# nType 0 = tren dau (o 0..5), 1 = tren than (6..11, cong 38 khi cuoi ngua),
+# 2 = duoi chan (12..17, nZ = 0). Can biet hieu ung "duoi chan" cua chieu ho tro
+# thuc su nam nhom nao truoc khi sua toa do - doan mo la sua nham nhu lan truoc.
+edit('Core/Src/KNpcRes.cpp',
+     b'\t\t\t\tm_cStateSpr[i].m_SprContrul.SetSprFile(szBuffer, nTotalFrame, nTotalDir, nInterVal);\r\n'
+     b'\t\t\t\tbreak;\r\n',
+     b'\t\t\t\tm_cStateSpr[i].m_SprContrul.SetSprFile(szBuffer, nTotalFrame, nTotalDir, nInterVal);\r\n'
+     b'\t\t\t\tg_DebugLog("[hieu ung] spr=%s nhom=%d o=%d", szBuffer, nType, i);\r\n'
+     b'\t\t\t\tbreak;\r\n',
+     'log tam: ten spr hieu ung trang thai + nhom (dau/than/chan)')
 
 # 3) VONG TRON PHAM VI mau vang khi phat chieu (quanh nhan vat, chi trong luc
 # phat). Toa do la khong gian canh, DrawPrimitives voi bSinglePlaneCoord = 0 tu
@@ -520,8 +506,9 @@ edit('Core/Src/KNpc.cpp',
      b'{\r\n',
      b'void KNpc::Paint()\r\n'
      b'{\r\n'
-     b'\tif (m_Index == Player[CLIENT_PLAYER_INDEX].m_nIndex && m_Doing == do_skill\r\n'
-     b'\t\t&& g_pRepresent && m_ActiveSkillID > 0)\r\n'
+     b'\tif (m_Index == Player[CLIENT_PLAYER_INDEX].m_nIndex && g_pRepresent\r\n'
+     b'\t\t&& m_ActiveSkillID > 0 && (m_Doing == do_magic || m_Doing == do_attack\r\n'
+     b'\t\t|| m_Doing == do_special1 || m_Doing == do_manyattack))\r\n'
      b'\t{\r\n'
      b'\t\tISkill* pChieuVong = g_SkillManager.GetSkill(m_ActiveSkillID, 1);\r\n'
      b'\t\tint nBanKinh = pChieuVong ? pChieuVong->GetAttackRadius() : 0;\r\n'
@@ -543,7 +530,7 @@ edit('Core/Src/KNpc.cpp',
      b'\t\t\t\tVong[nK].oEndPos.nX = nGocX + ((g_DirCos(nD2, 64) * nBanKinh) >> 10);\r\n'
      b'\t\t\t\tVong[nK].oEndPos.nY = nGocY + ((g_DirSin(nD2, 64) * nBanKinh) >> 10);\r\n'
      b'\t\t\t\tVong[nK].oEndPos.nZ = 0;\r\n'
-     b'\t\t\t\tVong[nK].Color.Color_dw = 0x60ffd040;\r\n'
+     b'\t\t\t\tVong[nK].Color.Color_dw = 0xa0ffd040;\r\n'
      b'\t\t\t}\r\n'
      b'\t\t\tg_pRepresent->DrawPrimitives(32, Vong, RU_T_LINE, 0);\r\n'
      b'\t\t}\r\n'
@@ -4250,6 +4237,16 @@ edit('Core/Src/KNpc.cpp',
            b'\tProcStatus();\n'
            b'\tif (IsPlayer())\n'
            b'\t\tAutoPathObsTick(16);\t// nap DAN lop vat can subworld -> khong dung hinh khi doi map\n'
+           b'\t// DANH NHAU = DA TOI NOI: bo duong tu tim. Neu con, khoi duoi van ban\n'
+           b'\t// lenh chay len server moi 4 khung trong luc client dang danh -> server\n'
+           b'\t// keo nhan vat ve buoc di do: moi cu keo la mot nac GIAT LUI. Chinh cu\n'
+           b'\t// keo do lai reset m_nAutoStall nen bo dem chong-ket khong bao gio tu dung.\n'
+           b'\tif (IsPlayer() && m_nAutoPathCnt > 0 && (m_Doing == do_attack ||\n'
+           b'\t\tm_Doing == do_magic || m_Doing == do_special1 || m_Doing == do_manyattack))\n'
+           b'\t{\n'
+           b'\t\tm_nAutoPathCnt = 0; m_nAutoPathIdx = 0; m_nAutoStall = 0; m_bAutoFar = 0;\n'
+           b'\t\tg_DebugLog("[AUTOPATH] danh nhau -> huy duong tu tim");\n'
+           b'\t}\n'
            b'\t// DI GIUA HANH LANG + LIEN TUC (y tuong user): moi ~4 khung, gui mot buoc\n'
            b'\t// ngan ve phia waypoint nhung DON VAO GIUA hai tuong. Server luon co dich\n'
            b'\t// gan phia truoc -> di MUOT khong dung o nga re; luon giua duong -> khong\n'
