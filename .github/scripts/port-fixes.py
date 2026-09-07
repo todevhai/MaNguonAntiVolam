@@ -458,11 +458,15 @@ edit('Core/Src/KSkillList.cpp',
 # m_Canvas.DrawSpriteAlpha da co san va dang duoc dung o nhanh
 # ALPHA_COLOR_ADJUST ngay ben duoi, nen chi la mo lai.
 edit('Represent/Represent2/KRepresentShell2.cpp',
-     b'\t\t\t\t\t\t/*\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
-     b'\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);*/\r\n'
-     b'\t\t\t\t\t\t\tbreak;\r\n',
      b'\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
      b'\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
+     b'\t\t\t\t\t\t\tbreak;\r\n',
+     b'\t\t\t\t\t\t\tif (pTemp->bRenderStyle == IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT)\r\n'
+     b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
+     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, 30);\t/* THU: nhanh alpha hang so */\r\n'
+     b'\t\t\t\t\t\t\telse\r\n'
+     b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
+     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
      b'\t\t\t\t\t\t\tbreak;\r\n',
      've SPR co alpha thay vi bo trong (het quang den quanh hieu ung)')
 
@@ -575,12 +579,6 @@ edit('Core/Src/KNpc.cpp',
      b'\t\t\t\tVong[nSo].Color.Color_dw = 0xffffd040;\r\n'
      b'\t\t\t\tnSo++;\r\n'
      b'\t\t\t}\r\n'
-     b'\t\t\tg_DebugLog("[vong] chieu=%d bk=%d man=%d,%d goc=%d,%d", m_ActiveSkillID, nBanKinh, Vong[0].oPosition.nX, Vong[0].oPosition.nY, nGocX, nGocY);\r\n'
-     b'\t\t\tKRULine Thu[1];\t/* THU: hai duong o goc man hinh, toa do co dinh */\r\n'
-     b'\t\t\tThu[0].oPosition.nX = 60; Thu[0].oPosition.nY = 60; Thu[0].oPosition.nZ = 0;\r\n'
-     b'\t\t\tThu[0].oEndPos.nX = 260; Thu[0].oEndPos.nY = 160; Thu[0].oEndPos.nZ = 0;\r\n'
-     b'\t\t\tThu[0].Color.Color_dw = 0xffff0000;\r\n'
-     b'\t\t\tg_pRepresent->DrawPrimitives(1, Thu, RU_T_LINE, 1);\r\n'
      b'\t\t\tg_pRepresent->DrawPrimitives(nSo, Vong, RU_T_LINE, 1);\r\n'
      b'\t\t}\r\n'
      b'\t}\r\n',
