@@ -576,6 +576,11 @@ edit('Core/Src/KNpc.cpp',
      b'\t\t\t\tnSo++;\r\n'
      b'\t\t\t}\r\n'
      b'\t\t\tg_DebugLog("[vong] chieu=%d bk=%d man=%d,%d goc=%d,%d", m_ActiveSkillID, nBanKinh, Vong[0].oPosition.nX, Vong[0].oPosition.nY, nGocX, nGocY);\r\n'
+     b'\t\t\tKRULine Thu[1];\t/* THU: hai duong o goc man hinh, toa do co dinh */\r\n'
+     b'\t\t\tThu[0].oPosition.nX = 60; Thu[0].oPosition.nY = 60; Thu[0].oPosition.nZ = 0;\r\n'
+     b'\t\t\tThu[0].oEndPos.nX = 260; Thu[0].oEndPos.nY = 160; Thu[0].oEndPos.nZ = 0;\r\n'
+     b'\t\t\tThu[0].Color.Color_dw = 0xffff0000;\r\n'
+     b'\t\t\tg_pRepresent->DrawPrimitives(1, Thu, RU_T_LINE, 1);\r\n'
      b'\t\t\tg_pRepresent->DrawPrimitives(nSo, Vong, RU_T_LINE, 1);\r\n'
      b'\t\t}\r\n'
      b'\t}\r\n',
