@@ -311,6 +311,27 @@ edit('Core/Src/KSkillList.cpp',
      b'\t\t\t\t\t)\r\n',
      'vi tri chieu tinh theo cung danh sach vua noi')
 
+# DOI HANH VI (cung ly do): danh sach chieu gan cho TAY TRAI / TAY PHAI cung bo
+# moi chieu IsPhysical. Hau qua: Vo Tuong Tram nang len cap 20 van khong xuat
+# hien de gan vao tay trai. `LRSkill` trong skills.txt moi la cho khai chieu
+# duoc gan tay nao (0 = ca hai, 1 = chi trai, 2 = chi phai, 3 = khong gan duoc);
+# cac chieu cong kich chinh deu de 0, tuc DUOC gan - dieu kien IsPhysical la thu
+# thua chen vao. Giu nguyen phep loc theo LRSkill.
+edit('Core/Src/KSkillList.cpp',
+     b'\t\t\t\t\tif ((!pOrdinSkill->IsPhysical()) &&\t\r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n',
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n',
+     'tay trai nhan ca chieu vat ly')
+
+edit('Core/Src/KSkillList.cpp',
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t(!pOrdinSkill->IsPhysical()) && \r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n',
+     b'\t\t\t\t\tif (\r\n'
+     b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n',
+     'tay phai nhan ca chieu vat ly')
+
 # DOI HANH VI: hover mot chieu trong bang vo cong ma mo ta cua no co ma "#l"
 # (chen ten mot chieu khac) lam CHET CA GAME. Ban goc goi thang
 # pSkill->GetSkillName() ma khong kiem NULL. Do 07/09/2026 bang kenh lenh
