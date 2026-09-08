@@ -560,6 +560,28 @@ edit('Engine/Src/KDrawBase.cpp',
      b'void g_DrawLine(void* node, void* canvas)\r\n',
      'them phep ve sprite CONG SANG (het quang den quanh hieu ung)')
 
+# TAM THOI (do dac): in ten SPR + KIEU VE cua 300 luot ve dau tien. Quang den
+# van con sau khi cho nhanh ALPHA_NOT_BE_LIT ve kieu cong -> hieu ung no
+# khong di duong do. Log nay cho biet no di duong nao (OPACITY? 3LEVEL?).
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'\t\t\t\t\t\tchar* pPalette = GET_SPR_PALETTE(pSprHeader);\r\n',
+     b'\t\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\t\tstatic int s_nDemLog = 0;\r\n'
+     b'\t\t\t\t\t\t\tif (s_nDemLog < 300)\r\n'
+     b'\t\t\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\t\t\ts_nDemLog++;\r\n'
+     b'\t\t\t\t\t\t\t\tg_DebugLog("[spr] %s kieu=%d a=%d", pTemp->szImage, (int)pTemp->bRenderStyle, (int)pTemp->Color.Color_b.a);\r\n'
+     b'\t\t\t\t\t\t\t}\r\n'
+     b'\t\t\t\t\t\t}\r\n'
+     b'\t\t\t\t\t\tchar* pPalette = GET_SPR_PALETTE(pSprHeader);\r\n',
+     'log tam: ten spr + kieu ve trong lop canh')
+
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'#include <assert.h>\r\n',
+     b'#include <assert.h>\r\n'
+     b'#include "..\\..\\engine\\src\\KDebug.h"\r\n',
+     'Represent2 them KDebug.h cho log tam')
+
 edit('Engine/Src/KDrawBase.h',
      b'void\tg_DrawLine(void* node, void* canvas);\r\n',
      b'void\tg_DrawLine(void* node, void* canvas);\r\n'
