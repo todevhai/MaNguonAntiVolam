@@ -4881,6 +4881,80 @@ edit_after('S3Client/Ui/UiCase/UiSkills.cpp',
 
 
 # ---------------------------------------------------------------------------
+# Icon o thanh phim tat nam lech ngoai o.
+#
+# Do in-game 08/09/2026: keo lenh bai GM va mot cuon sach vao thanh phim tat thi
+# hai icon nam lech len goc trai, trong khi thuoc va hoi thanh phu thi vao giua.
+#
+# Vi sao: CoreDrawGameObj can giua theo GetWidth() * 26 - tuc so O CHIEM trong
+# tui, khong phai kich thuoc THAT cua anh. Vat pham 1x1 nao cung duoc coi la
+# 26x26. Thuoc dung 26x26 nen vao giua; con \spr\item\questkey\obj_item_shanhe.spr
+# to hon han va cuon sach thi nho hon -> lech dung bang nua do chenh.
+#
+# Represent ve SPR tai (nX + pFrame->OffsetX, nY + pFrame->OffsetY) voi kich
+# thuoc pFrame->Width/Height (KRepresentShell2.cpp, nhanh RU_T_IMAGE khi khong
+# co co FRAME_DRAW). GetImageFrameParam tra ve dung hai cap so do, nen tinh lai
+# duoc chinh xac. Chi sua nhanh CGOG_IME_ITEM (thanh phim tat) - tui va o trang
+# bi giu nguyen cach ve cu de khong doi dien mao dang quen.
+print('\nIcon thanh phim tat can giua theo kich thuoc THAT:')
+# 1) KItem.h: khai bao ham do khung anh
+edit('Core/Src/KItem.h',
+     b'\tvoid\tGetDesc(char* pszMsg, bool bShowPrice = false, int nPriceScale = 1, int nActiveAttrib = 0);',
+     b'\tBOOL\tGetIconFrameBox(int* pOffX, int* pOffY, int* pW, int* pH);\t// khung THAT cua icon SPR\r\n'
+     b'\tvoid\tGetDesc(char* pszMsg, bool bShowPrice = false, int nPriceScale = 1, int nActiveAttrib = 0);',
+     'khai bao KItem::GetIconFrameBox')
+# 2) KItem.cpp: dinh nghia (dat ngay truoc KItem::Paint, van trong #ifndef _SERVER)
+edit('Core/Src/KItem.cpp',
+     b'void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)',
+     _crlf(b'// Khung THAT cua icon: offset va kich thuoc frame trong tep SPR. Khac han\n'
+           b'// GetWidth()/GetHeight() - hai cai do la so O CHIEM trong tui (du lieu\n'
+           b'// settings/item), khong lien quan gi den anh to hay nho.\n'
+           b'BOOL KItem::GetIconFrameBox(int* pOffX, int* pOffY, int* pW, int* pH)\n'
+           b'{\n'
+           b'\tif (!g_pRepresent || m_Image.szImage[0] == 0)\n'
+           b'\t\treturn FALSE;\n'
+           b'\tKRPosition2 oOffset, oSize;\n'
+           b'\toOffset.nX = oOffset.nY = 0;\n'
+           b'\toSize.nX = oSize.nY = 0;\n'
+           b'\tif (!g_pRepresent->GetImageFrameParam(m_Image.szImage, m_Image.nFrame,\n'
+           b'\t\t\t\t\t\t\t\t\t\t  &oOffset, &oSize, m_Image.nType))\n'
+           b'\t\treturn FALSE;\n'
+           b'\tif (oSize.nX <= 0 || oSize.nY <= 0)\n'
+           b'\t\treturn FALSE;\n'
+           b'\tif (pOffX) *pOffX = oOffset.nX;\n'
+           b'\tif (pOffY) *pOffY = oOffset.nY;\n'
+           b'\tif (pW) *pW = oSize.nX;\n'
+           b'\tif (pH) *pH = oSize.nY;\n'
+           b'\treturn TRUE;\n'
+           b'}\n'
+           b'\n'
+           b'void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)'),
+     'dinh nghia KItem::GetIconFrameBox')
+# 3) CoreDrawGameObj: nhanh thanh phim tat can lai theo khung that
+edit('Core/Src/CoreDrawGameObj.cpp',
+     _crlf(b'\t\tif (uObjGenre == CGOG_IME_ITEM)\n'
+           b'\t\t{\n'
+           b'\t\t\tItem[uId].Paint(x, y,FALSE);\n'
+           b'\t\t} '),
+     _crlf(b'\t\tif (uObjGenre == CGOG_IME_ITEM)\n'
+           b'\t\t{\n'
+           b'\t\t\t// Tren da can giua theo GetWidth() * 26 (so o chiem trong tui). Voi o\n'
+           b'\t\t\t// phim tat thi phai can theo khung THAT cua anh, khong thi icon to /\n'
+           b'\t\t\t// nho hon 26 se lech han ra ngoai o. Do chenh giua hai cach:\n'
+           b'\t\t\t//   (o_chiem*26 - rong_that) / 2 - offset_frame\n'
+           b'\t\t\t// Dung cho ca hai nhanh ben tren vi ca hai deu dat goc theo o_chiem*26.\n'
+           b'\t\t\tint nOffX = 0, nOffY = 0, nFrameW = 0, nFrameH = 0;\n'
+           b'\t\t\tif (Item[uId].GetIconFrameBox(&nOffX, &nOffY, &nFrameW, &nFrameH))\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tx += (Item[uId].GetWidth() * ITEM_CELL_WIDTH - nFrameW) / 2 - nOffX;\n'
+           b'\t\t\t\ty += (Item[uId].GetHeight() * ITEM_CELL_HEIGHT - nFrameH) / 2 - nOffY;\n'
+           b'\t\t\t}\n'
+           b'\t\t\tItem[uId].Paint(x, y,FALSE);\n'
+           b'\t\t} '),
+     'thanh phim tat can giua icon theo khung that')
+
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
