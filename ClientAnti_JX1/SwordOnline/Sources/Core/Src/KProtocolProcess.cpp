@@ -1685,6 +1685,11 @@ void KProtocolProcess::SyncNpcMin(BYTE* pMsg)
 				Npc[nIdx].m_CurrentLife = 0;
 			}
 			// Ã°Ñª´¦Àí
+			/* Log TAM - go khi biet vi sao so mau mat di khong hien. */
+			if (nOldLife != (int)Npc[nIdx].m_CurrentLife)
+				g_DebugLog("[mau quai] id=%u kind=%d max=%d pc=%d cu=%d moi=%d",
+					NpcSync->ID, (int)Npc[nIdx].m_Kind, (int)Npc[nIdx].m_CurrentLifeMax,
+					(int)NpcSync->LifePerCent, nOldLife, (int)Npc[nIdx].m_CurrentLife);
 			if (Npc[nIdx].m_Kind == kind_normal)
 			{
 				Npc[nIdx].SetBlood(nOldLife - Npc[nIdx].m_CurrentLife);
