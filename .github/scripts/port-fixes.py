@@ -462,13 +462,136 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
      b'\t\t\t\t\t\t\tbreak;\r\n',
      b'\t\t\t\t\t\t\tif (pTemp->bRenderStyle == IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT)\r\n'
-     b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
-     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, 30);\t/* THU: nhanh alpha hang so */\r\n'
+     b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAdd(nX, nY, pFrame->Width, pFrame->Height,\r\n'
+     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette);\t/* hieu ung tu phat sang: CONG */\r\n'
      b'\t\t\t\t\t\t\telse\r\n'
      b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
      b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
      b'\t\t\t\t\t\t\tbreak;\r\n',
      've SPR co alpha thay vi bo trong (het quang den quanh hieu ung)')
+
+# DOI HANH VI: THEM phep ve CONG SANG cho sprite hieu ung. Ban ve phan mem
+# Represent2 chi co phep tron thuong; hieu ung lua/khoi cua JX1 von duoc ve
+# bang phep CONG (ban DirectX) nen o day nhung diem toi cua sprite de len nen
+# thanh quang den. Do 08/09/2026: doi sang alpha hang so khong het -> khong
+# phai chon nham ham alpha ma la THIEU HAN phep cong.
+edit('Engine/Src/KDrawBase.cpp',
+     b'//---------------------------------------------------------------------------\r\n'
+     b'void g_DrawLine(void* node, void* canvas)\r\n',
+     b'//---------------------------------------------------------------------------\r\n'
+     b'// Ve sprite kieu CONG SANG (additive).\r\n'
+     b'// Hieu ung lua/khoi cua JX1 duoc ve bang phep CONG o ban DirectX. Bo ve phan\r\n'
+     b'// mem nay chi co phep tron thuong, nen nhung diem TOI cua sprite hieu ung de\r\n'
+     b'// len nen thanh mot QUANG DEN quanh chieu (do in-game 08/09/2026).\r\n'
+     b'// Luong sprite (xem DrawSpriteMP.inc): tung cap [do dai][alpha]\r\n'
+     b'//   alpha == 0  -> doan trong suot, KHONG co byte mau di kem\r\n'
+     b'//   alpha != 0  -> <do dai> byte chi so, tra mau qua bang mau 16 bit\r\n'
+     b'//---------------------------------------------------------------------------\r\n'
+     b'void g_DrawSpriteAdd(void* node, void* canvas)\r\n'
+     b'{\r\n'
+     b'	KDrawNode*	pNode = (KDrawNode *)node;\r\n'
+     b'	KCanvas*	pCanvas = (KCanvas *)canvas;\r\n'
+     b'\r\n'
+     b'	KClipper Clipper;\r\n'
+     b'	if (pCanvas->MakeClip(pNode->m_nX, pNode->m_nY, pNode->m_nWidth, pNode->m_nHeight, &Clipper) == 0)\r\n'
+     b'		return;\r\n'
+     b'\r\n'
+     b'	int nPitch;\r\n'
+     b'	void* pBuffer = pCanvas->LockCanvas(nPitch);\r\n'
+     b'	if (pBuffer == NULL)\r\n'
+     b'		return;\r\n'
+     b'\r\n'
+     b'	/* 0x07e0f81f la mat na cua 565, con lai la 555 */\r\n'
+     b'	unsigned short wMatR = (pCanvas->m_nMask32 == 0x07e0f81f) ? 0xf800 : 0x7c00;\r\n'
+     b'	unsigned short wMatG = (pCanvas->m_nMask32 == 0x07e0f81f) ? 0x07e0 : 0x03e0;\r\n'
+     b'	unsigned short wMatB = 0x001f;\r\n'
+     b'\r\n'
+     b'	int nRong = pNode->m_nWidth;\r\n'
+     b'	int nCao = pNode->m_nHeight;\r\n'
+     b'	int nTongDiem = nRong * nCao;\r\n'
+     b'	int nHangDau = Clipper.top;\r\n'
+     b'	int nHangCuoi = Clipper.top + Clipper.height;\r\n'
+     b'	int nCotDau = Clipper.left;\r\n'
+     b'	int nCotCuoi = nRong - Clipper.right;\r\n'
+     b'\r\n'
+     b'	unsigned char* pNguon = (unsigned char*)pNode->m_pBitmap;\r\n'
+     b'	unsigned short* pBangMau = (unsigned short*)pNode->m_pPalette;\r\n'
+     b'	char* pDongDau = (char*)pBuffer + Clipper.y * nPitch;\r\n'
+     b'\r\n'
+     b'	int nHang = 0, nCot = 0, nDiem = 0;\r\n'
+     b'	int nVongAn = nTongDiem * 2 + 64;	/* chan vong lap vo han khi du lieu hong */\r\n'
+     b'	while (nDiem < nTongDiem && nHang < nHangCuoi && nVongAn-- > 0)\r\n'
+     b'	{\r\n'
+     b'		int nDai = pNguon[0];\r\n'
+     b'		int nAlpha = pNguon[1];\r\n'
+     b'		pNguon += 2;\r\n'
+     b'		int nHeSo = (nAlpha >= 255) ? 32 : (nAlpha >> 3);\r\n'
+     b'		for (int nI = 0; nI < nDai && nDiem < nTongDiem; nI++, nDiem++)\r\n'
+     b'		{\r\n'
+     b'			unsigned char byIdx = 0;\r\n'
+     b'			if (nAlpha)\r\n'
+     b'				byIdx = *pNguon++;\r\n'
+     b'			if (nHeSo > 0 && nHang >= nHangDau && nHang < nHangCuoi &&\r\n'
+     b'				nCot >= nCotDau && nCot < nCotCuoi)\r\n'
+     b'			{\r\n'
+     b'				unsigned short* pO = (unsigned short*)(pDongDau + (nHang - nHangDau) * nPitch)\r\n'
+     b'					+ (Clipper.x + nCot - nCotDau);\r\n'
+     b'				unsigned short wNguon = pBangMau[byIdx];\r\n'
+     b'				int nR = (*pO & wMatR) + ((((int)(wNguon & wMatR) * nHeSo) >> 5) & wMatR);\r\n'
+     b'				int nG = (*pO & wMatG) + ((((int)(wNguon & wMatG) * nHeSo) >> 5) & wMatG);\r\n'
+     b'				int nB = (*pO & wMatB) + ((((int)(wNguon & wMatB) * nHeSo) >> 5) & wMatB);\r\n'
+     b'				if (nR > (int)wMatR) nR = wMatR;\r\n'
+     b'				if (nG > (int)wMatG) nG = wMatG;\r\n'
+     b'				if (nB > (int)wMatB) nB = wMatB;\r\n'
+     b'				*pO = (unsigned short)(nR | nG | nB);\r\n'
+     b'			}\r\n'
+     b'			nCot++;\r\n'
+     b'			if (nCot >= nRong)\r\n'
+     b'			{\r\n'
+     b'				nCot = 0;\r\n'
+     b'				nHang++;\r\n'
+     b'			}\r\n'
+     b'		}\r\n'
+     b'	}\r\n'
+     b'	pCanvas->UnlockCanvas();\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'//---------------------------------------------------------------------------\r\n'
+     b'void g_DrawLine(void* node, void* canvas)\r\n',
+     'them phep ve sprite CONG SANG (het quang den quanh hieu ung)')
+
+edit('Engine/Src/KDrawBase.h',
+     b'void\tg_DrawLine(void* node, void* canvas);\r\n',
+     b'void\tg_DrawLine(void* node, void* canvas);\r\n'
+     b'void\tg_DrawSpriteAdd(void* node, void* canvas);\r\n',
+     'khai bao g_DrawSpriteAdd')
+
+edit('Engine/Src/KCanvas.h',
+     b'\tvoid\t\tDrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite);\r\n',
+     b'\tvoid\t\tDrawSpriteAdd(int nX, int nY, int nWidth, int nHeight, void* lpSprite, void* lpPalette);\r\n'
+     b'\tvoid\t\tDrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite);\r\n',
+     'KCanvas khai bao DrawSpriteAdd')
+
+edit('Engine/Src/KCanvas.cpp',
+     b'void KCanvas::DrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite)\r\n',
+     b'void KCanvas::DrawSpriteAdd(int nX, int nY, int nWidth, int nHeight,\r\n'
+     b'\t\t\t\t\t\t\tvoid* lpSprite, void* lpPalette)\r\n'
+     b'{\r\n'
+     b'\tKDrawNode\tNode;\r\n'
+     b'\tNode.m_pPrev = NULL;\r\n'
+     b'\tNode.m_pNext = NULL;\r\n'
+     b'\tNode.m_bChanged = m_bChanged;\r\n'
+     b'\tNode.m_nX = nX;\r\n'
+     b'\tNode.m_nY = nY;\r\n'
+     b'\tNode.m_nWidth = nWidth;\r\n'
+     b'\tNode.m_nHeight = nHeight;\r\n'
+     b'\tNode.m_pBitmap = lpSprite;\r\n'
+     b'\tNode.m_pPalette = lpPalette;\r\n'
+     b'\tg_DrawSpriteAdd(&Node, this);\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'void KCanvas::DrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite)\r\n',
+     'KCanvas::DrawSpriteAdd goi ham ve cong sang')
 
 # 1) HIEU UNG DAC BIET cua chieu (vong sang duoi chan) khong duoc nang len 38
 # khi cuoi ngua: no dat tren MAT DAT, khong bam theo nguoi ngoi tren lung ngua.
