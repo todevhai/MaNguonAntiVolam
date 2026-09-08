@@ -567,7 +567,9 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'\t\t\t\t\t\tchar* pPalette = GET_SPR_PALETTE(pSprHeader);\r\n',
      b'\t\t\t\t\t\t{\r\n'
      b'\t\t\t\t\t\t\tstatic int s_nDemLog = 0;\r\n'
-     b'\t\t\t\t\t\t\tif (s_nDemLog < 300)\r\n'
+     b'\t\t\t\t\t\t\tif (s_nDemLog < 300 && (pTemp->bRenderStyle == IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT\r\n'
+     b'\t\t\t\t\t\t\t\t|| strstr(pTemp->szImage, "skill") || strstr(pTemp->szImage, "Skill")\r\n'
+     b'\t\t\t\t\t\t\t\t|| strstr(pTemp->szImage, "magic") || strstr(pTemp->szImage, "Magic")))\r\n'
      b'\t\t\t\t\t\t\t{\r\n'
      b'\t\t\t\t\t\t\t\ts_nDemLog++;\r\n'
      b'\t\t\t\t\t\t\t\tg_DebugLog("[spr] %s kieu=%d a=%d", pTemp->szImage, (int)pTemp->bRenderStyle, (int)pTemp->Color.Color_b.a);\r\n'
