@@ -560,43 +560,7 @@ edit('Engine/Src/KDrawBase.cpp',
      b'void g_DrawLine(void* node, void* canvas)\r\n',
      'them phep ve sprite CONG SANG (het quang den quanh hieu ung)')
 
-# TAM THOI (do dac): in ten SPR + KIEU VE cua 300 luot ve dau tien. Quang den
-# van con sau khi cho nhanh ALPHA_NOT_BE_LIT ve kieu cong -> hieu ung no
-# khong di duong do. Log nay cho biet no di duong nao (OPACITY? 3LEVEL?).
-edit('Represent/Represent2/KRepresentShell2.cpp',
-     b'\t\t\t\t\t\tchar* pPalette = GET_SPR_PALETTE(pSprHeader);\r\n',
-     b'\t\t\t\t\t\t{\r\n'
-     b'\t\t\t\t\t\t\t/* Chi in MOI ten+kieu MOT LAN: hieu ung ve lai moi khung se\r\n'
-     b'\t\t\t\t\t\t\t   an het han muc log neu in tat. */\r\n'
-     b'\t\t\t\t\t\t\tstatic char s_szDaIn[64][80];\r\n'
-     b'\t\t\t\t\t\t\tstatic int s_nDaIn[64];\r\n'
-     b'\t\t\t\t\t\t\tstatic int s_nSoDaIn = 0;\r\n'
-     b'\t\t\t\t\t\t\tif (strstr(pTemp->szImage, "skill") || strstr(pTemp->szImage, "Skill")\r\n'
-     b'\t\t\t\t\t\t\t\t|| strstr(pTemp->szImage, "magic") || strstr(pTemp->szImage, "Magic")\r\n'
-     b'\t\t\t\t\t\t\t\t|| pTemp->bRenderStyle == IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT)\r\n'
-     b'\t\t\t\t\t\t\t{\r\n'
-     b'\t\t\t\t\t\t\t\tint nK, bCo = 0;\r\n'
-     b'\t\t\t\t\t\t\t\tfor (nK = 0; nK < s_nSoDaIn; nK++)\r\n'
-     b'\t\t\t\t\t\t\t\t\tif (s_nDaIn[nK] == (int)pTemp->bRenderStyle && !strcmp(s_szDaIn[nK], pTemp->szImage))\r\n'
-     b'\t\t\t\t\t\t\t\t\t{ bCo = 1; break; }\r\n'
-     b'\t\t\t\t\t\t\t\tif (!bCo && s_nSoDaIn < 64)\r\n'
-     b'\t\t\t\t\t\t\t\t{\r\n'
-     b'\t\t\t\t\t\t\t\t\tstrncpy(s_szDaIn[s_nSoDaIn], pTemp->szImage, 79);\r\n'
-     b'\t\t\t\t\t\t\t\t\ts_szDaIn[s_nSoDaIn][79] = 0;\r\n'
-     b'\t\t\t\t\t\t\t\t\ts_nDaIn[s_nSoDaIn] = (int)pTemp->bRenderStyle;\r\n'
-     b'\t\t\t\t\t\t\t\t\ts_nSoDaIn++;\r\n'
-     b'\t\t\t\t\t\t\t\t\tg_DebugLog("[spr] %s kieu=%d a=%d", pTemp->szImage, (int)pTemp->bRenderStyle, (int)pTemp->Color.Color_b.a);\r\n'
-     b'\t\t\t\t\t\t\t\t}\r\n'
-     b'\t\t\t\t\t\t\t}\r\n'
-     b'\t\t\t\t\t\t}\r\n'
-     b'\t\t\t\t\t\tchar* pPalette = GET_SPR_PALETTE(pSprHeader);\r\n',
-     'log tam: ten spr + kieu ve trong lop canh')
 
-edit('Represent/Represent2/KRepresentShell2.cpp',
-     b'#include <assert.h>\r\n',
-     b'#include <assert.h>\r\n'
-     b'#include "..\\..\\engine\\src\\KDebug.h"\r\n',
-     'Represent2 them KDebug.h cho log tam')
 
 # DOI HANH VI: hieu ung dac biet cua chieu (KSkillSpecial) khai kieu ve ALPHA,
 # tuc di chung duong voi NHAN VAT. Do 08/09/2026 bang log [spr]: qua bom
@@ -661,17 +625,6 @@ edit('Core/Src/KNpcRes.cpp',
      b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n',
      'hieu ung dac biet nam duoi dat ke ca khi cuoi ngua')
 
-# TAM THOI (do dac): in ra spr hieu ung trang thai vua duoc gan va NHOM cua no.
-# nType 0 = tren dau (o 0..5), 1 = tren than (6..11, cong 38 khi cuoi ngua),
-# 2 = duoi chan (12..17, nZ = 0). Can biet hieu ung "duoi chan" cua chieu ho tro
-# thuc su nam nhom nao truoc khi sua toa do - doan mo la sua nham nhu lan truoc.
-edit('Core/Src/KNpcRes.cpp',
-     b'\t\t\t\tm_cStateSpr[i].m_SprContrul.SetSprFile(szBuffer, nTotalFrame, nTotalDir, nInterVal);\r\n'
-     b'\t\t\t\tbreak;\r\n',
-     b'\t\t\t\tm_cStateSpr[i].m_SprContrul.SetSprFile(szBuffer, nTotalFrame, nTotalDir, nInterVal);\r\n'
-     b'\t\t\t\tg_DebugLog("[hieu ung] spr=%s nhom=%d o=%d", szBuffer, nType, i);\r\n'
-     b'\t\t\t\tbreak;\r\n',
-     'log tam: ten spr hieu ung trang thai + nhom (dau/than/chan)')
 
 # DOI HANH VI: bang "trang thai hinh anh" cua BO DU LIEU TA DANG DUNG ghi kieu
 # bang TIENG ANH (Head / Body / Foot / MiniMap va Loop), con nguon 2003 chi so
