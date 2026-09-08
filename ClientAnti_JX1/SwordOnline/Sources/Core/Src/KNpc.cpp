@@ -7039,6 +7039,7 @@ void	KNpc::SetBlood(int nNo)
 		{
 			m_nBloodNo[i][0] = nNo;
 			m_nBloodNo[i][1] = defMAX_SHOW_BLOOD_TIME;
+			g_DebugLog("[so mau] ghi %d vao o %d cua npc %d", nNo, i, m_Index);
 		}
 		else
 		{
@@ -7162,6 +7163,9 @@ int	KNpc::PaintBlood(int nHeightOffset)
 		{
 			 nHeightOff = nHeightOffset + (defMAX_SHOW_BLOOD_TIME - m_nBloodNo[i][1]) * defSHOW_BLOOD_MOVE_SPEED;
 			 sprintf(m_szBloodNo, "%d", m_nBloodNo[i][0]);
+			 if (m_nBloodNo[i][1] == defMAX_SHOW_BLOOD_TIME)
+				 g_DebugLog("[so mau] ve '%s' tai %d,%d cao=%d mau=%08x",
+					 m_szBloodNo, nMpsX, nMpsY, nHeightOff, (unsigned int)dwColor);
 			 g_pRepresent->OutputText(nFontSize, m_szBloodNo, KRF_ZERO_END, nMpsX - nFontSize * g_StrLen(m_szBloodNo) / 4, nMpsY, dwColor, 0, nHeightOff);
 			 m_nBloodNo[i][1] = m_nBloodNo[i][1] - 1;
 			 if (m_nBloodNo[i][1] <=0)
