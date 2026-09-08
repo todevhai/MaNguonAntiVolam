@@ -298,18 +298,23 @@ edit('Core/Src/KSkillList.cpp',
      b'\t\t\t\t\tif (pOrdinSkill->IsPhysical())\r\n'
      b'\t\t\t\t\t\tcontinue;\r\n',
      b'\t\t\t\t\tpOrdinSkill = (KSkill * ) pSkill;\r\n'
-     b'\t\t\t\t\t(void)pOrdinSkill;\t/* khong con loc IsPhysical */\r\n',
-     'bang vo cong liet ke ca chieu vat ly')
+     b'\t\t\t\t\t(void)pOrdinSkill;\t/* khong con loc IsPhysical */\r\n'
+     b'\t\t\t\t\textern BOOL LaChieuNgoaiBangVoCong(int nSkillId);\r\n'
+     b'\t\t\t\t\tif (LaChieuNgoaiBangVoCong(m_Skills[i].SkillId))\r\n'
+     b'\t\t\t\t\t\tcontinue;\r\n',
+     'bang vo cong liet ke ca chieu vat ly, tru don danh thuong va khinh cong')
 
 edit('Core/Src/KSkillList.cpp',
      b'\t\t\t\tif (\r\n'
      b'\t\t\t\t\t(!m_Skills[i].SkillId) || \r\n'
      b'\t\t\t\t\t(pOrdinSkill->IsPhysical())\r\n'
      b'\t\t\t\t\t)\r\n',
+     b'\t\t\t\textern BOOL LaChieuNgoaiBangVoCong(int nSkillId);\r\n'
      b'\t\t\t\tif (\r\n'
-     b'\t\t\t\t\t(!m_Skills[i].SkillId)\r\n'
+     b'\t\t\t\t\t(!m_Skills[i].SkillId) ||\r\n'
+     b'\t\t\t\t\tLaChieuNgoaiBangVoCong(m_Skills[i].SkillId)\r\n'
      b'\t\t\t\t\t)\r\n',
-     'vi tri chieu tinh theo cung danh sach vua noi')
+     'vi tri chieu tinh theo cung danh sach vua noi (ke ca hai chieu bi giau)')
 
 # DOI HANH VI (cung ly do): danh sach chieu gan cho TAY TRAI / TAY PHAI cung bo
 # moi chieu IsPhysical. Hau qua: Vo Tuong Tram nang len cap 20 van khong xuat
@@ -412,8 +417,18 @@ edit('Core/Src/KCore.cpp',
      b'\t\tif (g_nRangeWeaponSkill[j] == nSkillId)\r\n'
      b'\t\t\treturn TRUE;\r\n'
      b'\treturn FALSE;\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'/* Chieu khong bao gio cong diem duoc, nen bang vo cong (F5) giau di:\r\n'
+     b'   53 la don danh thuong cua vu khi - client tu gan vao o tay trai,\r\n'
+     b'   210 la khinh cong - chi co MOT cap. De chung trong bang thi nguoi\r\n'
+     b'   choi thay o co nut \"+\" bam vao khong an gi. Ca hai VAN nam trong\r\n'
+     b'   danh sach chon chieu tay trai/tay phai va thanh phim tat. */\r\n'
+     b'BOOL LaChieuNgoaiBangVoCong(int nSkillId)\r\n'
+     b'{\r\n'
+     b'\treturn (nSkillId == 53 || nSkillId == 210);\r\n'
      b'}\r\n',
-     'them phep tra chieu vu khi')
+     'them phep tra chieu vu khi + chieu ngoai bang vo cong')
 
 edit('Core/Src/KSkills.cpp',
      b'\t\tif (IsPhysical())\r\n'
@@ -450,6 +465,19 @@ edit('Core/Src/KSkillList.cpp',
      b'\t\t\t\t\t\t((pOrdinSkill->GetSkillLRInfo() == BothSkill) || \r\n'
      b'\t\t\t\t\t\t(pOrdinSkill->GetSkillLRInfo() == RightOnlySkill))\r\n',
      'danh sach tay phai bo don danh thuong')
+
+# DOI HANH VI: so mau MAT DI cua quai bay len - engine da co san ma khong bao
+# gio thay. KNpc::SetBlood ghi so vao m_nBloodNo[][] va PaintBlood ve no moi
+# khung, nhung mau ve la SHOW_BLOOD_COLOR (0x00ff0000) OR (m_nBloodAlpha << 24)
+# ma m_nBloodAlpha chi duoc dat = 0: khoi tang alpha nam trong doan da bi dong
+# ngoac /* */ tu ban goc. Alpha 0 = trong suot hoan toan -> chu ve ra nhung
+# khong mot dong log nao bao. Dat alpha day nhu PaintInfo van lam (0xFF......).
+# So lay tu goi dong bo NPC (LifePerCent 7 bit) nen la XAP XI theo buoc
+# mau-toi-da/128, khong phai sat thuong tung don.
+edit('Core/Src/KNpc.cpp',
+     b'\tDWORD dwColor = SHOW_BLOOD_COLOR | (m_nBloodAlpha << 24);\r\n',
+     b'\tDWORD dwColor = SHOW_BLOOD_COLOR | 0xff000000;\t/* alpha day, khong thi vo hinh */\r\n',
+     'so mau mat di hien len duoc')
 
 # DOI HANH VI: bat lai duong ve SPR co ALPHA trong Represent2. Ban port de trong
 # hai nhanh IMAGE_RENDER_STYLE_ALPHA / _ALPHA_NOT_BE_LIT (code goc bi dong
