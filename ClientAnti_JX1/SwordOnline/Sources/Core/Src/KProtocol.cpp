@@ -136,6 +136,7 @@ int	g_nProtocolSize[MAX_PROTOCOL_NUM] =
 	sizeof(NPC_JUMP_SYNC),
 	sizeof(PKVALUE),						//s2c_pkvalue
 	sizeof(SET_AVATAR),						//s2c_setavatar
+	sizeof(LIEN_TRAM_SYNC),					//s2c_lientram
 #else
 	sizeof(LOGIN_COMMAND),		//	c2s_login,
 	sizeof(tagLogicLogin),		//	c2s_logicLogin,

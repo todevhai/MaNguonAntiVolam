@@ -497,6 +497,11 @@ private:
 	int					m_nBloodAlpha;
 //	int					m_nBloodTime;
 	char				m_szBloodNo[32];
+
+	/* Chuoi ha guc lien tiep - so nac may chu vua bao, va bo dem khung de
+	   chay het 10 khung cua bo anh roi tat. */
+	int					m_nLienTramNac;
+	int					m_nLienTramDem;
 #endif
 
 private:
@@ -721,6 +726,10 @@ public:
 //	void				ClearBlood(int i);
 	void				SetBlood(int nNo);
 	int				PaintBlood(int nHeightOffset);	//»æÖÆÃ°Ñª
+
+	// Chuoi ha guc lien tiep
+	void				BatDauLienTram(int nSoNac);
+	void				VeLienTram();
 #endif
 
 };

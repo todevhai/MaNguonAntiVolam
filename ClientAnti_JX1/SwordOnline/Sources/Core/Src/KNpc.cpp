@@ -53,6 +53,13 @@ extern KLuaScript		*g_pNpcLevelScript;
 #define		SHOW_BLOOD_COLOR			0x00ff0000
 #define		defMAX_SHOW_BLOOD_TIME		50
 #define		defSHOW_BLOOD_MOVE_SPEED	1
+/* Chuoi ha guc lien tiep: bo anh co 10 khung; giu moi khung vai luot ve cho
+   kip nhin; chu so rong 27 diem; ca cum nang len khoi xac mot doan. */
+#define		defLIEN_TRAM_SO_KHUNG		10
+#define		defLIEN_TRAM_LAP_KHUNG		3
+#define		defLIEN_TRAM_RONG_SO		27
+#define		defLIEN_TRAM_CACH_CHU		120
+#define		defLIEN_TRAM_CAO_HON		40
 
 #define		SHOW_LIFE_WIDTH				38
 #define		SHOW_LIFE_HEIGHT			3
@@ -274,6 +281,8 @@ void KNpc::Init()
 	m_nBloodAlpha				= 0;
 //	m_nBloodTime				= 0;
 	m_szBloodNo[0]				= 0;
+	m_nLienTramNac				= 0;
+	m_nLienTramDem				= 0;
 	m_nTongFlag					= 0;
 #endif
 
@@ -7043,6 +7052,69 @@ void	KNpc::SetBlood(int nNo)
 		}
 				
 	
+}
+#endif
+
+#ifndef _SERVER
+/* Chuoi ha guc lien tiep: bat dau chay hoat hinh tren xac muc tieu vua nga. */
+void	KNpc::BatDauLienTram(int nSoNac)
+{
+	if (nSoNac <= 0)
+		return;
+	m_nLienTramNac = nSoNac;
+	m_nLienTramDem = 0;
+}
+
+/* Ve chu "Lien tram" kem so nac. Bo anh o \spr\update\lientram\:
+   main.spr la chu, 0.spr..9.spr la chu so - deu 10 khung, nhip 70ms.
+   Nhip ve cua game nhanh hon nen moi khung anh giu defLIEN_TRAM_LAP_KHUNG
+   luot ve; het 10 khung thi tat.
+   Chu so rong 27, tam anh dat o (45,18) nen phai bu lai khi xep hang. */
+void	KNpc::VeLienTram()
+{
+	if (m_nLienTramNac <= 0)
+		return;
+	int nKhung = m_nLienTramDem / defLIEN_TRAM_LAP_KHUNG;
+	if (nKhung >= defLIEN_TRAM_SO_KHUNG)
+	{
+		m_nLienTramNac = 0;
+		m_nLienTramDem = 0;
+		return;
+	}
+	m_nLienTramDem++;
+
+	int nMpsX, nMpsY;
+	GetMpsPos(&nMpsX, &nMpsY);
+	nMpsY -= defLIEN_TRAM_CAO_HON;
+
+	char szSo[8];
+	sprintf(szSo, "%d", m_nLienTramNac);
+	int nSoChuSo = (int)strlen(szSo);
+	/* Xep ca cum quanh muc tieu: chu truoc, day so ngay sau. */
+	int nBatDau = nMpsX - (nSoChuSo * defLIEN_TRAM_RONG_SO) / 2;
+
+	KRUImage RUAnh;
+	RUAnh.nType = ISI_T_SPR;
+	RUAnh.Color.Color_b.a = 255;
+	RUAnh.bRenderFlag = RUIMAGE_RENDER_FLAG_REF_SPOT;
+	RUAnh.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;
+	RUAnh.uImage = 0;
+	RUAnh.nISPosition = IMAGE_IS_POSITION_INIT;
+	RUAnh.nFrame = nKhung;
+	RUAnh.oPosition.nZ = 0;
+
+	strcpy(RUAnh.szImage, "\\spr\\update\\lientram\\main.spr");
+	RUAnh.oPosition.nX = nBatDau - defLIEN_TRAM_CACH_CHU;
+	RUAnh.oPosition.nY = nMpsY;
+	g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, FALSE);
+
+	for (int i = 0; i < nSoChuSo; i++)
+	{
+		sprintf(RUAnh.szImage, "\\spr\\update\\lientram\\%c.spr", szSo[i]);
+		RUAnh.oPosition.nX = nBatDau + i * defLIEN_TRAM_RONG_SO;
+		RUAnh.oPosition.nY = nMpsY;
+		g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, FALSE);
+	}
 }
 #endif
 

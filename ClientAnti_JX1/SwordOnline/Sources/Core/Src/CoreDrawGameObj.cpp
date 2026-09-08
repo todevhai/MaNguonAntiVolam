@@ -28,6 +28,7 @@ void	CoreDrawGameObj(unsigned int uObjGenre, unsigned int uId, int x, int y, int
 				int nHeight = Npc[uId].GetNpcPate();
 				
 				Npc[uId].PaintBlood(nHeight / 2);	//冒血
+				Npc[uId].VeLienTram();				// chuoi ha guc lien tiep
 				
 				int nnHeight = nHeight;
 				nHeight = Npc[uId].PaintChat(nnHeight);	//聊天信息中有名字

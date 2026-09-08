@@ -147,6 +147,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_npcgoldchange] = s2cNpcGoldChange;
 	ProcessFunc[s2c_itemdurabilitychange] = ItemChangeDurability;
 	ProcessFunc[s2c_setavatar] = SetAvatar;
+	ProcessFunc[s2c_lientram] = LienTram;
 	ProcessFunc[s2c_opentremble] = OpenTremble;
 	ProcessFunc[s2c_rankname] = NetCommandSetRankFF;
 
@@ -3514,6 +3515,17 @@ void	KProtocolProcess::SetAvatar(BYTE* pMsg)
 	SET_AVATAR* pSet = (SET_AVATAR*)pMsg;
 	if (pSet->nAvatar <= defMAX_AVATAR)
 		Player[CLIENT_PLAYER_INDEX].m_nAvatar = (int)pSet->nAvatar;
+}
+
+/* May chu bao chuoi ha guc lien tiep vua dai them mot nac. Dan so nac vao
+   chinh muc tieu vua nga: xac con nam do them vai giay, du de ve xong hoat
+   hinh, va lay duoc toa do ma khong phai gui kem X/Y. */
+void	KProtocolProcess::LienTram(BYTE* pMsg)
+{
+	LIEN_TRAM_SYNC*	pSync = (LIEN_TRAM_SYNC *)pMsg;
+	int nIdx = NpcSet.SearchID(pSync->ID);
+	if (nIdx > 0)
+		Npc[nIdx].BatDauLienTram((int)pSync->nSoNac);
 }
 
 void	KProtocolProcess::ItemChangeDurability(BYTE* pMsg)

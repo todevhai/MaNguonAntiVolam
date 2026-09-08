@@ -2216,6 +2216,15 @@ typedef struct
 	BYTE	nAvatar;		// 0 = chua chon; 1..defMAX_AVATAR
 } SET_AVATAR;
 
+// Chuoi ha guc lien tiep. May chu dem, client chi ve chu "Lien tram N"
+// tai cho muc tieu vua nga - lay toa do tu ID nen khong can gui X/Y.
+typedef struct
+{
+	BYTE	ProtocolType;
+	DWORD	ID;			// npc/nguoi choi vua bi ha
+	BYTE	nSoNac;		// so nac cua chuoi
+} LIEN_TRAM_SYNC;
+
 typedef struct
 {
 	BYTE			ProtocolType;		// 协议类型			
