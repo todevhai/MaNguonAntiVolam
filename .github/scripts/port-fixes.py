@@ -598,6 +598,17 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'#include "..\\..\\engine\\src\\KDebug.h"\r\n',
      'Represent2 them KDebug.h cho log tam')
 
+# DOI HANH VI: hieu ung dac biet cua chieu (KSkillSpecial) khai kieu ve ALPHA,
+# tuc di chung duong voi NHAN VAT. Do 08/09/2026 bang log [spr]: qua bom
+# "dao kiem bao tac" va sl_150_..._d deu kieu=0. Ve kieu thuong thi nhung
+# doan sprite mau toi (khoi) de len nen thanh quang den.
+# Doi sang ALPHA_NOT_BE_LIT: dung nghia "tu phat sang, khong an anh sang canh",
+# va o Represent2 nhanh do nay ve bang phep CONG.
+edit('Core/Src/KSkillSpecial.cpp',
+     b'\tm_RUImage.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\r\n',
+     b'\tm_RUImage.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT;\r\n',
+     'hieu ung chieu tu phat sang -> ve kieu cong, het quang den')
+
 edit('Engine/Src/KDrawBase.h',
      b'void\tg_DrawLine(void* node, void* canvas);\r\n',
      b'void\tg_DrawLine(void* node, void* canvas);\r\n'
