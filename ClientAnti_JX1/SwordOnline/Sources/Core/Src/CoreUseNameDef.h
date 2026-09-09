@@ -280,6 +280,8 @@
 
 
 #define		MESSAGE_SYSTEM_ANNOUCE_HEAD		"C«ng bè"
+/* Chu TCVN3 (bang chu cua du lieu game), khong phai UTF-8. */
+#define		MSG_NHAN_KINH_NGHIEM			"Nh\xbec nh\xeb: B\xb9n nh\xcbn \xae\xad\xeec %d \xaei\xd3m kinh nghi\xd6m."
 
 enum enumMSG_ID
 {
@@ -321,6 +323,8 @@ enum enumMSG_ID
 	enumMSG_ID_COMP_FAILED,
 	enumMSG_ID_COMP_SUCCESS,
 	enumMSG_ID_COMP_ERITEM,
+	/* Bao diem kinh nghiem vua an. Than goi mang mot int la so diem. */
+	enumMSG_ID_NHAN_KINH_NGHIEM,	/* = 38, phai trung so ben may chu */
 	enumMSG_ID_NUM,
 };
 

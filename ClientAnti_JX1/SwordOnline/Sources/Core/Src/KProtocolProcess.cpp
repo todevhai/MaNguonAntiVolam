@@ -2383,6 +2383,20 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 
 	switch (pShowMsg->m_wMsgID)
 	{
+	case enumMSG_ID_NHAN_KINH_NGHIEM:
+		{
+			/* Dong "nhac nho" duoi khung chat, khong phai kenh chat. */
+			int nDiem = 0;
+			memcpy(&nDiem, pMsg + sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID), sizeof(int));
+			KSystemMessage	sMsg;
+			sprintf(sMsg.szMessage, MSG_NHAN_KINH_NGHIEM, nDiem);
+			sMsg.eType = SMT_NORMAL;
+			sMsg.byConfirmType = SMCT_NONE;
+			sMsg.byPriority = 0;
+			sMsg.byParamSize = 0;
+			CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
+		}
+		break;
 	case enumMSG_ID_TEAM_KICK_One:
 		{
 			char	szName[32];
