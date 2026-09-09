@@ -2623,8 +2623,6 @@ case GOI_AUTO_COMMAND:
 					continue;
 				if (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)
 					continue;
-				if (NpcSet.GetRelation(nMinh, i) != relation_enemy)
-					continue;
 				int nQx, nQy;
 				Npc[i].GetMpsPos(&nQx, &nQy);
 				int nDx = nQx - nX, nDy = nQy - nY;
@@ -2641,7 +2639,9 @@ case GOI_AUTO_COMMAND:
 				break;
 			}
 			int nChieu = Npc[nMinh].GetCurActiveWeaponSkill();
-			g_DebugLog("[danh-quai] npc %d (%s) chieu %d", nGan, Npc[nGan].Name, nChieu);
+			g_DebugLog("[danh-quai] npc %d (%s) chieu %d quan-he %d camp %d/%d",
+				nGan, Npc[nGan].Name, nChieu, NpcSet.GetRelation(nMinh, nGan),
+				(int)Npc[nMinh].m_CurrentCamp, (int)Npc[nGan].m_CurrentCamp);
 			LockSomeoneUseSkill(nGan, nChieu);
 		}
 		break;
