@@ -2978,6 +2978,9 @@ void KProtocolProcess::s2cExtendChat(BYTE* pMsg)
 	else if (protocol == chat_channelchat)
 	{
 		CHAT_CHANNELCHAT_SYNC* pCccSync = (CHAT_CHANNELCHAT_SYNC*)pExPckg;
+		/* Log TAM - go khi biet vi sao thong bao he thong khong hien ra. */
+		g_DebugLog("[chat] kenh %d tu '%s' dai %d",
+			(int)pCccSync->channelid, pCccSync->someone, (int)pCccSync->sentlen);
 
 		l_pDataChangedNotifyFunc->ChannelMessageArrival(
 			pCccSync->channelid, pCccSync->someone,
