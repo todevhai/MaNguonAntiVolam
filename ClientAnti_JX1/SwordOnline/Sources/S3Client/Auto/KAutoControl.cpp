@@ -110,10 +110,14 @@ void KAutoControl::RunLine(const char* szLine)
 	   cu bam ay - cung duong ma lclick di qua, khong them loi tat nao. */
 	else if (!strcmp(szCmd, "danh"))
 	{
+		/* "danh" dung don danh thuong; "danh <ma chieu>" dung chieu chi dinh -
+		   don thuong trat nhieu nen chuoi ha guc khong bao gio du nhip. */
+		int nChieu = 0;
+		sscanf(szLine, "%*s %d", &nChieu);
 		if (g_pCoreShell)
 		{
-			g_pCoreShell->OperationRequest(GOI_DANH_QUAI_GAN_NHAT, 0, 0);
-			g_DebugLog("[AUTO] danh quai gan nhat");
+			g_pCoreShell->OperationRequest(GOI_DANH_QUAI_GAN_NHAT, 0, nChieu);
+			g_DebugLog("[AUTO] danh quai gan nhat, chieu %d", nChieu);
 		}
 	}
 	else if (!strcmp(szCmd, "ride"))

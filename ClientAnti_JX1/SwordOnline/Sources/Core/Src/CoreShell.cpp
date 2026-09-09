@@ -2652,7 +2652,8 @@ case GOI_AUTO_COMMAND:
 			Npc[nGan].GetMpsPos(&nQx, &nQy);
 			int nVx = (nQx - nAx) * 100 / nHeSoX;
 			int nVy = (nQy - nAy) * 100 / nHeSoY;
-			int nChieu = Npc[nMinh].GetCurActiveWeaponSkill();
+			/* nParam = ma chieu muon dung; 0 thi lay don danh thuong cua vu khi. */
+			int nChieu = nParam > 0 ? nParam : Npc[nMinh].GetCurActiveWeaponSkill();
 			g_DebugLog("[danh-quai] npc %d (%s) chieu %d khung-nhin %d,%d",
 				nGan, Npc[nGan].Name, nChieu, nVx, nVy);
 			UseSkill(nVx, nVy, nChieu);	/* dung duong ma cu bam chuot di qua */
