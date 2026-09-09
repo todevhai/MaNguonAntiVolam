@@ -10,13 +10,6 @@
 #include "../Ui/UiCase/UiMiniMap.h"		// mo ban do lon (WORLD_MAP) de verify tim duong xa
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../../core/src/coreshell.h"
-/* Cac .cpp trong Core deu nap KCore.h TRUOC roi moi toi KNpc.h - thieu no thi
-   KNpcSet.h/KRegion.h khong co KClientNpcID, KIndexNode va vo hang loat. */
-#include "../../core/src/KCore.h"
-#include "../../core/src/KNpc.h"			// Npc[] - tim quai gan nhat cho lenh "danh"
-#include "../../core/src/KPlayer.h"
-#include "../../core/src/KPlayerDef.h"	// CLIENT_PLAYER_INDEX
-#include "../../core/src/KSubWorld.h"	// Mps2Screen: doi toa do khong gian sang man hinh
 #include "../../core/src/gamedatadef.h"	// PA_RIDE
 #include <stdio.h>
 #include <string.h>
@@ -117,39 +110,15 @@ void KAutoControl::RunLine(const char* szLine)
 	   cu bam ay - cung duong ma lclick di qua, khong them loi tat nao. */
 	else if (!strcmp(szCmd, "danh"))
 	{
-		int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
-		if (nMinh <= 0)
-			return;
-		int nX, nY;
-		Npc[nMinh].GetMpsPos(&nX, &nY);
-		int nGan = 0, nKhoangCachGan = 0;
-		for (int i = 1; i < MAX_NPC; i++)
-		{
-			if (i == nMinh || Npc[i].m_Index <= 0)
-				continue;
-			if (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)
-				continue;
-			int nQx, nQy;
-			Npc[i].GetMpsPos(&nQx, &nQy);
-			int nDx = nQx - nX, nDy = nQy - nY;
-			int nKc = nDx * nDx + nDy * nDy;
-			if (nGan == 0 || nKc < nKhoangCachGan)
-			{
-				nGan = i;
-				nKhoangCachGan = nKc;
-			}
-		}
-		if (nGan == 0)
+		POINT Diem;
+		if (!g_pCoreShell ||
+			!g_pCoreShell->GetGameData(GDI_QUAI_GAN_NHAT, (unsigned int)&Diem, 0))
 		{
 			g_DebugLog("[AUTO] danh: khong thay quai nao");
 			return;
 		}
-		int nSx, nSy;
-		Npc[nGan].GetMpsPos(&nSx, &nSy);
-		SubWorld[0].Mps2Screen(&nSx, &nSy);
-		g_DebugLog("[AUTO] danh npc %d (%s) tai man hinh %d,%d",
-			nGan, Npc[nGan].Name, nSx, nSy);
-		int nPos = (int)MAKELONG((short)nSx, (short)nSy);
+		g_DebugLog("[AUTO] danh quai tai man hinh %d,%d", (int)Diem.x, (int)Diem.y);
+		int nPos = (int)MAKELONG((short)Diem.x, (short)Diem.y);
 		Wnd_ProcessInput(WM_LBUTTONDOWN, 0, nPos);
 		Wnd_ProcessInput(WM_LBUTTONUP,   0, nPos);
 	}

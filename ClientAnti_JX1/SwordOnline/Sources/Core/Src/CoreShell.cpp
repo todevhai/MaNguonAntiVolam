@@ -1501,6 +1501,42 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 	case GDI_PLAYER_TK_XEPHANG:	
 		nRet = Player[CLIENT_PLAYER_INDEX].m_cTask.GetSaveVal(TASKVALUE_XEPHANG);
 		break;	
+	case GDI_QUAI_GAN_NHAT:
+		{
+			nRet = 0;
+			POINT* pDiem = (POINT*)uParam;
+			int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+			if (!pDiem || nMinh <= 0)
+				break;
+			int nX, nY;
+			Npc[nMinh].GetMpsPos(&nX, &nY);
+			int nGan = 0, nGanNhat = 0;
+			for (int i = 1; i < MAX_NPC; i++)
+			{
+				if (i == nMinh || Npc[i].m_Index <= 0)
+					continue;
+				if (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)
+					continue;
+				int nQx, nQy;
+				Npc[i].GetMpsPos(&nQx, &nQy);
+				int nDx = nQx - nX, nDy = nQy - nY;
+				int nKc = nDx * nDx + nDy * nDy;
+				if (nGan == 0 || nKc < nGanNhat)
+				{
+					nGan = i;
+					nGanNhat = nKc;
+				}
+			}
+			if (nGan == 0)
+				break;
+			int nSx, nSy;
+			Npc[nGan].GetMpsPos(&nSx, &nSy);
+			SubWorld[0].Mps2Screen(&nSx, &nSy);
+			pDiem->x = nSx;
+			pDiem->y = nSy;
+			nRet = 1;
+		}
+		break;
 	}
 	return nRet;
 }

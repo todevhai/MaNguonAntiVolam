@@ -254,6 +254,11 @@ enum GAMEDATA_INDEX
 	GDI_PLAYER_TK_PLAYER,
 	
 	GDI_PLAYER_TK_NPC,
+
+	// Toa do MAN HINH cua con quai gan nhat. uParam = (POINT*), tra 1 neu thay.
+	// Dung cho kenh lenh dieu khien: bam chuot len quai tu ben ngoai phai doan
+	// toa do qua anh chup, lech vai diem la thanh lenh DI chu khong phai danh.
+	GDI_QUAI_GAN_NHAT,
 	
 	GDI_PLAYER_TK_XEPHANG,
 
