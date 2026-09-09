@@ -3529,6 +3529,12 @@ void	KProtocolProcess::LienTram(BYTE* pMsg)
 {
 	LIEN_TRAM_SYNC*	pSync = (LIEN_TRAM_SYNC *)pMsg;
 	int nIdx = NpcSet.SearchID(pSync->ID);
+	/* Xac co the da bi xoa truoc khi goi toi (may chu gui ngay luc no nga).
+	   Khi do ve ngay tren nguoi choi - van dung cho, va khong mat chu. */
+	if (nIdx <= 0)
+		nIdx = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+	g_DebugLog("[lien tram] nhan nac %d id %u -> npc %d",
+		(int)pSync->nSoNac, (unsigned int)pSync->ID, nIdx);
 	if (nIdx > 0)
 		Npc[nIdx].BatDauLienTram((int)pSync->nSoNac);
 }
