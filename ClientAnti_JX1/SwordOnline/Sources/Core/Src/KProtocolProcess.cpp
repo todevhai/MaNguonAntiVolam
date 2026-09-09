@@ -2394,6 +2394,7 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 			sMsg.byConfirmType = SMCT_NONE;
 			sMsg.byPriority = 0;
 			sMsg.byParamSize = 0;
+			g_DebugLog("[bao exp] nhan %d diem", nDiem);
 			CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
 		}
 		break;
