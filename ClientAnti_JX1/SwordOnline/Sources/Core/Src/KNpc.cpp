@@ -7126,6 +7126,11 @@ void	KNpc::VeLienTram()
 
 	for (int i = 0; i < nSoChuSo; i++)
 	{
+		/* Phai dat LAI uImage/nISPosition truoc moi lan ve: engine ghi ket qua
+		   tra cuu anh vao chinh hai o nay, nen giu nguyen thi lan ve sau dung
+		   lai ANH CU - chu "Lien tram" hien ra hai lan va so bien mat. */
+		RUAnh.uImage = 0;
+		RUAnh.nISPosition = IMAGE_IS_POSITION_INIT;
 		sprintf(RUAnh.szImage, "\\spr\\update\\lientram\\%c.spr", szSo[i]);
 		RUAnh.oPosition.nX = nBatDau + defLIEN_TRAM_BU_SO + i * defLIEN_TRAM_RONG_SO;
 		RUAnh.oPosition.nY = nMpsY - defLIEN_TRAM_NANG_SO;
