@@ -10,6 +10,9 @@
 #include "../Ui/UiCase/UiMiniMap.h"		// mo ban do lon (WORLD_MAP) de verify tim duong xa
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../../core/src/coreshell.h"
+/* Cac .cpp trong Core deu nap KCore.h TRUOC roi moi toi KNpc.h - thieu no thi
+   KNpcSet.h/KRegion.h khong co KClientNpcID, KIndexNode va vo hang loat. */
+#include "../../core/src/KCore.h"
 #include "../../core/src/KNpc.h"			// Npc[] - tim quai gan nhat cho lenh "danh"
 #include "../../core/src/KPlayer.h"
 #include "../../core/src/KPlayerDef.h"	// CLIENT_PLAYER_INDEX
