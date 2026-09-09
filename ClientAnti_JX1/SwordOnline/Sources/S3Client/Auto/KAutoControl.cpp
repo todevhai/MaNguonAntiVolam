@@ -110,17 +110,11 @@ void KAutoControl::RunLine(const char* szLine)
 	   cu bam ay - cung duong ma lclick di qua, khong them loi tat nao. */
 	else if (!strcmp(szCmd, "danh"))
 	{
-		POINT Diem;
-		if (!g_pCoreShell ||
-			!g_pCoreShell->GetGameData(GDI_QUAI_GAN_NHAT, (unsigned int)&Diem, 0))
+		if (g_pCoreShell)
 		{
-			g_DebugLog("[AUTO] danh: khong thay quai nao");
-			return;
+			g_pCoreShell->OperationRequest(GOI_DANH_QUAI_GAN_NHAT, 0, 0);
+			g_DebugLog("[AUTO] danh quai gan nhat");
 		}
-		g_DebugLog("[AUTO] danh quai tai man hinh %d,%d", (int)Diem.x, (int)Diem.y);
-		int nPos = (int)MAKELONG((short)Diem.x, (short)Diem.y);
-		Wnd_ProcessInput(WM_LBUTTONDOWN, 0, nPos);
-		Wnd_ProcessInput(WM_LBUTTONUP,   0, nPos);
 	}
 	else if (!strcmp(szCmd, "ride"))
 	{

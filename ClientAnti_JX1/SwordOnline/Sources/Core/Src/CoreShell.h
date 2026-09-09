@@ -254,11 +254,6 @@ enum GAMEDATA_INDEX
 	GDI_PLAYER_TK_PLAYER,
 	
 	GDI_PLAYER_TK_NPC,
-
-	// Toa do MAN HINH cua con quai gan nhat. uParam = (POINT*), tra 1 neu thay.
-	// Dung cho kenh lenh dieu khien: bam chuot len quai tu ben ngoai phai doan
-	// toa do qua anh chup, lech vai diem la thanh lenh DI chu khong phai danh.
-	GDI_QUAI_GAN_NHAT,
 	
 	GDI_PLAYER_TK_XEPHANG,
 
@@ -527,6 +522,12 @@ enum GAMEOPERATION_INDEX
 	//nParam = (目前只传0值。)鼠标指针当前坐标（绝对坐标），横坐标在低16位，纵坐标在高16位。(像素点坐标)
 
 	GOI_SET_IMMDIA_SKILL,	//设置立即技能
+
+	// Danh con quai gan nhat. Khong tham so. Dung cho kenh lenh dieu khien:
+	// bam chuot len quai tu ben ngoai phai doan toa do man hinh qua anh chup,
+	// lech vai diem la thanh lenh DI chu khong phai danh. Trong Core thi chi so
+	// npc co san nen khoa muc tieu thang, khong qua toa do nao ca.
+	GOI_DANH_QUAI_GAN_NHAT,
 	//uParam = (KUiGameObject*)pSKill, 技能信息
 	//nParam = 立即位置，0表示为左键技能，1表示为右键技能
 

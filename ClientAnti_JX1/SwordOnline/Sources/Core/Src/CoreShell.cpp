@@ -1501,42 +1501,6 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 	case GDI_PLAYER_TK_XEPHANG:	
 		nRet = Player[CLIENT_PLAYER_INDEX].m_cTask.GetSaveVal(TASKVALUE_XEPHANG);
 		break;	
-	case GDI_QUAI_GAN_NHAT:
-		{
-			nRet = 0;
-			POINT* pDiem = (POINT*)uParam;
-			int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
-			if (!pDiem || nMinh <= 0)
-				break;
-			int nX, nY;
-			Npc[nMinh].GetMpsPos(&nX, &nY);
-			int nGan = 0, nGanNhat = 0;
-			for (int i = 1; i < MAX_NPC; i++)
-			{
-				if (i == nMinh || Npc[i].m_Index <= 0)
-					continue;
-				if (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)
-					continue;
-				int nQx, nQy;
-				Npc[i].GetMpsPos(&nQx, &nQy);
-				int nDx = nQx - nX, nDy = nQy - nY;
-				int nKc = nDx * nDx + nDy * nDy;
-				if (nGan == 0 || nKc < nGanNhat)
-				{
-					nGan = i;
-					nGanNhat = nKc;
-				}
-			}
-			if (nGan == 0)
-				break;
-			int nSx, nSy;
-			Npc[nGan].GetMpsPos(&nSx, &nSy);
-			SubWorld[0].Mps2Screen(&nSx, &nSy);
-			pDiem->x = nSx;
-			pDiem->y = nSy;
-			nRet = 1;
-		}
-		break;
 	}
 	return nRet;
 }
@@ -2641,6 +2605,46 @@ case GOI_AUTO_COMMAND:
 	//设置立即技能
 	//uParam = (KUiGameObject*)pSKill, 技能信息
 	//nParam = 立即位置，0表示为右键技能，1至4表示为F1至F4技能
+	/* Danh con quai gan nhat - cho kenh lenh dieu khien. Trong Core thi chi so
+	   npc co san, nen khoa muc tieu thang bang chinh duong ma cu bam chuot len
+	   quai di qua; khong phai doi qua toa do man hinh (Mps2Screen o ban port
+	   nay la HAM RONG). */
+	case GOI_DANH_QUAI_GAN_NHAT:
+		{
+			int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+			if (nMinh <= 0)
+				break;
+			int nX, nY;
+			Npc[nMinh].GetMpsPos(&nX, &nY);
+			int nGan = 0, nGanNhat = 0;
+			for (int i = 1; i < MAX_NPC; i++)
+			{
+				if (i == nMinh || Npc[i].m_Index <= 0)
+					continue;
+				if (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)
+					continue;
+				if (NpcSet.GetRelation(nMinh, i) != relation_enemy)
+					continue;
+				int nQx, nQy;
+				Npc[i].GetMpsPos(&nQx, &nQy);
+				int nDx = nQx - nX, nDy = nQy - nY;
+				int nKc = nDx * nDx + nDy * nDy;
+				if (nGan == 0 || nKc < nGanNhat)
+				{
+					nGan = i;
+					nGanNhat = nKc;
+				}
+			}
+			if (nGan == 0)
+			{
+				g_DebugLog("[danh-quai] khong thay quai thu dich nao");
+				break;
+			}
+			int nChieu = Npc[nMinh].GetCurActiveWeaponSkill();
+			g_DebugLog("[danh-quai] npc %d (%s) chieu %d", nGan, Npc[nGan].Name, nChieu);
+			LockSomeoneUseSkill(nGan, nChieu);
+		}
+		break;
 	case GOI_SET_IMMDIA_SKILL:
 		if (uParam)
 		{
