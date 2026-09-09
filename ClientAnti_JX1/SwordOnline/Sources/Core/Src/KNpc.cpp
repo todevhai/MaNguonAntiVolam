@@ -7171,7 +7171,9 @@ int	KNpc::PaintBlood(int nHeightOffset)
 			 if (m_nBloodNo[i][1] == defMAX_SHOW_BLOOD_TIME)
 				 g_DebugLog("[so mau] ve '%s' tai %d,%d cao=%d mau=%08x",
 					 m_szBloodNo, nMpsX, nMpsY, nHeightOff, (unsigned int)dwColor);
-			 g_pRepresent->OutputText(nFontSize, m_szBloodNo, KRF_ZERO_END, nMpsX - nFontSize * g_StrLen(m_szBloodNo) / 4, nMpsY, dwColor, 0, nHeightOff);
+			 /* Phai truyen ca mau VIEN nhu PaintInfo: chu ten npc ve duoc con so
+			    mau thi khong, khac nhau dung o tham so cuoi nay. */
+			 g_pRepresent->OutputText(nFontSize, m_szBloodNo, KRF_ZERO_END, nMpsX - nFontSize * g_StrLen(m_szBloodNo) / 4, nMpsY, dwColor, 0, nHeightOff, 0xff000000);
 			 m_nBloodNo[i][1] = m_nBloodNo[i][1] - 1;
 			 if (m_nBloodNo[i][1] <=0)
 			 {
