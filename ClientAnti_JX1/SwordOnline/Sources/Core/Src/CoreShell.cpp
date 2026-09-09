@@ -2638,11 +2638,24 @@ case GOI_AUTO_COMMAND:
 				g_DebugLog("[danh-quai] khong thay quai thu dich nao");
 				break;
 			}
+			/* Doi toa do khong gian cua quai sang toa do KHUNG NHIN. Engine chi
+			   co chieu xuoi (ViewPortCoordToSpaceCoord) va Mps2Screen la ham rong,
+			   nhung phep doi la TUYEN TINH - lay hai mau roi nghich dao. */
+			int nAx = 0, nAy = 0, nAz = 0;
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nAx, nAy, nAz);
+			int nBx = 100, nBy = 100, nBz = 0;
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nBx, nBy, nBz);
+			int nHeSoX = nBx - nAx, nHeSoY = nBy - nAy;
+			if (nHeSoX == 0 || nHeSoY == 0)
+				break;
+			int nQx, nQy;
+			Npc[nGan].GetMpsPos(&nQx, &nQy);
+			int nVx = (nQx - nAx) * 100 / nHeSoX;
+			int nVy = (nQy - nAy) * 100 / nHeSoY;
 			int nChieu = Npc[nMinh].GetCurActiveWeaponSkill();
-			g_DebugLog("[danh-quai] npc %d (%s) chieu %d quan-he %d camp %d/%d",
-				nGan, Npc[nGan].Name, nChieu, NpcSet.GetRelation(nMinh, nGan),
-				(int)Npc[nMinh].m_CurrentCamp, (int)Npc[nGan].m_CurrentCamp);
-			LockSomeoneUseSkill(nGan, nChieu);
+			g_DebugLog("[danh-quai] npc %d (%s) chieu %d khung-nhin %d,%d",
+				nGan, Npc[nGan].Name, nChieu, nVx, nVy);
+			UseSkill(nVx, nVy, nChieu);	/* dung duong ma cu bam chuot di qua */
 		}
 		break;
 	case GOI_SET_IMMDIA_SKILL:
