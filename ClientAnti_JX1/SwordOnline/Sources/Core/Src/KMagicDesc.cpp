@@ -251,11 +251,11 @@ BOOL KMagicDesc::Init()
 const char* KMagicDesc::GetDesc(void *pData)
 {
 	
-	char	szTempDesc[128];
+	char	szTempDesc[256];
 	char*	pTempDesc = szTempDesc;
 	int		i = 0;
 
-	ZeroMemory(m_szDesc, 128);
+	ZeroMemory(m_szDesc, sizeof(m_szDesc));
 	
 	if (!pData)
 		return NULL;
@@ -263,7 +263,7 @@ const char* KMagicDesc::GetDesc(void *pData)
 	KMagicAttrib* pAttrib = (KMagicAttrib *)pData;
 
 	const char	*pszKeyName = g_MagicID2String(pAttrib->nAttribType);
-	m_IniFile.GetString("Descript", pszKeyName, "", szTempDesc, 128);
+	m_IniFile.GetString("Descript", pszKeyName, "", szTempDesc, sizeof(szTempDesc));
 	/* Sau thuoc tinh addskilldamage1..6 duoc DU LIEU khai voi tien to
 	   "skill_" (ca ban ta, ban6 lan voz2 deu vay) trong khi bang ten noi bo
 	   cua nguon 2003 ghi tran. Doi chieu ca bang: 197/211 ten khop san,
@@ -277,7 +277,7 @@ const char* KMagicDesc::GetDesc(void *pData)
 		{
 			strcpy(szKhac, "skill_");
 			strcat(szKhac, pszKeyName);
-			m_IniFile.GetString("Descript", szKhac, "", szTempDesc, 128);
+			m_IniFile.GetString("Descript", szKhac, "", szTempDesc, sizeof(szTempDesc));
 		}
 	}
 	while(*pTempDesc)
@@ -372,24 +372,39 @@ const char* KMagicDesc::GetDesc(void *pData)
 					//	return NULL;
 					}
 
-					switch(nDescAddType)
-					{
-					case 1:
-						if (nValue > 0)
-						{
-							strcat(m_szDesc, "T¨ng");
-						}
-						else
-						{
-							nValue = -nValue;
-							strcat(m_szDesc, "Gi¶m");
-						}
-						break;
-					default:
-						break;
-					}
+					/* KHONG tu them chu "Tang"/"Giam" nua: du lieu Viet hoa da viet
+					   san chu do trong chinh nhan ("Tang tan cong chi mang: #d1+"),
+					   them lan nua thanh "Tang tan cong chi mang: Tang80". So am van
+					   ra dau tru qua sprintf("%d").
+					   Ban goc khong bao gio chay nhanh nay - switch ben tren thieu mot
+					   cap ngoac nen nDescAddType luon 0 - vi vay du lieu moi duoc viet
+					   theo cach tu ke chu san. */
 					char	szMsg[16];
 					sprintf(szMsg, "%d", nValue);
+					strcat(m_szDesc, szMsg);
+					i += strlen(szMsg);
+				}
+				break;
+			/* Hai the RIENG cua ta. Du lieu 8.x goi HAI so vao mot o nValue:
+			     autoreplyskill  nValue[0] = idChieu*256 + capChieu
+			                     nValue[2] = (giay*18)*256 + tyLe%
+			   (doc tu script/skill/advancedskill.lua). Ban 8.x tra bang chi so
+			   #d7/#d9/#f6 ma engine 2003 khong hieu - ca ba deu roi vao nhanh
+			   default nen in RA CUNG MOT SO 5121 ba lan.
+			     #p<i> = nValue[i] & 0xFF        (cap chieu, ty le %)
+			     #q<i> = nValue[i] >> 8, /18     (khung hinh -> giay) */
+			case 'p':
+				{
+					char	szMsg[16];
+					sprintf(szMsg, "%d", nValue & 0xff);
+					strcat(m_szDesc, szMsg);
+					i += strlen(szMsg);
+				}
+				break;
+			case 'q':
+				{
+					char	szMsg[16];
+					sprintf(szMsg, "%d", (nValue >> 8) / 18);
 					strcat(m_szDesc, szMsg);
 					i += strlen(szMsg);
 				}

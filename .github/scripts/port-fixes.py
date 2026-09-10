@@ -748,7 +748,9 @@ edit('Core/Src/KNpc.cpp',
 # nen thu ca hai kieu roi moi bo cuoc. 15 muc trong magicdesc.ini dung "#l".
 # Ma KHONG tu them ngoac vuong quanh ten chieu: du lieu nao can thi tu khai,
 # vd skill_addskilldamage1 = "Tang sat thuong [#l1] h#d3-%" - them nua thanh
-# hai lop "[[ ten ]".
+# hai lop "[[ ten ]". Nhung PHAI chua mot dau cach truoc "<color>": ten chieu
+# tieng Viet hay ket thuc bang byte TCVN3 >= 0x80, ma TEncodeText coi byte do
+# la nua dau chu Trung nen nuot luon dau '<' - hien ra "...Thu]color] 1%".
 # szMsg cung tang 32 -> 128: rieng phan trang tri "<color=HGreen><color>"
 # da 25 byte, ten chieu tieng Viet dai hon 6 byte la tran ngan xep.
 edit('Core/Src/KMagicDesc.cpp',
@@ -769,7 +771,7 @@ edit('Core/Src/KMagicDesc.cpp',
      b'\t\t\t\t\t}\r\n'
      b'\t\t\t\t\tif (pSkill && pSkill->GetSkillName())\r\n'
      b'\t\t\t\t\t{\r\n'
-     b'\t\t\t\t\t\t_snprintf(szMsg, sizeof(szMsg), "<color=HGreen>%s<color>", pSkill->GetSkillName());\r\n'
+     b'\t\t\t\t\t\t_snprintf(szMsg, sizeof(szMsg), "<color=HGreen>%s <color>", pSkill->GetSkillName());\r\n'
      b'\t\t\t\t\t\tszMsg[sizeof(szMsg) - 1] = 0;\r\n'
      b'\t\t\t\t\t}\r\n'
      b'\t\t\t\t\telse\r\n',
