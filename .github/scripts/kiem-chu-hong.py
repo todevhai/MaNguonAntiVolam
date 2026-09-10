@@ -38,7 +38,10 @@ def quet(goc: Path):
     for p in goc.rglob('*'):
         if not p.is_file() or p.suffix.lower() not in DUOI:
             continue
-        if '/.git/' in str(p) or any(x in str(p) for x in BO_QUA):
+        # as_posix(): tren Windows duong dan dung '\\' nen so chuoi kieu '/LINUX/'
+        # se khong bao gio khop - da lam CI do mot lan vi dung str(p).
+        duong = p.as_posix()
+        if '/.git/' in duong or any(x in duong for x in BO_QUA):
             continue
         try:
             b = p.read_bytes()
