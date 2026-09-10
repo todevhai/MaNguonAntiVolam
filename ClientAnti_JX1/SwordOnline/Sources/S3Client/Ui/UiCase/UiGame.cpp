@@ -358,10 +358,10 @@ void PopUpContextPeopleMenu(const KUiPlayerItem& SelectPlayer, int x, int y)
 	pMenuData->nItemHeight = 0;
 	for (i = 0; i < nActionDataCount; i++)
 	{
-		if ((i == ACTION_JOINTEAM && SelectPlayer.nIndex != -1 && SelectPlayer.nData == PLAYER_MENU_STATE_TEAMOPEN) ||	//"�������", �Է�δ�򿪶���ʱ���ܼ���
-			(i == ACTION_TRADE && SelectPlayer.nIndex != -1 && SelectPlayer.nData == PLAYER_MENU_STATE_TRADEOPEN) ||	//"������Ʒ", �Է�δ�򿪽���ʱ���ܼ���
-			(i == ACTION_MAKEFRIEND && !KUiChatCentre::IsMyFriend((char*)SelectPlayer.Name)) || //"��Ϊ����", �Է������ҵĺ���ʱ����������
-			(i == ACTION_INVITETEAM && SelectPlayer.uId != 0 && TeamInfo.nCaptainPower > 0)	||	//"�������", ���鲻���Լ����˾Ͳ����������
+		if ((i == ACTION_JOINTEAM && SelectPlayer.nIndex != -1 && SelectPlayer.nData == PLAYER_MENU_STATE_TEAMOPEN) ||	//"Nhap doi": doi phuong chua mo to doi thi khong duoc phep
+			(i == ACTION_TRADE && SelectPlayer.nIndex != -1 && SelectPlayer.nData == PLAYER_MENU_STATE_TRADEOPEN) ||	//"Giao dich": doi phuong chua mo giao dich thi khong duoc phep
+			(i == ACTION_MAKEFRIEND && !KUiChatCentre::IsMyFriend((char*)SelectPlayer.Name)) || //"Hao huu": da la ban roi thi khong hien muc nay nua
+			(i == ACTION_INVITETEAM && SelectPlayer.uId != 0 && TeamInfo.nCaptainPower > 0)	||	//"To doi": khong co quyen moi nguoi thi khong hien muc nay
 			(i == ACTION_FOLLOW && SelectPlayer.nIndex != -1) ||
 			(i == ACTION_REVENGE && SelectPlayer.uId != 0) ||
 			(i == ACTION_VIEWITEM && SelectPlayer.uId != 0) ||

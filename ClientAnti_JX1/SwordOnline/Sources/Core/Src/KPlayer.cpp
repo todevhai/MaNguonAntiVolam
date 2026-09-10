@@ -2357,7 +2357,7 @@ void	KPlayer::AddSelfExp(int nExp, int nTarLevel)
 		nGetExp = 1;
 	
 	m_nExp += nGetExp;
-	g_DebugLog("[��ֵ]%sʵ�����Ӿ���%d��", Npc[m_nIndex].Name, nGetExp);
+	g_DebugLog("[kinh nghiem] %s thuc nhan %d diem", Npc[m_nIndex].Name, nGetExp);
 #ifdef _SERVER
 	if (m_nExp >= m_nNextLevelExp)	// ����
 	{
