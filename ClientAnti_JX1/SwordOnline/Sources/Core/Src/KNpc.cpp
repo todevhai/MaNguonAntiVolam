@@ -57,7 +57,9 @@ extern KLuaScript		*g_pNpcLevelScript;
    kip nhin; chu so rong 27 diem; ca cum nang len khoi xac mot doan. */
 #define		defLIEN_TRAM_SO_KHUNG		10
 #define		defLIEN_TRAM_LAP_KHUNG		3
-#define		defLIEN_TRAM_RONG_SO		22
+#define		defLIEN_TRAM_RONG_SO		27
+/* Khoang trong trong khung chu: tu diem 135 den het 198. */
+#define		defLIEN_TRAM_RONG_VUNG		63
 /* Khung chu "Lien tram" la 198x90, tam anh o (160,60): chu chiem nua trai,
    nua phai la vet mau - KHOANG TRONG CO Y de chua so nac. Chu so 27x31 tam
    (45,18), dat sao cho mep trai no roi vao diem 135 cua khung chu:
@@ -7109,11 +7111,17 @@ void	KNpc::VeLienTram()
 	sprintf(szSo, "%d", m_nLienTramNac);
 	int nSoChuSo = (int)strlen(szSo);
 	int nBatDau = nMpsX;
-	/* Khoang trong trong khung chu chi rong 62 diem - vua dung HAI chu so
-	   o be rong 27. So dai hon thi cum phai noi sang TRAI: mep phai cua
-	   khung nam o diem 1018 tren man hinh 1024, khong con cho de tran ra.
-	   Chu so cung xit lai con defLIEN_TRAM_RONG_SO diem mot cot. */
-	int nBuSo = defLIEN_TRAM_BU_SO - (nSoChuSo - 1) * defLIEN_TRAM_RONG_SO / 2;
+	/* Khoang trong chi chua vua HAI chu so o be rong 27. So dai hon thi
+	   phai XIT cac chu so lai chu khong duoc noi cum ra hai ben: ben trai
+	   la chu "Lien tram", ben phai la mep man hinh (khung ket thuc o diem
+	   1018 tren man hinh 1024). Mep trai cum giu nguyen. */
+	int nRongSo = defLIEN_TRAM_RONG_SO;
+	if (nSoChuSo > 1)
+	{
+		int nVua = (defLIEN_TRAM_RONG_VUNG - defLIEN_TRAM_RONG_SO) / (nSoChuSo - 1);
+		if (nVua < nRongSo)
+			nRongSo = nVua;
+	}
 
 	KRUImage RUAnh;
 	RUAnh.nType = ISI_T_SPR;
@@ -7138,7 +7146,7 @@ void	KNpc::VeLienTram()
 		RUAnh.uImage = 0;
 		RUAnh.nISPosition = IMAGE_IS_POSITION_INIT;
 		sprintf(RUAnh.szImage, "\\spr\\update\\lientram\\%c.spr", szSo[i]);
-		RUAnh.oPosition.nX = nBatDau + nBuSo + i * defLIEN_TRAM_RONG_SO;
+		RUAnh.oPosition.nX = nBatDau + defLIEN_TRAM_BU_SO + i * nRongSo;
 		RUAnh.oPosition.nY = nMpsY - defLIEN_TRAM_NANG_SO;
 		g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, TRUE);
 	}
