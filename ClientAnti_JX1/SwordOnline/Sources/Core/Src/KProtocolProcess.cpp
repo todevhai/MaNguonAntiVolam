@@ -2390,7 +2390,10 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 			memcpy(&nDiem, pMsg + sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID), sizeof(int));
 			KSystemMessage	sMsg;
 			sprintf(sMsg.szMessage, MSG_NHAN_KINH_NGHIEM, nDiem);
-			sMsg.eType = SMT_NORMAL;
+			/* SMT_NORMAL bi day thang vao KHUNG CHAT (AMessageArrival goi
+			   KUiMsgCentrePad::SystemMessageArrival); dong "nhac nho" co dau "!"
+			   nam duoi khung chat la loai SMT_SYSTEM. */
+			sMsg.eType = SMT_SYSTEM;
 			sMsg.byConfirmType = SMCT_NONE;
 			sMsg.byPriority = 0;
 			sMsg.byParamSize = 0;
