@@ -441,7 +441,11 @@ enum SYS_MESSAGE_CONFIRM_TYPE
 //==================================
 struct KSystemMessage
 {
-	char			szMessage[64];	//消息文本
+	/* 64 byte du cho cau tran, KHONG du khi cau mang the mau <color=...>:
+	   moi the ton 7-13 byte va sprintf ghi lo dem. Struct nay chi song
+	   trong tien trinh (goi mang la SHOW_MSG_SYNC), moi noi deu dung
+	   sizeof nen noi rong la an toan. */
+	char			szMessage[128];	//消息文本
 	unsigned int	uReservedForUi;	//界面使用的数据域,core里填0即可
 	unsigned char	eType;			//消息分类取值来自枚举类型 SYS_MESSAGE_TYPE
 	unsigned char	byConfirmType;	//响应类型
