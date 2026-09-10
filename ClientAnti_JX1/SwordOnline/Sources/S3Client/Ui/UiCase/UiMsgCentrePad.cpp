@@ -197,10 +197,65 @@ void KUiMsgCentrePad::SetAutoDelMsgInterval(unsigned int uInterval /*= 0*/)
 }
 
 // 加入一条消息
+/* Boc moi day chu so trong tin he thong bang the mau xanh la. Chu con lai
+   lay mau mac dinh cua khung ([SysRoom_List] MsgColor, dang de DO), va the
+   <color> khong tham so chinh la lenh tro VE mau mac dinh do.
+
+   Lam o day, MOT cho, thay vi sua tung hang chuoi trong CoreUseNameDef.h.
+
+   Hai rang buoc cua chuoi game:
+   - Chu tieng Viet la TCVN3, byte >= 0x80. TEncodeText coi byte do la nua
+     dau mot chu Trung nen NUOT luon byte ke tiep; the mau dat ngay sau mot
+     byte nhu vay se bi an mat dau '<'. Vi the chi to khi ky tu lien truoc la
+     ASCII - trong thuc te so luon di sau dau cach.
+   - Moi day so ton them 20 byte nen dem dich phai rong hon szMessage. */
+static int ToSoMauXanh(const char* pNguon, int nDai, char* pDich, int nMax)
+{
+	const char szMo[] = "<color=Green>";
+	const char szDong[] = "<color>";
+	int nRa = 0;
+	for (int i = 0; i < nDai && nRa < nMax - 1; )
+	{
+		unsigned char c = (unsigned char)pNguon[i];
+		if (c >= 0x80)		/* giu nguyen cap byte, dung tach doi */
+		{
+			pDich[nRa++] = pNguon[i++];
+			if (i < nDai && nRa < nMax - 1)
+				pDich[nRa++] = pNguon[i++];
+			continue;
+		}
+		if (c >= '0' && c <= '9' &&
+			(i == 0 || (unsigned char)pNguon[i - 1] < 0x80))
+		{
+			int nSo = 0;
+			while (i + nSo < nDai && pNguon[i + nSo] >= '0' && pNguon[i + nSo] <= '9')
+				nSo++;
+			if (nRa + (int)sizeof(szMo) + nSo + (int)sizeof(szDong) < nMax)
+			{
+				memcpy(pDich + nRa, szMo, sizeof(szMo) - 1);
+				nRa += sizeof(szMo) - 1;
+				memcpy(pDich + nRa, pNguon + i, nSo);
+				nRa += nSo;
+				memcpy(pDich + nRa, szDong, sizeof(szDong) - 1);
+				nRa += sizeof(szDong) - 1;
+				i += nSo;
+				continue;
+			}
+		}
+		pDich[nRa++] = pNguon[i++];
+	}
+	pDich[nRa] = 0;
+	return nRa;
+}
+
 void KUiMsgCentrePad::SystemMessageArrival(const char* pMsgBuff, unsigned short nMsgLength)
 {
 	if (m_pSelf == NULL || pMsgBuff == NULL || nMsgLength <= 0)
 		return;
+
+	char szTo[512];
+	nMsgLength = (unsigned short)ToSoMauXanh(pMsgBuff, nMsgLength, szTo, sizeof(szTo));
+	pMsgBuff = szTo;
 
 	int nKenh = -1;
 	if (m_pSelf->m_nDefaultChannelResource >= 0 && m_pSelf->m_nDefaultChannelResource < m_pSelf->m_nChannelsResource)
