@@ -7173,9 +7173,11 @@ int	KNpc::PaintBlood(int nHeightOffset)
 					 m_szBloodNo, nMpsX, nMpsY, nHeightOff, (unsigned int)dwColor);
 			 /* Phai truyen ca mau VIEN nhu PaintInfo: chu ten npc ve duoc con so
 			    mau thi khong, khac nhau dung o tham so cuoi nay. */
-			 /* TAM (do duong ve): chu TRANG, co 24, nang them 120 - de phan biet
-			    "OutputText khong ve" voi "ve nhung sai cho / chim mau". */
-			 g_pRepresent->OutputText(24, m_szBloodNo, KRF_ZERO_END, nMpsX, nMpsY, 0xffffffff, 0, nHeightOff + 120, 0xff000000);
+			 /* Tham so DAU la nFontId, KHONG phai co chu. PaintInfo - ham ve ten
+			    npc, thu duy nhat hien duoc - dung id 14; ban goc o day de 16 nen
+			    khong co font nao khop va chu khong bao gio ra hinh.
+			    Tham so thu 8 la nZ (do cao trong khong gian), khong phai offset. */
+			 g_pRepresent->OutputText(14, m_szBloodNo, KRF_ZERO_END, nMpsX - 14 * g_StrLen(m_szBloodNo) / 4, nMpsY, dwColor, 0, nHeightOff, 0xff000000);
 			 m_nBloodNo[i][1] = m_nBloodNo[i][1] - 1;
 			 if (m_nBloodNo[i][1] <=0)
 			 {
