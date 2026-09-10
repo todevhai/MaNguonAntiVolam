@@ -285,7 +285,10 @@ const char* KMagicDesc::GetDesc(void *pData)
 		if (*pTempDesc == '#')
 		{
 			int	nDescAddType = 0;
-			switch(*pTempDesc + 3)
+			/* Ban goc viet *pTempDesc + 3: do la gia tri cua '#' cong 3 (= '&'),
+			   khong bao gio bang '+' - nen chu "Tang"/"Giam" cua #d chua tung
+			   hien ra lan nao. */
+			switch(*(pTempDesc + 3))
 			{
 			case '+':
 				nDescAddType = 1;
@@ -404,7 +407,9 @@ const char* KMagicDesc::GetDesc(void *pData)
 					if (nValue > 0)
 					{
 						ISkill* pSkill =  g_SkillManager.GetSkill(nValue, 1);
-						sprintf(szMsg, "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());
+						/* Khong tu them "[ ]": du lieu nao can ngoac thi tu khai,
+						   vd skill_addskilldamage1 = "Tang sat thuong [#l1] ...". */
+						sprintf(szMsg, "<color=HGreen>%s<color>", pSkill->GetSkillName());
 					}
 					else
 						sprintf(szMsg, "%s", "vâ c«ng vèn cã");
@@ -415,7 +420,12 @@ const char* KMagicDesc::GetDesc(void *pData)
 			default:
 				break;
 			}
-			pTempDesc += 4;
+			/* Ky tu thu tu chi thuoc ve the khi no la dau '+'/'-'. Nhay 4 vo dieu
+			   kien thi "[#l1]" bi an mat dau ']' - ra "[[ ten chieu " mot ben. */
+			if (*(pTempDesc + 3) == '+' || *(pTempDesc + 3) == '-')
+				pTempDesc += 4;
+			else
+				pTempDesc += 3;
 		}
 		else
 		{
