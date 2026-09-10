@@ -199,16 +199,32 @@ void KUiMsgCentrePad::SetAutoDelMsgInterval(unsigned int uInterval /*= 0*/)
 // 加入一条消息
 void KUiMsgCentrePad::SystemMessageArrival(const char* pMsgBuff, unsigned short nMsgLength)
 {
-	if (m_pSelf && pMsgBuff && nMsgLength > 0)
+	if (m_pSelf == NULL || pMsgBuff == NULL || nMsgLength <= 0)
+		return;
+
+	int nKenh = -1;
+	if (m_pSelf->m_nDefaultChannelResource >= 0 && m_pSelf->m_nDefaultChannelResource < m_pSelf->m_nChannelsResource)
 	{
-		if (m_pSelf->m_nDefaultChannelResource >= 0 && m_pSelf->m_nDefaultChannelResource < m_pSelf->m_nChannelsResource)
-		{			
-			m_pSelf->ChannelMessageArrival(m_pSelf->FindActivateChannelIndex(m_pSelf->m_ChannelsResource[m_pSelf->m_nDefaultChannelResource].cTitle),
-											m_pSelf->m_DefaultChannelSendName,
-											pMsgBuff, nMsgLength, &m_pSelf->m_Sys.m_SysRoom, false);
-			m_pSelf->m_Sys.ScrollBottom();
-		}
+		nKenh = m_pSelf->FindActivateChannelIndex(
+					m_pSelf->m_ChannelsResource[m_pSelf->m_nDefaultChannelResource].cTitle);
 	}
+
+	/* Duong kenh chat chi chay khi may chu DA mo kenh mac dinh va nguoi choi
+	   con dang ky no. ChannelMessageArrival co ba cua thoat im lang (chi so
+	   kenh < 0, ten nguoi gui rong, bSubscribe = false); roi vao cua nao thi
+	   dong nhac nho cung bien mat khong dau vet. Khung SysRoom la cua so rieng
+	   nam duoi thanh chat, khong phai kenh - nen khi kenh chua san sang thi
+	   ghi THANG vao no. */
+	if (nKenh >= 0 && m_pSelf->m_pActivateChannel[nKenh].bSubscribe)
+	{
+		m_pSelf->ChannelMessageArrival(nKenh, m_pSelf->m_DefaultChannelSendName,
+										pMsgBuff, nMsgLength, &m_pSelf->m_Sys.m_SysRoom, false);
+	}
+	else
+	{
+		m_pSelf->m_Sys.m_SysRoom.AddOneMessage(pMsgBuff, nMsgLength);
+	}
+	m_pSelf->m_Sys.ScrollBottom();
 }
 
 void KUiMsgCentrePad::ChannelMessageArrival(int nChannelIndex, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength, KWndMessageListBox* pM, bool bName)
