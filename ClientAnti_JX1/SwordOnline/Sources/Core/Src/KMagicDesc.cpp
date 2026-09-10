@@ -407,9 +407,7 @@ const char* KMagicDesc::GetDesc(void *pData)
 					if (nValue > 0)
 					{
 						ISkill* pSkill =  g_SkillManager.GetSkill(nValue, 1);
-						/* Khong tu them "[ ]": du lieu nao can ngoac thi tu khai,
-						   vd skill_addskilldamage1 = "Tang sat thuong [#l1] ...". */
-						sprintf(szMsg, "<color=HGreen>%s<color>", pSkill->GetSkillName());
+						sprintf(szMsg, "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());
 					}
 					else
 						sprintf(szMsg, "%s", "vâ c«ng vèn cã");
