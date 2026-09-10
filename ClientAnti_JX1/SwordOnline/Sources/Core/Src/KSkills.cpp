@@ -2963,7 +2963,9 @@ void	KSkill::GetDesc(unsigned long ulSkillId, unsigned long ulCurLevel, char * p
 	}
 	strcat (pszMsg, "\n");
 	
-	if (!pTempSkill->IsPhysical())
+	/* Bo luat "chieu IsPhysical thi giau cap": bang chieu cua ta da thoi loc
+	   theo co nay (xem 12/15), va ban hoan thien VAN hien cap cho chinh chieu
+	   nay - du lieu ba ban deu ghi IsPhysical=1 cho id 14. */
 	{
 		if (nAddPoint)
 		{
@@ -3055,7 +3057,8 @@ void	KSkill::GetDesc(unsigned long ulSkillId, unsigned long ulCurLevel, char * p
 		}
 	}
 
-	if (!pTempSkill->IsPhysical())
+	/* Cung ly do tren: khoi "Dang cap tiep theo" (chu do) tung bi cat het o
+	   moi chieu IsPhysical. */
 	{
 		if (bGetNextLevelDesc)
 		{
