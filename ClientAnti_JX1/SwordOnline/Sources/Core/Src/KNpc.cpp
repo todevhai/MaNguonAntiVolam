@@ -7039,7 +7039,6 @@ void	KNpc::SetBlood(int nNo)
 		{
 			m_nBloodNo[i][0] = nNo;
 			m_nBloodNo[i][1] = defMAX_SHOW_BLOOD_TIME;
-			g_DebugLog("[so mau] ghi %d vao o %d cua npc %d", nNo, i, m_Index);
 		}
 		else
 		{
@@ -7168,9 +7167,6 @@ int	KNpc::PaintBlood(int nHeightOffset)
 		{
 			 nHeightOff = nHeightOffset + (defMAX_SHOW_BLOOD_TIME - m_nBloodNo[i][1]) * defSHOW_BLOOD_MOVE_SPEED;
 			 sprintf(m_szBloodNo, "%d", m_nBloodNo[i][0]);
-			 if (m_nBloodNo[i][1] == defMAX_SHOW_BLOOD_TIME)
-				 g_DebugLog("[so mau] ve '%s' tai %d,%d cao=%d mau=%08x",
-					 m_szBloodNo, nMpsX, nMpsY, nHeightOff, (unsigned int)dwColor);
 			 /* Phai truyen ca mau VIEN nhu PaintInfo: chu ten npc ve duoc con so
 			    mau thi khong, khac nhau dung o tham so cuoi nay. */
 			 /* Tham so DAU la nFontId, KHONG phai co chu. PaintInfo - ham ve ten

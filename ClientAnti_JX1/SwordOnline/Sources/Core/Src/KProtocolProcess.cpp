@@ -1685,11 +1685,6 @@ void KProtocolProcess::SyncNpcMin(BYTE* pMsg)
 				Npc[nIdx].m_CurrentLife = 0;
 			}
 			// Ã°Ñª´¦Àí
-			/* Log TAM - go khi biet vi sao so mau mat di khong hien. */
-			if (nOldLife != (int)Npc[nIdx].m_CurrentLife)
-				g_DebugLog("[mau quai] id=%u kind=%d max=%d pc=%d cu=%d moi=%d",
-					NpcSync->ID, (int)Npc[nIdx].m_Kind, (int)Npc[nIdx].m_CurrentLifeMax,
-					(int)NpcSync->LifePerCent, nOldLife, (int)Npc[nIdx].m_CurrentLife);
 			if (Npc[nIdx].m_Kind == kind_normal)
 			{
 				Npc[nIdx].SetBlood(nOldLife - Npc[nIdx].m_CurrentLife);
@@ -2397,7 +2392,6 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 			sMsg.byConfirmType = SMCT_NONE;
 			sMsg.byPriority = 0;
 			sMsg.byParamSize = 0;
-			g_DebugLog("[bao exp] nhan %d diem", nDiem);
 			CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
 		}
 		break;
@@ -2996,9 +2990,6 @@ void KProtocolProcess::s2cExtendChat(BYTE* pMsg)
 	else if (protocol == chat_channelchat)
 	{
 		CHAT_CHANNELCHAT_SYNC* pCccSync = (CHAT_CHANNELCHAT_SYNC*)pExPckg;
-		/* Log TAM - go khi biet vi sao thong bao he thong khong hien ra. */
-		g_DebugLog("[chat] kenh %d tu '%s' dai %d",
-			(int)pCccSync->channelid, pCccSync->someone, (int)pCccSync->sentlen);
 
 		l_pDataChangedNotifyFunc->ChannelMessageArrival(
 			pCccSync->channelid, pCccSync->someone,
@@ -3554,8 +3545,6 @@ void	KProtocolProcess::LienTram(BYTE* pMsg)
 	   Khi do ve ngay tren nguoi choi - van dung cho, va khong mat chu. */
 	if (nIdx <= 0)
 		nIdx = Player[CLIENT_PLAYER_INDEX].m_nIndex;
-	g_DebugLog("[lien tram] nhan nac %d id %u -> npc %d",
-		(int)pSync->nSoNac, (unsigned int)pSync->ID, nIdx);
 	if (nIdx > 0)
 		Npc[nIdx].BatDauLienTram((int)pSync->nSoNac);
 }
