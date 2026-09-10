@@ -9,6 +9,10 @@ on:
     paths:
       - '.github/workflows/build-client.yml'
       - '.github/scripts/**'
+      # Sua NGUON client cung phai dung lai. Thieu dong nay thi commit chi
+      # cham ClientAnti_JX1 KHONG kich hoat CI, ma `gh run list` van hien mot
+      # lan chay cu "success" - de tuong da dung xong binary moi.
+      - 'ClientAnti_JX1/**'
 
 jobs:
   build:
