@@ -2385,10 +2385,12 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 			memcpy(&nDiem, pMsg + sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID), sizeof(int));
 			KSystemMessage	sMsg;
 			sprintf(sMsg.szMessage, MSG_NHAN_KINH_NGHIEM, nDiem);
-			/* SMT_NORMAL bi day thang vao KHUNG CHAT (AMessageArrival goi
-			   KUiMsgCentrePad::SystemMessageArrival); dong "nhac nho" co dau "!"
-			   nam duoi khung chat la loai SMT_SYSTEM. */
-			sMsg.eType = SMT_SYSTEM;
+			/* SMT_NORMAL di vao KUiMsgCentrePad::SystemMessageArrival -> khung
+			   "SysRoom" ([SysRoom] trong ui3/UiMsgCentrePadLeft.ini), tuc dong
+			   nhac nho co thanh cuon rieng nam NGOAI bang/kenh chat.
+			   SMT_SYSTEM thi lai vao trung tam thong bao co dau "!" - cho do
+			   danh cho len cap / to doi / giao dich (co dong y va cu tuyet). */
+			sMsg.eType = SMT_NORMAL;
 			sMsg.byConfirmType = SMCT_NONE;
 			sMsg.byPriority = 0;
 			sMsg.byParamSize = 0;

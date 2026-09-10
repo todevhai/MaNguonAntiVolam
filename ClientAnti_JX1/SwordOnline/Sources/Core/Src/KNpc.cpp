@@ -58,13 +58,16 @@ extern KLuaScript		*g_pNpcLevelScript;
 #define		defLIEN_TRAM_SO_KHUNG		10
 #define		defLIEN_TRAM_LAP_KHUNG		3
 #define		defLIEN_TRAM_RONG_SO		27
-/* Khung chu "Lien tram" la 198x90 voi tam anh dat o (160,60), con chu so la
-   27x31 tam (45,18). Ve ca hai o CUNG mot diem thi so nam de len chu - phai
-   day so sang phai 160-45+38+... = 83 diem, va nang len 13 diem cho cung
-   duong giua voi chu. */
-#define		defLIEN_TRAM_BU_SO			83
-#define		defLIEN_TRAM_NANG_SO		13
-#define		defLIEN_TRAM_CAO_HON		40
+/* Khung chu "Lien tram" la 198x90, tam anh o (160,60): chu chiem nua trai,
+   nua phai la vet mau - KHOANG TRONG CO Y de chua so nac. Chu so 27x31 tam
+   (45,18), dat sao cho mep trai no roi vao diem 135 cua khung chu:
+     Qx = Px - 160 + 135 + 45 = Px + 20
+     Qy = Py -  60 +  40 + 18 = Py -  2
+   Ve o TOA DO MAN HINH ngay duoi ban do nho, khong bam theo xac quai. */
+#define		defLIEN_TRAM_BU_SO			20
+#define		defLIEN_TRAM_NANG_SO		2
+#define		defLIEN_TRAM_MAN_X			980
+#define		defLIEN_TRAM_MAN_Y			190
 
 #define		SHOW_LIFE_WIDTH				38
 #define		SHOW_LIFE_HEIGHT			3
@@ -7098,15 +7101,14 @@ void	KNpc::VeLienTram()
 	}
 	m_nLienTramDem++;
 
-	int nMpsX, nMpsY;
-	GetMpsPos(&nMpsX, &nMpsY);
-	nMpsY -= defLIEN_TRAM_CAO_HON;
+	/* Toa do MAN HINH co dinh (bSinglePlaneCoord = TRUE ben duoi), khong lay
+	   vi tri xac: xac nam lung tung va co the bien mat truoc khi ve xong. */
+	int nMpsX = defLIEN_TRAM_MAN_X, nMpsY = defLIEN_TRAM_MAN_Y;
 
 	char szSo[8];
 	sprintf(szSo, "%d", m_nLienTramNac);
 	int nSoChuSo = (int)strlen(szSo);
-	/* Ca cum (chu + day so) can giua muc tieu: day sang phai nua be rong day so. */
-	int nBatDau = nMpsX + (nSoChuSo * defLIEN_TRAM_RONG_SO) / 2;
+	int nBatDau = nMpsX;
 
 	KRUImage RUAnh;
 	RUAnh.nType = ISI_T_SPR;
@@ -7121,7 +7123,7 @@ void	KNpc::VeLienTram()
 	strcpy(RUAnh.szImage, "\\spr\\update\\lientram\\main.spr");
 	RUAnh.oPosition.nX = nBatDau;
 	RUAnh.oPosition.nY = nMpsY;
-	g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, FALSE);
+	g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, TRUE);
 
 	for (int i = 0; i < nSoChuSo; i++)
 	{
@@ -7133,7 +7135,7 @@ void	KNpc::VeLienTram()
 		sprintf(RUAnh.szImage, "\\spr\\update\\lientram\\%c.spr", szSo[i]);
 		RUAnh.oPosition.nX = nBatDau + defLIEN_TRAM_BU_SO + i * defLIEN_TRAM_RONG_SO;
 		RUAnh.oPosition.nY = nMpsY - defLIEN_TRAM_NANG_SO;
-		g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, FALSE);
+		g_pRepresent->DrawPrimitives(1, &RUAnh, RU_T_IMAGE, TRUE);
 	}
 }
 #endif
