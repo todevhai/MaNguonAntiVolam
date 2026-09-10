@@ -1281,7 +1281,7 @@ BOOL KItemList::EatMecidine(int nIdx)
 			Msg.byParamSize = 0;
 			Msg.byPriority = 1;
 			Msg.eType = SMT_PLAYER;
-			strcpy(Msg.szMessage, "Khï¿½ng thï¿½ sï¿½ dï¿½ng thï¿½ ï¿½ï¿½a phï¿½ ï¿½ ï¿½ï¿½y!");
+			strcpy(Msg.szMessage, "Kh«ng thÓ sö dông thÎ ®Þa phñ ë ®©y!");
 			CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, NULL);
 #endif
 			return FALSE;

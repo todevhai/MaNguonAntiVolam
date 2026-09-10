@@ -64,6 +64,7 @@ KUiSysMsgCentre::KUiSysMsgCentre()
 	memset(&m_MsgIcon, 0, sizeof(m_MsgIcon));
 	memset(&m_nMsgIconFrame, 0, sizeof(m_nMsgIconFrame));
 	m_pHandlingMsg = NULL;
+	m_nMsgFont = 14;
 	m_bShowMsgText = false;
 	m_uMoveInterval = POPUP_MOVE_INTERVAL_DEF;
 	m_uDisappearInterval = MSG_DISAPPEAR_INTERVAL_DEF;
@@ -154,6 +155,7 @@ void KUiSysMsgCentre::LoadScheme(KIniFile* pIni)
 {
 	KWndWindow::Init(pIni, "Main");
 	m_MsgTextWnd .Init(pIni, "MsgText");
+	pIni->GetInteger("MsgText", "Font", 14, &m_nMsgFont);
 
 	char		szBuf[16];
 	for (int i = 0; i < MAX_SYS_MSG_TYPE; i++)
@@ -761,6 +763,20 @@ void KUiSysMsgCentre::PaintWindow()
 		Shadow.oPosition.nY += m_nAbsoluteTop;
 		Shadow.oPosition.nZ = 0;
 		m_MsgTextWnd.GetSize(&Shadow.oEndPos.nX, &Shadow.oEndPos.nY);
+		/* O nen bam theo DO DAI CHU that. Widget rong 476 diem nen lay nguyen
+		   kich thuoc cua no thi cau ba chu cung keo mot vet den het man hinh.
+		   Chu TCVN3 lan chu Latin deu chiem NUA o (KFont2::OutputText cong
+		   m_nFontHalfWidth) nen be rong ~ so byte nhan nua co chu. */
+		{
+			char szTam[256];
+			int nDaiChu = m_MsgTextWnd.GetText(szTam, sizeof(szTam));
+			if (nDaiChu > 0 && m_nMsgFont > 0)
+			{
+				int nRong = nDaiChu * m_nMsgFont / 2 + m_nMsgFont;
+				if (nRong < Shadow.oEndPos.nX)
+					Shadow.oEndPos.nX = nRong;
+			}
+		}
 		Shadow.oEndPos.nX += Shadow.oPosition.nX;
 		Shadow.oEndPos.nY += Shadow.oPosition.nY;
 		Shadow.Color.Color_dw = 0x10000000;

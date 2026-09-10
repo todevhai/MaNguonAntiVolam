@@ -67,6 +67,7 @@ private:
 	/* KWndText32 chi giu 32 byte - moi thong bao he thong deu bi cat ngang
 	   ("Nhac nho: Ban nhan duoc 145 di"). Dung bo dem 256. */
 	KWndText256				m_MsgTextWnd;
+	int						m_nMsgFont;		/* co chu MsgText - de tinh be rong o nen */
 	int						m_bShowMsgText;
 
 	KWndButton				m_MsgIconBtn[MAX_SYS_MSG_TYPE];

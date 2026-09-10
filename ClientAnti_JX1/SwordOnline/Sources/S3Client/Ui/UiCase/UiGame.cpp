@@ -317,16 +317,16 @@ void ProcessEmote(char* szDest, char *szDestChannel, int nEmoteIndex)
 
 char g_ActionName[][32] = 
 {
-	"Tï¿½n gï¿½u",
-	"Hï¿½o hï¿½u",
-	"Giao dï¿½ch",
-	"Nhï¿½p ï¿½ï¿½i",
-	"Tï¿½ ï¿½ï¿½i",
+	"T¸n gÉu",
+	"H¶o h÷u",
+	"Giao dÞch",
+	"NhËp ®éi",
+	"Tæ ®éi",
 	"Theo sau",
-	"Cï¿½u sï¿½t",
-	"Tin tï¿½c",
-	"Sï¿½ ï¿½en",
-	"Bang hï¿½i",
+	"Cõu s¸t",
+	"Tin tøc",
+	"Sæ ®en",
+	"Bang héi",
 };
 
 bool IsInBlackName(char* strName);

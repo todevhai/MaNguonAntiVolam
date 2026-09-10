@@ -3744,14 +3744,14 @@ void	KPlayer::AddSkillPoint(BYTE* pProtocol)
 							if (nWantToBeLevel >=  g_SkillManager.GetSkillMaxLevel(pAdd->m_nSkillID))
 							{
 								char szMsg[100];
-								sprintf(szMsg, "Kï¿½ nï¿½ng <color=green>%s <color>ï¿½ï¿½ ï¿½ï¿½t cï¿½p tï¿½i ï¿½a, khï¿½ng thï¿½ cï¿½ng thï¿½m!", pSkill->GetSkillName());
-								KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Hï¿½ thï¿½ng", (char *) szMsg, strlen(szMsg) );
+								sprintf(szMsg, "Kü n¨ng <color=green>%s <color>®· ®¹t cÊp tèi ®a, kh«ng thÓ céng thªm!", pSkill->GetSkillName());
+								KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "HÖ thèng", (char *) szMsg, strlen(szMsg) );
 							}
 							else 
 							{
 								char szMsg[100];
-								sprintf(szMsg, "Bï¿½n cï¿½n ï¿½ï¿½t cï¿½p <color=green>%d<color> mï¿½i cï¿½ thï¿½ nï¿½ng kï¿½ nï¿½ng <color=green>%s <color>.", ((KSkill *)pSkill)->GetSkillReqLevel() -1 +  pAdd->m_nAddPoint + nSkillLevel,  ((KSkill*)pSkill)->GetSkillName());
-								KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Hï¿½ thï¿½ng", (char *) szMsg, strlen(szMsg) );
+								sprintf(szMsg, "B¹n cÇn ®¹t cÊp <color=green>%d<color> míi cã thÓ n©ng kü n¨ng <color=green>%s <color>.", ((KSkill *)pSkill)->GetSkillReqLevel() -1 +  pAdd->m_nAddPoint + nSkillLevel,  ((KSkill*)pSkill)->GetSkillName());
+								KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "HÖ thèng", (char *) szMsg, strlen(szMsg) );
 							}
 							
 						}
@@ -6650,16 +6650,16 @@ void	KPlayer::SetChestLock(BOOL unlockFlag)
 		// Ruong duoc mo
 		m_CUnlocked = 1;
 		char szMsg[100];
-		sprintf(szMsg, "<color=cyan> Bï¿½n cï¿½ thï¿½ sï¿½ dï¿½ng cï¿½c chï¿½c nï¿½ng !");
-		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Bï¿½o mï¿½t", (char *) szMsg, strlen(szMsg) );
+		sprintf(szMsg, "<color=cyan> B¹n cã thÓ sö dông c¸c chøc n¨ng !");
+		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "B¶o mËt", (char *) szMsg, strlen(szMsg) );
 	}
 	else
 	{
 		// Ruong duoc khoa
 		m_CUnlocked = 0;
 		char szMsg[100];
-		sprintf(szMsg, "<color=cyan> Tï¿½ khï¿½a nhï¿½n vï¿½t hoï¿½n tï¿½t !");
-		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Bï¿½o mï¿½t", (char *) szMsg, strlen(szMsg) );
+		sprintf(szMsg, "<color=cyan> Tù khãa nh©n vËt hoµn tÊt !");
+		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "B¶o mËt", (char *) szMsg, strlen(szMsg) );
 	}
 }
 #endif
@@ -6671,16 +6671,16 @@ BOOL	KPlayer::CheckChestPW(int iPassword)
 	{
 		// Mat khau ruong chinh xac
 		char szMsg[100];
-		sprintf(szMsg, "<color=cyan> Nhï¿½n vï¿½t ï¿½ï¿½ mï¿½ khï¿½a !");
-		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Bï¿½o mï¿½t", (char *) szMsg, strlen(szMsg) );
+		sprintf(szMsg, "<color=cyan> Nh©n vËt ®· më khãa !");
+		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "B¶o mËt", (char *) szMsg, strlen(szMsg) );
 		return TRUE;
 	}
 	else
 	{
 		// Mat khau ruong SAI
 		char szMsg[100];
-		sprintf(szMsg, "<color=cyan> Mï¿½t mï¿½ sai, xin nhï¿½p lï¿½i !");
-		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Bï¿½o mï¿½t", (char *) szMsg, strlen(szMsg) );
+		sprintf(szMsg, "<color=cyan> MËt m· sai, xin nhËp l¹i !");
+		KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "B¶o mËt", (char *) szMsg, strlen(szMsg) );
 		return FALSE;
 	}
 }
@@ -6693,8 +6693,8 @@ void	KPlayer::SetChestPW(int newPW)
 	
 	// Thong bao cho Client
 	char szMsg[100];
-	sprintf(szMsg, "<color=cyan> Mï¿½t mï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½c thay ï¿½ï¿½i !");
-	KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Bï¿½o mï¿½t", (char *) szMsg, strlen(szMsg) );
+	sprintf(szMsg, "<color=cyan> MËt m· ®· ®­îc thay ®æi !");
+	KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "B¶o mËt", (char *) szMsg, strlen(szMsg) );
 	
 }
 #endif
@@ -6706,8 +6706,8 @@ void	KPlayer::SetNewPW(int resetPW)
 	
 	// Thong bao cho Client
 	char szMsg[100];
-	sprintf(szMsg, "<color=cyan> Mï¿½t mï¿½ thay ï¿½ï¿½i thï¿½nh cï¿½ng !");
-	KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "Bï¿½o mï¿½t", (char *) szMsg, strlen(szMsg) );
+	sprintf(szMsg, "<color=cyan> MËt m· thay ®æi thµnh c«ng !");
+	KPlayerChat::SendSystemInfo(1, m_nPlayerIndex, "B¶o mËt", (char *) szMsg, strlen(szMsg) );
 	
 }
 #endif
