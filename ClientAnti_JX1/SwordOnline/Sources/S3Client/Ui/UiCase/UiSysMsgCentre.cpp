@@ -378,11 +378,9 @@ bool KUiSysMsgCentre::AMessageArrival(KSystemMessage* pMsg, void* pParam)
 			return true;
 	}
 
-	/* Ban goc chi hien CHU khi re chuot len icon (WND_N_MOUSE_ENTER_CHILD),
-	   nen nguoi choi chi thay mot cham "!" ma khong biet chuyen gi. Cho hien
-	   ngay dong moi nhat, nhu ban hoan thien van lam. */
-	m_pSelf->m_MsgTextWnd.SetText(pMsg->szMessage);
-	m_pSelf->m_bShowMsgText = true;
+	/* KHONG tu hien chu o day: cum nay nam ben phai man hinh, chu bung ra
+	   moi lan co tin se de len thu khac. Chu chi hien khi re chuot len icon
+	   (WND_N_MOUSE_ENTER_CHILD) - dung nhu ban hoan thien. */
 
 	KSystemMessage* pCloneMsg = m_pSelf->GetAMsgSpace(pMsg->byParamSize);
 	if (pCloneMsg)
