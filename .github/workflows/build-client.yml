@@ -41,6 +41,14 @@ jobs:
       - name: Setup MSBuild
         uses: microsoft/setup-msbuild@v2
 
+      # Chan chu bi thay bang dau hoi U+FFFD: nguon tron TCVN3/GBK, cong cu nao
+      # doc bang UTF-8 roi ghi lai se an mat tung byte chu ma trinh dich khong
+      # bao gi. Da xay ra that dem 06/09/2026 - 31 chuoi hien thi, ba ngay sau
+      # moi phat hien qua menu chuot phai.
+      - name: Kiem chu bi hong
+        shell: cmd
+        run: python .github/scripts/kiem-chu-hong.py
+
       - name: Va nguon cho trinh dich hien dai
         shell: bash
         run: python .github/scripts/port-fixes.py .
