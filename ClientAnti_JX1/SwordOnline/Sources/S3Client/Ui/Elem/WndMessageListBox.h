@@ -101,6 +101,10 @@ private:
 	int				m_nHideNumLine;		//被强迫隐藏的行数,追加/删除/选中/滚动行/改尺寸时会无效
 
 	int				m_nFontSize;			//字体大小
+	/* Khoang cach giua hai dong = m_nFontSize + m_nLineSpace. Ban goc ghi
+	   cung so 1; nay doc tu khoa "LineSpace" cua ini de rieng khung tin
+	   he thong gian ra duoc ma bang chat giu nguyen. */
+	int				m_nLineSpace;
 	int				m_nStartShowMsg;		//首条显示的信息
 	int				m_nStartMsgSkipLine;	//首条显示的信息上方忽略的行数目
 

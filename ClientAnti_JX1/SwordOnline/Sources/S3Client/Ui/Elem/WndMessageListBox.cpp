@@ -27,6 +27,7 @@ KWndMessageListBox::KWndMessageListBox()
 	m_nNumMessage = 0;			//信息条数目
 	m_nCapability = 0;			//信息条最多允许数目
 	m_nFontSize = 12;			//字体大小
+	m_nLineSpace = 1;
 	m_nNumMaxShowLine = 0;
 	m_nNumBytesPerLine = 20;	//每一行字符的数目	
 	m_nStartShowMsg = 0;
@@ -234,6 +235,7 @@ void KWndMessageListBox::Clone(KWndMessageListBox* pCopy)
 	{
 		KWndWindow::Clone(pCopy);
 		pCopy->m_nFontSize = m_nFontSize;
+		pCopy->m_nLineSpace = m_nLineSpace;
 		pCopy->m_nNumBytesPerLine	= m_nNumBytesPerLine;
 		pCopy->m_nNumMaxShowLine	= m_nNumMaxShowLine;
 		pCopy->m_MsgColor		= m_MsgColor;
@@ -261,13 +263,14 @@ int KWndMessageListBox::Init(KIniFile* pIniFile, const char* pSection)
 		pIniFile->GetInteger(pSection, "HitText", 0, &m_bHitText);
 		//====文字大小====
 		pIniFile->GetInteger(pSection, "Font", 16, &m_nFontSize);
+		pIniFile->GetInteger(pSection, "LineSpace", 1, &m_nLineSpace);
 		if (m_nFontSize < 4)
 			m_nFontSize = 4;
 		//---文字显示宽度与行数---
 		m_nNumBytesPerLine = (m_Width * 2) / m_nFontSize;
 		if (m_nNumBytesPerLine < 2)
 			m_nNumBytesPerLine = 2;
-		m_nNumMaxShowLine = m_Height / (m_nFontSize + 1);
+		m_nNumMaxShowLine = m_Height / (m_nFontSize + m_nLineSpace);
 
 		char	Buff[16];
 		pIniFile->GetString(pSection, "MsgColor", "", Buff, 16);
@@ -352,7 +355,7 @@ void KWndMessageListBox::SetSize(int nWidth, int nHeight)
 	if (nWidth < m_nFontSize)
 		nWidth = m_nFontSize + 1;
 	if (nHeight < m_nFontSize)
-		nHeight = m_nFontSize + 1;
+		nHeight = m_nFontSize + m_nLineSpace;
 
 	KWndWindow::SetSize(nWidth, nHeight);
 
@@ -360,7 +363,7 @@ void KWndMessageListBox::SetSize(int nWidth, int nHeight)
 	int nNumBytesPerLine = (m_Width * 2) / m_nFontSize;
 	if (nNumBytesPerLine < 2)
 		nNumBytesPerLine = 2;
-	int nLines = m_Height / (m_nFontSize + 1);
+	int nLines = m_Height / (m_nFontSize + m_nLineSpace);
 
 	if (nLines != m_nNumMaxShowLine || m_nNumBytesPerLine != nNumBytesPerLine)
 	{
@@ -522,7 +525,7 @@ void KWndMessageListBox::PaintWindow()
 	if (m_Style & MSGLISTBOX_S_TEXTBOTTOM)
 	{
 		nNumVisibleTextLine = m_nNumVisibleTextLine - m_nHideNumLine;
-		y += m_nHideNumLine * (m_nFontSize + 1);
+		y += m_nHideNumLine * (m_nFontSize + m_nLineSpace);
 	}
 	else
 	{
@@ -536,7 +539,7 @@ void KWndMessageListBox::PaintWindow()
 		bg.oPosition.nX = m_nAbsoluteLeft;
 		bg.oEndPos.nX = bg.oPosition.nX + m_Width;
 		bg.oPosition.nY = y;
-		bg.oEndPos.nY = bg.oPosition.nY + nNumVisibleTextLine * (m_nFontSize + 1);
+		bg.oEndPos.nY = bg.oPosition.nY + nNumVisibleTextLine * (m_nFontSize + m_nLineSpace);
 		g_pRepresentShell->DrawPrimitives(1, &bg, RU_T_SHADOW, true);
 	}
 
@@ -568,7 +571,7 @@ void KWndMessageListBox::PaintWindow()
 					bg.oPosition.nX = Param.nX;
 					bg.oPosition.nY = Param.nY;
 					bg.oEndPos.nX = bg.oPosition.nX + m_Width;
-					bg.oEndPos.nY = bg.oPosition.nY + Param.nNumLine * (m_nFontSize + 1);
+					bg.oEndPos.nY = bg.oPosition.nY + Param.nNumLine * (m_nFontSize + m_nLineSpace);
 					g_pRepresentShell->DrawPrimitives(1, &bg, RU_T_SHADOW, true);
 				}
 				Param.Color = m_SelMsgColor;
@@ -592,14 +595,14 @@ void KWndMessageListBox::PaintWindow()
 				bg.oPosition.nX = Param.nX;
 				bg.oPosition.nY = Param.nY;
 				bg.oEndPos.nX = bg.oPosition.nX + (pCurMsg->nCharWidth * m_nFontSize / 2);
-				bg.oEndPos.nY = bg.oPosition.nY + Param.nNumLine * (m_nFontSize + 1);
+				bg.oEndPos.nY = bg.oPosition.nY + Param.nNumLine * (m_nFontSize + m_nLineSpace);
 				g_pRepresentShell->DrawPrimitives(1, &bg, RU_T_SHADOW, true);
 			}
 		
 			Param.bPicPackInSingleLine = true;
 			g_pRepresentShell->OutputRichText(m_nFontSize, &Param, pCurMsg->Msg + nOffset, pCurMsg->nLen - nOffset, m_Width);
 
-			y += Param.nNumLine * (m_nFontSize + 1);
+			y += Param.nNumLine * (m_nFontSize + m_nLineSpace);
 		}
 
 		nSkipLine = 0;
@@ -650,7 +653,7 @@ int	KWndMessageListBox::GetMsgAtPoint(int x, int y)
 {
 	int nSelLine = 0;
 
-	nSelLine = (y - m_nAbsoluteTop - GetOffsetTextHeight()) / (m_nFontSize + 1);
+	nSelLine = (y - m_nAbsoluteTop - GetOffsetTextHeight()) / (m_nFontSize + m_nLineSpace);
 
 	if (nSelLine < 0 || nSelLine >= m_nNumVisibleTextLine)
 		return -1;
@@ -911,7 +914,7 @@ unsigned int KWndMessageListBox::GetOffsetTextHeight()
 	if (m_Style & MSGLISTBOX_S_TEXTBOTTOM)
 	{
 		if (m_nNumVisibleTextLine < m_nNumMaxShowLine)
-			return (m_nNumMaxShowLine - m_nNumVisibleTextLine) * (m_nFontSize + 1);
+			return (m_nNumMaxShowLine - m_nNumVisibleTextLine) * (m_nFontSize + m_nLineSpace);
 	}
 	return 0;
 }
@@ -961,7 +964,7 @@ void KWndMessageListBox::HideAllLine()
 
 int KWndMessageListBox::GetMinHeight()
 {
-	return max(m_nFontSize + 1, 0);
+	return max(m_nFontSize + m_nLineSpace, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
