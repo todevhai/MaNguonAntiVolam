@@ -9,7 +9,6 @@
 #include "../elem/wnds.h"
 #include "../Elem/WndMessage.h"
 #include "UiMsgCentrePad.h"
-extern "C" void g_DebugLog(char* Fmt, ...);	/* log tam */
 #include "UiChatCentre.h"
 #include "../UiBase.h"
 #include "../../../core/src/gamedatadef.h"
@@ -202,9 +201,6 @@ void KUiMsgCentrePad::SystemMessageArrival(const char* pMsgBuff, unsigned short 
 {
 	if (m_pSelf && pMsgBuff && nMsgLength > 0)
 	{
-		g_DebugLog("[sysroom] tin dai %d, kenh mac dinh %d/%d, so kenh bat %d",
-			(int)nMsgLength, m_pSelf->m_nDefaultChannelResource,
-			m_pSelf->m_nChannelsResource, m_pSelf->m_nActivateChannels);
 		if (m_pSelf->m_nDefaultChannelResource >= 0 && m_pSelf->m_nDefaultChannelResource < m_pSelf->m_nChannelsResource)
 		{			
 			m_pSelf->ChannelMessageArrival(m_pSelf->FindActivateChannelIndex(m_pSelf->m_ChannelsResource[m_pSelf->m_nDefaultChannelResource].cTitle),
@@ -217,7 +213,6 @@ void KUiMsgCentrePad::SystemMessageArrival(const char* pMsgBuff, unsigned short 
 
 void KUiMsgCentrePad::ChannelMessageArrival(int nChannelIndex, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength, KWndMessageListBox* pM, bool bName)
 {
-	g_DebugLog("[sysroom] ChannelMessageArrival kenh %d / %d", nChannelIndex, m_nActivateChannels);
 	if (nChannelIndex < 0 || nChannelIndex >= m_nActivateChannels)
 		return;
 
@@ -1295,6 +1290,10 @@ void KUiMsgCentrePad::LoadScheme(KIniFile* pIni)
 	m_Sys.Init(pIni, "SysRoom");
 	m_Sys.m_OpenSysButton.Init(pIni, "SysRoom_Open");
 	m_Sys.m_OpenSysButton.CheckButton(1);
+	/* CheckButton chi danh dau NUT mo, khong Show danh sach - no van an cho
+	   toi khi co ai bam nut, nen moi dong nhac nho di vao deu roi vao cho
+	   khong ai thay. */
+	m_Sys.m_SysRoom.Show();
 	
 	m_Sys.m_SysRoom.Init(pIni, "SysRoom_List");
 	m_Sys.m_UpButton.Init(pIni, "SysRoom_Up");
