@@ -264,6 +264,22 @@ const char* KMagicDesc::GetDesc(void *pData)
 
 	const char	*pszKeyName = g_MagicID2String(pAttrib->nAttribType);
 	m_IniFile.GetString("Descript", pszKeyName, "", szTempDesc, 128);
+	/* Sau thuoc tinh addskilldamage1..6 duoc DU LIEU khai voi tien to
+	   "skill_" (ca ban ta, ban6 lan voz2 deu vay) trong khi bang ten noi bo
+	   cua nguon 2003 ghi tran. Doi chieu ca bang: 197/211 ten khop san,
+	   dung 6 ten nay lech tien to - nen thu them mot lan thay vi sua du lieu.
+	   Thieu buoc nay thi mo ta tra ve rong va dong "Tang sat thuong [ten
+	   chieu]" bien mat khong dau vet. */
+	if (!szTempDesc[0])
+	{
+		char szKhac[64];
+		if (strlen(pszKeyName) + 7 < sizeof(szKhac))
+		{
+			strcpy(szKhac, "skill_");
+			strcat(szKhac, pszKeyName);
+			m_IniFile.GetString("Descript", szKhac, "", szTempDesc, 128);
+		}
+	}
 	while(*pTempDesc)
 	{
 		if (*pTempDesc == '#')
