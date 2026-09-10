@@ -222,7 +222,18 @@ void KUiMsgCentrePad::SystemMessageArrival(const char* pMsgBuff, unsigned short 
 	}
 	else
 	{
-		m_pSelf->m_Sys.m_SysRoom.AddOneMessage(pMsgBuff, nMsgLength);
+		/* AddOneMessage doi chuoi DA MA HOA (no do dong bang
+		   TGetEncodedTextLineCount). Duong di qua kenh chat duoc
+		   FilterTextColor goi TEncodeText ho; duong nay thi khong, nen
+		   the <color=...> se hien ra nguyen van neu quen buoc nay. */
+		char szTam[560];
+		int nDai = nMsgLength;
+		if (nDai > (int)sizeof(szTam) - 1)
+			nDai = (int)sizeof(szTam) - 1;
+		memcpy(szTam, pMsgBuff, nDai);
+		szTam[nDai] = 0;
+		nDai = TEncodeText(szTam, nDai);
+		m_pSelf->m_Sys.m_SysRoom.AddOneMessage(szTam, nDai);
 	}
 	m_pSelf->m_Sys.ScrollBottom();
 }

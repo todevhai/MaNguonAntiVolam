@@ -283,7 +283,7 @@
 /* Chu TCVN3 (bang chu cua du lieu game), khong phai UTF-8. Escape BAT PHAN
    chu khong phai \x..: escape hex an ky tu ke tiep neu no cung la chu so hex
    ('\xbe' roi 'c' thanh '\xbec' -> loi C7744), con bat phan dung o ba chu so. */
-#define		MSG_NHAN_KINH_NGHIEM			"Nh\276c nh\353: B\271n nh\313n \256\255\356c %d \256i\323m kinh nghi\326m."
+#define		MSG_NHAN_KINH_NGHIEM			"<color=Red>Nh\276c nh\353: B\271n nh\313n \256\255\356c <color=Green>%d<color=Red> \256i\323m kinh nghi\326m."
 
 enum enumMSG_ID
 {
