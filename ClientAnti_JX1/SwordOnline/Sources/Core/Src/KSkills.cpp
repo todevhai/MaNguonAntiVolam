@@ -3113,6 +3113,27 @@ void KSkill::GetDescAboutLevel(char * pszMsg)
 	for (i  = 0; i < m_nImmediateAttribsNum; i ++)
 	{
 		if (!m_ImmediateAttribs[i].nAttribType) continue;
+#ifndef _SERVER
+		/* Dong "Tang sat thuong [ten chieu]": chi hien khi chieu dich CO
+		   trong bang cua nguoi choi. Ta da thoi cap 58 chieu nam ngoai anh
+		   cay chieu chinh thuc, ma bang ho tro cheo van tro toi chung - nen
+		   tooltip liet ke ca chieu khong bao gio hoc duoc. Nang hon: chieu
+		   271 va 272 TRUNG TEN nhau nen hai dong nhin y het nhau.
+		   Enum khong lien tuc (magic_expenhance_p chen giua 2 va 3) nen phai
+		   ke tung hang, khong dung duoc khoang. */
+		{
+			int nLoai = m_ImmediateAttribs[i].nAttribType;
+			if (nLoai == magic_addskilldamage1 || nLoai == magic_addskilldamage2 ||
+				nLoai == magic_addskilldamage3 || nLoai == magic_addskilldamage4 ||
+				nLoai == magic_addskilldamage5 || nLoai == magic_addskilldamage6)
+			{
+				int nChu = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+				if (nChu <= 0 ||
+					Npc[nChu].m_SkillList.FindSame(m_ImmediateAttribs[i].nValue[0]) < 0)
+					continue;
+			}
+		}
+#endif
 		char * pszInfo = (char *)g_MagicDesc.GetDesc(&m_ImmediateAttribs[i]);
 		if (!pszInfo) continue;
 		if (!pszInfo[0]) continue;
