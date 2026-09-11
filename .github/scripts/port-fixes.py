@@ -5036,7 +5036,7 @@ edit('Core/Src/KMissleRes.cpp',
      b'\tif (eStatus == MS_DoFly)\r\n'
      b'\t{\r\n'
      b'\t\tstatic int s_nLogDan = 0;\r\n'
-     b'\t\tif (s_nLogDan < 40)\r\n'
+     b'\t\tif (s_nLogDan < 60 && m_MissleRes[eStatus].AnimFileName[0])\r\n'
      b'\t\t{\r\n'
      b'\t\t\ts_nLogDan++;\r\n'
      b'\t\t\tg_DebugLog("[dan] Draw spr=%s huong=%d khung=%d song=%d/%d",\r\n'
@@ -5157,6 +5157,27 @@ edit('Core/Src/KNpc.cpp',
      b'\telse if (IsReachFrame(ATTACKACTION_EFFECT_PERCENT))\r\n'
      b'\t{\r\n',
      'LOG TAM: vao OnSkill')
+
+# LOG TAM: dan cua chieu 1073 DUOC TAO (log CastMissles) nhung khong thay tren
+# man hinh. Bit cua vao KMissle::Paint xem no co duoc ve khong.
+edit('Core/Src/KMissle.cpp',
+     b'void KMissle::Paint()\r\n'
+     b'{\r\n'
+     b'\tif (m_nMissleId <= 0 ) return;\r\n',
+     b'void KMissle::Paint()\r\n'
+     b'{\r\n'
+     b'\t{\r\n'
+     b'\t\tstatic int s_nLogVe = 0;\r\n'
+     b'\t\tif (s_nLogVe < 60 && m_nSkillId > 53)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\ts_nLogVe++;\r\n'
+     b'\t\t\tg_DebugLog("[ve] dan id=%d chieu=%d mau=%d tinh=%d song=%d/%d o=(%d,%d) huong=%d",\r\n'
+     b'\t\t\t\tm_nMissleId, m_nSkillId, m_MissleRes.m_nMissleId, (int)m_eMissleStatus,\r\n'
+     b'\t\t\t\tm_nCurrentLife, m_nLifeTime, m_nCurrentMapX, m_nCurrentMapY, m_nDir);\r\n'
+     b'\t\t}\r\n'
+     b'\t}\r\n'
+     b'\tif (m_nMissleId <= 0 ) return;\r\n',
+     'LOG TAM: cua vao KMissle::Paint')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
