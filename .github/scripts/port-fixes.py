@@ -5253,6 +5253,36 @@ edit('Core/Src/KMissle.h',
      b'\t\tif (nBarrierKind == Obstacle_Normal || nBarrierKind == Obstacle_Jump)\r\n',
      'LOG TAM: gia tri vat can ma dan doc duoc')
 
+# LOG TAM: vat-can=4 (JumpFly) nen TestBarrier KHONG chan. Con lai hai duong:
+# CheckBeyondRegion tra FALSE, hoac CheckCollision tra -1. In ca hai.
+edit('Core/Src/KMissle.cpp',
+     b'\tif (CheckBeyondRegion(nDOffsetX, nDOffsetY))\r\n'
+     b'\t{\r\n'
+     b'\t\tif (CheckCollision() == -1) \r\n'
+     b'\t\t{\r\n',
+     b'#ifndef _SERVER\r\n'
+     b'\t{\r\n'
+     b'\t\tstatic int s_nLogDi = 0;\r\n'
+     b'\t\tif (s_nLogDi < 30 && m_nSkillId > 53)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\ts_nLogDi++;\r\n'
+     b'\t\t\tg_DebugLog("[di] dan id=%d chieu=%d buoc=(%d,%d) he-so=(%d,%d) toc=%d vung=%d o=(%d,%d)",\r\n'
+     b'\t\t\t\tm_nMissleId, m_nSkillId, nDOffsetX, nDOffsetY, m_nXFactor, m_nYFactor,\r\n'
+     b'\t\t\t\tm_nSpeed, m_nRegionId, m_nCurrentMapX, m_nCurrentMapY);\r\n'
+     b'\t\t}\r\n'
+     b'\t}\r\n'
+     b'#endif\r\n'
+     b'\tif (CheckBeyondRegion(nDOffsetX, nDOffsetY))\r\n'
+     b'\t{\r\n'
+     b'\t\tint nVa = CheckCollision();\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\tif (m_nSkillId > 53)\r\n'
+     b'\t\t\tg_DebugLog("[di] dan id=%d chieu=%d TRONG VUNG, va-cham=%d", m_nMissleId, m_nSkillId, nVa);\r\n'
+     b'#endif\r\n'
+     b'\t\tif (nVa == -1) \r\n'
+     b'\t\t{\r\n',
+     'LOG TAM: buoc di va ket qua va cham cua dan')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
