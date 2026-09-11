@@ -12,8 +12,16 @@
 
 #include "GameDataDef.h"
 
-#define		FACTIONS_PRR_SERIES				2			// 五行每个系的门派数
-#define		MAX_FACTION						(FACTIONS_PRR_SERIES * series_num)	// 总的门派数
+/* Ban goc xep mon phai theo LUOI 5 he x 2 phai, id = he * 2 + thu tu. Luoi do
+   khong chua duoc phai thu 11: settings/faction/mon-phai.ini da khai san Hoa
+   Son [10] (he Thuy), Vu Hon [11], Tieu Dao [12] - ma he Thuy da du hai cho
+   cho Nga Mi va Thuy Yen.
+
+   Doi 11/09/2026: id lay THANG tu so hieu muc trong ini (phang), nen id 0..9
+   giu NGUYEN. PHAI GIONG HET ben may chu (Core/KFaction.h) - hai nua ma danh
+   so khac nhau thi cung mot id se ra hai mon phai khac nhau. */
+#define		FACTIONS_PRR_SERIES				4			// toi da moi he
+#define		MAX_FACTION						16			// tong so mon phai (phang)
 
 class KFaction
 {

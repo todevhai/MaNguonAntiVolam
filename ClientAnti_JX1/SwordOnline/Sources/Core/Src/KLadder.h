@@ -2,8 +2,10 @@
 #define	KLadderH
 
 #include "KProtocol.h"
+#include "KFaction.h"		// MAX_FACTION
 
-#define	MAX_FAC series_num * FACTIONS_PRR_SERIES + 1
+/* Mon phai danh so PHANG (xem KFaction.h) nen lay thang MAX_FACTION. */
+#define	MAX_FAC (MAX_FACTION + 1)
 enum
 {
 	enumLadderBegin = 0,

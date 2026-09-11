@@ -25,8 +25,11 @@ BOOL	KFaction::Init()
 {
 	KIniFile	Ini;
 	char		szSection[80], szBuffer[32];
-	char		szSeries[series_num][16] = {"金", "木", "水", "火", "土"};
-	char		szCamp[camp_num][16] = {"新手", "正派", "邪派", "中立", "杀手", "野兽", "路人"};
+	char		szSeries[series_num][16] =
+		{"S_GOLD", "S_WOOD", "S_WATER", "S_FIRE", "S_EARTH"};
+	char		szCamp[camp_num][16] =
+		{"C_BEGIN", "C_JUSTICE", "C_EVIL", "C_BALANCE",
+		 "C_FREE", "C_ANIMAL", "C_EVENT"};
 	int			i, j, k, nArrayPos;
 
 	// 清空
@@ -42,38 +45,35 @@ BOOL	KFaction::Init()
 		return FALSE;
 
 	// 读入每一个门派数据
+	/* Doc THANG theo so hieu muc: muc [n] cua ini la mon phai id n. Giong het
+	   ben may chu - xem ghi chu o KFaction.h. */
 	for (i = 0; i < MAX_FACTION; i++)
 	{
 		sprintf(szSection, "%d", i);
-		Ini.GetString(szSection, "Series", "金", szBuffer, sizeof(szBuffer));
-		// 找到阵营数组中的相应位置
+		Ini.GetString(szSection, "Name", "", m_sAttribute[i].m_szName, sizeof(m_sAttribute[i].m_szName));
+		if (m_sAttribute[i].m_szName[0] == 0)
+			continue;
+
+		Ini.GetString(szSection, "Series", "", szBuffer, sizeof(szBuffer));
 		for (j = 0; j < series_num; j++)
-		{
-			if (strcmp(szBuffer, szSeries[j]) != 0)
-				continue;
-			for (k = 0; k < FACTIONS_PRR_SERIES; k++)
+			if (strcmp(szBuffer, szSeries[j]) == 0)
 			{
-				if (m_sAttribute[j * FACTIONS_PRR_SERIES + k].m_szName[0] == 0)
-				{
-					nArrayPos = j * FACTIONS_PRR_SERIES + k;
-					m_sAttribute[nArrayPos].m_nSeries = j;
-					break;
-				}
-			}
-			break;
-		}
-		_ASSERT(j < series_num);
-		Ini.GetString(szSection, "Name", "少林派", m_sAttribute[nArrayPos].m_szName, sizeof(m_sAttribute[nArrayPos].m_szName));
-		Ini.GetString(szSection, "Camp", "正义", szBuffer, sizeof(szBuffer));
-		for (j = 0; j < camp_num; j++)
-		{
-			if (strcmp(szBuffer, szCamp[j]) == 0)
-			{
-				m_sAttribute[nArrayPos].m_nCamp = j;
+				m_sAttribute[i].m_nSeries = j;
 				break;
 			}
+		if (j >= series_num)
+		{
+			m_sAttribute[i].m_szName[0] = 0;
+			continue;
 		}
-		_ASSERT(j < camp_num);
+
+		Ini.GetString(szSection, "Camp", "", szBuffer, sizeof(szBuffer));
+		for (j = 0; j < camp_num; j++)
+			if (strcmp(szBuffer, szCamp[j]) == 0)
+			{
+				m_sAttribute[i].m_nCamp = j;
+				break;
+			}
 	}
 
 	return TRUE;
@@ -86,7 +86,17 @@ int		KFaction::GetID(int nSeries, int nNo)
 {
 	if (nSeries < series_metal || nSeries >= series_num || nNo < 0 || nNo >= FACTIONS_PRR_SERIES)
 		return -1;
-	return nSeries * FACTIONS_PRR_SERIES + nNo;
+	/* Mang phang roi nen phai DEM: tra ve phai thu nNo cua he do. */
+	int nDem = 0;
+	for (int i = 0; i < MAX_FACTION; i++)
+	{
+		if (m_sAttribute[i].m_szName[0] == 0 || m_sAttribute[i].m_nSeries != nSeries)
+			continue;
+		if (nDem == nNo)
+			return i;
+		nDem ++;
+	}
+	return -1;
 }
 
 //---------------------------------------------------------------------------
@@ -98,8 +108,10 @@ int		KFaction::GetID(int nSeries, char *lpszName)
 		return -1;
 	if ( !lpszName || !lpszName[0])
 		return -1;
-	for (int i = nSeries * FACTIONS_PRR_SERIES; i < (nSeries + 1) * FACTIONS_PRR_SERIES; i++)
+	for (int i = 0; i < MAX_FACTION; i++)
 	{
+		if (m_sAttribute[i].m_nSeries != nSeries)
+			continue;
 		if (strcmp(lpszName, m_sAttribute[i].m_szName) == 0)
 			return i;
 	}
