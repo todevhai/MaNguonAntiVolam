@@ -5022,6 +5022,55 @@ edit('Core/Src/KMissle.cpp',
      b'\tcase\tMISSLE_MMK_Parabola:\t\t\t\t\t\t//\t\xc5\xd7\xce\xef\xcf\xdf\r\n\tcase\tMISSLE_MMK_Line:\t\t\t\t\t\t\t//\t\xd6\xb1\xcf\xdf\xb7\xc9\xd0\xd0\r\n\t\t{\t\r\n\t\t\t/* DOI HANH VI: bo khoi "bam muc tieu" rieng cua ban 8.x o nhanh bay\r\n\t\t\t   THANG - may chu (ban 2003) chi di theo he so huong da tinh luc ban.\r\n\t\t\t   De lai thi client be duong con may chu bay thang: hai ben lech. */\r\n\t\t\tnDOffsetX    = (m_nSpeed * m_nXFactor);\r\n\t\t\tnDOffsetY\t = (m_nSpeed * m_nYFactor);\r\n\t\t}\r\n\t\tbreak;\r\n',
      'nhanh bay thang: bo khoi bam muc tieu rieng cua 8.x')
 
+# LOG TAM: chu phim tat khong hien tren icon chieu trong cay chon chieu.
+# Ma ve DA CO SAN (UiSkillTree::PaintWindow) nhung khong ra chu - bit xem no
+# co tim thay lenh "ShortcutSkill(n)" trong bang phim khong.
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'#include "../UiSoundSetting.h"\r\n',
+     b'#include "../UiSoundSetting.h"\r\n#include "../../../Engine/src/KDebug.h"\r\n',
+     'LOG TAM: them KDebug.h cho UiSkillTree')
+
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'void KUiSkillTree::HandleShortcutKey(int nIndex)\r\n'
+     b'{\r\n'
+     b'\tif (m_pSelf == NULL || nIndex < 0 || nIndex >= SKILLTREE_SHORTCUT_SKILL_COUNT)\r\n'
+     b'\t\treturn;\r\n',
+     b'void KUiSkillTree::HandleShortcutKey(int nIndex)\r\n'
+     b'{\r\n'
+     b'\tg_DebugLog("[phim] HandleShortcutKey o=%d co-cua-so=%d dang-hien=%d",\r\n'
+     b'\t\tnIndex, m_pSelf ? 1 : 0, GetIfVisible() ? 1 : 0);\r\n'
+     b'\tif (m_pSelf == NULL || nIndex < 0 || nIndex >= SKILLTREE_SHORTCUT_SKILL_COUNT)\r\n'
+     b'\t\treturn;\r\n',
+     'LOG TAM: vao HandleShortcutKey')
+
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'\t\tfor (int j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tif (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&\r\n',
+     b'\t\t{\r\n'
+     b'\t\t\tstatic int s_nLogVeChu = 0;\r\n'
+     b'\t\t\tif (s_nLogVeChu < 30)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\ts_nLogVeChu++;\r\n'
+     b'\t\t\t\tg_DebugLog("[phim] ve o %d: chieu=%d trai=%d | shortcut0 id=%d trai=%d font=%d mau=%08X",\r\n'
+     b'\t\t\t\t\ti, m_Skills[i].uId, (int)m_bLeft, ms_ShortcutSkills[0].uId,\r\n'
+     b'\t\t\t\t\t(int)ms_ShortcutSkills[0].IS_LEFT_SKILL, m_nFont, m_uColor);\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t}\r\n'
+     b'\t\tfor (int j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tif (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&\r\n',
+     'LOG TAM: trang thai khi ve chu phim')
+
+edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
+     b'\t\t\t\tif (pszKey)\r\n'
+     b'\t\t\t\t{\r\n',
+     b'\t\t\t\tg_DebugLog("[phim] o %d khop shortcut %d -> lenh=%d phim=%s",\r\n'
+     b'\t\t\t\t\ti, j, nIndexC, pszKey ? pszKey : "(khong co)");\r\n'
+     b'\t\t\t\tif (pszKey)\r\n'
+     b'\t\t\t\t{\r\n',
+     'LOG TAM: co tim ra ten phim khong')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
