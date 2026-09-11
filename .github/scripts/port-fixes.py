@@ -5022,54 +5022,11 @@ edit('Core/Src/KMissle.cpp',
      b'\tcase\tMISSLE_MMK_Parabola:\t\t\t\t\t\t//\t\xc5\xd7\xce\xef\xcf\xdf\r\n\tcase\tMISSLE_MMK_Line:\t\t\t\t\t\t\t//\t\xd6\xb1\xcf\xdf\xb7\xc9\xd0\xd0\r\n\t\t{\t\r\n\t\t\t/* DOI HANH VI: bo khoi "bam muc tieu" rieng cua ban 8.x o nhanh bay\r\n\t\t\t   THANG - may chu (ban 2003) chi di theo he so huong da tinh luc ban.\r\n\t\t\t   De lai thi client be duong con may chu bay thang: hai ben lech. */\r\n\t\t\tnDOffsetX    = (m_nSpeed * m_nXFactor);\r\n\t\t\tnDOffsetY\t = (m_nSpeed * m_nYFactor);\r\n\t\t}\r\n\t\tbreak;\r\n',
      'nhanh bay thang: bo khoi bam muc tieu rieng cua 8.x')
 
-# LOG TAM: chu phim tat khong hien tren icon chieu trong cay chon chieu.
-# Ma ve DA CO SAN (UiSkillTree::PaintWindow) nhung khong ra chu - bit xem no
-# co tim thay lenh "ShortcutSkill(n)" trong bang phim khong.
+# DOI HANH VI: chu phim tat tren icon chieu bi icon phu kin - ve chu sau cung.
 edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
-     b'#include "../UiSoundSetting.h"\r\n',
-     b'#include "../UiSoundSetting.h"\r\n#include "../../../Engine/src/KDebug.h"\r\n',
-     'LOG TAM: them KDebug.h cho UiSkillTree')
-
-edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
-     b'void KUiSkillTree::HandleShortcutKey(int nIndex)\r\n'
-     b'{\r\n'
-     b'\tif (m_pSelf == NULL || nIndex < 0 || nIndex >= SKILLTREE_SHORTCUT_SKILL_COUNT)\r\n'
-     b'\t\treturn;\r\n',
-     b'void KUiSkillTree::HandleShortcutKey(int nIndex)\r\n'
-     b'{\r\n'
-     b'\tg_DebugLog("[phim] HandleShortcutKey o=%d co-cua-so=%d dang-hien=%d",\r\n'
-     b'\t\tnIndex, m_pSelf ? 1 : 0, GetIfVisible() ? 1 : 0);\r\n'
-     b'\tif (m_pSelf == NULL || nIndex < 0 || nIndex >= SKILLTREE_SHORTCUT_SKILL_COUNT)\r\n'
-     b'\t\treturn;\r\n',
-     'LOG TAM: vao HandleShortcutKey')
-
-edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
-     b'\t\tfor (int j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)\r\n'
-     b'\t\t{\r\n'
-     b'\t\t\tif (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&\r\n',
-     b'\t\t{\r\n'
-     b'\t\t\tstatic int s_nLogVeChu = 0;\r\n'
-     b'\t\t\tif (s_nLogVeChu < 30)\r\n'
-     b'\t\t\t{\r\n'
-     b'\t\t\t\ts_nLogVeChu++;\r\n'
-     b'\t\t\t\tg_DebugLog("[phim] ve o %d: chieu=%d trai=%d | shortcut0 id=%d trai=%d font=%d mau=%08X",\r\n'
-     b'\t\t\t\t\ti, m_Skills[i].uId, (int)m_bLeft, ms_ShortcutSkills[0].uId,\r\n'
-     b'\t\t\t\t\t(int)ms_ShortcutSkills[0].IS_LEFT_SKILL, m_nFont, m_uColor);\r\n'
-     b'\t\t\t}\r\n'
-     b'\t\t}\r\n'
-     b'\t\tfor (int j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)\r\n'
-     b'\t\t{\r\n'
-     b'\t\t\tif (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&\r\n',
-     'LOG TAM: trang thai khi ve chu phim')
-
-edit('S3Client/Ui/UiCase/UiSkillTree.cpp',
-     b'\t\t\t\tif (pszKey)\r\n'
-     b'\t\t\t\t{\r\n',
-     b'\t\t\t\tg_DebugLog("[phim] o %d khop shortcut %d -> lenh=%d phim=%s",\r\n'
-     b'\t\t\t\t\ti, j, nIndexC, pszKey ? pszKey : "(khong co)");\r\n'
-     b'\t\t\t\tif (pszKey)\r\n'
-     b'\t\t\t\t{\r\n',
-     'LOG TAM: co tim ra ten phim khong')
+     b'void KUiSkillTree::PaintWindow()\r\n{\r\n\tif (g_pRepresentShell == NULL)\r\n\t\treturn;\r\n\tKWndWindow::PaintWindow();\r\n\tint\tnCurRowIndex = -1;\r\n\tint\tnLeft, nTop = m_nAbsoluteTop - m_nHeightPerSkill;\r\n\tint nDX = -m_nWidthPerSkill; //m_bLeft ? m_nWidthPerSkill : (-m_nWidthPerSkill);\r\n\t\r\n\tfor (int i = 0; i < m_nNumSkills; i++)\r\n\t{\r\n\t\tif (m_Skills[i].nLevel == nCurRowIndex)\r\n\t\t{\r\n\t\t\tnLeft += nDX;\r\n\t\t}\r\n\t\telse\r\n\t\t{\r\n\t\t\tnTop += m_nHeightPerSkill;\r\n//\t\t\tif (m_bLeft)\r\n//\t\t\t\tnLeft = m_nAbsoluteLeft;\r\n//\t\t\telse\r\n\t\t\t\tnLeft = m_nAbsoluteLeft + m_Width - m_nWidthPerSkill;\r\n\t\t\tnCurRowIndex = m_Skills[i].nLevel;\r\n\t\t}\r\n\t\tg_pCoreShell->DrawGameObj(m_Skills[i].uGenre, m_Skills[i].uId,\r\n\t\t\tnLeft, nTop, m_nWidthPerSkill, m_nHeightPerSkill, 0);\r\n\r\n\r\n\t\tfor (int j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)\r\n\t\t{\r\n\t\t\tif (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&\r\n\t\t\t\tm_Skills[i].uGenre == ms_ShortcutSkills[j].uGenre &&\r\n\t\t\t\tm_Skills[i].uId == ms_ShortcutSkills[j].uId)\r\n\t\t\t{\r\n\t\t\t\tchar szScript[64];\r\n\t\t\t\tsprintf(szScript, SCK_SHORTCUTSKILL_FORMAT, j);\r\n\t\t\t\tint nIndexC = KShortcutKeyCentre::FindCommandByScript(szScript);\r\n\t\t\t\tchar* pszKey = NULL;\r\n\t\t\t\tif (nIndexC >= 0)\r\n\t\t\t\t{\r\n\t\t\t\t\tpszKey = (char*)KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tsprintf(szScript, SCK_DIRECTSHORTCUTSKILL_FORMAT, j);\r\n\t\t\t\t\tnIndexC = KShortcutKeyCentre::FindCommandByScript(szScript);\r\n\t\t\t\t\tif (nIndexC >= 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tpszKey = (char*)KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (pszKey)\r\n\t\t\t\t{\r\n\t\t\t\t\tg_pRepresentShell->OutputText(m_nFont, pszKey, KRF_ZERO_END,\r\n\t\t\t\t\t\tnLeft + m_nWidthPerSkill - m_nFont, nTop + m_nHeightPerSkill - m_nFont - 1, m_uColor);\r\n\t\t\t\t\tbreak;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n}\r\n',
+     b'void KUiSkillTree::PaintWindow()\r\n{\r\n\tif (g_pRepresentShell == NULL)\r\n\t\treturn;\r\n\tKWndWindow::PaintWindow();\r\n\tint\tnCurRowIndex = -1;\r\n\tint\tnLeft = 0, nTop = m_nAbsoluteTop - m_nHeightPerSkill;\r\n\tint nDX = -m_nWidthPerSkill;\r\n\r\n\t/* DOI HANH VI: gom chu phim tat lai, ve HET icon roi moi ve chu.\r\n\t   Icon di duong g_pCoreShell->DrawGameObj (lop Represent) con chu di\r\n\t   duong g_pRepresentShell->OutputText - hai kenh khong do len mat ve\r\n\t   cung mot luc, nen ve xen ke thi chu bi icon phu kin: nguoi choi gan\r\n\t   phim xong khong thay chu nao (do 12/09/2026, log cho thay ham ve chu\r\n\t   CO chay va tim ra dung ten phim). */\r\n\tint nSoChu = 0;\r\n\tint anChuX[SKILLTREE_MAX_SKILL_COUNT];\r\n\tint anChuY[SKILLTREE_MAX_SKILL_COUNT];\r\n\tchar aszChu[SKILLTREE_MAX_SKILL_COUNT][16];\r\n\tint i = 0, j = 0;\r\n\r\n\tfor (i = 0; i < m_nNumSkills; i++)\r\n\t{\r\n\t\tif (m_Skills[i].nLevel == nCurRowIndex)\r\n\t\t{\r\n\t\t\tnLeft += nDX;\r\n\t\t}\r\n\t\telse\r\n\t\t{\r\n\t\t\tnTop += m_nHeightPerSkill;\r\n\t\t\tnLeft = m_nAbsoluteLeft + m_Width - m_nWidthPerSkill;\r\n\t\t\tnCurRowIndex = m_Skills[i].nLevel;\r\n\t\t}\r\n\t\tg_pCoreShell->DrawGameObj(m_Skills[i].uGenre, m_Skills[i].uId,\r\n\t\t\tnLeft, nTop, m_nWidthPerSkill, m_nHeightPerSkill, 0);\r\n\r\n\t\tfor (j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)\r\n\t\t{\r\n\t\t\tif (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&\r\n\t\t\t\tm_Skills[i].uGenre == ms_ShortcutSkills[j].uGenre &&\r\n\t\t\t\tm_Skills[i].uId == ms_ShortcutSkills[j].uId)\r\n\t\t\t{\r\n\t\t\t\tchar szScript[64];\r\n\t\t\t\tsprintf(szScript, SCK_SHORTCUTSKILL_FORMAT, j);\r\n\t\t\t\tint nIndexC = KShortcutKeyCentre::FindCommandByScript(szScript);\r\n\t\t\t\tconst char* pszKey = NULL;\r\n\t\t\t\tif (nIndexC >= 0)\r\n\t\t\t\t{\r\n\t\t\t\t\tpszKey = KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));\r\n\t\t\t\t}\r\n\t\t\t\telse\r\n\t\t\t\t{\r\n\t\t\t\t\tsprintf(szScript, SCK_DIRECTSHORTCUTSKILL_FORMAT, j);\r\n\t\t\t\t\tnIndexC = KShortcutKeyCentre::FindCommandByScript(szScript);\r\n\t\t\t\t\tif (nIndexC >= 0)\r\n\t\t\t\t\t\tpszKey = KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));\r\n\t\t\t\t}\r\n\r\n\t\t\t\tif (pszKey && pszKey[0] && nSoChu < SKILLTREE_MAX_SKILL_COUNT)\r\n\t\t\t\t{\r\n\t\t\t\t\t/* GetKeyName tra con tro toi mot chuoi TINH dung chung -\r\n\t\t\t\t\t   lan goi sau ghi de len no, nen phai chep ra ngay. */\r\n\t\t\t\t\tstrncpy(aszChu[nSoChu], pszKey, 15);\r\n\t\t\t\t\taszChu[nSoChu][15] = 0;\r\n\t\t\t\t\tanChuX[nSoChu] = nLeft + m_nWidthPerSkill - m_nFont;\r\n\t\t\t\t\tanChuY[nSoChu] = nTop + m_nHeightPerSkill - m_nFont - 1;\r\n\t\t\t\t\tnSoChu++;\r\n\t\t\t\t\tbreak;\r\n\t\t\t\t}\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\r\n\t/* Vien den truoc, chu mau sau: nen icon sang toi lan lon, chu mot mau\r\n\t   de chim vao hoa tiet. */\r\n\tfor (i = 0; i < nSoChu; i++)\r\n\t{\r\n\t\tg_pRepresentShell->OutputText(m_nFont, aszChu[i], KRF_ZERO_END,\r\n\t\t\tanChuX[i] + 1, anChuY[i] + 1, 0xFF000000);\r\n\t\tg_pRepresentShell->OutputText(m_nFont, aszChu[i], KRF_ZERO_END,\r\n\t\t\tanChuX[i], anChuY[i], m_uColor);\r\n\t}\r\n}\r\n',
+     'chu phim tat ve sau tat ca icon, them vien den')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
