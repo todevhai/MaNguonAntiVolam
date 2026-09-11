@@ -5034,6 +5034,12 @@ edit('Core/Src/KSkills.cpp',
      b'\t\t\t\t\t/* DOI HANH VI: dan BAM MUC TIEU (MoveKind = 5) phai xuat phat tu\r\n\t\t\t\t\t   NGUOI PHAT, khong phai tu vi tri dich. Hinh TUONG von sinh dan\r\n\t\t\t\t\t   ngay tai dich - dung cho tuong lua dat xuong dat - nhung chieu\r\n\t\t\t\t\t   8x Cai Bang lai khai dan bam muc tieu, nen dan de ra ngay tren\r\n\t\t\t\t\t   dau con quai roi duoi theo chinh no: nhin ra ngoai la "no ngay\r\n\t\t\t\t\t   tai quai roi bay loan xa". Doi chung ban6 ngay 12/09/2026: dan\r\n\t\t\t\t\t   bay TU NGUOI TOI QUAI. */\r\n\t\t\t\t\tif (g_MisslesLib[m_nChildSkillId].m_eMoveKind == MISSLE_MMK_Follow)\r\n\t\t\t\t\t\tCastWall(&SkillParam , nDir, nSrcPX, nSrcPY);\r\n\t\t\t\t\telse\r\n\t\t\t\t\t\tCastWall(&SkillParam , nDir, nDesPX, nDesPY);\r\n',
      'chieu hinh tuong: dan bam muc tieu xuat phat tu nguoi phat')
 
+# DOI HANH VI: dan bam muc tieu thieu he so huong -> danh vao khoang trong thi bay tu phia.
+edit('Core/Src/KSkills.cpp',
+     b'\t\t\tif (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line|| Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)\r\n\t\t\t{\r\n\t\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(Missle[nMissleIndex].m_nDir, MaxMissleDir);\r\n\t\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(Missle[nMissleIndex].m_nDir, MaxMissleDir);\r\n\t\t\t}\r\n',
+     b'\t\t\t/* DOI HANH VI: dat he so huong cho MOI loai dan, khong rieng bay\r\n\t\t\t   thang. Dan BAM MUC TIEU khong nam trong hai loai cu nen hai he so\r\n\t\t\t   nay giu nguyen RAC cua lan dung truoc o dan. Co muc tieu thi khong\r\n\t\t\t   sao (moi nhip tu tinh huong), nhung danh vao KHOANG TRONG thi\r\n\t\t\t   khong co muc tieu -> roi vao nhanh dung he so -> dan bay tu phia\r\n\t\t\t   (do 12/09/2026). Cac loai khac khong doc hai he so nay nen dat\r\n\t\t\t   thua cung vo hai. */\r\n\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(Missle[nMissleIndex].m_nDir, MaxMissleDir);\r\n\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(Missle[nMissleIndex].m_nDir, MaxMissleDir);\r\n',
+     'dat he so huong cho moi loai dan trong CastWall')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
