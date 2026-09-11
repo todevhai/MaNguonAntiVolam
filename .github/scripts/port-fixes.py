@@ -654,6 +654,23 @@ edit('Core/Src/KNpcRes.cpp',
      'hieu ung dac biet nam duoi dat ke ca khi cuoi ngua')
 
 
+# DOI HANH VI: hieu ung PHAT CHIEU bam vao nhan vat (PreCastSpr -> m_cSpecialSpr)
+# dung chung mang m_cDrawFile voi cac bo phan nguoi, ma vong ve bo phan dat
+# bRenderStyle = ALPHA cho tung o. Ve kieu tron thuong thi nhung doan sprite mau
+# TOI (khoi, vien lua) de len nen thanh QUANG DEN quanh nhan vat luc vung chieu
+# - user bao 11/09/2026 voi chieu 150 Cai Bang (precast rieng
+# gb_150_shichengjiulong_a.spr). Dan bay (KMissleRes) va hieu ung no
+# (KSkillSpecial) da di duong CONG SANG tu 08/09, chi con duong nay con sot.
+edit('Core/Src/KNpcRes.cpp',
+     b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n'
+     b'\t\tnPos++;\r\n',
+     b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n'
+     b'\t\t/* Hieu ung tu phat sang: ve bang phep CONG, khong thi quang den. */\r\n'
+     b'\t\tm_cDrawFile[nPos].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT;\r\n'
+     b'\t\tnPos++;\r\n',
+     'hieu ung phat chieu bam nguoi ve kieu cong sang (het quang den)')
+
+
 # DOI HANH VI: bang "trang thai hinh anh" cua BO DU LIEU TA DANG DUNG ghi kieu
 # bang TIENG ANH (Head / Body / Foot / MiniMap va Loop), con nguon 2003 chi so
 # voi chu Han "dau" / "chan" / "tuan hoan". Khong khop nao het -> nhanh else:
