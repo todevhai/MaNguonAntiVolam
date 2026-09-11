@@ -5004,6 +5004,62 @@ edit('Core/Src/CoreDrawGameObj.cpp',
      'thanh phim tat can giua icon theo khung that')
 
 
+# ---------------------------------------------------------------- LOG TAM
+# Do 11/09/2026: chieu 150 Cai Bang (1073/1074) khong thay DAN (dau rong) bay
+# ra, trong khi chieu 80 (357) thay ro ba qua cau lua. Ba dong log duoi day de
+# biet dan co duoc TAO khong, va neu tao roi thi Draw thoat o dau.
+# GO SAU KHI TIM RA NGUYEN NHAN.
+edit('Core/Src/KSkills.cpp',
+     b'\tif (nLauncher <= 0) return FALSE;\r\n'
+     b'\t\r\n'
+     b'\tswitch(m_eMisslesForm)\r\n',
+     b'\tif (nLauncher <= 0) return FALSE;\r\n'
+     b'\tg_DebugLog("[dan] CastMissles chieu=%d form=%d launcher=%d p1=%d p2=%d con=%d",\r\n'
+     b'\t\tm_nId, (int)m_eMisslesForm, nLauncher, nParam1, nParam2, m_nChildSkillNum);\r\n'
+     b'\t\r\n'
+     b'\tswitch(m_eMisslesForm)\r\n',
+     'LOG TAM: vao CastMissles')
+
+edit_all('Core/Src/KSkills.cpp',
+     b'\t\t\tCreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);\r\n'
+     b'\t\t\tMissle[nMissleIndex].m_nFollowNpcIdx\t= pSkillParam->nTargetId;\r\n',
+     b'\t\t\tCreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);\r\n'
+     b'\t\t\tg_DebugLog("[dan] tao dan %d cho chieu=%d mau=%d dir=%d muc tieu=%d",\r\n'
+     b'\t\t\t\tnMissleIndex, m_nId, m_nChildSkillId, nDir, pSkillParam->nTargetId);\r\n'
+     b'\t\t\tMissle[nMissleIndex].m_nFollowNpcIdx\t= pSkillParam->nTargetId;\r\n',
+     'LOG TAM: tao dan (ca 3 hinh thuc)')
+
+edit('Core/Src/KMissleRes.cpp',
+     b'\tif (eStatus == MS_DoFly)\r\n'
+     b'\t{\r\n'
+     b'\t\tif (nCurLifeFrame < 0 || (nAllFrame != 0 && nAllFrame < nCurLifeFrame)) return FALSE;\r\n',
+     b'\tif (eStatus == MS_DoFly)\r\n'
+     b'\t{\r\n'
+     b'\t\tstatic int s_nLogDan = 0;\r\n'
+     b'\t\tif (s_nLogDan < 40)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\ts_nLogDan++;\r\n'
+     b'\t\t\tg_DebugLog("[dan] Draw spr=%s huong=%d khung=%d song=%d/%d",\r\n'
+     b'\t\t\t\tm_MissleRes[eStatus].AnimFileName, m_MissleRes[eStatus].nDir,\r\n'
+     b'\t\t\t\tm_MissleRes[eStatus].nTotalFrame, nCurLifeFrame, nAllFrame);\r\n'
+     b'\t\t}\r\n'
+     b'\t\tif (nCurLifeFrame < 0 || (nAllFrame != 0 && nAllFrame < nCurLifeFrame))\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tif (s_nLogDan < 40) g_DebugLog("[dan] Draw THOAT: song=%d ngoai [0,%d]", nCurLifeFrame, nAllFrame);\r\n'
+     b'\t\t\treturn FALSE;\r\n'
+     b'\t\t}\r\n',
+     'LOG TAM: vao KMissleRes::Draw nhanh bay')
+
+edit('Core/Src/KMissleRes.cpp',
+     b'\t\t\t\tif (nFrame > (nTotalFrame - 1)) \r\n'
+     b'\t\t\t\t\treturn FALSE;\r\n',
+     b'\t\t\t\tif (nFrame > (nTotalFrame - 1)) \r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tif (s_nLogDan < 40) g_DebugLog("[dan] Draw THOAT: khung %d > %d", nFrame, nTotalFrame - 1);\r\n'
+     b'\t\t\t\t\treturn FALSE;\r\n'
+     b'\t\t\t\t}\r\n',
+     'LOG TAM: duong thoat theo so khung')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
