@@ -1951,6 +1951,14 @@ void KProtocolProcess::SyncPlayer(BYTE* pMsg)
 	Npc[nIdx].m_ArmorType			= pPlaySync->ArmorType;
 	Npc[nIdx].m_AttackSpeed			= pPlaySync->AttackSpeed;
 	Npc[nIdx].m_CastSpeed			= pPlaySync->CastSpeed;
+	/* May chu gui GIA TRI HIEN TAI (da cong buff cua chieu tran phai nhu
+	   Nhu Lai Thien Diep), nhung ban goc chi do vao m_AttackSpeed/m_CastSpeed
+	   la gia tri GOC - con nhip ve don danh lai doc m_Current*. Ket qua: may
+	   chu danh nhanh len ma nhan vat tren man hinh van vung tay nhu cu, va
+	   chi "an" khi nao co thu khac goi ResetAttrib. Dat thang vao m_Current*
+	   nhu RunSpeed/WalkSpeed ngay ben duoi da lam. */
+	Npc[nIdx].m_CurrentAttackSpeed	= pPlaySync->AttackSpeed;
+	Npc[nIdx].m_CurrentCastSpeed	= pPlaySync->CastSpeed;
 	Npc[nIdx].m_HelmType			= pPlaySync->HelmType;
 	Npc[nIdx].m_HorseType			= (char)pPlaySync->HorseType;
 	Npc[nIdx].m_CurrentRunSpeed		= pPlaySync->RunSpeed;
@@ -2029,6 +2037,10 @@ void KProtocolProcess::SyncPlayerMin(BYTE* pMsg)
 
 	Npc[nIdx].m_AttackSpeed			= pPlaySync->AttackSpeed;
 	Npc[nIdx].m_CastSpeed			= pPlaySync->CastSpeed;
+	/* Xem ghi chu o SyncPlayer: gia tri may chu gui la HIEN TAI, phai vao
+	   m_Current* thi nhip ve don danh moi doi theo. */
+	Npc[nIdx].m_CurrentAttackSpeed	= pPlaySync->AttackSpeed;
+	Npc[nIdx].m_CurrentCastSpeed	= pPlaySync->CastSpeed;
 	Npc[nIdx].m_CurrentRunSpeed		= pPlaySync->RunSpeed;
 	Npc[nIdx].m_CurrentWalkSpeed	= pPlaySync->WalkSpeed;
 	Npc[nIdx].m_HelmType			= pPlaySync->HelmType;
