@@ -490,8 +490,14 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
      b'\t\t\t\t\t\t\tbreak;\r\n',
      b'\t\t\t\t\t\t\tif (pTemp->bRenderStyle == IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT)\r\n'
+     b'\t\t\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\t\t\t/* Alpha 254 la CO do KNpcRes dat: hieu ung phat chieu bam\r\n'
+     b'\t\t\t\t\t\t\t\t   nguoi, phai tron kieu ALPHA. Con lai (dan dang bay) thi\r\n'
+     b'\t\t\t\t\t\t\t\t   CONG vi sprite dan co nen den. */\r\n'
+     b'\t\t\t\t\t\t\t\tg_nKieuTronSprite = (pTemp->Color.Color_b.a == 254) ? 2 : 1;\r\n'
      b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAdd(nX, nY, pFrame->Width, pFrame->Height,\r\n'
-     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette);\t/* hieu ung tu phat sang: CONG */\r\n'
+     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette);\r\n'
+     b'\t\t\t\t\t\t\t}\r\n'
      b'\t\t\t\t\t\t\telse\r\n'
      b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
      b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);\r\n'
@@ -520,6 +526,10 @@ edit('Engine/Src/KDrawBase.cpp',
      b'//   alpha == 0  -> doan trong suot, KHONG co byte mau di kem\r\n'
      b'//   alpha != 0  -> <do dai> byte chi so, tra mau qua bang mau 16 bit\r\n'
      b'//---------------------------------------------------------------------------\r\n'
+     b'/* 1 = cong (dan dang bay), 2 = alpha (hieu ung bam nguoi), 0 = screen.\r\n'
+     b'   Noi goi dat truoc khi ve; xem KRepresentShell2. */\r\n'
+     b'int g_nKieuTronSprite = 1;\r\n'
+     b'\r\n'
      b'void g_DrawSpriteAdd(void* node, void* canvas)\r\n'
      b'{\r\n'
      b'	KDrawNode*	pNode = (KDrawNode *)node;\r\n'
@@ -571,18 +581,25 @@ edit('Engine/Src/KDrawBase.cpp',
      b'		   nen den nen phai cong. Hieu ung PHAT CHIEU bam nguoi da chuyen\r\n'
      b'		   sang ve kieu ALPHA o KNpcRes, khong di qua day nua.\r\n'
      b'		   Doi bang VLTK_TRON=screen|alpha khi can do lai. */\r\n'
-     b'		static int s_nKieuTron = 1;\t/* 0 screen, 1 cong, 2 alpha */\r\n'
+     b'		/* Kieu tron do NOI GOI quyet dinh (g_nKieuTronSprite): dan dang bay\r\n'
+     b'		   can phep CONG (sprite nen den), con hieu ung phat chieu bam nguoi\r\n'
+     b'		   can ALPHA (khong thi loi lua chay trang). VLTK_TRON chi de EP mot\r\n'
+     b'		   kieu cho ca hai khi can do. */\r\n'
+     b'		static int s_nEpKieu = -2;\r\n'
+     b'		int s_nKieuTron = g_nKieuTronSprite;\r\n'
      b'		if (s_nCuongDo < 0)\r\n'
      b'		{\r\n'
      b'			const char* pszTron = getenv("VLTK_TRON");\r\n'
-     b'			if (pszTron && pszTron[0] == \'c\') s_nKieuTron = 1;\r\n'
-     b'			else if (pszTron && pszTron[0] == \'s\') s_nKieuTron = 0;\r\n'
-     b'			else if (pszTron && pszTron[0] == \'a\') s_nKieuTron = 2;\r\n'
+     b'			if (pszTron && pszTron[0] == \'c\') s_nEpKieu = 1;\r\n'
+     b'			else if (pszTron && pszTron[0] == \'s\') s_nEpKieu = 0;\r\n'
+     b'			else if (pszTron && pszTron[0] == \'a\') s_nEpKieu = 2;\r\n'
+     b'			else s_nEpKieu = -1;\r\n'
      b'			const char* pszSang = getenv("VLTK_SANG");\r\n'
      b'			s_nCuongDo = pszSang ? atoi(pszSang) : 32;\t/* alpha that cua sprite */\r\n'
      b'			if (s_nCuongDo < 1) s_nCuongDo = 1;\r\n'
      b'			if (s_nCuongDo > 32) s_nCuongDo = 32;\r\n'
      b'		}\r\n'
+     b'		if (s_nEpKieu >= 0) s_nKieuTron = s_nEpKieu;\r\n'
      b'		int nHeSo = (nAlpha >= 255) ? s_nCuongDo : ((nAlpha >> 3) * s_nCuongDo >> 5);\r\n'
      b'		for (int nI = 0; nI < nDai && nDiem < nTongDiem; nI++, nDiem++)\r\n'
      b'		{\r\n'
@@ -662,7 +679,8 @@ edit('Core/Src/KSkillSpecial.cpp',
 edit('Engine/Src/KDrawBase.h',
      b'void\tg_DrawLine(void* node, void* canvas);\r\n',
      b'void\tg_DrawLine(void* node, void* canvas);\r\n'
-     b'void\tg_DrawSpriteAdd(void* node, void* canvas);\r\n',
+     b'void\tg_DrawSpriteAdd(void* node, void* canvas);\r\n'
+     b'extern int g_nKieuTronSprite;\t/* 1 cong, 2 alpha, 0 screen */\r\n',
      'khai bao g_DrawSpriteAdd')
 
 edit('Engine/Src/KCanvas.h',
@@ -723,12 +741,13 @@ edit('Core/Src/KNpcRes.cpp',
      b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n'
      b'\t\tnPos++;\r\n',
      b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n'
-     b'\t\t/* Ve kieu ALPHA (tron theo alpha cua sprite), KHONG phai phep cong:\r\n'
-     b'\t\t   do 12/09/2026 ba kieu canh nhau - alpha cho lua CAM DAM sac net,\r\n'
-     b'\t\t   cong thuan lam loi lua chay trang, screen thi nhat. Nhanh ALPHA\r\n'
-     b'\t\t   cua Represent2 da duoc bat lai (DrawSpriteAlpha) nen khong con\r\n'
-     b'\t\t   quang den nhu truoc. */\r\n'
-     b'\t\tm_cDrawFile[nPos].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\r\n'
+     b'\t\t/* Hieu ung phat chieu: van di duong ALPHA_NOT_BE_LIT (g_DrawSpriteAdd)\r\n'
+     b'\t\t   nhung danh dau alpha = 254 de ham do tron kieu ALPHA thay vi CONG.\r\n'
+     b'\t\t   Do 12/09/2026: cong lam loi lua chay trang, con DrawSpriteAlpha goc\r\n'
+     b'\t\t   cua Represent2 lai tra ve QUANG DEN - chi cong thuc alpha trong\r\n'
+     b'\t\t   g_DrawSpriteAdd cho ra dung mau cam. */\r\n'
+     b'\t\tm_cDrawFile[nPos].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT;\r\n'
+     b'\t\tm_cDrawFile[nPos].Color.Color_b.a = 254;\r\n'
      b'\t\tnPos++;\r\n',
      'hieu ung phat chieu bam nguoi ve kieu cong sang (het quang den)')
 
@@ -5113,6 +5132,12 @@ edit('Core/Src/KMissle.cpp',
      b'\t\tif (nNpcIdx > 0)\r\n\t\t{ \r\n\t\t\tif (m_nDamageRange == 1)',
      b'\t\t/* DOI HANH VI: bo qua NPC DA CHET. Bon vien dan cua mot chieu bay sat\r\n\t\t   nhau: vien dau giet con quai, cac vien sau van "va" vao xac trong\r\n\t\t   cung nhip va no ngay do - nguoi choi thay quai chet TRUOC khi chieu\r\n\t\t   bay toi. Cho dan bay xuyen qua xac de con quet trung con dang song. */\r\n\t\tif (nNpcIdx > 0 && (Npc[nNpcIdx].m_Doing == do_death || Npc[nNpcIdx].m_CurrentLife <= 0))\r\n\t\t\tnNpcIdx = 0;\r\n\t\tif (nNpcIdx > 0)\r\n\t\t{ \r\n\t\t\tif (m_nDamageRange == 1)',
      'dan bo qua NPC da chet khi kiem va cham')
+
+# Represent2 can khai bao g_nKieuTronSprite (o Engine/Src/KDrawBase.h).
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'#include "KRepresentShell2.h"\r\n',
+     b'#include "KRepresentShell2.h"\r\n#include "../../Engine/src/KDrawBase.h"\r\n',
+     'Represent2 lay khai bao g_nKieuTronSprite')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
