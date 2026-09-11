@@ -5179,6 +5179,53 @@ edit('Core/Src/KMissle.cpp',
      b'\tif (m_nMissleId <= 0 ) return;\r\n',
      'LOG TAM: cua vao KMissle::Paint')
 
+# LOG TAM: dan chieu 1073 nam o MS_DoWait 5 nhip roi nhay thang sang MS_DoVanish,
+# tuc PrePareFly() tra false. Bit ba duong thoat cua no.
+edit('Core/Src/KMissle.cpp',
+     b'\tif (m_nCurrentLife == m_nStartLifeTime && m_eMissleStatus != MS_DoVanish)\t\r\n'
+     b'\t{\r\n'
+     b'\t\tif (PrePareFly())\r\n',
+     b'\tif (m_nCurrentLife == m_nStartLifeTime && m_eMissleStatus != MS_DoVanish)\t\r\n'
+     b'\t{\r\n'
+     b'\t\tBOOL bSanSang = PrePareFly();\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\tif (m_nSkillId > 53)\r\n'
+     b'\t\t\tg_DebugLog("[bay] dan id=%d chieu=%d PrePareFly=%d ngat-khi-di=%d bam-cha=%d cha=%d",\r\n'
+     b'\t\t\t\tm_nMissleId, m_nSkillId, bSanSang ? 1 : 0, m_nInteruptTypeWhenMove,\r\n'
+     b'\t\t\t\tm_bHeelAtParent ? 1 : 0, m_nParentMissleIndex);\r\n'
+     b'#endif\r\n'
+     b'\t\tif (bSanSang)\r\n',
+     'LOG TAM: PrePareFly tra gi')
+
+edit('Core/Src/KMissle.cpp',
+     b'\t\tif (nPX != m_nLauncherSrcPX || nPY != m_nLauncherSrcPY)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\treturn false;\r\n'
+     b'\t\t}\r\n',
+     b'\t\tif (nPX != m_nLauncherSrcPX || nPY != m_nLauncherSrcPY)\r\n'
+     b'\t\t{\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\t\tg_DebugLog("[bay] THOAT: nguoi phat da di chuyen (%d,%d)->(%d,%d) chieu=%d",\r\n'
+     b'\t\t\t\tm_nLauncherSrcPX, m_nLauncherSrcPY, nPX, nPY, m_nSkillId);\r\n'
+     b'#endif\r\n'
+     b'\t\t\treturn false;\r\n'
+     b'\t\t}\r\n',
+     'LOG TAM: PrePareFly thoat vi nguoi phat di chuyen')
+
+edit('Core/Src/KMissle.cpp',
+     b'\t\t\tif (Missle[m_nParentMissleIndex].m_dwLauncherId != m_dwLauncherId)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\treturn false;\r\n'
+     b'\t\t\t}\r\n',
+     b'\t\t\tif (Missle[m_nParentMissleIndex].m_dwLauncherId != m_dwLauncherId)\r\n'
+     b'\t\t\t{\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\t\t\tg_DebugLog("[bay] THOAT: dan cha khac chu (chieu=%d cha=%d)", m_nSkillId, m_nParentMissleIndex);\r\n'
+     b'#endif\r\n'
+     b'\t\t\t\treturn false;\r\n'
+     b'\t\t\t}\r\n',
+     'LOG TAM: PrePareFly thoat vi dan cha khac chu')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
