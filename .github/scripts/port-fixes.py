@@ -566,11 +566,12 @@ edit('Engine/Src/KDrawBase.cpp',
      b'		   duoc mau goc cua sprite. Chinh bang bien moi truong VLTK_SANG\r\n'
      b'		   de do muc dung ma khong phai dich lai. */\r\n'
      b'		static int s_nCuongDo = -1;\r\n'
-     b'		/* Mac dinh ALPHA: do 12/09/2026 ba kieu canh nhau tren cung mot\r\n'
-     b'		   chieu - alpha cho lua CAM DAM sac net (giong ban hoan thien),\r\n'
-     b'		   cong thuan thi bet vang va chay trang, screen thi nhat vi no\r\n'
-     b'		   keo mau ve trang khi nen sang. Doi bang VLTK_TRON=cong|screen. */\r\n'
-     b'		static int s_nKieuTron = 2;\t/* 0 screen, 1 cong, 2 alpha */\r\n'
+     b'		/* Mac dinh CONG: ham nay chi con phuc vu DAN dang bay\r\n'
+     b'		   (KMissleRes khai ALPHA_NOT_BE_LIT tu ban goc) - sprite dan co\r\n'
+     b'		   nen den nen phai cong. Hieu ung PHAT CHIEU bam nguoi da chuyen\r\n'
+     b'		   sang ve kieu ALPHA o KNpcRes, khong di qua day nua.\r\n'
+     b'		   Doi bang VLTK_TRON=screen|alpha khi can do lai. */\r\n'
+     b'		static int s_nKieuTron = 1;\t/* 0 screen, 1 cong, 2 alpha */\r\n'
      b'		if (s_nCuongDo < 0)\r\n'
      b'		{\r\n'
      b'			const char* pszTron = getenv("VLTK_TRON");\r\n'
@@ -722,8 +723,12 @@ edit('Core/Src/KNpcRes.cpp',
      b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n'
      b'\t\tnPos++;\r\n',
      b'\t\tm_cDrawFile[nPos].oPosition.nZ = nScreenZ;\r\n'
-     b'\t\t/* Hieu ung tu phat sang: ve bang phep CONG, khong thi quang den. */\r\n'
-     b'\t\tm_cDrawFile[nPos].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT;\r\n'
+     b'\t\t/* Ve kieu ALPHA (tron theo alpha cua sprite), KHONG phai phep cong:\r\n'
+     b'\t\t   do 12/09/2026 ba kieu canh nhau - alpha cho lua CAM DAM sac net,\r\n'
+     b'\t\t   cong thuan lam loi lua chay trang, screen thi nhat. Nhanh ALPHA\r\n'
+     b'\t\t   cua Represent2 da duoc bat lai (DrawSpriteAlpha) nen khong con\r\n'
+     b'\t\t   quang den nhu truoc. */\r\n'
+     b'\t\tm_cDrawFile[nPos].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\r\n'
      b'\t\tnPos++;\r\n',
      'hieu ung phat chieu bam nguoi ve kieu cong sang (het quang den)')
 
