@@ -494,9 +494,9 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'\t\t\t\t\t\t\t\t/* Alpha 254 la CO do KNpcRes dat: hieu ung phat chieu bam\r\n'
      b'\t\t\t\t\t\t\t\t   nguoi, phai tron kieu ALPHA. Con lai (dan dang bay) thi\r\n'
      b'\t\t\t\t\t\t\t\t   CONG vi sprite dan co nen den. */\r\n'
-     b'\t\t\t\t\t\t\t\tg_nKieuTronSprite = (pTemp->Color.Color_b.a == 254) ? 2 : 1;\r\n'
      b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAdd(nX, nY, pFrame->Width, pFrame->Height,\r\n'
-     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette);\r\n'
+     b'\t\t\t\t\t\t\t\t\tpFrame->Sprite, pPalette,\r\n'
+     b'\t\t\t\t\t\t\t\t\t(pTemp->Color.Color_b.a == 254) ? 2 : 1);\r\n'
      b'\t\t\t\t\t\t\t}\r\n'
      b'\t\t\t\t\t\t\telse\r\n'
      b'\t\t\t\t\t\t\t\tm_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,\r\n'
@@ -685,15 +685,19 @@ edit('Engine/Src/KDrawBase.h',
 
 edit('Engine/Src/KCanvas.h',
      b'\tvoid\t\tDrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite);\r\n',
-     b'\tvoid\t\tDrawSpriteAdd(int nX, int nY, int nWidth, int nHeight, void* lpSprite, void* lpPalette);\r\n'
+     b'\tvoid\t\tDrawSpriteAdd(int nX, int nY, int nWidth, int nHeight, void* lpSprite, void* lpPalette, int nKieu = 1);\r\n'
      b'\tvoid\t\tDrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite);\r\n',
      'KCanvas khai bao DrawSpriteAdd')
 
 edit('Engine/Src/KCanvas.cpp',
      b'void KCanvas::DrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite)\r\n',
      b'void KCanvas::DrawSpriteAdd(int nX, int nY, int nWidth, int nHeight,\r\n'
-     b'\t\t\t\t\t\t\tvoid* lpSprite, void* lpPalette)\r\n'
+     b'\t\t\t\t\t\t\tvoid* lpSprite, void* lpPalette, int nKieu)\r\n'
      b'{\r\n'
+     b'\t/* Kieu tron di qua BIEN trong Engine chu khong phai tham so cua\r\n'
+     b'\t   g_DrawSpriteAdd: Represent2.dll khong link duoc bien cua Engine\r\n'
+     b'\t   (LNK2001), nhung goi HAM thi duoc. */\r\n'
+     b'\tg_nKieuTronSprite = nKieu;\r\n'
      b'\tKDrawNode\tNode;\r\n'
      b'\tNode.m_pPrev = NULL;\r\n'
      b'\tNode.m_pNext = NULL;\r\n'
@@ -5134,10 +5138,6 @@ edit('Core/Src/KMissle.cpp',
      'dan bo qua NPC da chet khi kiem va cham')
 
 # Represent2 can khai bao g_nKieuTronSprite (o Engine/Src/KDrawBase.h).
-edit('Represent/Represent2/KRepresentShell2.cpp',
-     b'#include "KRepresentShell2.h"\r\n',
-     b'#include "KRepresentShell2.h"\r\n#include "../../Engine/src/KDrawBase.h"\r\n',
-     'Represent2 lay khai bao g_nKieuTronSprite')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
