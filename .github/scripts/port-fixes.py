@@ -5060,6 +5060,28 @@ edit('Core/Src/KMissleRes.cpp',
      b'\t\t\t\t}\r\n',
      'LOG TAM: duong thoat theo so khung')
 
+# LOG TAM (11/09): client KHONG he goi CastMissles cho chieu 1073 - 9 lan ra
+# lenh chi thay chieu 53 (don thuong). Hai dong duoi chi ra chieu nao thuc su
+# duoc chon va duoc Cast ben client.
+edit('Core/Src/CoreShell.cpp',
+     b'\t\tnIdx = Npc[nIndex].m_SkillList.FindSame(nSkillID);\r\n'
+     b'\t\tg_DebugLog("[skill]Active");\r\n'
+     b'\t\tNpc[nIndex].SetActiveSkill(nIdx);\r\n',
+     b'\t\tnIdx = Npc[nIndex].m_SkillList.FindSame(nSkillID);\r\n'
+     b'\t\tg_DebugLog("[skill]Active");\r\n'
+     b'\t\tNpc[nIndex].SetActiveSkill(nIdx);\r\n'
+     b'\t\tg_DebugLog("[chon] xin chieu=%d -> o=%d -> ActiveSkillID=%d cap=%d",\r\n'
+     b'\t\t\tnSkillID, nIdx, Npc[nIndex].m_ActiveSkillID,\r\n'
+     b'\t\t\tNpc[nIndex].m_SkillList.GetCurrentLevel(Npc[nIndex].m_ActiveSkillID));\r\n',
+     'LOG TAM: chieu nao duoc chon o client')
+
+edit('Core/Src/KNpc.cpp',
+     b'\t\t\tpSkill->Cast(m_Index, m_DesX, m_DesY);\r\n',
+     b'\t\t\tif (IsPlayer())\r\n'
+     b'\t\t\t\tg_DebugLog("[chon] Cast chieu=%d tai (%d,%d)", pSkill->GetSkillId(), m_DesX, m_DesY);\r\n'
+     b'\t\t\tpSkill->Cast(m_Index, m_DesX, m_DesY);\r\n',
+     'LOG TAM: chieu nao duoc Cast o client')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
