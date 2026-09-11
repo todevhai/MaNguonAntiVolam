@@ -504,6 +504,11 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
 # thanh quang den. Do 08/09/2026: doi sang alpha hang so khong het -> khong
 # phai chon nham ham alpha ma la THIEU HAN phep cong.
 edit('Engine/Src/KDrawBase.cpp',
+     b'#include "KDrawBase.h"\r\n',
+     b'#include "KDrawBase.h"\r\n#include <stdlib.h>\t/* getenv/atoi cho cuong do ve */\r\n',
+     'them stdlib.h cho getenv')
+
+edit('Engine/Src/KDrawBase.cpp',
      b'//---------------------------------------------------------------------------\r\n'
      b'void g_DrawLine(void* node, void* canvas)\r\n',
      b'//---------------------------------------------------------------------------\r\n'
@@ -557,7 +562,18 @@ edit('Engine/Src/KDrawBase.cpp',
      b'		int nDai = pNguon[0];\r\n'
      b'		int nAlpha = pNguon[1];\r\n'
      b'		pNguon += 2;\r\n'
-     b'		int nHeSo = (nAlpha >= 255) ? 32 : (nAlpha >> 3);\r\n'
+     b'		/* Cuong do ve: 32 = cong nguyen ven (chay trang), thap hon thi giu\r\n'
+     b'		   duoc mau goc cua sprite. Chinh bang bien moi truong VLTK_SANG\r\n'
+     b'		   de do muc dung ma khong phai dich lai. */\r\n'
+     b'		static int s_nCuongDo = -1;\r\n'
+     b'		if (s_nCuongDo < 0)\r\n'
+     b'		{\r\n'
+     b'			const char* pszSang = getenv("VLTK_SANG");\r\n'
+     b'			s_nCuongDo = pszSang ? atoi(pszSang) : 18;\r\n'
+     b'			if (s_nCuongDo < 1) s_nCuongDo = 1;\r\n'
+     b'			if (s_nCuongDo > 32) s_nCuongDo = 32;\r\n'
+     b'		}\r\n'
+     b'		int nHeSo = (nAlpha >= 255) ? s_nCuongDo : ((nAlpha >> 3) * s_nCuongDo >> 5);\r\n'
      b'		for (int nI = 0; nI < nDai && nDiem < nTongDiem; nI++, nDiem++)\r\n'
      b'		{\r\n'
      b'			unsigned char byIdx = 0;\r\n'
