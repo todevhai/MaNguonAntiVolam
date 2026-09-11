@@ -5098,6 +5098,12 @@ edit('Core/Src/KMissle.cpp',
      b'\t\t/* DOI HANH VI: bo bam khi muc tieu DA CHET. Truoc day dan van bam\r\n\t\t   xac: vien dau giet con quai, ba vien con lai bay toi roi DUNG IM\r\n\t\t   tai cho do den het doi va va vao xac - "co trung ma khong mat\r\n\t\t   mau". Bo bam thi dan bay tiep va con quet trung con khac. */\r\n\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n\t\t\t|| Npc[m_nFollowNpcIdx].m_Doing == do_death || Npc[m_nFollowNpcIdx].m_CurrentLife <= 0)\r\n\t\t{\r\n\t\t\tm_nFollowNpcIdx = 0;\r\n\t\t}\r\n',
      'dan bo bam muc tieu da chet')
 
+# DOI HANH VI: dan bay xuyen qua XAC, khong no vao NPC da chet.
+edit('Core/Src/KMissle.cpp',
+     b'\t\tif (nNpcIdx > 0)\r\n\t\t{ \r\n\t\t\tif (m_nDamageRange == 1)',
+     b'\t\t/* DOI HANH VI: bo qua NPC DA CHET. Bon vien dan cua mot chieu bay sat\r\n\t\t   nhau: vien dau giet con quai, cac vien sau van "va" vao xac trong\r\n\t\t   cung nhip va no ngay do - nguoi choi thay quai chet TRUOC khi chieu\r\n\t\t   bay toi. Cho dan bay xuyen qua xac de con quet trung con dang song. */\r\n\t\tif (nNpcIdx > 0 && (Npc[nNpcIdx].m_Doing == do_death || Npc[nNpcIdx].m_CurrentLife <= 0))\r\n\t\t\tnNpcIdx = 0;\r\n\t\tif (nNpcIdx > 0)\r\n\t\t{ \r\n\t\t\tif (m_nDamageRange == 1)',
+     'dan bo qua NPC da chet khi kiem va cham')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
