@@ -5226,6 +5226,33 @@ edit('Core/Src/KMissle.cpp',
      b'\t\t\t}\r\n',
      'LOG TAM: PrePareFly thoat vi dan cha khac chu')
 
+# LOG TAM: dan chieu 150 chuyen sang MS_DoFly roi bien mat NGAY nhip sau.
+# Nghi KMissle::TestBarrier - o client KSubWorld::TestBarrier rot xuong
+# Region::GetBarrier, ham do tra DO CAO dia hinh chu khong phai loai vat can
+# (bay da ghi trong docs/06 khi lam A*). In thang gia tri ra.
+edit('Core/Src/KMissle.h',
+     b'\tinline BOOL TestBarrier()\r\n'
+     b'\t{\r\n'
+     b'\t\tint nBarrierKind = SubWorld[m_nSubWorldId].TestBarrier(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, 0, 0);\r\n'
+     b'\t\tif (nBarrierKind == Obstacle_Normal || nBarrierKind == Obstacle_Jump)\r\n',
+     b'\tinline BOOL TestBarrier()\r\n'
+     b'\t{\r\n'
+     b'\t\tint nBarrierKind = SubWorld[m_nSubWorldId].TestBarrier(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, 0, 0);\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tstatic int s_nLogCan = 0;\r\n'
+     b'\t\t\tif (s_nLogCan < 40 && m_nSkillId > 53)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\ts_nLogCan++;\r\n'
+     b'\t\t\t\tg_DebugLog("[can] dan id=%d chieu=%d vat-can=%d o=(%d,%d) lech=(%d,%d)",\r\n'
+     b'\t\t\t\t\tm_nMissleId, m_nSkillId, nBarrierKind, m_nCurrentMapX, m_nCurrentMapY,\r\n'
+     b'\t\t\t\t\tm_nXOffset, m_nYOffset);\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t}\r\n'
+     b'#endif\r\n'
+     b'\t\tif (nBarrierKind == Obstacle_Normal || nBarrierKind == Obstacle_Jump)\r\n',
+     'LOG TAM: gia tri vat can ma dan doc duoc')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
