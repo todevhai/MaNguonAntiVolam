@@ -571,7 +571,10 @@ void KMissle::OnFly()
 			SubWorld[m_nSubWorldId].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nSrcMpsX, &nSrcMpsY);
 			SubWorld[m_nSubWorldId].Map2Mps(Npc[m_nFollowNpcIdx].m_RegionIndex, Npc[m_nFollowNpcIdx].m_MapX, Npc[m_nFollowNpcIdx].m_MapY, Npc[m_nFollowNpcIdx].m_OffX, Npc[m_nFollowNpcIdx].m_OffY, &nDesMpsX, &nDesMpsY);
 			nDistance = SubWorld[m_nSubWorldId].GetDistance(nSrcMpsX, nSrcMpsY, nDesMpsX, nDesMpsY);
-			int nXFactor = ((nDesMpsX - nSrcMpsY ) <<10) / nDistance;
+			/* nSrcMpsY -> nSrcMpsX: ban goc tinh huong X tu hieu cua hai truc khac
+			   nhau nen dan bam muc tieu bay lech, khong cham dich. Sua giong ben
+			   may chu (Core/KMissle.cpp). */
+			int nXFactor = ((nDesMpsX - nSrcMpsX ) <<10) / nDistance;
 			int nYFactor = ((nDesMpsY - nSrcMpsY ) <<10) / nDistance;
 			int dx				= nXFactor * m_nSpeed;
 			int dy				= nYFactor * m_nSpeed;	

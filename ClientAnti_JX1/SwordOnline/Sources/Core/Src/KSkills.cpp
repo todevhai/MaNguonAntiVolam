@@ -661,6 +661,10 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					if (nDir >= MaxMissleDir) nDir -= MaxMissleDir;
 					SkillParam.nLauncher = nLauncher;
 					SkillParam.eLauncherType = eLauncherType;
+					/* Nhanh hinh TUONG la nhanh duy nhat quen gan nTargetId ->
+					   dan bam muc tieu (MoveKind 5) theo Npc[0] nen bay lac va
+					   khong va vao ai. Sua giong ben may chu (Core/KSkills.cpp). */
+					SkillParam.nTargetId = nTargetId;
 					
 					CastWall(&SkillParam , nDir, nDesPX, nDesPY);
 				}	break;
