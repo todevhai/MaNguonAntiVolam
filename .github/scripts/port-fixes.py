@@ -5082,6 +5082,82 @@ edit('Core/Src/KNpc.cpp',
      b'\t\t\tpSkill->Cast(m_Index, m_DesX, m_DesY);\r\n',
      'LOG TAM: chieu nao duoc Cast o client')
 
+# LOG TAM (11/09 vong 3): client CHON dung chieu 1073 (o=18 cap=27) nhung
+# khong bao gio toi pSkill->Cast trong OnSkill. Bit ba cua cua DoSkill va
+# duong vao/thoat cua OnSkill de biet no dung o dau.
+edit('Core/Src/KNpc.cpp',
+     b'\tISkill * pSkill = GetActiveSkill();\r\n'
+     b'\tif(pSkill)\r\n'
+     b'\t{\r\n'
+     b'\t\teSkillStyle eStyle = (eSkillStyle)pSkill->GetSkillStyle();\r\n',
+     b'\tISkill * pSkill = GetActiveSkill();\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\tif (IsPlayer())\r\n'
+     b'\t\tg_DebugLog("[cua] DoSkill chieu=%d co-chieu=%d (%d,%d)",\r\n'
+     b'\t\t\tm_ActiveSkillID, pSkill ? 1 : 0, nX, nY);\r\n'
+     b'#endif\r\n'
+     b'\tif(pSkill)\r\n'
+     b'\t{\r\n'
+     b'\t\teSkillStyle eStyle = (eSkillStyle)pSkill->GetSkillStyle();\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\tif (IsPlayer())\r\n'
+     b'\t\t\tg_DebugLog("[cua] kieu=%d CanCast=%d CanCastSkill=%d du-suc=%d",\r\n'
+     b'\t\t\t\t(int)eStyle,\r\n'
+     b'\t\t\t\tm_SkillList.CanCast(m_ActiveSkillID, SubWorld[m_SubWorldIndex].m_dwCurrentTime) ? 1 : 0,\r\n'
+     b'\t\t\t\tpSkill->CanCastSkill(m_Index, nX, nY) ? 1 : 0,\r\n'
+     b'\t\t\t\t(m_Kind != kind_player) ? 2 : 3);\r\n'
+     b'#endif\r\n',
+     'LOG TAM: ba cua cua DoSkill')
+
+edit('Core/Src/KNpc.cpp',
+     b'\t\telse\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tm_nPeopleIdx = 0;\r\n'
+     b'\t\t\tm_nObjectIdx = 0;\r\n'
+     b'\t\t\tDoStand();\r\n'
+     b'\t\t}\r\n',
+     b'\t\telse\r\n'
+     b'\t\t{\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\t\t\tif (IsPlayer())\r\n'
+     b'\t\t\t\tg_DebugLog("[cua] DoSkill BI CHAN -> DoStand (chieu=%d)", m_ActiveSkillID);\r\n'
+     b'#endif\r\n'
+     b'\t\t\tm_nPeopleIdx = 0;\r\n'
+     b'\t\t\tm_nObjectIdx = 0;\r\n'
+     b'\t\t\tDoStand();\r\n'
+     b'\t\t}\r\n',
+     'LOG TAM: DoSkill bi chan')
+
+edit('Core/Src/KNpc.cpp',
+     b'void KNpc::OnSkill()\r\n'
+     b'{\r\n'
+     b'\tKSkill * pSkill = NULL;\r\n'
+     b'\tif (WaitForFrame() &&m_Frames.nTotalFrame != 0)\r\n'
+     b'\t{\r\n'
+     b'\t\tDoStand();\r\n'
+     b'\t\tm_ProcessAI = 1;\t\r\n'
+     b'\t}\r\n'
+     b'\telse if (IsReachFrame(ATTACKACTION_EFFECT_PERCENT))\r\n'
+     b'\t{\r\n',
+     b'void KNpc::OnSkill()\r\n'
+     b'{\r\n'
+     b'\tKSkill * pSkill = NULL;\r\n'
+     b'#ifndef _SERVER\r\n'
+     b'\tif (IsPlayer() && m_ActiveSkillID > 53)\r\n'
+     b'\t\tg_DebugLog("[cua] OnSkill chieu=%d lam=%d khung=%d/%d cho=%d toi=%d des=(%d,%d)",\r\n'
+     b'\t\t\tm_ActiveSkillID, (int)m_Doing, m_Frames.nCurrentFrame, m_Frames.nTotalFrame,\r\n'
+     b'\t\t\tWaitForFrame() ? 1 : 0, IsReachFrame(ATTACKACTION_EFFECT_PERCENT) ? 1 : 0,\r\n'
+     b'\t\t\tm_DesX, m_DesY);\r\n'
+     b'#endif\r\n'
+     b'\tif (WaitForFrame() &&m_Frames.nTotalFrame != 0)\r\n'
+     b'\t{\r\n'
+     b'\t\tDoStand();\r\n'
+     b'\t\tm_ProcessAI = 1;\t\r\n'
+     b'\t}\r\n'
+     b'\telse if (IsReachFrame(ATTACKACTION_EFFECT_PERCENT))\r\n'
+     b'\t{\r\n',
+     'LOG TAM: vao OnSkill')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
