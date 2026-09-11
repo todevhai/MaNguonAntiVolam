@@ -120,6 +120,19 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] danh quai gan nhat, chieu %d", nChieu);
 		}
 	}
+	/* Phat mot chieu LEN CHINH MINH: "chieu <ma>". Khac "danh <ma>" o cho
+	   khong can con quai nao - chieu buff (TargetSelf) khong co muc tieu, ma
+	   "danh" thi luon phai tim quai truoc de tinh toa do. */
+	else if (!strcmp(szCmd, "chieu"))
+	{
+		int nChieu = 0;
+		sscanf(szLine, "%*s %d", &nChieu);
+		if (g_pCoreShell && nChieu > 0)
+		{
+			g_pCoreShell->OperationRequest(GOI_PHAT_CHIEU_LEN_MINH, 0, nChieu);
+			g_DebugLog("[AUTO] chieu %d len chinh minh", nChieu);
+		}
+	}
 	else if (!strcmp(szCmd, "ride"))
 	{
 		// Dung hanh dong cua phim M: Switch([[horse]]) -> PA_RIDE. Server quyet

@@ -528,6 +528,14 @@ enum GAMEOPERATION_INDEX
 	// lech vai diem la thanh lenh DI chu khong phai danh. Trong Core thi chi so
 	// npc co san nen khoa muc tieu thang, khong qua toa do nao ca.
 	GOI_DANH_QUAI_GAN_NHAT,
+
+	// Phat mot chieu LEN CHINH MINH, khong can muc tieu. nParam = ma chieu.
+	// GOI_DANH_QUAI_GAN_NHAT luon phai co mot con quai de tinh toa do khung
+	// nhin, nen khong thu duoc chieu buff (TargetSelf) khi xung quanh sach
+	// quai. Day lay thang toa do cua ban than.
+	// Dat o GIUA enum chu khong phai cuoi: cuoi enum la moc neo cua hai ban
+	// va trong port-fixes.py.
+	GOI_PHAT_CHIEU_LEN_MINH,
 	//uParam = (KUiGameObject*)pSKill, 技能信息
 	//nParam = 立即位置，0表示为左键技能，1表示为右键技能
 

@@ -2659,6 +2659,39 @@ case GOI_AUTO_COMMAND:
 			UseSkill(nVx, nVy, nChieu);	/* dung duong ma cu bam chuot di qua */
 		}
 		break;
+	case GOI_PHAT_CHIEU_LEN_MINH:
+		{
+			/* Phat chieu len CHINH MINH. Chieu buff (TargetSelf) khong can muc
+			   tieu, nhung UseSkill nhan toa do KHUNG NHIN nen phai doi vi tri
+			   ban than sang he do - nghich dao ViewPortCoordToSpaceCoord bang
+			   hai mau, y nhu GOI_DANH_QUAI_GAN_NHAT lam.
+			   Con IsCanInput(): dang danh/chay thi UseSkill thoat ngay o dong
+			   dau va chi de lai mot dong "[skill]return" - nen bao ro ra day
+			   thay vi de nguoi do ngoi doan. */
+			int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+			if (nMinh <= 0 || nParam <= 0)
+				break;
+			if (!Npc[nMinh].IsCanInput())
+			{
+				g_DebugLog("[chieu] dang ban (IsCanInput false), chua phat duoc");
+				break;
+			}
+			int nAx = 0, nAy = 0, nAz = 0;
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nAx, nAy, nAz);
+			int nBx = 100, nBy = 100, nBz = 0;
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nBx, nBy, nBz);
+			int nHeSoX = nBx - nAx, nHeSoY = nBy - nAy;
+			if (nHeSoX == 0 || nHeSoY == 0)
+				break;
+			int nTx, nTy;
+			Npc[nMinh].GetMpsPos(&nTx, &nTy);
+			int nVx = (nTx - nAx) * 100 / nHeSoX;
+			int nVy = (nTy - nAy) * 100 / nHeSoY;
+			g_DebugLog("[chieu] phat chieu %d len chinh minh, khung-nhin %d,%d",
+				nParam, nVx, nVy);
+			UseSkill(nVx, nVy, nParam);
+		}
+		break;
 	case GOI_SET_IMMDIA_SKILL:
 		if (uParam)
 		{
