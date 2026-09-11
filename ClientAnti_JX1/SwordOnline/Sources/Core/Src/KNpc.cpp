@@ -2111,6 +2111,12 @@ int KNpc::DoOrdinSkill(KSkill * pSkill, int nX, int nY)
 			m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + m_CurrentAttackSpeed);
 		
 #ifndef _SERVER
+		/* Nhip ve mot don danh cua CHINH MINH. Day la cho duy nhat thay duoc
+		   buff toc do danh cua chieu tran phai co toi client hay khong - may
+		   chu gui qua PLAYER_SYNC.AttackSpeed, xem KProtocolProcess::SyncPlayer. */
+		if (IsPlayer())
+			g_DebugLog("[tocdanh]khung-goc=%d toc=%d -> khung-that=%d",
+				m_AttackFrame, m_CurrentAttackSpeed, m_Frames.nTotalFrame);
 		if (g_Random(3))
 			m_ClientDoing = cdo_attack;
 		else 
