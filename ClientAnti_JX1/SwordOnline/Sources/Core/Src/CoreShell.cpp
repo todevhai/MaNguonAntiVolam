@@ -2656,7 +2656,20 @@ case GOI_AUTO_COMMAND:
 			int nChieu = nParam > 0 ? nParam : Npc[nMinh].GetCurActiveWeaponSkill();
 			g_DebugLog("[danh-quai] npc %d (%s) chieu %d khung-nhin %d,%d",
 				nGan, Npc[nGan].Name, nChieu, nVx, nVy);
-			UseSkill(nVx, nVy, nChieu);	/* dung duong ma cu bam chuot di qua */
+			/* KHOA MUC TIEU thang, khong di qua toa do khung nhin. Duong cu goi
+			   UseSkill(nVx, nVy) roi de no tu do nguoc ra con quai; nhung phep
+			   doi toa do o day tra ve goc 0 khi khung nhin chua san sang, nen
+			   FindSelectNpc khong tim ra ai: client phat chieu theo TOA DO rac
+			   trong khi may chu nhan (-1, index). Hai nua chay hai muc tieu
+			   khac nhau - moi phep do duong dan deu sai. Day la doan UseSkill
+			   vao nhanh "co muc tieu", chep nguyen. */
+			if (!Npc[nMinh].IsCanInput())
+				break;
+			Npc[nMinh].SetActiveSkill(Npc[nMinh].m_SkillList.FindSame(nChieu));
+			if (Npc[nMinh].m_ActiveSkillID <= 0)
+				break;
+			Npc[nMinh].SendCommand(do_skill, Npc[nMinh].m_ActiveSkillID, -1, nGan);
+			SendClientCmdSkill(Npc[nMinh].m_ActiveSkillID, -1, Npc[nGan].m_dwID);
 		}
 		break;
 	case GOI_PHAT_CHIEU_LEN_MINH:
