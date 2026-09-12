@@ -1061,6 +1061,53 @@ edit('Core/Src/CoreShell.cpp',
      'danh quai: uu tien con trong khung nhin')
 
 
+# LOG TAM (VLTK_LOG_DAN=1): vong ve DANH SACH HIEU UNG NO nam o CUOI
+# KMissleRes::Draw, ma nhanh MS_DoFly cua ham do co HAI lenh return FALSE som.
+# Roi vao mot trong hai duong thoat ay thi hieu ung no da tao van khong bao gio
+# duoc ve. Ba dong duoi phan biet: co vao ham khong / thoat o dau / co goi Draw
+# cua hieu ung khong.
+edit('Core/Src/KMissleRes.cpp',
+     b'#include "KCore.h"\r\n',
+     b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
+     'them stdlib.h cho log hieu ung no')
+
+edit('Core/Src/KMissleRes.cpp',
+     b'\t\tif (nCurLifeFrame < 0 || (nAllFrame != 0 && nAllFrame < nCurLifeFrame)) return FALSE;\r\n',
+     b'\t\tif (nCurLifeFrame < 0 || (nAllFrame != 0 && nAllFrame < nCurLifeFrame))\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tif (getenv("VLTK_LOG_DAN") && m_SkillSpecialList.GetHead())\r\n'
+     b'\t\t\t\tg_DebugLog("[ve-no] THOAT SOM (doi=%d/%d) - bo qua danh sach hieu ung",\r\n'
+     b'\t\t\t\t\tnCurLifeFrame, nAllFrame);\r\n'
+     b'\t\t\treturn FALSE;\r\n'
+     b'\t\t}\r\n',
+     'log duong thoat som thu nhat cua KMissleRes::Draw')
+
+edit('Core/Src/KMissleRes.cpp',
+     b'\t\t\t\tif (nFrame > (nTotalFrame - 1)) \r\n'
+     b'\t\t\t\t\treturn FALSE;\r\n',
+     b'\t\t\t\tif (nFrame > (nTotalFrame - 1))\r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tif (getenv("VLTK_LOG_DAN") && m_SkillSpecialList.GetHead())\r\n'
+     b'\t\t\t\t\t\tg_DebugLog("[ve-no] THOAT SOM (khung %d > %d) - bo qua danh sach hieu ung",\r\n'
+     b'\t\t\t\t\t\t\tnFrame, nTotalFrame - 1);\r\n'
+     b'\t\t\t\t\treturn FALSE;\r\n'
+     b'\t\t\t\t}\r\n',
+     'log duong thoat som thu hai cua KMissleRes::Draw')
+
+edit('Core/Src/KMissleRes.cpp',
+     b'\t\t\t\tpNode->m_pSkillSpecial->Draw(dwCurrentTime);\r\n',
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tif (getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t\t\t\t\tg_DebugLog("[ve-no] VE hieu ung %s khung %d tai (%d,%d)",\r\n'
+     b'\t\t\t\t\t\tpNode->m_pSkillSpecial->m_RUImage.szImage,\r\n'
+     b'\t\t\t\t\t\t(int)pNode->m_pSkillSpecial->m_RUImage.nFrame,\r\n'
+     b'\t\t\t\t\t\t(int)pNode->m_pSkillSpecial->m_nPX,\r\n'
+     b'\t\t\t\t\t\t(int)pNode->m_pSkillSpecial->m_nPY);\r\n'
+     b'\t\t\t\tpNode->m_pSkillSpecial->Draw(dwCurrentTime);\r\n'
+     b'\t\t\t}\r\n',
+     'log moi lan ve mot hieu ung no')
+
+
 edit('Core/Src/KNpcResNode.cpp',
      b'\t\tif (strcmp(szBuffer, "\xcd\xb7\xb6\xa5") == 0)\r\n'
      b'\t\t\tm_nType[i] = STATE_MAGIC_HEAD;\r\n'
