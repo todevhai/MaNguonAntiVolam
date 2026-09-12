@@ -870,6 +870,108 @@ edit('Represent/iRepresent/Font/KFont2.cpp',
      'chu luon ve co vien den')
 
 
+# DOI HANH VI: cai that nut "Do sang" trong bang Tuy chon.
+#
+# Duong day da co san tu giao dien toi bo ve: UiOptions -> OPTION_BRIGHTNESS ->
+# KOption::SetGamma -> g_pRepresent->SetGamma. Nhung o bo ve PHAN MEM thi
+# KRepresentShell2::SetGamma la THAN RONG (KRepresentShell2.h) - keo thanh truot
+# la goi vao khoang khong. Represent3 (DirectX) moi cai that.
+# Ban hoan thien cung the: quet engine.dll/represent2.dll cua ho khong co mot ky
+# hieu gamma nao. Ta co nguon nen lam duoc: dung bang tra 32/64 muc roi ap mot
+# luot len canvas truoc khi do ra man hinh.
+edit('Represent/Represent2/KRepresentShell2.h',
+     b'\tvirtual void SetGamma(int nGamma){}\r\n',
+     b'\tvirtual void SetGamma(int nGamma);\t/* cai that o .cpp */\r\n',
+     'SetGamma khong con than rong')
+
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'//##ModelId=3DD20C450066\r\n'
+     b'void KRepresentShell2::RepresentEnd()\r\n'
+     b'{\r\n'
+     b'\tm_Canvas.Changed(true);\r\n'
+     b'\tm_Canvas.UpdateScreen();\r\n'
+     b'}\r\n',
+     b'/* ---- Nut "Do sang" (gamma) cho bo ve phan mem ----\r\n'
+     b'   nGamma 0..100, 50 = nguyen ven (UiOptions.cpp dat mac dinh 50).\r\n'
+     b'   Duoi 50 toi dan, tren 50 sang dan. Giu o bien tinh de khong doi bo cuc\r\n'
+     b'   lop (khoi phai va them ham dung). */\r\n'
+     b'static int s_nDoSang = 50;\r\n'
+     b'static unsigned short s_wBang5[32];\r\n'
+     b'static unsigned short s_wBang6[64];\r\n'
+     b'\r\n'
+     b'void KRepresentShell2::SetGamma(int nGamma)\r\n'
+     b'{\r\n'
+     b'\tif (nGamma < 0) nGamma = 0;\r\n'
+     b'\tif (nGamma > 100) nGamma = 100;\r\n'
+     b'\ts_nDoSang = nGamma;\r\n'
+     b'\t/* so mu: 2.2 (toi nhat) -> 1.0 (nguyen ven) -> 0.45 (sang nhat) */\r\n'
+     b'\tdouble fMu = (nGamma <= 50) ? (1.0 + (50 - nGamma) * (1.2 / 50.0))\r\n'
+     b'\t\t\t\t\t\t\t\t: (1.0 - (nGamma - 50) * (0.55 / 50.0));\r\n'
+     b'\tint i;\r\n'
+     b'\tfor (i = 0; i < 32; i++)\r\n'
+     b'\t{\r\n'
+     b'\t\tint v = (int)(pow((double)i / 31.0, fMu) * 31.0 + 0.5);\r\n'
+     b'\t\ts_wBang5[i] = (unsigned short)(v < 0 ? 0 : (v > 31 ? 31 : v));\r\n'
+     b'\t}\r\n'
+     b'\tfor (i = 0; i < 64; i++)\r\n'
+     b'\t{\r\n'
+     b'\t\tint v = (int)(pow((double)i / 63.0, fMu) * 63.0 + 0.5);\r\n'
+     b'\t\ts_wBang6[i] = (unsigned short)(v < 0 ? 0 : (v > 63 ? 63 : v));\r\n'
+     b'\t}\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'static void g_ApDoSang(KCanvas& Canvas)\r\n'
+     b'{\r\n'
+     b'\tif (s_nDoSang == 50) return;\t/* nguyen ven thi khong quet lam gi */\r\n'
+     b'\tint nPitch = 0;\r\n'
+     b'\tvoid* pDau = Canvas.LockCanvas(nPitch);\r\n'
+     b'\tif (pDau == NULL) return;\r\n'
+     b'\tint bLa565 = (Canvas.m_nMask32 == 0x07e0f81f);\r\n'
+     b'\tint nRong = Canvas.GetWidth();\r\n'
+     b'\tint nCao = Canvas.GetHeight();\r\n'
+     b'\tfor (int y = 0; y < nCao; y++)\r\n'
+     b'\t{\r\n'
+     b'\t\tunsigned short* d = (unsigned short*)((char*)pDau + y * nPitch);\r\n'
+     b'\t\tfor (int x = 0; x < nRong; x++)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tunsigned short w = d[x];\r\n'
+     b'\t\t\tif (bLa565)\r\n'
+     b'\t\t\t\td[x] = (unsigned short)((s_wBang5[(w >> 11) & 31] << 11)\r\n'
+     b'\t\t\t\t\t| (s_wBang6[(w >> 5) & 63] << 5) | s_wBang5[w & 31]);\r\n'
+     b'\t\t\telse\r\n'
+     b'\t\t\t\td[x] = (unsigned short)((s_wBang5[(w >> 10) & 31] << 10)\r\n'
+     b'\t\t\t\t\t| (s_wBang5[(w >> 5) & 31] << 5) | s_wBang5[w & 31]);\r\n'
+     b'\t\t}\r\n'
+     b'\t}\r\n'
+     b'\tCanvas.UnlockCanvas();\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'//##ModelId=3DD20C450066\r\n'
+     b'void KRepresentShell2::RepresentEnd()\r\n'
+     b'{\r\n'
+     b'\tg_ApDoSang(m_Canvas);\r\n'
+     b'\tm_Canvas.Changed(true);\r\n'
+     b'\tm_Canvas.UpdateScreen();\r\n'
+     b'}\r\n',
+     'cai that SetGamma cho bo ve phan mem')
+
+edit('Represent/Represent2/KRepresentShell2.cpp',
+     b'#include "KRepresentShell2.h"\r\n',
+     b'#include "KRepresentShell2.h"\r\n#include <math.h>\t/* pow() cho bang gamma */\r\n',
+     'them math.h cho bang gamma')
+
+# Giao dien chi gui do sang khi dung bo ve DirectX (g_bRepresent3) - nen bam OK
+# xong thi bo ve phan mem khong nhan duoc gia tri. Gui cho ca hai.
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'\t\t\tg_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, nBrightness);\r\n'
+     b'\t\t}\r\n',
+     b'\t\t}\r\n'
+     b'\t\t/* Do sang gui cho CA HAI bo ve: truoc day nam trong nhanh\r\n'
+     b'\t\t   g_bRepresent3 nen bo ve phan mem khong bao gio nhan duoc. */\r\n'
+     b'\t\tg_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, nBrightness);\r\n',
+     'gui do sang cho ca bo ve phan mem')
+
+
 edit('Core/Src/KNpcResNode.cpp',
      b'\t\tif (strcmp(szBuffer, "\xcd\xb7\xb6\xa5") == 0)\r\n'
      b'\t\t\tm_nType[i] = STATE_MAGIC_HEAD;\r\n'
