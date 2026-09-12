@@ -614,7 +614,7 @@ edit('Engine/Src/KDrawBase.cpp',
      b'		/* 40 voi kieu THEOSANG (mac dinh): user chon 12/09/2026 de keo mau chieu 8x\r\n'
      b'		   len, chap nhan chieu 15x dam hon. An toan vi nhanh theosang tron kieu\r\n'
      b'		   SCREEN va do duc bi kep o 31, tuc khong bao gio vuot mau goc -> khong\r\n'
-     b'		   chay trang. (Khac han kieu 'ban6': o do nhan thang nguon nen 40 lam loi\r\n'
+     b'		   chay trang. (Khac han kieu "ban6": o do nhan thang nguon nen 40 lam loi\r\n'
      b'		   hieu ung bet trang - da thu va bo.) */\r\n'
      b'		static int s_nSangDan = 40, s_nSangHU = 40;\r\n'
      b'		static int s_nEpDan = -1, s_nEpHU = -1;\r\n'
