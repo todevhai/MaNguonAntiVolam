@@ -5320,10 +5320,10 @@ edit('Core/Src/KMissle.cpp',
      b'\t\tif (nNpcIdx > 0)\r\n'
      b'\t\t{ \r\n'
      b'\t\t\tif (m_nDamageRange == 1)',
-     b'\t\tif (nNpcIdx > 0 && getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t\t\tg_DebugLog("[va-c] dan=%d chieu=%d o=(%d,%d) npc=%d tam-sat=%d doi=%d/%d",\r\n'
-     b'\t\t\t\t(int)(this - Missle), (int)m_nSkillId, nColMapX, nColMapY, nNpcIdx,\r\n'
-     b'\t\t\t\t(int)m_nDamageRange, (int)m_nCurrentLife, (int)m_nLifeTime);\r\n'
+     b'\t\tif (getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t\t\tg_DebugLog("[va-c] dan=%d chieu=%d vung=%d o=(%d,%d) cao=%d quan-he=%d nguoi-phat=%d -> npc=%d",\r\n'
+     b'\t\t\t\t(int)(this - Missle), (int)m_nSkillId, nColRegion, nColMapX, nColMapY,\r\n'
+     b'\t\t\t\t(int)m_nCurrentMapZ, (int)m_eRelation, (int)m_nLauncher, nNpcIdx);\r\n'
      b'\t\tif (nNpcIdx > 0)\r\n'
      b'\t\t{ \r\n'
      b'\t\t\tif (m_nDamageRange == 1)',
