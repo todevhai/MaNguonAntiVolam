@@ -5312,6 +5312,33 @@ edit('Core/Src/KSkills.cpp',
      b'\t\t\t(int)m_nId, (int)m_eMisslesForm, (int)m_nChildSkillNum, nParam1, nParam2, nLauncher);\r\n',
      'log tham so phat chieu ben client')
 
+# LOG TAM (VLTK_LOG_DAN=1): hieu ung NO khi dan dung quai. Dan 363 (chieu 15x noi
+# cong) co AnimFile4 = mag_tr_bz1_bao-no, nhung log duong bay cho thay no bay het
+# doi roi tat - tuc CheckCollision khong bao gio thay NPC. Hai dong duoi phan biet
+# ba kha nang: khong tim thay NPC / tim thay ma thieu hinh / tao duoc hieu ung.
+edit('Core/Src/KMissle.cpp',
+     b'\t\tif (nNpcIdx > 0)\r\n'
+     b'\t\t{ \r\n'
+     b'\t\t\tif (m_nDamageRange == 1)',
+     b'\t\tif (nNpcIdx > 0 && getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t\t\tg_DebugLog("[va-c] dan=%d chieu=%d o=(%d,%d) npc=%d tam-sat=%d doi=%d/%d",\r\n'
+     b'\t\t\t\t(int)(this - Missle), (int)m_nSkillId, nColMapX, nColMapY, nNpcIdx,\r\n'
+     b'\t\t\t\t(int)m_nDamageRange, (int)m_nCurrentLife, (int)m_nLifeTime);\r\n'
+     b'\t\tif (nNpcIdx > 0)\r\n'
+     b'\t\t{ \r\n'
+     b'\t\t\tif (m_nDamageRange == 1)',
+     'log dan cham NPC ben client')
+
+edit('Core/Src/KMissle.cpp',
+     b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
+     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t\tg_DebugLog("[no-c] dan=%d chieu=%d trang-thai=%d npc=%d hinh=%s",\r\n'
+     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, (int)eStatus, nNpcIndex,\r\n'
+     b'\t\t\tm_MissleRes.m_MissleRes[eStatus].AnimFileName[0] ? m_MissleRes.m_MissleRes[eStatus].AnimFileName : "(THIEU)");\r\n'
+     b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
+     'log tao hieu ung no ben client')
+
+
 edit('Core/Src/KSkills.cpp',
      b'#include "KCore.h"\r\n',
      b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
