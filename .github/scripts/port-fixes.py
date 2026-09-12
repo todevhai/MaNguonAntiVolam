@@ -5320,6 +5320,26 @@ edit('Core/Src/KSkills.cpp',
      b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
      'them stdlib.h cho log chieu')
 
+
+# DOI HANH VI: ghi luon ID cua muc tieu o MOI ham sinh dan. Chi CastWall lam
+# viec nay; cac ham con lai bo qua nen m_dwFollowNpcID = 0. May chu dung ID do
+# de kiem muc tieu con song (IsMatch) va bo bam ngay nhip dau - may chu cho dan
+# bay thang trong khi client van duoi theo quai: hinh mot dang sat thuong mot
+# neo. Dinh chieu 15x ngoai cong (1074, di CastLine).
+edit_all('Core/Src/KSkills.cpp',
+     b'Missle[nMissleIndex].m_nFollowNpcIdx\t= pSkillParam->nTargetId;\r\n',
+     b'Missle[nMissleIndex].m_nFollowNpcIdx\t= pSkillParam->nTargetId;\r\n'
+     b'\t\t\tMissle[nMissleIndex].m_dwFollowNpcID\t= (pSkillParam->nTargetId > 0)\r\n'
+     b'\t\t\t\t? Npc[pSkillParam->nTargetId].m_dwID : 0;\r\n',
+     'ghi ID muc tieu o moi ham sinh dan')
+
+# Cho client dung CUNG phep kiem muc tieu nhu may chu.
+edit('Core/Src/KMissle.cpp',
+     b'\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n',
+     b'\t\tif (!Npc[m_nFollowNpcIdx].IsMatch(m_dwFollowNpcID)\r\n'
+     b'\t\t\t|| Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n',
+     'client kiem muc tieu bang ID nhu may chu')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
