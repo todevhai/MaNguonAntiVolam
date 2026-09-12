@@ -5184,6 +5184,102 @@ edit('Core/Src/KMissle.cpp',
 
 # Represent2 can khai bao g_nKieuTronSprite (o Engine/Src/KDrawBase.h).
 
+
+# DOI HANH VI: g_GetDirIndex tra -1 khi nguon TRUNG dich (quai dung sat nguoi).
+# Khi do g_DirCos/g_DirSin phia sau doc NGOAI mang: dan sinh ra voi huong -1 va
+# he so huong rac - co vien dung im tai cho, co vien bay tu phia. Dinh chieu 15x
+# ngoai cong (1074 Bong Huynh Luoc Dia). Lay huong nhan vat lam phuong an du phong.
+edit('Core/Src/KSkills.cpp',
+     b'inline int\tKSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , int *npPX, int *npPY, eSkillLauncherType eLauncherType)  const \r\n',
+     b'static int TinhHuongDan(int nLauncher, int nSrcPX, int nSrcPY, int nDesPX, int nDesPY)\r\n'
+     b'{\r\n'
+     b'\tint nDirIndex = g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);\r\n'
+     b'\tif (nDirIndex < 0)\r\n'
+     b'\t\tnDirIndex = g_Dir2DirIndex(Npc[nLauncher].m_Dir, MaxMissleDir);\r\n'
+     b'\tif (nDirIndex < 0 || nDirIndex >= MaxMissleDir)\r\n'
+     b'\t\tnDirIndex = 0;\r\n'
+     b'\treturn nDirIndex;\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'inline int\tKSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , int *npPX, int *npPY, eSkillLauncherType eLauncherType)  const \r\n',
+     'them ham chan huong -1')
+
+edit_all('Core/Src/KSkills.cpp',
+     b'g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);\r\n',
+     b'TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);\r\n',
+     'chan huong -1 o moi cho sinh dan')
+
+# DOI HANH VI: dat he so huong cho MOI loai dan (giong CastWall). Dan bam muc
+# tieu khong nam trong hai loai cu nen hai he so giu nguyen RAC: vien dung im
+# tai cho, vien bay tu phia khi mat muc tieu.
+edit_all('Core/Src/KSkills.cpp',
+     b'\t\t\tif (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line || Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(nDir, MaxMissleDir);\r\n'
+     b'\t\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(nDir, MaxMissleDir);\r\n'
+     b'\t\t\t}\r\n',
+     b'\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(nDir, MaxMissleDir);\r\n'
+     b'\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(nDir, MaxMissleDir);\r\n',
+     'he so huong cho moi loai dan (nDir)')
+
+edit_all('Core/Src/KSkills.cpp',
+     b'\t\t\tif (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line || Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(nCurSubDir, MaxMissleDir);\r\n'
+     b'\t\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(nCurSubDir, MaxMissleDir);\r\n'
+     b'\t\t\t}\r\n',
+     b'\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(nCurSubDir, MaxMissleDir);\r\n'
+     b'\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(nCurSubDir, MaxMissleDir);\r\n',
+     'he so huong cho moi loai dan (nCurSubDir)')
+
+# DOI HANH VI: muc tieu chet thi chuyen sang con dich con song gan nhat, thay vi
+# bo bam han. Bo bam thi dan phong thang ra xa va het doi ngoai bai - nguoi choi
+# thay "quai chet la dan bay thang". Dan phai quan lai trong dam cho het vong doi.
+edit('Core/Src/KMissle.h',
+     b'\tint\t\t\t\t\tCheckNearestCollision();\r\n',
+     b'\tint\t\t\t\t\tCheckNearestCollision();\r\n'
+     b'\tint\t\t\t\t\tTimMucTieuGanNhat();\r\n',
+     'khai bao TimMucTieuGanNhat')
+
+edit('Core/Src/KMissle.cpp',
+     b'int KMissle::CheckNearestCollision()\r\n',
+     b'/* Tim muc tieu dich CON SONG gan dan nhat. Chi quet khi muc tieu dang bam vua\r\n'
+     b'   chet nen khong ton them gi o nhip thuong. */\r\n'
+     b'int KMissle::TimMucTieuGanNhat()\r\n'
+     b'{\r\n'
+     b'\tconst int nBanKinh = 6;\r\n'
+     b'\tint nGan = 0;\r\n'
+     b'\tint nKhoangCachGan = 0;\r\n'
+     b'\tint i = 0, j = 0;\r\n'
+     b'\tif (m_nSubWorldId < 0 || m_nRegionId < 0)\r\n'
+     b'\t\treturn 0;\r\n'
+     b'\tfor (i = -nBanKinh; i <= nBanKinh; i++)\r\n'
+     b'\t\tfor (j = -nBanKinh; j <= nBanKinh; j++)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tint nRegion = 0, nMapX = 0, nMapY = 0;\r\n'
+     b'\t\t\tif (!KMissle::GetOffsetAxis(m_nSubWorldId, m_nRegionId, m_nCurrentMapX,\r\n'
+     b'\t\t\t\tm_nCurrentMapY, i, j, nRegion, nMapX, nMapY))\r\n'
+     b'\t\t\t\tcontinue;\r\n'
+     b'\t\t\tint nIdx = SubWorld[m_nSubWorldId].m_Region[nRegion].FindNpc(nMapX, nMapY, m_nLauncher, m_eRelation);\r\n'
+     b'\t\t\tif (nIdx <= 0)\r\n'
+     b'\t\t\t\tcontinue;\r\n'
+     b'\t\t\tif (Npc[nIdx].m_Doing == do_death || Npc[nIdx].m_CurrentLife <= 0)\r\n'
+     b'\t\t\t\tcontinue;\r\n'
+     b'\t\t\tif (Npc[nIdx].m_SubWorldIndex != m_nSubWorldId)\r\n'
+     b'\t\t\t\tcontinue;\r\n'
+     b'\t\t\tint nKhoangCach = i * i + j * j;\r\n'
+     b'\t\t\tif (nGan == 0 || nKhoangCach < nKhoangCachGan)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tnGan = nIdx;\r\n'
+     b'\t\t\t\tnKhoangCachGan = nKhoangCach;\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t}\r\n'
+     b'\treturn nGan;\r\n'
+     b'}\r\n'
+     b'\r\n'
+     b'int KMissle::CheckNearestCollision()\r\n',
+     'them ham tim muc tieu con song gan nhat')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
