@@ -5302,6 +5302,24 @@ edit('Core/Src/KMissle.cpp',
      b'\t/* DOI HANH VI: dan di nhanh hon MOT O moi nhip bi CheckBeyondRegion tra\r\n',
      'log duong bay ben client')
 
+
+# LOG TAM (VLTK_LOG_DAN=1): in tham so CastMissles ben client de biet client co
+# nhan duoc MUC TIEU khong - may chu thay (-1, index) ma dan ben client lai co
+# m_nFollowNpcIdx = -1.
+edit('Core/Src/KSkills.cpp',
+     b'\tSkillParam.nTargetId = 0;\r\n\tif (nLauncher <= 0) return FALSE;\r\n',
+     b'\tSkillParam.nTargetId = 0;\r\n'
+     b'\tif (nLauncher <= 0) return FALSE;\r\n'
+     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t\tg_DebugLog("[chieu-c] chieu=%d hinh-dan=%d so-dan=%d tham-so(%d,%d) nguoi=%d",\r\n'
+     b'\t\t\t(int)m_nId, (int)m_eMisslesForm, (int)m_nChildSkillNum, nParam1, nParam2, nLauncher);\r\n',
+     'log tham so phat chieu ben client')
+
+edit('Core/Src/KSkills.cpp',
+     b'#include "KCore.h"\r\n',
+     b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
+     'them stdlib.h cho log chieu')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
