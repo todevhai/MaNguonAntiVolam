@@ -5173,7 +5173,7 @@ edit('Core/Src/KSkills.cpp',
 # DOI HANH VI: dan bo bam khi muc tieu da chet (khong dung im tai xac).
 edit('Core/Src/KMissle.cpp',
      b'\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId)\r\n\t\t{\r\n\t\t\tm_nFollowNpcIdx = 0;\r\n\t\t}\r\n',
-     b'\t\t/* DOI HANH VI: bo bam khi muc tieu DA CHET. Truoc day dan van bam\r\n\t\t   xac: vien dau giet con quai, ba vien con lai bay toi roi DUNG IM\r\n\t\t   tai cho do den het doi va va vao xac - "co trung ma khong mat\r\n\t\t   mau". Bo bam thi dan bay tiep va con quet trung con khac. */\r\n\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n\t\t\t|| Npc[m_nFollowNpcIdx].m_Doing == do_death || Npc[m_nFollowNpcIdx].m_CurrentLife <= 0)\r\n\t\t{\r\n\t\t\tm_nFollowNpcIdx = 0;\r\n\t\t}\r\n',
+     b'\t\t/* DOI HANH VI: bo bam khi muc tieu DA CHET. Truoc day dan van bam\r\n\t\t   xac: vien dau giet con quai, ba vien con lai bay toi roi DUNG IM\r\n\t\t   tai cho do den het doi va va vao xac - "co trung ma khong mat\r\n\t\t   mau". Bo bam thi dan bay tiep va con quet trung con khac. */\r\n\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n\t\t\t|| Npc[m_nFollowNpcIdx].m_Doing == do_death || Npc[m_nFollowNpcIdx].m_CurrentLife <= 0)\r\n\t\t{\r\n\t\t\t/* Chuyen sang con dich con song gan nhat thay vi bo bam han: bo\r\n\t\t\t   bam thi dan phong thang ra xa va het doi ngoai bai. */\r\n\t\t\tm_nFollowNpcIdx = TimMucTieuGanNhat();\r\n\t\t}\r\n',
      'dan bo bam muc tieu da chet')
 
 # DOI HANH VI: dan bay xuyen qua XAC, khong no vao NPC da chet.
@@ -5191,9 +5191,9 @@ edit('Core/Src/KMissle.cpp',
 # ngoai cong (1074 Bong Huynh Luoc Dia). Lay huong nhan vat lam phuong an du phong.
 edit('Core/Src/KSkills.cpp',
      b'inline int\tKSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , int *npPX, int *npPY, eSkillLauncherType eLauncherType)  const \r\n',
-     b'static int TinhHuongDan(int nLauncher, int nSrcPX, int nSrcPY, int nDesPX, int nDesPY)\r\n'
+     b'static int TinhHuongDan(int nLauncher, int nX1, int nY1, int nX2, int nY2)\r\n'
      b'{\r\n'
-     b'\tint nDirIndex = g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);\r\n'
+     b'\tint nDirIndex = g_GetDirIndex(nX1, nY1, nX2, nY2);\r\n'
      b'\tif (nDirIndex < 0)\r\n'
      b'\t\tnDirIndex = g_Dir2DirIndex(Npc[nLauncher].m_Dir, MaxMissleDir);\r\n'
      b'\tif (nDirIndex < 0 || nDirIndex >= MaxMissleDir)\r\n'
