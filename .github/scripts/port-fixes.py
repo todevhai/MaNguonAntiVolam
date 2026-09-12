@@ -5170,11 +5170,15 @@ edit('Core/Src/KSkills.cpp',
      b'\t\t\t/* DOI HANH VI: dat he so huong cho MOI loai dan, khong rieng bay\r\n\t\t\t   thang. Dan BAM MUC TIEU khong nam trong hai loai cu nen hai he so\r\n\t\t\t   nay giu nguyen RAC cua lan dung truoc o dan. Co muc tieu thi khong\r\n\t\t\t   sao (moi nhip tu tinh huong), nhung danh vao KHOANG TRONG thi\r\n\t\t\t   khong co muc tieu -> roi vao nhanh dung he so -> dan bay tu phia\r\n\t\t\t   (do 12/09/2026). Cac loai khac khong doc hai he so nay nen dat\r\n\t\t\t   thua cung vo hai. */\r\n\t\t\tMissle[nMissleIndex].m_nXFactor = g_DirCos(Missle[nMissleIndex].m_nDir, MaxMissleDir);\r\n\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(Missle[nMissleIndex].m_nDir, MaxMissleDir);\r\n',
      'dat he so huong cho moi loai dan trong CastWall')
 
-# DOI HANH VI: dan bo bam khi muc tieu da chet (khong dung im tai xac).
+# DOI HANH VI: muc tieu CHET thi van bam tiep cho het vong doi - dan bay toi
+# cho xac roi tan (nguong 20 o nhanh Follow lo viec do), khong chuyen sang con
+# khac. Chi bo bam khi o NPC da bi mot con KHAC chiem hoac muc tieu sang ban
+# do khac, vi luc do toa do khong con nghia gi.
 edit('Core/Src/KMissle.cpp',
-     b'\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId)\r\n\t\t{\r\n\t\t\tm_nFollowNpcIdx = 0;\r\n\t\t}\r\n',
-     b'\t\t/* DOI HANH VI: bo bam khi muc tieu DA CHET. Truoc day dan van bam\r\n\t\t   xac: vien dau giet con quai, ba vien con lai bay toi roi DUNG IM\r\n\t\t   tai cho do den het doi va va vao xac - "co trung ma khong mat\r\n\t\t   mau". Bo bam thi dan bay tiep va con quet trung con khac. */\r\n\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n\t\t\t|| Npc[m_nFollowNpcIdx].m_Doing == do_death || Npc[m_nFollowNpcIdx].m_CurrentLife <= 0)\r\n\t\t{\r\n\t\t\t/* Chuyen sang con dich con song gan nhat thay vi bo bam han: bo\r\n\t\t\t   bam thi dan phong thang ra xa va het doi ngoai bai. */\r\n\t\t\tm_nFollowNpcIdx = TimMucTieuGanNhat();\r\n\t\t}\r\n',
-     'dan bo bam muc tieu da chet')
+     b'\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId)\r\n',
+     b'\t\tif (!Npc[m_nFollowNpcIdx].IsMatch(m_dwFollowNpcID)\r\n'
+     b'\t\t\t|| Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId)\r\n',
+     'giu bam muc tieu da chet, chi bo khi o NPC bi con khac chiem')
 
 # DOI HANH VI: dan bay xuyen qua XAC, khong no vao NPC da chet.
 edit('Core/Src/KMissle.cpp',
@@ -5232,53 +5236,6 @@ edit_all('Core/Src/KSkills.cpp',
      b'\t\t\tMissle[nMissleIndex].m_nYFactor = g_DirSin(nCurSubDir, MaxMissleDir);\r\n',
      'he so huong cho moi loai dan (nCurSubDir)')
 
-# DOI HANH VI: muc tieu chet thi chuyen sang con dich con song gan nhat, thay vi
-# bo bam han. Bo bam thi dan phong thang ra xa va het doi ngoai bai - nguoi choi
-# thay "quai chet la dan bay thang". Dan phai quan lai trong dam cho het vong doi.
-edit('Core/Src/KMissle.h',
-     b'\tint\t\t\t\t\tCheckNearestCollision();\r\n',
-     b'\tint\t\t\t\t\tCheckNearestCollision();\r\n'
-     b'\tint\t\t\t\t\tTimMucTieuGanNhat();\r\n',
-     'khai bao TimMucTieuGanNhat')
-
-edit('Core/Src/KMissle.cpp',
-     b'int KMissle::CheckNearestCollision()\r\n',
-     b'/* Tim muc tieu dich CON SONG gan dan nhat. Chi quet khi muc tieu dang bam vua\r\n'
-     b'   chet nen khong ton them gi o nhip thuong. */\r\n'
-     b'int KMissle::TimMucTieuGanNhat()\r\n'
-     b'{\r\n'
-     b'\tconst int nBanKinh = 6;\r\n'
-     b'\tint nGan = 0;\r\n'
-     b'\tint nKhoangCachGan = 0;\r\n'
-     b'\tint i = 0, j = 0;\r\n'
-     b'\tif (m_nSubWorldId < 0 || m_nRegionId < 0)\r\n'
-     b'\t\treturn 0;\r\n'
-     b'\tfor (i = -nBanKinh; i <= nBanKinh; i++)\r\n'
-     b'\t\tfor (j = -nBanKinh; j <= nBanKinh; j++)\r\n'
-     b'\t\t{\r\n'
-     b'\t\t\tint nRegion = 0, nMapX = 0, nMapY = 0;\r\n'
-     b'\t\t\tif (!KMissle::GetOffsetAxis(m_nSubWorldId, m_nRegionId, m_nCurrentMapX,\r\n'
-     b'\t\t\t\tm_nCurrentMapY, i, j, nRegion, nMapX, nMapY))\r\n'
-     b'\t\t\t\tcontinue;\r\n'
-     b'\t\t\tint nIdx = SubWorld[m_nSubWorldId].m_Region[nRegion].FindNpc(nMapX, nMapY, m_nLauncher, m_eRelation);\r\n'
-     b'\t\t\tif (nIdx <= 0)\r\n'
-     b'\t\t\t\tcontinue;\r\n'
-     b'\t\t\tif (Npc[nIdx].m_Doing == do_death || Npc[nIdx].m_CurrentLife <= 0)\r\n'
-     b'\t\t\t\tcontinue;\r\n'
-     b'\t\t\tif (Npc[nIdx].m_SubWorldIndex != m_nSubWorldId)\r\n'
-     b'\t\t\t\tcontinue;\r\n'
-     b'\t\t\tint nKhoangCach = i * i + j * j;\r\n'
-     b'\t\t\tif (nGan == 0 || nKhoangCach < nKhoangCachGan)\r\n'
-     b'\t\t\t{\r\n'
-     b'\t\t\t\tnGan = nIdx;\r\n'
-     b'\t\t\t\tnKhoangCachGan = nKhoangCach;\r\n'
-     b'\t\t\t}\r\n'
-     b'\t\t}\r\n'
-     b'\treturn nGan;\r\n'
-     b'}\r\n'
-     b'\r\n'
-     b'int KMissle::CheckNearestCollision()\r\n',
-     'them ham tim muc tieu con song gan nhat')
 
 
 # LOG TAM (VLTK_LOG_DAN=1): in duong bay cua dan BEN CLIENT, doi xung voi log
@@ -5332,13 +5289,6 @@ edit_all('Core/Src/KSkills.cpp',
      b'\t\t\tMissle[nMissleIndex].m_dwFollowNpcID\t= (pSkillParam->nTargetId > 0)\r\n'
      b'\t\t\t\t? Npc[pSkillParam->nTargetId].m_dwID : 0;\r\n',
      'ghi ID muc tieu o moi ham sinh dan')
-
-# Cho client dung CUNG phep kiem muc tieu nhu may chu.
-edit('Core/Src/KMissle.cpp',
-     b'\t\tif (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n',
-     b'\t\tif (!Npc[m_nFollowNpcIdx].IsMatch(m_dwFollowNpcID)\r\n'
-     b'\t\t\t|| Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId\r\n',
-     'client kiem muc tieu bang ID nhu may chu')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
