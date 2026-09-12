@@ -507,15 +507,6 @@ edit('Represent/Represent2/KRepresentShell2.cpp',
      b'\t\t\t\t\t\t\tbreak;\r\n',
      've SPR co alpha thay vi bo trong (het quang den quanh hieu ung)')
 
-# DOI HANH VI: THEM phep ve CONG SANG cho sprite hieu ung. Ban ve phan mem
-# Represent2 chi co phep tron thuong; hieu ung lua/khoi cua JX1 von duoc ve
-# bang phep CONG (ban DirectX) nen o day nhung diem toi cua sprite de len nen
-# thanh quang den. Do 08/09/2026: doi sang alpha hang so khong het -> khong
-# phai chon nham ham alpha ma la THIEU HAN phep cong.
-edit('Engine/Src/KDrawBase.cpp',
-     b'#include "KDrawBase.h"\r\n',
-     b'#include "KDrawBase.h"\r\n#include <stdlib.h>\t/* getenv/atoi cho cuong do ve */\r\n',
-     'them stdlib.h cho getenv')
 
 edit('Engine/Src/KDrawBase.cpp',
      b'//---------------------------------------------------------------------------\r\n'
@@ -532,28 +523,6 @@ edit('Engine/Src/KDrawBase.cpp',
      b'/* 1 = cong (dan dang bay), 2 = alpha (hieu ung bam nguoi), 0 = screen.\r\n'
      b'   Noi goi dat truoc khi ve; xem KRepresentShell2. */\r\n'
      b'int g_nKieuTronSprite = 1;\r\n'
-     b'\r\n'
-     b'/* Doc ten kieu tron tu bien moi truong; tra nMacDinh khi khong co. */\r\n'
-     b'static int g_DocKieuTron(const char* pszTen, int nMacDinh)\r\n'
-     b'{\r\n'
-     b'	const char* psz = getenv(pszTen);\r\n'
-     b'	if (psz == NULL || psz[0] == 0) return nMacDinh;\r\n'
-     b'	if (psz[0] == \'c\') return 1;\r\n'
-     b'	if (psz[0] == \'a\') return 2;\r\n'
-     b'	if (psz[0] == \'t\') return 3;\r\n'
-     b'	if (psz[0] == \'s\') return 0;\r\n'
-     b'	if (psz[0] == \'b\') return 4;\r\n'
-     b'	return nMacDinh;\r\n'
-     b'}\r\n'
-     b'\r\n'
-     b'static int g_DocCuongDo(const char* pszTen, int nMacDinh)\r\n'
-     b'{\r\n'
-     b'	const char* psz = getenv(pszTen);\r\n'
-     b'	int n = (psz && psz[0]) ? atoi(psz) : nMacDinh;\r\n'
-     b'	if (n < 1) n = 1;\r\n'
-     b'	if (n > 64) n = 64;\r\n'
-     b'	return n;\r\n'
-     b'}\r\n'
      b'\r\n'
      b'void g_DrawSpriteAdd(void* node, void* canvas)\r\n'
      b'{\r\n'
@@ -597,52 +566,12 @@ edit('Engine/Src/KDrawBase.cpp',
      b'		int nDai = pNguon[0];\r\n'
      b'		int nAlpha = pNguon[1];\r\n'
      b'		pNguon += 2;\r\n'
-     b'		/* Cuong do ve (VLTK_SANG*): 32 = nguyen ven, thap hon thi giu duoc mau\r\n'
-     b'		   goc cua sprite, cao hon 32 thi day dam len. Kieu tron (VLTK_TRON*):\r\n'
-     b'		     cong     - dst + src; loi alpha 255 de chay trang\r\n'
-     b'		     alpha    - dst + (src-dst)*a; giu dung mau nhung diem TOI cua sprite\r\n'
-     b'		                keo nen xuong -> quang den quanh chieu\r\n'
-     b'		     screen   - dst + src - dst*src; khong cham tran nhung bac mau tren\r\n'
-     b'		                nen sang (dat)\r\n'
-     b'		     ban6     - screen 5 bit y nhu KCanvas::DrawSpriteScreen cua ban hoan\r\n'
-     b'		                thien, alpha doan chi dung de bo qua diem. KHONG dat lam mac\r\n'
-     b'		                dinh: user bao 12/09/2026 hieu ung chieu cua QUAI bi hong.\r\n'
-     b'		     theosang - alpha nhung LAY DO SANG CUA SPRITE LAM DO DUC: cho den\r\n'
-     b'		                = trong suot (het quang den) ma loi sang van ra dung mau\r\n'
-     b'		                (khong chay trang)\r\n'
-     b'		   Hai duong ve tach rieng: DAN dang bay (g_nKieuTronSprite = 1) va HIEU\r\n'
-     b'		   UNG PHAT CHIEU bam nguoi (= 2, do KNpcRes danh dau alpha 254). Moi\r\n'
-     b'		   duong mot bien rieng vi hai loai sprite khac han nhau. */\r\n'
-     b'		static int s_nDaDoc = 0;\r\n'
-     b'		/* 40 voi kieu THEOSANG (mac dinh): user chon 12/09/2026 de keo mau chieu 8x\r\n'
-     b'		   len, chap nhan chieu 15x dam hon. An toan vi nhanh theosang tron kieu\r\n'
-     b'		   SCREEN va do duc bi kep o 31, tuc khong bao gio vuot mau goc -> khong\r\n'
-     b'		   chay trang. (Khac han kieu "ban6": o do nhan thang nguon nen 40 lam loi\r\n'
-     b'		   hieu ung bet trang - da thu va bo.) */\r\n'
-     b'		static int s_nSangDan = 32, s_nSangHU = 32;\r\n'
-     b'		static int s_nEpDan = -1, s_nEpHU = -1;\r\n'
-     b'		if (!s_nDaDoc)\r\n'
-     b'		{\r\n'
-     b'			s_nDaDoc = 1;\r\n'
-     b'			s_nEpDan = g_DocKieuTron("VLTK_TRON_DAN", g_DocKieuTron("VLTK_TRON", 4));\r\n'
-     b'			s_nEpHU  = g_DocKieuTron("VLTK_TRON_HIEU_UNG", g_DocKieuTron("VLTK_TRON", 4));\r\n'
-     b'			s_nSangDan = g_DocCuongDo("VLTK_SANG_DAN", g_DocCuongDo("VLTK_SANG", 32));\r\n'
-     b'			s_nSangHU  = g_DocCuongDo("VLTK_SANG_HIEU_UNG", g_DocCuongDo("VLTK_SANG", 32));\r\n'
-     b'		}\r\n'
-     b'		int s_nKieuTron = g_nKieuTronSprite;\r\n'
-     b'		int nCuongDo = (g_nKieuTronSprite == 2) ? s_nSangHU : s_nSangDan;\r\n'
-     b'		int nEpKieu = (g_nKieuTronSprite == 2) ? s_nEpHU : s_nEpDan;\r\n'
-     b'		if (nEpKieu >= 0) s_nKieuTron = nEpKieu;\r\n'
-     b'		/* Kieu 4 (ban6): alpha cua DOAN chi la co trong/duc, KHONG phai trong so.\r\n'
-     b'		   Do lai engine.dll cua ban hoan thien 12/09/2026: KCanvas::DrawSpriteScreen\r\n'
-     b'		   chi so alpha doan voi 0 de bo qua diem, con cuong do lay tu alpha cua\r\n'
-     b'		   NODE (moi hieu ung deu dat 255). Nhan them alpha doan lam sprite nay dam\r\n'
-     b'		   sprite kia nhat - dung trieu chung "chieu nay dat thi chieu kia nhat". */\r\n'
-     b'		int nHeSo;\r\n'
-     b'		if (s_nKieuTron == 4)\r\n'
-     b'			nHeSo = nAlpha ? nCuongDo : 0;\r\n'
-     b'		else\r\n'
-     b'			nHeSo = (nAlpha >= 255) ? nCuongDo : ((nAlpha >> 3) * nCuongDo >> 5);\r\n'
+     b'\t\t/* He so ve: 32 = giu nguyen mau goc cua sprite; alpha cua DOAN chi la\r\n'
+     b'\t\t   co trong/duc chu KHONG phai trong so. Do lai engine.dll cua ban hoan\r\n'
+     b'\t\t   thien 12/09/2026: KCanvas::DrawSpriteScreen chi so alpha doan voi 0 de\r\n'
+     b'\t\t   bo qua diem. Nhan them alpha doan lam sprite nay dam sprite kia nhat -\r\n'
+     b'\t\t   dung trieu chung "chieu nay dat thi chieu kia nhat". */\r\n'
+     b'\t\tint nHeSo = nAlpha ? 32 : 0;\r\n'
      b'		for (int nI = 0; nI < nDai && nDiem < nTongDiem; nI++, nDiem++)\r\n'
      b'		{\r\n'
      b'			unsigned char byIdx = 0;\r\n'
@@ -654,87 +583,28 @@ edit('Engine/Src/KDrawBase.cpp',
      b'				unsigned short* pO = (unsigned short*)(pDongDau + (nHang - nHangDau) * nPitch)\r\n'
      b'					+ (Clipper.x + nCot - nCotDau);\r\n'
      b'				unsigned short wNguon = pBangMau[byIdx];\r\n'
-     b'				/* SCREEN thay vi CONG THUAN: kq = D + S - D*S. Cong thuan voi he\r\n'
-     b'				   so 1.0 (doan alpha = 255) lam loi lua chay trang, mat het chi\r\n'
-     b'				   tiet - user bao 12/09/2026 "ca hieu ung sang ruc". Screen giu\r\n'
-     b'				   dung tinh chat "den = trong suot" cua sprite hieu ung ma khong\r\n'
-     b'				   bao gio cham tran. */\r\n'
      b'				int nSR0 = (wNguon >> nDichR) & nTranR;\r\n'
      b'				int nSG0 = (wNguon >> nDichG) & nTranG;\r\n'
      b'				int nSB0 = wNguon & nTranB;\r\n'
-     b'				int nSR = (nSR0 * nHeSo) >> 5;\r\n'
-     b'				int nSG = (nSG0 * nHeSo) >> 5;\r\n'
-     b'				int nSB = (nSB0 * nHeSo) >> 5;\r\n'
      b'				int nDR = (*pO >> nDichR) & nTranR;\r\n'
      b'				int nDG = (*pO >> nDichG) & nTranG;\r\n'
      b'				int nDB = *pO & nTranB;\r\n'
-     b'				int nR, nG, nB;\r\n'
-     b'				if (s_nKieuTron == 1)\t/* cong thuan: ruc nhat */\r\n'
-     b'				{\r\n'
-     b'					nR = nDR + nSR; nG = nDG + nSG; nB = nDB + nSB;\r\n'
-     b'				}\r\n'
-     b'				else if (s_nKieuTron == 2)\t/* alpha: giu dung mau sprite */\r\n'
-     b'				{\r\n'
-     b'					/* Nguon phai la mau GOC, khong phai ban da nhan nHeSo: nhan hai\r\n'
-     b'					   lan lam doan ban trong suot vua toi vua KEO NEN XUONG, thanh\r\n'
-     b'					   vien den quanh chieu. */\r\n'
-     b'					nR = nDR + (((nSR0 - nDR) * nHeSo) >> 5);\r\n'
-     b'					nG = nDG + (((nSG0 - nDG) * nHeSo) >> 5);\r\n'
-     b'					nB = nDB + (((nSB0 - nDB) * nHeSo) >> 5);\r\n'
-     b'					if (nR < 0) nR = 0;\r\n'
-     b'					if (nG < 0) nG = 0;\r\n'
-     b'					if (nB < 0) nB = 0;\r\n'
-     b'				}\r\n'
-     b'				else if (s_nKieuTron == 3)\t/* theo do sang cua sprite */\r\n'
-     b'				{\r\n'
-     b'					/* Do duc lay tu DO SANG cua diem nguon: nen den cua sprite thanh\r\n'
-     b'					   trong suot nen khong con quang den, con loi sang thi thay han\r\n'
-     b'					   nen nen giu nguyen mau, khong chay trang. */\r\n'
-     b'					int nG5 = (nChiaG == 6) ? (nSG0 >> 1) : nSG0;\r\n'
-     b'					int nSang = (nSR0 * 77 + nG5 * 151 + nSB0 * 28) >> 8;\r\n'
-     b'					/* Do duc theo CAN cua do sang, khong tuyen tinh: sprite SAM\r\n'
-     b'					   (vong lua cua chieu 15x noi cong) tuyen tinh thi ra gan\r\n'
-     b'					   trong suot va bien mat han. Nen den (do sang 0) van trong\r\n'
-     b'					   suot hoan toan nen khong sinh lai quang den. */\r\n'
-     b'					static const unsigned char s_byCan[32] = {0, 6, 8, 10, 11, 12, 14, 15, 16, 17, 18, 18, 19, 20, 21, 22, 22, 23, 24, 24, 25, 26, 26, 27, 27, 28, 28, 29, 29, 30, 30, 31};\r\n'
-     b'					int nA = (s_byCan[nSang & 31] * nHeSo) >> 5;\r\n'
-     b'					if (nA > 31) nA = 31;\r\n'
-     b'					/* Tron kieu SCREEN voi nguon da nhan do duc, KHONG noi suy thang:\r\n'
-     b'					   noi suy keo nen XUONG o cho diem nguon toi hon nen - lai sinh\r\n'
-     b'					   quang den. Screen thi ket qua khong bao gio thap hon nen (het\r\n'
-     b'					   quang den) va khong bao gio vuot tran (het chay trang), ma\r\n'
-     b'					   sprite sam van hien nho do duc lay theo can. */\r\n'
-     b'					int nTR = (nSR0 * nA) >> 5;\r\n'
-     b'					int nTG = (nSG0 * nA) >> 5;\r\n'
-     b'					int nTB = (nSB0 * nA) >> 5;\r\n'
-     b'					nR = nDR + nTR - ((nDR * nTR) >> 5);\r\n'
-     b'					nG = nDG + nTG - ((nDG * nTG) >> nChiaG);\r\n'
-     b'					nB = nDB + nTB - ((nDB * nTB) >> 5);\r\n'
-     b'				}\r\n'
-     b'				else if (s_nKieuTron == 4)\t/* ban6: screen 5 bit, lam tron len */\r\n'
-     b'				{\r\n'
-     b'					/* Chep dung phep cua KCanvas::DrawSpriteScreen trong engine.dll\r\n'
-     b'					   ban hoan thien (0x1000ad50): ca ba kenh tinh o 5 BIT - kenh luc\r\n'
-     b'					   cua 565 bi bo bit thap - roi S + D - (S*D + 31)/32. Lam tron LEN\r\n'
-     b'					   (cong 31 truoc khi dich) chu khong cat cut. */\r\n'
-     b'					int nDR5 = nDR, nDG5 = (nChiaG == 6) ? (nDG >> 1) : nDG, nDB5 = nDB;\r\n'
-     b'					int nTR = (nSR0 * nHeSo) >> 5;\r\n'
-     b'					int nTG = (((nChiaG == 6) ? (nSG0 >> 1) : nSG0) * nHeSo) >> 5;\r\n'
-     b'					int nTB = (nSB0 * nHeSo) >> 5;\r\n'
-     b'					if (nTR > 31) nTR = 31;\r\n'
-     b'					if (nTG > 31) nTG = 31;\r\n'
-     b'					if (nTB > 31) nTB = 31;\r\n'
-     b'					nR = nDR5 + nTR - ((nDR5 * nTR + 31) >> 5);\r\n'
-     b'					nG = nDG5 + nTG - ((nDG5 * nTG + 31) >> 5);\r\n'
-     b'					nB = nDB5 + nTB - ((nDB5 * nTB + 31) >> 5);\r\n'
-     b'					if (nChiaG == 6) nG <<= 1;\r\n'
-     b'				}\r\n'
-     b'				else\t/* screen: D + S - D*S */\r\n'
-     b'				{\r\n'
-     b'					nR = nDR + nSR - ((nDR * nSR) >> 5);\r\n'
-     b'					nG = nDG + nSG - ((nDG * nSG) >> nChiaG);\r\n'
-     b'					nB = nDB + nSB - ((nDB * nSB) >> 5);\r\n'
-     b'				}\r\n'
+     b'\t\t\t\t/* Chep dung phep cua KCanvas::DrawSpriteScreen trong engine.dll\r\n'
+     b'\t\t\t\t   ban hoan thien (0x1000ad50): ca ba kenh tinh o 5 BIT - kenh luc\r\n'
+     b'\t\t\t\t   cua 565 bi bo bit thap - roi S + D - (S*D + 31)/32, lam tron LEN.\r\n'
+     b'\t\t\t\t   Cong thuan lam loi lua chay trang, con alpha thi diem TOI cua\r\n'
+     b'\t\t\t\t   sprite keo nen xuong thanh quang den - screen khong dinh ca hai. */\r\n'
+     b'\t\t\t\tint nDR5 = nDR, nDG5 = (nChiaG == 6) ? (nDG >> 1) : nDG, nDB5 = nDB;\r\n'
+     b'\t\t\t\tint nTR = (nSR0 * nHeSo) >> 5;\r\n'
+     b'\t\t\t\tint nTG = (((nChiaG == 6) ? (nSG0 >> 1) : nSG0) * nHeSo) >> 5;\r\n'
+     b'\t\t\t\tint nTB = (nSB0 * nHeSo) >> 5;\r\n'
+     b'\t\t\t\tif (nTR > 31) nTR = 31;\r\n'
+     b'\t\t\t\tif (nTG > 31) nTG = 31;\r\n'
+     b'\t\t\t\tif (nTB > 31) nTB = 31;\r\n'
+     b'\t\t\t\tint nR = nDR5 + nTR - ((nDR5 * nTR + 31) >> 5);\r\n'
+     b'\t\t\t\tint nG = nDG5 + nTG - ((nDG5 * nTG + 31) >> 5);\r\n'
+     b'\t\t\t\tint nB = nDB5 + nTB - ((nDB5 * nTB + 31) >> 5);\r\n'
+     b'\t\t\t\tif (nChiaG == 6) nG <<= 1;\r\n'
      b'				if (nR > nTranR) nR = nTranR;\r\n'
      b'				if (nG > nTranG) nG = nTranG;\r\n'
      b'				if (nB > nTranB) nB = nTranB;\r\n'
@@ -1061,51 +931,9 @@ edit('Core/Src/CoreShell.cpp',
      'danh quai: uu tien con trong khung nhin')
 
 
-# LOG TAM (VLTK_LOG_DAN=1): vong ve DANH SACH HIEU UNG NO nam o CUOI
-# KMissleRes::Draw, ma nhanh MS_DoFly cua ham do co HAI lenh return FALSE som.
-# Roi vao mot trong hai duong thoat ay thi hieu ung no da tao van khong bao gio
-# duoc ve. Ba dong duoi phan biet: co vao ham khong / thoat o dau / co goi Draw
-# cua hieu ung khong.
-edit('Core/Src/KMissleRes.cpp',
-     b'#include "KCore.h"\r\n',
-     b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
-     'them stdlib.h cho log hieu ung no')
 
-edit('Core/Src/KMissleRes.cpp',
-     b'\t\tif (nCurLifeFrame < 0 || (nAllFrame != 0 && nAllFrame < nCurLifeFrame)) return FALSE;\r\n',
-     b'\t\tif (nCurLifeFrame < 0 || (nAllFrame != 0 && nAllFrame < nCurLifeFrame))\r\n'
-     b'\t\t{\r\n'
-     b'\t\t\tif (getenv("VLTK_LOG_DAN") && m_SkillSpecialList.GetHead())\r\n'
-     b'\t\t\t\tg_DebugLog("[ve-no] THOAT SOM (doi=%d/%d) - bo qua danh sach hieu ung",\r\n'
-     b'\t\t\t\t\tnCurLifeFrame, nAllFrame);\r\n'
-     b'\t\t\treturn FALSE;\r\n'
-     b'\t\t}\r\n',
-     'log duong thoat som thu nhat cua KMissleRes::Draw')
 
-edit('Core/Src/KMissleRes.cpp',
-     b'\t\t\t\tif (nFrame > (nTotalFrame - 1)) \r\n'
-     b'\t\t\t\t\treturn FALSE;\r\n',
-     b'\t\t\t\tif (nFrame > (nTotalFrame - 1))\r\n'
-     b'\t\t\t\t{\r\n'
-     b'\t\t\t\t\tif (getenv("VLTK_LOG_DAN") && m_SkillSpecialList.GetHead())\r\n'
-     b'\t\t\t\t\t\tg_DebugLog("[ve-no] THOAT SOM (khung %d > %d) - bo qua danh sach hieu ung",\r\n'
-     b'\t\t\t\t\t\t\tnFrame, nTotalFrame - 1);\r\n'
-     b'\t\t\t\t\treturn FALSE;\r\n'
-     b'\t\t\t\t}\r\n',
-     'log duong thoat som thu hai cua KMissleRes::Draw')
 
-edit('Core/Src/KMissleRes.cpp',
-     b'\t\t\t\tpNode->m_pSkillSpecial->Draw(dwCurrentTime);\r\n',
-     b'\t\t\t{\r\n'
-     b'\t\t\t\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t\t\t\t\tg_DebugLog("[ve-no] VE hieu ung %s khung %d tai (%d,%d)",\r\n'
-     b'\t\t\t\t\t\tpNode->m_pSkillSpecial->m_RUImage.szImage,\r\n'
-     b'\t\t\t\t\t\t(int)pNode->m_pSkillSpecial->m_RUImage.nFrame,\r\n'
-     b'\t\t\t\t\t\t(int)pNode->m_pSkillSpecial->m_nPX,\r\n'
-     b'\t\t\t\t\t\t(int)pNode->m_pSkillSpecial->m_nPY);\r\n'
-     b'\t\t\t\tpNode->m_pSkillSpecial->Draw(dwCurrentTime);\r\n'
-     b'\t\t\t}\r\n',
-     'log moi lan ve mot hieu ung no')
 
 
 edit('Core/Src/KNpcResNode.cpp',
@@ -5539,91 +5367,14 @@ edit_all('Core/Src/KSkills.cpp',
 
 
 
-# LOG TAM (VLTK_LOG_DAN=1): in duong bay cua dan BEN CLIENT, doi xung voi log
-# [bay] ben may chu. Can de biet hai nua co chay cung mot duong khong - nguoi
-# choi bao "khong thay dan toi quai ma quai van mat mau".
-edit('Core/Src/KMissle.cpp',
-     b'#include "KCore.h"\r\n',
-     b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
-     'them stdlib.h cho log dan')
-
-edit('Core/Src/KMissle.cpp',
-     b'\t/* DOI HANH VI: dan di nhanh hon MOT O moi nhip bi CheckBeyondRegion tra\r\n',
-     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t{\r\n'
-     b'\t\tint nLogX = 0, nLogY = 0;\r\n'
-     b'\t\tGetMpsPos(&nLogX, &nLogY);\r\n'
-     b'\t\tg_DebugLog("[bay-c] dan=%d chieu=%d buoc=(%d,%d) vitri=(%d,%d) huong=%d bam=%d doi=%d/%d bat-dau=%d",\r\n'
-     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, nDOffsetX, nDOffsetY, nLogX, nLogY,\r\n'
-     b'\t\t\t(int)m_nDir, (int)m_nFollowNpcIdx, (int)m_nCurrentLife, (int)m_nLifeTime, (int)m_nStartLifeTime);\r\n'
-     b'\t}\r\n'
-     b'\t/* DOI HANH VI: dan di nhanh hon MOT O moi nhip bi CheckBeyondRegion tra\r\n',
-     'log duong bay ben client')
 
 
-# LOG TAM (VLTK_LOG_DAN=1): in tham so CastMissles ben client de biet client co
-# nhan duoc MUC TIEU khong - may chu thay (-1, index) ma dan ben client lai co
-# m_nFollowNpcIdx = -1.
-edit('Core/Src/KSkills.cpp',
-     b'\tSkillParam.nTargetId = 0;\r\n\tif (nLauncher <= 0) return FALSE;\r\n',
-     b'\tSkillParam.nTargetId = 0;\r\n'
-     b'\tif (nLauncher <= 0) return FALSE;\r\n'
-     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t\tg_DebugLog("[chieu-c] chieu=%d hinh-dan=%d so-dan=%d tham-so(%d,%d) nguoi=%d",\r\n'
-     b'\t\t\t(int)m_nId, (int)m_eMisslesForm, (int)m_nChildSkillNum, nParam1, nParam2, nLauncher);\r\n',
-     'log tham so phat chieu ben client')
-
-# LOG TAM (VLTK_LOG_DAN=1): hieu ung NO khi dan dung quai. Dan 363 (chieu 15x noi
-# cong) co AnimFile4 = mag_tr_bz1_bao-no, nhung log duong bay cho thay no bay het
-# doi roi tat - tuc CheckCollision khong bao gio thay NPC. Hai dong duoi phan biet
-# ba kha nang: khong tim thay NPC / tim thay ma thieu hinh / tao duoc hieu ung.
-edit('Core/Src/KMissle.cpp',
-     b'\t\tif (nNpcIdx > 0)\r\n'
-     b'\t\t{ \r\n'
-     b'\t\t\tif (m_nDamageRange == 1)',
-     b'\t\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t\t\tg_DebugLog("[va-c] dan=%d chieu=%d vung=%d o=(%d,%d) cao=%d quan-he=%d nguoi-phat=%d -> npc=%d",\r\n'
-     b'\t\t\t\t(int)(this - Missle), (int)m_nSkillId, nColRegion, nColMapX, nColMapY,\r\n'
-     b'\t\t\t\t(int)m_nCurrentMapZ, (int)m_eRelation, (int)m_nLauncher, nNpcIdx);\r\n'
-     b'\t\tif (nNpcIdx > 0)\r\n'
-     b'\t\t{ \r\n'
-     b'\t\t\tif (m_nDamageRange == 1)',
-     'log dan cham NPC ben client')
-
-# LOG TAM (VLTK_LOG_DAN=1): hai cua thoat IM LANG o dau CheckCollision - do cao va
-# vung. Dan bay ca chuc nhip ma khong sinh mot dong [va-c] nao, tuc ham thoat
-# TRUOC khi kip goi FindNpc.
-edit('Core/Src/KMissle.cpp',
-     b'\tif (m_nCurrentMapZ <= MISSLE_MIN_COLLISION_ZHEIGHT) \r\n',
-     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t\tg_DebugLog("[cua-c] dan=%d chieu=%d cao=%d vung=%d tam-cham=%d doi=%d/%d",\r\n'
-     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, (int)m_nCurrentMapZ, (int)m_nRegionId,\r\n'
-     b'\t\t\t(int)m_nCollideRange, (int)m_nCurrentLife, (int)m_nLifeTime);\r\n'
-     b'\tif (m_nCurrentMapZ <= MISSLE_MIN_COLLISION_ZHEIGHT) \r\n',
-     'log hai cua thoat dau CheckCollision')
-
-edit('Core/Src/KMissle.cpp',
-     b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
-     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t{\r\n'
-     b'\t\t/* Kem TOA DO: hieu ung no duoc tao that nhung khong thay o cho\r\n'
-     b'\t\t   trung quai - phai biet no ra doi O DAU va con quai dung o dau moi\r\n'
-     b'\t\t   phan biet duoc "sinh sai cho" voi "sinh dung cho ma khong ve". */\r\n'
-     b'\t\tint nQx = 0, nQy = 0;\r\n'
-     b'\t\tif (nNpcIndex > 0)\r\n'
-     b'\t\t\tNpc[nNpcIndex].GetMpsPos(&nQx, &nQy);\r\n'
-     b'\t\tg_DebugLog("[no-c] dan=%d chieu=%d trang-thai=%d npc=%d vitri=(%d,%d) quai=(%d,%d) hinh=%s",\r\n'
-     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, (int)eStatus, nNpcIndex, nPX, nPY, nQx, nQy,\r\n'
-     b'\t\t\tm_MissleRes.m_MissleRes[eStatus].AnimFileName[0] ? m_MissleRes.m_MissleRes[eStatus].AnimFileName : "(THIEU)");\r\n'
-     b'\t}\r\n'
-     b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
-     'log tao hieu ung no ben client')
 
 
-edit('Core/Src/KSkills.cpp',
-     b'#include "KCore.h"\r\n',
-     b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
-     'them stdlib.h cho log chieu')
+
+
+
+
 
 
 # DOI HANH VI: ghi luon ID cua muc tieu o MOI ham sinh dan. Chi CastWall lam
