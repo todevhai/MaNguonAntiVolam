@@ -616,15 +616,15 @@ edit('Engine/Src/KDrawBase.cpp',
      b'		   SCREEN va do duc bi kep o 31, tuc khong bao gio vuot mau goc -> khong\r\n'
      b'		   chay trang. (Khac han kieu "ban6": o do nhan thang nguon nen 40 lam loi\r\n'
      b'		   hieu ung bet trang - da thu va bo.) */\r\n'
-     b'		static int s_nSangDan = 40, s_nSangHU = 40;\r\n'
+     b'		static int s_nSangDan = 44, s_nSangHU = 44;\r\n'
      b'		static int s_nEpDan = -1, s_nEpHU = -1;\r\n'
      b'		if (!s_nDaDoc)\r\n'
      b'		{\r\n'
      b'			s_nDaDoc = 1;\r\n'
      b'			s_nEpDan = g_DocKieuTron("VLTK_TRON_DAN", g_DocKieuTron("VLTK_TRON", 3));\r\n'
      b'			s_nEpHU  = g_DocKieuTron("VLTK_TRON_HIEU_UNG", g_DocKieuTron("VLTK_TRON", 3));\r\n'
-     b'			s_nSangDan = g_DocCuongDo("VLTK_SANG_DAN", g_DocCuongDo("VLTK_SANG", 40));\r\n'
-     b'			s_nSangHU  = g_DocCuongDo("VLTK_SANG_HIEU_UNG", g_DocCuongDo("VLTK_SANG", 40));\r\n'
+     b'			s_nSangDan = g_DocCuongDo("VLTK_SANG_DAN", g_DocCuongDo("VLTK_SANG", 44));\r\n'
+     b'			s_nSangHU  = g_DocCuongDo("VLTK_SANG_HIEU_UNG", g_DocCuongDo("VLTK_SANG", 44));\r\n'
      b'		}\r\n'
      b'		int s_nKieuTron = g_nKieuTronSprite;\r\n'
      b'		int nCuongDo = (g_nKieuTronSprite == 2) ? s_nSangHU : s_nSangDan;\r\n'
@@ -853,6 +853,23 @@ edit('Core/Src/KNpcRes.cpp',
 # Hau qua nhin thay: vong sang duoi chan (vd sl_07 La Han Tran) bi cong 38 khi
 # cuoi ngua nen noi len giua than ngua - dung loi user bao 07/09.
 # Do 08/09/2026: settings/npcres/<bang>.txt dong 45 ghi ro cot 3 = "Foot".
+# DOI HANH VI: chu trong game luon ve theo duong CO VIEN.
+#
+# Font cua ta gio co lai muc 4 (vanh vien, dung lai bang client/them-vien-font.py).
+# Nhung KFont2 chi goi DrawFontWithBorder khi m_nDrawBorderWithDeffColor bat, ma
+# dong khoi tao no trong ham dung DA BI CHU THICH LAI - bien khong duoc gan gia
+# tri nao. Roi vao duong DrawFont thuong thi muc 4 duoc ve bang CHINH MAU CHU o
+# alpha 4/7 (KDrawFont.cpp: shl ebx,2 roi nhan nAlpha) -> chu trang bi quang
+# trang mo quanh net. Duong co vien thi moi muc < 7 deu to bang MAU VIEN (den):
+# KDrawFont.cpp nhanh DrawFrontWithBorder_DrawBorder.
+#
+# Do 12/09/2026: user bao "cac chu mau khac duoc roi nhung mau trang thi bi mo".
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'//\tm_nDrawBorderWithDeffColor = true;\r\n',
+     b'\tm_nDrawBorderWithDeffColor = true;\t/* vien den, khop ban hoan thien */\r\n',
+     'chu luon ve co vien den')
+
+
 edit('Core/Src/KNpcResNode.cpp',
      b'\t\tif (strcmp(szBuffer, "\xcd\xb7\xb6\xa5") == 0)\r\n'
      b'\t\t\tm_nType[i] = STATE_MAGIC_HEAD;\r\n'
