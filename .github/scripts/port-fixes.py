@@ -5280,6 +5280,28 @@ edit('Core/Src/KMissle.cpp',
      b'int KMissle::CheckNearestCollision()\r\n',
      'them ham tim muc tieu con song gan nhat')
 
+
+# LOG TAM (VLTK_LOG_DAN=1): in duong bay cua dan BEN CLIENT, doi xung voi log
+# [bay] ben may chu. Can de biet hai nua co chay cung mot duong khong - nguoi
+# choi bao "khong thay dan toi quai ma quai van mat mau".
+edit('Core/Src/KMissle.cpp',
+     b'#include "KCore.h"\r\n',
+     b'#include "KCore.h"\r\n#include <stdlib.h>\t/* getenv cho log tam */\r\n',
+     'them stdlib.h cho log dan')
+
+edit('Core/Src/KMissle.cpp',
+     b'\t/* DOI HANH VI: dan di nhanh hon MOT O moi nhip bi CheckBeyondRegion tra\r\n',
+     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t{\r\n'
+     b'\t\tint nLogX = 0, nLogY = 0;\r\n'
+     b'\t\tGetMpsPos(&nLogX, &nLogY);\r\n'
+     b'\t\tg_DebugLog("[bay-c] dan=%d chieu=%d buoc=(%d,%d) vitri=(%d,%d) huong=%d bam=%d doi=%d/%d bat-dau=%d",\r\n'
+     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, nDOffsetX, nDOffsetY, nLogX, nLogY,\r\n'
+     b'\t\t\t(int)m_nDir, (int)m_nFollowNpcIdx, (int)m_nCurrentLife, (int)m_nLifeTime, (int)m_nStartLifeTime);\r\n'
+     b'\t}\r\n'
+     b'\t/* DOI HANH VI: dan di nhanh hon MOT O moi nhip bi CheckBeyondRegion tra\r\n',
+     'log duong bay ben client')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
