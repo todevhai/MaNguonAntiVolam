@@ -5558,9 +5558,17 @@ edit('Core/Src/KMissle.cpp',
 edit('Core/Src/KMissle.cpp',
      b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
      b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
-     b'\t\tg_DebugLog("[no-c] dan=%d chieu=%d trang-thai=%d npc=%d hinh=%s",\r\n'
-     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, (int)eStatus, nNpcIndex,\r\n'
+     b'\t{\r\n'
+     b'\t\t/* Kem TOA DO: hieu ung no duoc tao that nhung khong thay o cho\r\n'
+     b'\t\t   trung quai - phai biet no ra doi O DAU va con quai dung o dau moi\r\n'
+     b'\t\t   phan biet duoc "sinh sai cho" voi "sinh dung cho ma khong ve". */\r\n'
+     b'\t\tint nQx = 0, nQy = 0;\r\n'
+     b'\t\tif (nNpcIndex > 0)\r\n'
+     b'\t\t\tNpc[nNpcIndex].GetMpsPos(&nQx, &nQy);\r\n'
+     b'\t\tg_DebugLog("[no-c] dan=%d chieu=%d trang-thai=%d npc=%d vitri=(%d,%d) quai=(%d,%d) hinh=%s",\r\n'
+     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, (int)eStatus, nNpcIndex, nPX, nPY, nQx, nQy,\r\n'
      b'\t\t\tm_MissleRes.m_MissleRes[eStatus].AnimFileName[0] ? m_MissleRes.m_MissleRes[eStatus].AnimFileName : "(THIEU)");\r\n'
+     b'\t}\r\n'
      b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
      'log tao hieu ung no ben client')
 
