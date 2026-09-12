@@ -975,6 +975,92 @@ edit('S3Client/Ui/UiCase/UiOptions.cpp',
      'gui do sang cho ca bo ve phan mem')
 
 
+# DOI HANH VI: "danh quai gan nhat" uu tien con NAM TRONG KHUNG NHIN.
+#
+# Cu chon theo khoang cach khong gian thi no hay nham con o NGOAI man hinh (danh
+# sach NPC cua client giu ca nhung con vua ra khoi khung), dan bay ra ria - moi
+# phep do bang anh chup deu hong. Do 12-13/09/2026: mat mot dem khong chup noi
+# hieu ung no o cho trung quai chi vi li do nay.
+#
+# Phep doi toa do khong gian -> khung nhin von da co san o duoi (tuyen tinh, lay
+# hai mau roi nghich dao); day chi keo no len TRUOC vong lap de loc.
+edit('Core/Src/CoreShell.cpp',
+     b'\t\t\tint nGan = 0, nGanNhat = 0;\r\n'
+     b'\t\t\tfor (int i = 1; i < MAX_NPC; i++)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tif (i == nMinh || Npc[i].m_Index <= 0)\r\n'
+     b'\t\t\t\t\tcontinue;\r\n'
+     b'\t\t\t\tif (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)\r\n'
+     b'\t\t\t\t\tcontinue;\r\n'
+     b'\t\t\t\tint nQx, nQy;\r\n'
+     b'\t\t\t\tNpc[i].GetMpsPos(&nQx, &nQy);\r\n'
+     b'\t\t\t\tint nDx = nQx - nX, nDy = nQy - nY;\r\n'
+     b'\t\t\t\tint nKc = nDx * nDx + nDy * nDy;\r\n'
+     b'\t\t\t\tif (nGan == 0 || nKc < nGanNhat)\r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tnGan = i;\r\n'
+     b'\t\t\t\t\tnGanNhat = nKc;\r\n'
+     b'\t\t\t\t}\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t\tif (nGan == 0)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tg_DebugLog("[danh-quai] khong thay quai thu dich nao");\r\n'
+     b'\t\t\t\tbreak;\r\n'
+     b'\t\t\t}\r\n',
+     b'\t\t\t/* Phep doi khong gian -> khung nhin, lay TRUOC vong lap de loc\r\n'
+     b'\t\t\t   theo man hinh. Tuyen tinh nen hai mau la du. */\r\n'
+     b'\t\t\tint nLocAx = 0, nLocAy = 0, nLocAz = 0;\r\n'
+     b'\t\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nLocAx, nLocAy, nLocAz);\r\n'
+     b'\t\t\tint nLocBx = 100, nLocBy = 100, nLocBz = 0;\r\n'
+     b'\t\t\tg_ScenePlace.ViewPortCoordToSpaceCoord(nLocBx, nLocBy, nLocBz);\r\n'
+     b'\t\t\tint nLocHsX = nLocBx - nLocAx, nLocHsY = nLocBy - nLocAy;\r\n'
+     b'\t\t\t/* Do phan giai client: config.ini [Client] Resolution = 1 la\r\n'
+     b'\t\t\t   1024x768. Chua bien 80 diem moi ria de hieu ung no con nam\r\n'
+     b'\t\t\t   tron trong khung, khong bi cat mat nua. */\r\n'
+     b'\t\t\tconst int nRongKhung = 1024, nCaoKhung = 768, nBien = 80;\r\n'
+     b'\t\t\tint nGan = 0, nGanNhat = 0;\t\t/* gan nhat, khong ke khung nhin */\r\n'
+     b'\t\t\tint nTrong = 0, nTrongNhat = 0;\t/* gan nhat TRONG khung nhin */\r\n'
+     b'\t\t\tfor (int i = 1; i < MAX_NPC; i++)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tif (i == nMinh || Npc[i].m_Index <= 0)\r\n'
+     b'\t\t\t\t\tcontinue;\r\n'
+     b'\t\t\t\tif (Npc[i].m_Kind != kind_normal || Npc[i].m_Doing == do_death)\r\n'
+     b'\t\t\t\t\tcontinue;\r\n'
+     b'\t\t\t\tint nQx, nQy;\r\n'
+     b'\t\t\t\tNpc[i].GetMpsPos(&nQx, &nQy);\r\n'
+     b'\t\t\t\tint nDx = nQx - nX, nDy = nQy - nY;\r\n'
+     b'\t\t\t\tint nKc = nDx * nDx + nDy * nDy;\r\n'
+     b'\t\t\t\tif (nGan == 0 || nKc < nGanNhat)\r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tnGan = i;\r\n'
+     b'\t\t\t\t\tnGanNhat = nKc;\r\n'
+     b'\t\t\t\t}\r\n'
+     b'\t\t\t\tif (nLocHsX && nLocHsY)\r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tint nVx = (nQx - nLocAx) * 100 / nLocHsX;\r\n'
+     b'\t\t\t\t\tint nVy = (nQy - nLocAy) * 100 / nLocHsY;\r\n'
+     b'\t\t\t\t\tif (nVx >= nBien && nVx <= nRongKhung - nBien &&\r\n'
+     b'\t\t\t\t\t\tnVy >= nBien && nVy <= nCaoKhung - nBien &&\r\n'
+     b'\t\t\t\t\t\t(nTrong == 0 || nKc < nTrongNhat))\r\n'
+     b'\t\t\t\t\t{\r\n'
+     b'\t\t\t\t\t\tnTrong = i;\r\n'
+     b'\t\t\t\t\t\tnTrongNhat = nKc;\r\n'
+     b'\t\t\t\t\t}\r\n'
+     b'\t\t\t\t}\r\n'
+     b'\t\t\t}\r\n'
+     b'\t\t\tif (nTrong)\r\n'
+     b'\t\t\t\tnGan = nTrong;\t\t\t\t/* uu tien con nhin thay duoc */\r\n'
+     b'\t\t\telse if (nGan)\r\n'
+     b'\t\t\t\tg_DebugLog("[danh-quai] khong con nao trong khung nhin, "\r\n'
+     b'\t\t\t\t\t"danh con gan nhat o ngoai");\r\n'
+     b'\t\t\tif (nGan == 0)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\t\tg_DebugLog("[danh-quai] khong thay quai thu dich nao");\r\n'
+     b'\t\t\t\tbreak;\r\n'
+     b'\t\t\t}\r\n',
+     'danh quai: uu tien con trong khung nhin')
+
+
 edit('Core/Src/KNpcResNode.cpp',
      b'\t\tif (strcmp(szBuffer, "\xcd\xb7\xb6\xa5") == 0)\r\n'
      b'\t\t\tm_nType[i] = STATE_MAGIC_HEAD;\r\n'
