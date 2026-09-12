@@ -5329,6 +5329,18 @@ edit('Core/Src/KMissle.cpp',
      b'\t\t\tif (m_nDamageRange == 1)',
      'log dan cham NPC ben client')
 
+# LOG TAM (VLTK_LOG_DAN=1): hai cua thoat IM LANG o dau CheckCollision - do cao va
+# vung. Dan bay ca chuc nhip ma khong sinh mot dong [va-c] nao, tuc ham thoat
+# TRUOC khi kip goi FindNpc.
+edit('Core/Src/KMissle.cpp',
+     b'\tif (m_nCurrentMapZ <= MISSLE_MIN_COLLISION_ZHEIGHT) \r\n',
+     b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
+     b'\t\tg_DebugLog("[cua-c] dan=%d chieu=%d cao=%d vung=%d tam-cham=%d doi=%d/%d",\r\n'
+     b'\t\t\t(int)(this - Missle), (int)m_nSkillId, (int)m_nCurrentMapZ, (int)m_nRegionId,\r\n'
+     b'\t\t\t(int)m_nCollideRange, (int)m_nCurrentLife, (int)m_nLifeTime);\r\n'
+     b'\tif (m_nCurrentMapZ <= MISSLE_MIN_COLLISION_ZHEIGHT) \r\n',
+     'log hai cua thoat dau CheckCollision')
+
 edit('Core/Src/KMissle.cpp',
      b'\tm_MissleRes.PlaySound(eStatus, nPX, nPY, 0);\r\n',
      b'\tif (getenv("VLTK_LOG_DAN"))\r\n'
