@@ -3675,7 +3675,7 @@ edit('Core/Src/CoreShell.cpp',
      _crlf(b'\t\t\tif (sShopName == 0 || sShopName[0] == 0)\n'
            b'\t\t\t{\n'
            b'\t\t\t\tKSystemMessage\tsMsg;\n'
-           b'\t\t\t\tsprintf(sMsg.szMessage, "Hay dat Loi rao truoc khi bay ban!");\n'
+           b'\t\t\t\tsprintf(sMsg.szMessage, "H\\267y \\256\\306t L\\352i rao tr\\255\\355c khi b\\265y b\\270n!");\t/* TCVN3 */\n'
            b'\t\t\t\tsMsg.eType = SMT_SYSTEM;\t/* SMT_SYSTEM: popup noi, khong chim vao chat */\n'
            b'\t\t\t\tsMsg.byConfirmType = SMCT_NONE;\n'
            b'\t\t\t\tsMsg.byPriority = 0;\n'
@@ -4250,9 +4250,9 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
      _crlf(b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
      _crlf(b'\t\t/* To NEN o vat pham dang bay ban (da dinh gia), neu chua co mau\n'
            b'\t\t   hover/chon de khong de len. Nen ve truoc icon nen nam duoi. */\n'
-           b'\t\tif (Shadow.Color.Color_dw == 0 && pObj->uGenre == CGOG_ITEM &&\n'
+           b'\t\tif ((Shadow.Color.Color_dw == 0 || Shadow.Color.Color_dw == 0x16FF0000) && pObj->uGenre == CGOG_ITEM &&\n'
            b'\t\t\tg_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)\n'
-           b'\t\t\tShadow.Color.Color_dw = 0x26FFFF00;\t/* vang, opacity ~0.15 (ARGB) */\n'
+           b'\t\t\tShadow.Color.Color_dw = 0x16FFFF00;\t/* vang, mau chiem 10/32 ~ opacity .3 - xem ClearAlpha */\n'
            b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
      'to nen o vat pham dang bay ban')
 
@@ -4684,6 +4684,46 @@ edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
      b'\tif (KUiExBox1::GetIfVisible())\t/* dang xem trang mo rong: cat vao trang do */\r\n'
      b'\t\treturn KUiExBox1::GetIfVisible()->DepositBagItem(pBagItem);\r\n',
      'chuot phai cat vao trang mo rong dang xem')
+
+# ------------------------------------------------ nen do khong mac duoc
+# DOI HANH VI (user 14/09/2026): do khong du dieu kien mac (CanEquip) to nen DO,
+# opacity .3. Engine da tinh san IIEP_NOT_USEABLE nhung mau lay tu muc
+# [ObjContColor] cua ini, ma bo giao dien ta khong khai muc do -> mau 0 -> khong ve.
+# RU_T_SHADOW (KCanvas::ClearAlpha): ket qua = (nen*a + mau*(32-a)) >> 5, tuc byte
+# alpha la TRONG SO NEN tren thang 32. Mau .3 -> a = 22 (0x16). Dat a > 32 (vd 0x26)
+# thi mau tran, ra khoi mau choi - dung loi nen vang cua o dang bay ban truoc day.
+edit_all('S3Client/Ui/Elem/WndObjContainer.cpp',
+     b'Shadow.Color.Color_dw = l_BgColors[1];',
+     b'Shadow.Color.Color_dw = 0x16FF0000;\t/* do khong mac duoc: do, opacity .3 */',
+     'nen do cho do khong mac duoc')
+
+# ------------------------------------------------ hop dat / doi mat khau
+# Chua dat mat khau lan nao thi bo hang "Mat ma cu". May chu gui co khoa:
+# 0 = khoa, 1 = mo chua co mat khau, 3 = mo da co mat khau (bit 2). Moi cho khac
+# chi xet dung/sai nen khong doi. Bo cuc chua co mat khau la cac muc *_New trong
+# UiChangePWBox.ini (anh tu sinh, cao 91). Mo hop thi dat san con tro vao o dau.
+edit('S3Client/Ui/UiCase/UiChangePWBox.cpp',
+     _crlf(b'\t\tm_pSelf->Init(&Ini, "Main");\n'
+           b'\t\tm_pSelf->m_OldPassword.Init(&Ini, "Password");\n'
+           b'\t\tm_pSelf->m_NewPassword1.Init(&Ini, "NewPassword");\n'
+           b'\t\tm_pSelf->m_NewPassword2.Init(&Ini, "NewPassConfirm");\n'
+           b'\t\tm_pSelf->m_NoticeText.Init(&Ini, "Notice");\n'
+           b'\t\tm_pSelf->m_OKBtn.Init(&Ini, "Confirm");\n'
+           b'\t\tm_pSelf->m_CancelBtn.Init(&Ini, "Cancel");\n'),
+     _crlf(b'\t\tint bCoMatKhau = (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0) & 2) != 0;\n'
+b'\t\tconst char* szDuoi = bCoMatKhau ? "" : "_New";\n'
+           b'\t\tchar szMuc[32];\n'
+           b'\t\tsprintf(szMuc, "Main%s", szDuoi);\t\tm_pSelf->Init(&Ini, szMuc);\n'
+           b'\t\tm_pSelf->m_OldPassword.Init(&Ini, "Password");\n'
+           b'\t\tsprintf(szMuc, "NewPassword%s", szDuoi);\tm_pSelf->m_NewPassword1.Init(&Ini, szMuc);\n'
+           b'\t\tsprintf(szMuc, "NewPassConfirm%s", szDuoi);\tm_pSelf->m_NewPassword2.Init(&Ini, szMuc);\n'
+           b'\t\tm_pSelf->m_NoticeText.Init(&Ini, "Notice");\n'
+           b'\t\tsprintf(szMuc, "Confirm%s", szDuoi);\tm_pSelf->m_OKBtn.Init(&Ini, szMuc);\n'
+           b'\t\tsprintf(szMuc, "Cancel%s", szDuoi);\tm_pSelf->m_CancelBtn.Init(&Ini, szMuc);\n'
+           b'\t\tif (!bCoMatKhau)\n'
+           b'\t\t\tm_pSelf->m_OldPassword.Hide();\n'
+           b'\t\tWnd_SetFocusWnd(bCoMatKhau ? (KWndWindow*)&m_pSelf->m_OldPassword : (KWndWindow*)&m_pSelf->m_NewPassword1);\n'),
+     'hop mat khau: bo hang mat ma cu khi chua dat')
 
 # ===========================================================================
 # A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).

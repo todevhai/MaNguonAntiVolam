@@ -774,7 +774,12 @@ void KUiSysMsgCentre::PaintWindow()
 			{
 				int nRong = nDaiChu * m_nMsgFont / 2 + m_nMsgFont;
 				if (nRong < Shadow.oEndPos.nX)
+				{
+					/* Text is right-aligned (MsgText HAlign=2) so it sits next to the
+					   message icons on the right: keep the backdrop at the right end too. */
+					Shadow.oPosition.nX += Shadow.oEndPos.nX - nRong;
 					Shadow.oEndPos.nX = nRong;
+				}
 			}
 		}
 		Shadow.oEndPos.nX += Shadow.oPosition.nX;
