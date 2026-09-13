@@ -2307,13 +2307,6 @@ edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
      b'void KUiStoreBox::CloseWindow()\r\n{\r\n\tKUiExBox1::CloseWindow();\t/* roi ruong (di xa, UiShell) cung dong trang mo rong */\r\n\tif (m_pSelf)\r\n\t{\r\n',
      'dong ruong dong luon Mo rong ruong')
 
-edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
-     b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\r\n{\r\n',
-     b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\r\n{\r\n'
-     b'\tif (KUiExBox1::GetIfVisible())\t/* dang xem trang mo rong: cat vao trang do */\r\n'
-     b'\t\treturn KUiExBox1::GetIfVisible()->DepositBagItem(pBagItem);\r\n',
-     'chuot phai cat vao trang mo rong dang xem')
-
 # ------------------------------------- muoi nut chuc nang tren thanh cong cu
 # DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
 # Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
@@ -4682,6 +4675,15 @@ edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
            b'\t\tOnItemPickDrop((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);\n'
            b'\t\tbreak;'),
      '#3b rclick trong ruong lay do ve tui')
+
+# Ruong mo rong dang trang (xem khoi 'ruong mo rong dang trang' o tren): phai dat SAU
+# ban va tao DepositBagItem, neu khong mau khong khop va ca Engine bi bo qua.
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\r\n{\r\n',
+     b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\r\n{\r\n'
+     b'\tif (KUiExBox1::GetIfVisible())\t/* dang xem trang mo rong: cat vao trang do */\r\n'
+     b'\t\treturn KUiExBox1::GetIfVisible()->DepositBagItem(pBagItem);\r\n',
+     'chuot phai cat vao trang mo rong dang xem')
 
 # ===========================================================================
 # A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).
