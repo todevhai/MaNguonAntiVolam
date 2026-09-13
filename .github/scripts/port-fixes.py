@@ -2160,6 +2160,14 @@ edit('Core/Src/CoreShell.cpp',
      b'case GDI_IMMEDIATEITEM_NUM:\r\n\t\tif (uParam >= 0 && uParam < MAX_IMMEDIACY_ITEM)\r\n',
      'dem so do cho ca chin o phim tat')
 
+# DOI HANH VI (user yeu cau 13/09/2026): o chi con 1 mon cung hien so "1" - nguon
+# goc chi ve khi >= 2. Chi dung trong KImmediaItem::PaintWindow; so tren icon
+# trong tui (KItem::Paint) giu nguyen luat > 1.
+edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
+     b'\t\tif (nNum > 1 && nNum < 1000)\r\n',
+     b'\t\tif (nNum >= 1 && nNum < 1000)\r\n',
+     'o phim tat hien ca so 1')
+
 # ------------------------------------- muoi nut chuc nang tren thanh cong cu
 # DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
 # Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
