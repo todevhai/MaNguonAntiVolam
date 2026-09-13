@@ -4725,6 +4725,15 @@ b'\t\tconst char* szDuoi = bCoMatKhau ? "" : "_New";\n'
            b'\t\tWnd_SetFocusWnd(bCoMatKhau ? (KWndWindow*)&m_pSelf->m_OldPassword : (KWndWindow*)&m_pSelf->m_NewPassword1);\n'),
      'hop mat khau: bo hang mat ma cu khi chua dat')
 
+# OnCheckInput chay sau MOI phim cho TAT CA o nhap: o trong -> GetIntNumber 0 ->
+# itoa "0" khac "" -> SetIntText(0). Go o tren thi o duoi hien san "*" (mot so 0),
+# o an "Mat ma cu" cung bi ghi "0". Chi chuan hoa o da co chu.
+for f, n in (('S3Client/Ui/UiCase/UiChangePWBox.cpp', 3), ('S3Client/Ui/UiCase/UiUnlockBox.cpp', 1)):
+    edit_all(f,
+         _crlf(b'\tif (strcmp(szBuff1, szBuff2))\n'),
+         _crlf(b'\tif (szBuff2[0] && strcmp(szBuff1, szBuff2))\t/* o trong: de trong, dung ep thanh 0 */\n'),
+         'o nhap mat khau trong khong bi ep thanh 0 (' + f + ')')
+
 # ===========================================================================
 # A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).
 # Van de: click dich (minimap/khung game) -> GotoWhere -> di theo VECTOR, gap tuong
