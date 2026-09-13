@@ -1,16 +1,8 @@
-/*****************************************************************************************
-//	½çÃæ--´¢ÎïÏä½çÃæ
-//	Copyright : Kingsoft 2003
-//	Author	:   Wooy(Wu yue)
-//	CreateTime:	2003-4-21
-*****************************************************************************************/
+// "Mo rong ruong" window - see UiExBox1.h for how pages map to chest rows.
 #include "KWin32.h"
 #include "KIniFile.h"
 #include "../elem/wnds.h"
 #include "UiExBox1.h"
-#include "UiExBox2.h"
-#include "UiExBox3.h"
-#include "UiGetMoney.h"
 #include "UiItem.h"
 #include "../../../core/src/coreshell.h"
 #include "../../../core/src/GameDataDef.h"
@@ -20,15 +12,10 @@
 
 extern iCoreShell*		g_pCoreShell;
 
-#define SCHEME_INI_ITEM	"MoRongRuongMain.ini"
-#define SCHEME_INI_EX1	"MoRongRuongMot.ini"
+#define SCHEME_INI_ITEM	"UiStoreBoxEx.ini"
 
 KUiExBox1* KUiExBox1::m_pSelf = NULL;
 
-
-//--------------------------------------------------------------------------
-//	¹¦ÄÜ£ºÈç¹û´°¿ÚÕý±»ÏÔÊ¾£¬Ôò·µ»ØÊµÀýÖ¸Õë
-//--------------------------------------------------------------------------
 KUiExBox1* KUiExBox1::GetIfVisible()
 {
 	if (m_pSelf && m_pSelf->IsVisible())
@@ -36,9 +23,6 @@ KUiExBox1* KUiExBox1::GetIfVisible()
 	return NULL;
 }
 
-//--------------------------------------------------------------------------
-//	¹¦ÄÜ£º´ò¿ª´°¿Ú£¬·µ»ØÎ¨Ò»µÄÒ»¸öÀà¶ÔÏóÊµÀý
-//--------------------------------------------------------------------------
 KUiExBox1* KUiExBox1::OpenWindow()
 {
 	if (m_pSelf == NULL)
@@ -49,150 +33,38 @@ KUiExBox1* KUiExBox1::OpenWindow()
 	}
 	if (m_pSelf)
 	{
-		if (KUiItem::GetIfVisible() == NULL)
-			KUiItem::OpenWindow();
-		else
-			UiSoundPlay(UI_SI_WND_OPENCLOSE);
-
-		m_pSelf->UpdateData();
+		UiSoundPlay(UI_SI_WND_OPENCLOSE);
+		m_pSelf->SelectPage(m_pSelf->m_nPage);
 		m_pSelf->BringToTop();
 		m_pSelf->Show();
-		Wnd_GameSpaceHandleInput(false);
-
 	}
 	return m_pSelf;
 }
-//----------new
-KUiExBox1* KUiExBox1::OpenWindow2()
-{
-	if (m_pSelf == NULL)
-	{
-		m_pSelf = new KUiExBox1;
-		if (m_pSelf)
-			m_pSelf->Initialize2();
-	}
-	if (m_pSelf)
-	{
-		if (KUiItem::GetIfVisible() == NULL)
-			KUiItem::OpenWindow();
-		else
-			UiSoundPlay(UI_SI_WND_OPENCLOSE);
 
-		m_pSelf->UpdateData();
-		m_pSelf->BringToTop();
-		m_pSelf->Show();
-		Wnd_GameSpaceHandleInput(false);
-
-	}
-	return m_pSelf;
-}
-//--------------------------------------------------------------------------
-//	¹¦ÄÜ£º¹Ø±Õ´°¿Ú
-//--------------------------------------------------------------------------
+// Game-space input stays with the chest window, which owns it while open.
 void KUiExBox1::CloseWindow()
 {
 	if (m_pSelf)
 	{
-		Wnd_GameSpaceHandleInput(true);
-		m_pSelf->Hide();
+		m_pSelf->Destroy();
 		m_pSelf = NULL;
 	}
 }
 
-// -------------------------------------------------------------------------
-// ¹¦ÄÜ	: ³õÊ¼»¯
-// -------------------------------------------------------------------------
 void KUiExBox1::Initialize()
 {
-	AddChild(&m_SelectionOne);
-	AddChild(&m_BuyTwo);
-	AddChild(&m_BuyThree);
 	AddChild(&m_CloseBtn);
-	AddChild(&m_ItemBoxMot);
-	AddChild(&m_InfoTextPage);
-	AddChild(&m_TextPage);
+	AddChild(&m_ItemBox);
+	for (int i = 0; i < EXBOX_PAGE_COUNT; i++)
+		AddChild(&m_PageBtn[i]);
+	m_ItemBox.SetContainerId((int)UOC_STORE_BOX);
 
-	m_ItemBoxMot.SetContainerId((int)UOC_EX_BOX1);
 	char Scheme[256];
 	g_UiBase.GetCurSchemePath(Scheme, 256);
 	LoadScheme(Scheme);
-
 	Wnd_AddWindow(this);
 }
 
-//--------------------------------------------------------------------------
-//	¹¦ÄÜ£º¹¹Ôìº¯Êý
-//--------------------------------------------------------------------------
-//----------------new load 1
-void KUiExBox1::Initialize2()
-{
-	AddChild(&m_SelectionOne);
-	AddChild(&m_BuyTwo);
-	AddChild(&m_BuyThree);
-	AddChild(&m_CloseBtn);
-	AddChild(&m_ItemBoxMot);
-	AddChild(&m_InfoTextPage);
-	AddChild(&m_TextPage);
-
-	m_ItemBoxMot.SetContainerId((int)UOC_EX_BOX1);
-	char Scheme[256];
-	g_UiBase.GetCurSchemePath(Scheme, 256);
-	LoadScheme2(Scheme);
-
-	Wnd_AddWindow(this);
-}
-//------------------------------------------------
-void KUiExBox1::UpdateData()
-{
-	m_ItemBoxMot.Clear();
-	
-	KUiObjAtRegion* pObjs = NULL;
-
-	int nCount = g_pCoreShell->GetGameData(GDI_ITEM_IN_EX_BOX1, 0, 0);
-	if (nCount == 0)
-		return;
-
-	if (pObjs = (KUiObjAtRegion*)malloc(sizeof(KUiObjAtRegion) * nCount))
-	{
-		g_pCoreShell->GetGameData(GDI_ITEM_IN_EX_BOX1, (unsigned int)pObjs, nCount);//µ¥Ïß³ÌÖ´ÐÐ£¬nCountÖµ²»±ä
-		for (int i = 0; i < nCount; i++)
-			UpdateItem(&pObjs[i], true);
-		free(pObjs);
-		pObjs = NULL;
-	}
-}
-
-// -------------------------------------------------------------------------
-// ¹¦ÄÜ	: ÎïÆ·±ä»¯¸üÐÂ
-// -------------------------------------------------------------------------
-void KUiExBox1::UpdateItem(KUiObjAtRegion* pItem, int bAdd)
-{
-	if (pItem)
-	{
-		UiSoundPlay(UI_SI_PICKPUT_ITEM);
-		if (pItem->Obj.uGenre != CGOG_MONEY)
-		{
-			KUiDraggedObject Obj;
-			Obj.uGenre = pItem->Obj.uGenre;
-			Obj.uId = pItem->Obj.uId;
-			Obj.DataX = pItem->Region.h;
-			Obj.DataY = pItem->Region.v;
-			Obj.DataW = pItem->Region.Width;
-			Obj.DataH = pItem->Region.Height;
-			if (bAdd)
-				m_ItemBoxMot.AddObject(&Obj, 1);
-			else
-				m_ItemBoxMot.RemoveObject(&Obj);
-		}
-		
-	}
-	else
-		UpdateData();
-}
-
-// -------------------------------------------------------------------------
-// ¹¦ÄÜ	: ÔØÈë½çÃæ·½°¸
-// -------------------------------------------------------------------------
 void KUiExBox1::LoadScheme(const char* pScheme)
 {
 	char		Buff[128];
@@ -201,73 +73,112 @@ void KUiExBox1::LoadScheme(const char* pScheme)
 	if (m_pSelf && Ini.Load(Buff))
 	{
 		m_pSelf->Init(&Ini, "Main");
-		m_pSelf->m_SelectionOne.Init(&Ini, "SelectionOne");
-		m_pSelf->m_BuyTwo.Init(&Ini, "BuyTwo");
-		m_pSelf->m_BuyThree.Init(&Ini, "BuyThree");
 		m_pSelf->m_CloseBtn.Init(&Ini, "CloseBtn");
-		m_pSelf->m_ItemBoxMot.Init(&Ini, "ItemBoxMot");
-		m_pSelf->m_ItemBoxMot.EnableTracePutPos(true);
-		m_pSelf->m_InfoTextPage.Init(&Ini, "InfoTextPage");
-		m_pSelf->m_InfoTextPage.SetText("R­¬ng 1");
-		m_pSelf->m_TextPage.Init(&Ini,"TextPage");
-		char szTextEx[32];
-		sprintf(szTextEx,"B¹n ®· më réng ®­îc %d/3",g_pCoreShell->GetGameData(GDI_EXBOX_ID, 0, 0));
-		m_pSelf->m_TextPage.SetText(szTextEx);
-		
-	}
-}
-//--------new
-void KUiExBox1::LoadScheme2(const char* pScheme)
-{
-	char		Buff[128];
-	KIniFile	Ini;
-	sprintf(Buff, "%s\\%s", pScheme, SCHEME_INI_EX1);
-	if (m_pSelf && Ini.Load(Buff))
-	{
-		m_pSelf->Init(&Ini, "Main");
-		m_pSelf->m_SelectionOne.Init(&Ini, "SelectionOne");
-		m_pSelf->m_BuyTwo.Init(&Ini, "BuyTwo");
-		m_pSelf->m_BuyThree.Init(&Ini, "BuyThree");
-		m_pSelf->m_CloseBtn.Init(&Ini, "CloseBtn");
-		m_pSelf->m_ItemBoxMot.Init(&Ini, "ItemBoxMot");
-		m_pSelf->m_ItemBoxMot.EnableTracePutPos(true);
-		m_pSelf->m_InfoTextPage.Init(&Ini, "InfoTextPage");
-		m_pSelf->m_InfoTextPage.SetText("R­¬ng 1");
-		m_pSelf->m_TextPage.Init(&Ini,"TextPage");
-		char szTextEx[32];
-		sprintf(szTextEx,"B¹n ®· më réng ®­îc %d/3",g_pCoreShell->GetGameData(GDI_EXBOX_ID, 0, 0));
-		m_pSelf->m_TextPage.SetText(szTextEx);
-		
+		m_pSelf->m_ItemBox.Init(&Ini, "ItemBox");
+		m_pSelf->m_ItemBox.EnableTracePutPos(true);
+		for (int i = 0; i < EXBOX_PAGE_COUNT; i++)
+		{
+			char szSection[16];
+			sprintf(szSection, "BtnPage%d", i + 1);
+			m_pSelf->m_PageBtn[i].Init(&Ini, szSection);
+		}
 	}
 }
 
-// -------------------------------------------------------------------------
-// ¹¦ÄÜ	: ´°¿Úº¯Êý
-// -------------------------------------------------------------------------
+int KUiExBox1::RowOffset() const
+{
+	return m_nPage * REPOSITORY_ROOM_HEIGHT;
+}
+
+void KUiExBox1::SelectPage(int nPage)
+{
+	if (nPage < 1 || nPage > EXBOX_PAGE_COUNT)
+		nPage = 1;
+	m_nPage = nPage;
+	for (int i = 0; i < EXBOX_PAGE_COUNT; i++)
+		m_PageBtn[i].CheckButton(i + 1 == m_nPage);
+	UpdateData();
+}
+
+void KUiExBox1::UpdateData()
+{
+	m_ItemBox.Clear();
+	int nCount = g_pCoreShell->GetGameData(GDI_ITEM_IN_STORE_BOX, 0, 0);
+	if (nCount <= 0)
+		return;
+	KUiObjAtRegion* pObjs = (KUiObjAtRegion*)malloc(sizeof(KUiObjAtRegion) * nCount);
+	if (pObjs == NULL)
+		return;
+	g_pCoreShell->GetGameData(GDI_ITEM_IN_STORE_BOX, (unsigned int)pObjs, nCount);	// fills nCount entries, same as KUiStoreBox::UpdateData
+	int nOff = RowOffset();
+	for (int i = 0; i < nCount; i++)
+	{
+		KUiObjAtRegion* p = &pObjs[i];
+		if (p->Obj.uGenre == CGOG_MONEY || p->Region.v < nOff || p->Region.v >= nOff + REPOSITORY_ROOM_HEIGHT)
+			continue;
+		KUiDraggedObject Obj;
+		Obj.uGenre = p->Obj.uGenre;
+		Obj.uId = p->Obj.uId;
+		Obj.DataX = p->Region.h;
+		Obj.DataY = p->Region.v - nOff;
+		Obj.DataW = p->Region.Width;
+		Obj.DataH = p->Region.Height;
+		m_ItemBox.AddObject(&Obj, 1);
+	}
+	free(pObjs);
+}
+
+void KUiExBox1::UpdateItem(KUiObjAtRegion* pItem, int bAdd)
+{
+	if (pItem == NULL)
+	{
+		UpdateData();
+		return;
+	}
+	int nOff = RowOffset();
+	if (pItem->Obj.uGenre == CGOG_MONEY || pItem->Region.v < nOff || pItem->Region.v >= nOff + REPOSITORY_ROOM_HEIGHT)
+		return;		// another page
+	UiSoundPlay(UI_SI_PICKPUT_ITEM);
+	KUiDraggedObject Obj;
+	Obj.uGenre = pItem->Obj.uGenre;
+	Obj.uId = pItem->Obj.uId;
+	Obj.DataX = pItem->Region.h;
+	Obj.DataY = pItem->Region.v - nOff;
+	Obj.DataW = pItem->Region.Width;
+	Obj.DataH = pItem->Region.Height;
+	if (bAdd)
+		m_ItemBox.AddObject(&Obj, 1);
+	else
+		m_ItemBox.RemoveObject(&Obj);
+}
+
 int KUiExBox1::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
-	switch(uMsg)
+	switch (uMsg)
 	{
 	case WND_N_ITEM_PICKDROP:
 		if (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0))
-		{
 			OnItemPickDrop((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);
-			break;
-		}
-		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, CN_GH, 0);
-			break;
+		else
+			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, CN_GH, 0);	// "needs unlocking"
+		break;
+	case WND_N_RIGHT_CLICK_ITEM:
+		WithdrawBoxItem((KUiDraggedObject*)uParam);
+		break;
 	case WND_N_BUTTON_CLICK:
 		if (uParam == (unsigned int)(KWndWindow*)&m_CloseBtn)
-			CloseWindow();
-		else if (uParam == (unsigned int)(KWndWindow*)&m_BuyTwo)
 		{
-			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, EX_BOX2, 0);
-			
+			CloseWindow();
+			return 0;
 		}
-		else if (uParam == (unsigned int)(KWndWindow*)&m_BuyThree)
-			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, EX_BOX3, 0);
-			
-		
+		for (int i = 0; i < EXBOX_PAGE_COUNT; i++)
+		{
+			if (uParam == (unsigned int)(KWndWindow*)&m_PageBtn[i])
+			{
+				SelectPage(i + 1);
+				break;
+			}
+		}
 		break;
 	default:
 		return KWndShowAnimate::WndProc(uMsg, uParam, nParam);
@@ -275,29 +186,26 @@ int KUiExBox1::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 	return 0;
 }
 
-
-
 void KUiExBox1::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)
 {
 	if (g_UiBase.GetStatus() != UIS_S_IDLE)
 		return;
 	KUiObjAtContRegion	Pick, Drop;
 	KUiDraggedObject	Obj;
+	int nOff = RowOffset();
 
 	if (pPickPos)
 	{
-		_ASSERT(pPickPos->pWnd);		
-		((KWndObjectMatrix*)(pPickPos->pWnd))->GetObject(
-			Obj, pPickPos->h, pPickPos->v);
+		_ASSERT(pPickPos->pWnd);
+		((KWndObjectMatrix*)(pPickPos->pWnd))->GetObject(Obj, pPickPos->h, pPickPos->v);
 		Pick.Obj.uGenre = Obj.uGenre;
 		Pick.Obj.uId = Obj.uId;
 		Pick.Region.Width = Obj.DataW;
 		Pick.Region.Height = Obj.DataH;
 		Pick.Region.h = Obj.DataX;
-		Pick.Region.v = Obj.DataY;
-		Pick.eContainer = UOC_EX_BOX1;
+		Pick.Region.v = Obj.DataY + nOff;
+		Pick.eContainer = UOC_STORE_BOX;
 	}
-
 	if (pDropPos)
 	{
 		Wnd_GetDragObj(&Obj);
@@ -306,11 +214,63 @@ void KUiExBox1::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLAC
 		Drop.Region.Width = Obj.DataW;
 		Drop.Region.Height = Obj.DataH;
 		Drop.Region.h = pDropPos->h;
-		Drop.Region.v = pDropPos->v;
-		Drop.eContainer = UOC_EX_BOX1;
+		Drop.Region.v = pDropPos->v + nOff;
+		Drop.eContainer = UOC_STORE_BOX;
 	}
-	
 	g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT,
 		pPickPos ? (unsigned int)&Pick : 0,
 		pDropPos ? (int)&Drop : 0);
+}
+
+// Right click in the bag while this window is open: put the item on the page being viewed.
+BOOL KUiExBox1::DepositBagItem(KUiDraggedObject* pBagItem)
+{
+	if (pBagItem == NULL || pBagItem->uGenre == CGOG_NOTHING || g_pCoreShell == NULL)
+		return FALSE;
+	int iw = pBagItem->DataW > 0 ? pBagItem->DataW : 1;
+	int ih = pBagItem->DataH > 0 ? pBagItem->DataH : 1;
+	int fx = -1, fy = -1;
+	if (!m_ItemBox.FindBlankCell(iw, ih, &fx, &fy))
+		return FALSE;	// page full
+	KUiObjAtContRegion Pick, Drop;
+	Pick.Obj.uGenre = Drop.Obj.uGenre = pBagItem->uGenre;
+	Pick.Obj.uId = Drop.Obj.uId = pBagItem->uId;
+	Pick.Region.Width = Drop.Region.Width = pBagItem->DataW;
+	Pick.Region.Height = Drop.Region.Height = pBagItem->DataH;
+	Pick.Region.h = pBagItem->DataX;
+	Pick.Region.v = pBagItem->DataY;
+	Pick.eContainer = UOC_ITEM_TAKE_WITH;
+	Drop.Region.h = fx;
+	Drop.Region.v = fy + RowOffset();
+	Drop.eContainer = UOC_STORE_BOX;
+	g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, (unsigned int)&Pick, (int)&Drop);
+	return TRUE;
+}
+
+// Right click on an item here: move it to the first free bag cell.
+BOOL KUiExBox1::WithdrawBoxItem(KUiDraggedObject* pBoxItem)
+{
+	if (pBoxItem == NULL || pBoxItem->uGenre == CGOG_NOTHING || g_pCoreShell == NULL)
+		return FALSE;
+	KUiItem* pBag = KUiItem::GetIfVisible();
+	if (pBag == NULL)
+		return FALSE;
+	int iw = pBoxItem->DataW > 0 ? pBoxItem->DataW : 1;
+	int ih = pBoxItem->DataH > 0 ? pBoxItem->DataH : 1;
+	int fx = -1, fy = -1;
+	if (!pBag->FindBlankBagCell(iw, ih, &fx, &fy))
+		return FALSE;	// bag full
+	KUiObjAtContRegion Pick, Drop;
+	Pick.Obj.uGenre = Drop.Obj.uGenre = pBoxItem->uGenre;
+	Pick.Obj.uId = Drop.Obj.uId = pBoxItem->uId;
+	Pick.Region.Width = Drop.Region.Width = pBoxItem->DataW;
+	Pick.Region.Height = Drop.Region.Height = pBoxItem->DataH;
+	Pick.Region.h = pBoxItem->DataX;
+	Pick.Region.v = pBoxItem->DataY + RowOffset();
+	Pick.eContainer = UOC_STORE_BOX;
+	Drop.Region.h = fx;
+	Drop.Region.v = fy;
+	Drop.eContainer = UOC_ITEM_TAKE_WITH;
+	g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, (unsigned int)&Pick, (int)&Drop);
+	return TRUE;
 }

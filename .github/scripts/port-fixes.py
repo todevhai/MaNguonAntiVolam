@@ -2251,6 +2251,69 @@ edit('S3Client/Ui/UiCase/UiStatus.cpp',
      b'void KUiStatus::PaintWindow()\r\n{\r\n\tUpdateAvatar();\r\n\tif (g_pCoreShell)\t/* nhan nut Khoa theo trang thai that, xem ruong */\r\n\t\tm_UnlockBtn.CheckButton(!g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0));\r\n',
      'nhan nut Khoa o F3 theo trang thai that')
 
+# ------------------------------------------------ ruong mo rong dang trang
+# DOI HANH VI (user chot 14/09/2026): ruong co 6 trang - trang 0 la cua so ruong,
+# trang 1..5 la cua so "Mo rong ruong" (KUiExBox1, viet lai). KHONG them vi tri do
+# moi: ngan room_repository cao 10 x 6 hang, trang k = hang 10k..10k+9. May chu
+# (server/linux-server/Core/GameDataDef.h) doi CUNG hang so - hai ben phai khop,
+# MAX_PLAYER_ITEM tinh theo MAX_REPOSITORY_ITEM.
+for f in ('Core/Src/GameDataDef.h', 'Engine/Core/GameDataDef.h'):
+    edit(f,
+         b'#define\t\tREPOSITORY_ROOM_HEIGHT\t\t10\r\n#define\t\tMAX_REPOSITORY_ITEM\t\t\t(REPOSITORY_ROOM_WIDTH * REPOSITORY_ROOM_HEIGHT)\r\n',
+         b'#define\t\tREPOSITORY_ROOM_HEIGHT\t\t10\t/* hang MOI TRANG */\r\n'
+         b'#define\t\tREPOSITORY_ROOM_PAGES\t\t6\t/* trang 0 = cua so ruong, 1..5 = Mo rong ruong */\r\n'
+         b'#define\t\tMAX_REPOSITORY_ITEM\t\t\t(REPOSITORY_ROOM_WIDTH * REPOSITORY_ROOM_HEIGHT * REPOSITORY_ROOM_PAGES)\r\n',
+         'ruong 6 trang (' + f + ')')
+
+edit('Core/Src/KItemList.cpp',
+     b'\tm_Room[room_repository].Init(REPOSITORY_ROOM_WIDTH, REPOSITORY_ROOM_HEIGHT);',
+     b'\tm_Room[room_repository].Init(REPOSITORY_ROOM_WIDTH, REPOSITORY_ROOM_HEIGHT * REPOSITORY_ROOM_PAGES);',
+     'ngan ruong cao du 6 trang')
+
+# Cua so ruong chi hien trang 0; mon o trang khac chuyen cho cua so Mo rong ruong.
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'\t\tfor (int i = 0; i < nCount; i++)\r\n\t\t\tUpdateItem(&pObjs[i], true);\r\n',
+     b'\t\tfor (int i = 0; i < nCount; i++)\r\n'
+     b'\t\t\tif (pObjs[i].Obj.uGenre == CGOG_MONEY || pObjs[i].Region.v < REPOSITORY_ROOM_HEIGHT)\t/* chi trang 0 */\r\n'
+     b'\t\t\t\tUpdateItem(&pObjs[i], true);\r\n',
+     'cua so ruong chi hien trang 0')
+
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'{\r\n\tif (pItem)\r\n\t{\r\n\t\tUiSoundPlay(UI_SI_PICKPUT_ITEM);\r\n\t\tif (pItem->Obj.uGenre != CGOG_MONEY)\r\n',
+     b'{\r\n'
+     b'\tif (pItem && pItem->Obj.uGenre != CGOG_MONEY && pItem->Region.v >= REPOSITORY_ROOM_HEIGHT)\r\n'
+     b'\t{\t/* mon o trang mo rong */\r\n'
+     b'\t\tif (KUiExBox1::GetIfVisible())\r\n'
+     b'\t\t\tKUiExBox1::GetIfVisible()->UpdateItem(pItem, bAdd);\r\n'
+     b'\t\treturn;\r\n'
+     b'\t}\r\n'
+     b'\tif (pItem == NULL && KUiExBox1::GetIfVisible())\r\n'
+     b'\t\tKUiExBox1::GetIfVisible()->UpdateItem(NULL, bAdd);\r\n'
+     b'\tif (pItem)\r\n\t{\r\n\t\tUiSoundPlay(UI_SI_PICKPUT_ITEM);\r\n\t\tif (pItem->Obj.uGenre != CGOG_MONEY)\r\n',
+     'mon trang mo rong chuyen sang cua so Mo rong ruong')
+
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'\t\t{\t\r\n\t\t\tg_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, EX_BOX, 0);\r\n\t\t\t\t\r\n\t\t}\r\n',
+     b'\t\t{\t/* bat/tat cua so Mo rong ruong - moi trang deu mo san */\r\n'
+     b'\t\t\tif (KUiExBox1::GetIfVisible())\r\n'
+     b'\t\t\t\tKUiExBox1::CloseWindow();\r\n'
+     b'\t\t\telse\r\n'
+     b'\t\t\t\tKUiExBox1::OpenWindow();\r\n'
+     b'\t\t}\r\n',
+     'nut Mo rong bat tat cua so Mo rong ruong')
+
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'void KUiStoreBox::CloseWindow()\r\n{\r\n\tif (m_pSelf)\r\n\t{\r\n',
+     b'void KUiStoreBox::CloseWindow()\r\n{\r\n\tKUiExBox1::CloseWindow();\t/* roi ruong (di xa, UiShell) cung dong trang mo rong */\r\n\tif (m_pSelf)\r\n\t{\r\n',
+     'dong ruong dong luon Mo rong ruong')
+
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\r\n{\r\n',
+     b'BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)\r\n{\r\n'
+     b'\tif (KUiExBox1::GetIfVisible())\t/* dang xem trang mo rong: cat vao trang do */\r\n'
+     b'\t\treturn KUiExBox1::GetIfVisible()->DepositBagItem(pBagItem);\r\n',
+     'chuot phai cat vao trang mo rong dang xem')
+
 # ------------------------------------- muoi nut chuc nang tren thanh cong cu
 # DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
 # Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
