@@ -328,6 +328,11 @@ int KUiStatus::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			Wnd_DragFinished();
 		break;
 		}
+		// Locked: the slot already lifted the item onto the cursor at the UI layer before
+		// telling us. Nobody will take it, so drop the drag image or it sticks to the cursor.
+		// Only for a plain pick (uParam set, nParam empty) - same rule as the idle branch.
+		if (uParam && !nParam)
+			Wnd_DragFinished();
 		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, CN_GH, 0);
 		break;
 	default:
