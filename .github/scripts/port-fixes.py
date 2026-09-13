@@ -2225,6 +2225,32 @@ edit('S3Client/Ui/UiCase/UiUnlockBox.cpp',
      b'\t\tm_pSelf->Show();\r\n\t\tWnd_GameSpaceHandleInput(false);\r\n\t\tWnd_SetFocusWnd(&m_pSelf->m_Password);\t/* go ngay, khong phai bam vao o */\r\n',
      'hop mo khoa dat san con tro nhap')
 
+# Nut Khoa o ruong va F3 la CheckBox=1: bam la tu lat nhan, KHONG doc trang thai
+# that. Do 14/09/2026: khoa o F3 xong, ruong van ghi "Khoa" va nguoc lai; dang
+# nhap lai thi nhan theo lan bam cuoi chu khong theo may chu. Moi lan ve dat lai
+# theo co khoa (checked = dang khoa = nhan "Mo khoa").
+edit('S3Client/Ui/UiCase/UiStoreBox.h',
+     b'\tvoid\tUpdateData();\r\n\tvoid\tOnItemPickDrop(',
+     b'\tvoid\tUpdateData();\r\n\tvoid\tPaintWindow();\t/* nhan nut Khoa theo trang thai that */\r\n\tvoid\tOnItemPickDrop(',
+     'khai bao PaintWindow cho ruong')
+
+edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
+     b'int KUiStoreBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\r\n',
+     _crlf(b'void KUiStoreBox::PaintWindow()\n'
+           b'{\n'
+           b'\tif (g_pCoreShell)\n'
+           b'\t\tm_UnlockBtn.CheckButton(!g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0));\n'
+           b'\tKWndShowAnimate::PaintWindow();\n'
+           b'}\n'
+           b'\n'
+           b'int KUiStoreBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\n'),
+     'nhan nut Khoa o ruong theo trang thai that')
+
+edit('S3Client/Ui/UiCase/UiStatus.cpp',
+     b'void KUiStatus::PaintWindow()\r\n{\r\n\tUpdateAvatar();\r\n',
+     b'void KUiStatus::PaintWindow()\r\n{\r\n\tUpdateAvatar();\r\n\tif (g_pCoreShell)\t/* nhan nut Khoa theo trang thai that, xem ruong */\r\n\t\tm_UnlockBtn.CheckButton(!g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0));\r\n',
+     'nhan nut Khoa o F3 theo trang thai that')
+
 # ------------------------------------- muoi nut chuc nang tren thanh cong cu
 # DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
 # Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
