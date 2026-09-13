@@ -2168,6 +2168,63 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.cpp',
      b'\t\tif (nNum >= 1 && nNum < 1000)\r\n',
      'o phim tat hien ca so 1')
 
+# ------------------------------------------------ khoa nhan vat + mat khau
+# DOI HANH VI (user chot 13/09/2026): mat khau khoa nhan vat la so 1..9 chu so,
+# lan dat dau tien khong can mat khau cu. May chu quyet dinh moi luat
+# (server/linux-server/Core/KPlayerChestLock.cpp); client chi can gui duoc.
+#
+# Ba cho chan o client lam hop mat khau khong dung duoc:
+#   - UiChangePWBox: MIN 100000 (bat 6 chu so) va bat mat khau CU hop le -> lan
+#     dat dau (o cu trong = 0) khong bao gio gui; sai thi im lang vi hai loi goi
+#     thong bao bi chu thich.
+#   - UiUnlockBox: o nhap la KWndEdit6 - bo dem 6 byte, go 9 chu so bi cat; va
+#     AddChild(&m_Text) bi chu thich nen dong "Nhap mat ma" khong hien.
+edit('S3Client/Ui/UiCase/UiChangePWBox.h',
+     b'#define CHEST_PW_MAX_VALUE\t999999\r\n#define CHEST_PW_MIN_VALUE\t100000\r\n',
+     b'#define CHEST_PW_MAX_VALUE\t999999999\r\n#define CHEST_PW_MIN_VALUE\t1\r\n',
+     'mat khau 1..9 chu so')
+
+edit('S3Client/Ui/UiCase/UiChangePWBox.cpp',
+     b'\tif (oldPW < CHEST_PW_MIN_VALUE || oldPW > CHEST_PW_MAX_VALUE || \r\n',
+     b'\tif (oldPW < 0 || oldPW > CHEST_PW_MAX_VALUE || \t/* trong = chua dat, may chu xet */\r\n',
+     'cho de trong mat khau cu lan dat dau')
+
+edit('S3Client/Ui/UiCase/UiChangePWBox.cpp',
+     b'//\t\tg_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_LONG, 0);\r\n',
+     b'\t\tg_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_LONG, 0);\r\n',
+     'bao mat khau khong hop le')
+
+edit('S3Client/Ui/UiCase/UiChangePWBox.cpp',
+     b'//\t\tg_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_SAME, 0);\t\r\n',
+     b'\t\tg_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_SAME, 0);\r\n',
+     'bao hai mat khau moi khong khop')
+
+# "Mat khau phai dai du 6 chu so" -> "Mat khau phai la so, tu 1 den 9 chu so" (TCVN3)
+edit('Core/Src/CoreShell.cpp',
+     b'"M\xcbt kh\xc8u ph\xb6i d\xb5i \xae\xf1 6 ch\xf7 s\xe8"',
+     b'"M\xcbt kh\xc8u ph\xb6i l\xb5 s\xe8, t\xf5 1 \xae\xd5n 9 ch\xf7 s\xe8"',
+     'cau bao do dai mat khau')
+
+edit('S3Client/Ui/UiCase/UiUnlockBox.h',
+     b'#define CHEST_PW_MAX_VALUE\t999999\r\n',
+     b'#define CHEST_PW_MAX_VALUE\t999999999\r\n',
+     'hop mo khoa nhan 9 chu so')
+
+edit('S3Client/Ui/UiCase/UiUnlockBox.h',
+     b'\tKWndEdit6\t\t\tm_Password;\r\n',
+     b'\tKWndEdit32\t\t\tm_Password;\t/* 6 byte khong chua noi 9 chu so */\r\n',
+     'o nhap mo khoa du cho 9 chu so')
+
+edit('S3Client/Ui/UiCase/UiUnlockBox.cpp',
+     b'//\tAddChild(&m_Text);\r\n',
+     b'\tAddChild(&m_Text);\r\n',
+     'hien dong chu tren hop mo khoa')
+
+edit('S3Client/Ui/UiCase/UiUnlockBox.cpp',
+     b'\t\tm_pSelf->Show();\r\n\t\tWnd_GameSpaceHandleInput(false);\r\n',
+     b'\t\tm_pSelf->Show();\r\n\t\tWnd_GameSpaceHandleInput(false);\r\n\t\tWnd_SetFocusWnd(&m_pSelf->m_Password);\t/* go ngay, khong phai bam vao o */\r\n',
+     'hop mo khoa dat san con tro nhap')
+
 # ------------------------------------- muoi nut chuc nang tren thanh cong cu
 # DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
 # Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
