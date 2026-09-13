@@ -2153,6 +2153,13 @@ edit('S3Client/Ui/UiCase/UiPlayerBar.h',
      b'#define\tUPB_IMMEDIA_ITEM_COUNT\t9',
      'so o lop khung duoi dung 3 -> 9')
 
+# Con so con lai o goc o phim tat: GDI_IMMEDIATEITEM_NUM van chan o >= 3 tu thoi
+# con ba o, nen o 4..9 khong bao gio hien so du co do.
+edit('Core/Src/CoreShell.cpp',
+     b'case GDI_IMMEDIATEITEM_NUM:\r\n\t\tif (uParam >= 0 && uParam < 3)\r\n',
+     b'case GDI_IMMEDIATEITEM_NUM:\r\n\t\tif (uParam >= 0 && uParam < MAX_IMMEDIACY_ITEM)\r\n',
+     'dem so do cho ca chin o phim tat')
+
 # ------------------------------------- muoi nut chuc nang tren thanh cong cu
 # DOI HANH VI - KUiToolsControlBar chi khai SAU nut (Rec, ItemEx, Mission,
 # Friend, ChatRoom, Options), thieu het cac nut hay dung nhat: nhan vat, hanh
