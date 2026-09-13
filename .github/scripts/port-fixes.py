@@ -4763,6 +4763,74 @@ edit('Core/Src/CoreShell.cpp',
            b'\t\tg_DebugLog("[vat-the] khoa dich %d kind=%d", nTargetIndex, Object[nTargetIndex].m_nKind);\n\t}\n'),
      'log khoa dich vat the')
 
+# ------------------------------------------------ min-max tren dong thuoc tinh
+# DOI HANH VI (user 14/09/2026): tooltip moi dong thuoc tinh ma phap kem khoang
+# gia tri co the ra cua thuoc tinh do "[min-max]" (xanh) va "[MAX]" (cam) khi da
+# dat tran. Khoang = min/max tham so 1 cua MOI hang cung "loai thuoc tinh" trong
+# magicattrib.txt, qua moi tang cap (vd Sinh luc toi da 5..200 = tang 1 min ->
+# tang 10 max) - dung vi du user gui. Bang da nap san trong ItemGen.m_BPTLib.
+# Mo ta ghi vao KGameObjDesc.szTitle (1024 byte); chot do dai de khong tran.
+edit('Core/Src/KItemGenerator.h',
+     _crlf(b'protected:\n\tKLibOfBPT\tm_BPTLib;'),
+     _crlf(b'public:\n\tconst KLibOfBPT* GetBPTLib() const { return &m_BPTLib; }\t/* tooltip min-max */\nprotected:\n\tKLibOfBPT\tm_BPTLib;'),
+     'ItemGen cho doc bang thuoc tinh')
+
+edit('Core/Src/KItem.cpp',
+     b'#include "KMagicDesc.h"',
+     _crlf(b'#include "KMagicDesc.h"\n'
+           b'#include "KItemGenerator.h"\n'
+           b'\n'
+           b'#ifndef _SERVER\n'
+           b'/* Min/max of parameter 1 over every magicattrib row of this property kind, all tiers.\n'
+           b'   Built once. -1 in the table means "unused" so negatives are skipped. */\n'
+           b'static BOOL MagicAttribRange(int nPropKind, int* pnMin, int* pnMax)\n'
+           b'{\n'
+           b'\tenum { MAX_KIND = 1024 };\n'
+           b'\tstatic int s_bDaLap = 0;\n'
+           b'\tstatic int s_nMin[MAX_KIND], s_nMax[MAX_KIND];\n'
+           b'\tif (!s_bDaLap)\n'
+           b'\t{\n'
+           b'\t\ts_bDaLap = 1;\n'
+           b'\t\tfor (int k = 0; k < MAX_KIND; k++) { s_nMin[k] = 0x7fffffff; s_nMax[k] = -1; }\n'
+           b'\t\tconst KLibOfBPT* pLib = ItemGen.GetBPTLib();\n'
+           b'\t\tint n = pLib->GetMARecordNumber();\n'
+           b'\t\tfor (int r = 0; r < n; r++)\n'
+           b'\t\t{\n'
+           b'\t\t\tconst KMAGICATTRIB_TABFILE* pRec = pLib->GetMARecord(r);\n'
+           b'\t\t\tif (!pRec) continue;\n'
+           b'\t\t\tint k = pRec->m_MagicAttrib.nPropKind;\n'
+           b'\t\t\tint a = pRec->m_MagicAttrib.aryRange[0].nMin, b = pRec->m_MagicAttrib.aryRange[0].nMax;\n'
+           b'\t\t\tif (k <= 0 || k >= MAX_KIND || a < 0 || b < a) continue;\n'
+           b'\t\t\tif (a < s_nMin[k]) s_nMin[k] = a;\n'
+           b'\t\t\tif (b > s_nMax[k]) s_nMax[k] = b;\n'
+           b'\t\t}\n'
+           b'\t}\n'
+           b'\tif (nPropKind <= 0 || nPropKind >= MAX_KIND || s_nMax[nPropKind] <= s_nMin[nPropKind])\n'
+           b'\t\treturn FALSE;\t/* not in the table, or a single fixed value */\n'
+           b'\t*pnMin = s_nMin[nPropKind];\n'
+           b'\t*pnMax = s_nMax[nPropKind];\n'
+           b'\treturn TRUE;\n'
+           b'}\n'
+           b'#endif'),
+     'ham lay khoang min-max cua thuoc tinh')
+
+edit('Core/Src/KItem.cpp',
+     _crlf(b'\t\t\t\t\tstrcat(pszMsg, "<color=DBlue>");\n\t\t\t}\n\t\t}\n\t\tstrcat(pszMsg, pszInfo);\n\t\tstrcat(pszMsg, "\\n");\n'),
+     _crlf(b'\t\t\t\t\tstrcat(pszMsg, "<color=DBlue>");\n\t\t\t}\n\t\t}\n\t\tstrcat(pszMsg, pszInfo);\n'
+           b'\t\t{\n'
+           b'\t\t\tint nMin, nMax;\n'
+           b'\t\t\tif (strlen(pszMsg) < 800 && MagicAttribRange(m_aryMagicAttrib[i].nAttribType, &nMin, &nMax))\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\tchar szKhoang[48];\n'
+           b'\t\t\t\tsprintf(szKhoang, " <color=Cyan>[%d-%d]", nMin, nMax);\n'
+           b'\t\t\t\tstrcat(pszMsg, szKhoang);\n'
+           b'\t\t\t\tif (abs(m_aryMagicAttrib[i].nValue[0]) >= nMax)\n'
+           b'\t\t\t\t\tstrcat(pszMsg, "<color=Fire>[MAX]");\n'
+           b'\t\t\t}\n'
+           b'\t\t}\n'
+           b'\t\tstrcat(pszMsg, "\\n");\n'),
+     'tooltip them [min-max] va [MAX] cho dong thuoc tinh')
+
 # ===========================================================================
 # A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).
 # Van de: click dich (minimap/khung game) -> GotoWhere -> di theo VECTOR, gap tuong
