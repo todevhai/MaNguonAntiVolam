@@ -101,6 +101,9 @@ void KAutoControl::RunLine(const char* szLine)
 		if (sscanf(szArg, "%d %d", &x, &y) == 2)
 		{
 			Wnd_ProcessInput(WM_MOUSEMOVE, 0, (int)MAKELONG((short)x, (short)y));
+			// Tooltips and the system-message text wait for WM_MOUSEHOVER, which Windows only
+			// raises for the real cursor (TrackMouseEvent). Send it too so hover can show them.
+			Wnd_ProcessInput(0x02A1 /* WM_MOUSEHOVER */, 0, (int)MAKELONG((short)x, (short)y));
 			g_DebugLog("[AUTO] hover %d,%d", x, y);
 		}
 	}
