@@ -104,6 +104,14 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] hover %d,%d", x, y);
 		}
 	}
+	else if (!strcmp(szCmd, "go"))
+	{
+		// Go chuoi vao o nhap dang giu focus (vd o mat khau): tung ky tu la mot
+		// WM_CHAR qua Wnd_ProcessInput - thu dong nhu hover, khong cuop focus may.
+		for (const char* p = szArg; *p; p++)
+			Wnd_ProcessInput(WM_CHAR, (unsigned char)*p, 0);
+		g_DebugLog("[AUTO] go %d ky tu", (int)strlen(szArg));
+	}
 	/* Danh con quai GAN NHAT. Bam chuot len quai la thao tac kho nhat khi
 	   dieu khien tu ngoai: phai doan toa do man hinh cua no qua anh chup, lech
 	   vai diem la thanh lenh DI. Day tim quai ngay trong bo nho roi bom dung
