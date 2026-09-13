@@ -789,6 +789,37 @@ edit('Represent/iRepresent/Font/KFont2.cpp',
      b'\tm_nDrawBorderWithDeffColor = true;\t/* vien den, khop ban hoan thien */\r\n',
      'chu luon ve co vien den')
 
+# DOI HANH VI: SetBorderColor KHONG tat vien khi alpha = 0 - khop ban hoan thien.
+#
+# Ban va tren chi dat gia tri ban dau: moi lan OutputText/OutputRichText deu goi
+# SetBorderColor(BorderColor), ma ten NPC/nhan vat (KNpc::PaintInfo mac dinh
+# dwBorderColor = 0), ten vat pham roi, so mau... truyen 0 -> alpha 0 -> co ve vien
+# bi tat -> roi ve DrawFont -> muc 4 ve bang CHINH MAU CHU nua duc -> chu phinh, nhoe.
+# Chi ten dang duoc chon (0xFF000000) moi con vien.
+#
+# Mo represent2.dll cua ban6 (13/09/2026): SetBorderColor (0x10005d40) luon gan
+# m_nBorderColor = g_RGB(r,g,b), KHONG xet alpha; ca ba ham DrawCharacter deu goi
+# thang DrawFontWithBorder - DLL do khong nhap DrawFont. Tuc moi chu deu co vien,
+# mau vien 0 = den.
+edit('Represent/iRepresent/Font/KFont2.cpp',
+     b'\tif (uColor & 0xff000000)\r\n'
+     b'\t{\t\t\r\n'
+     b'\t\tKRColor\t\tc;\r\n'
+     b'\t\tc.Color_dw = uColor;\r\n'
+     b'\t\tm_nBorderColor = g_RGB(c.Color_b.r, c.Color_b.g, c.Color_b.b);\r\n'
+     b'\t\tm_nDrawBorderWithDeffColor = true;\r\n'
+     b'\t}\r\n'
+     b'\telse\r\n'
+     b'\t{\r\n'
+     b'\t\tm_nDrawBorderWithDeffColor = false;\r\n'
+     b'\t}\r\n',
+     b'\t/* Khop ban hoan thien: alpha khong tat vien, mau vien luon lay tu RGB. */\r\n'
+     b'\tKRColor\t\tc;\r\n'
+     b'\tc.Color_dw = uColor;\r\n'
+     b'\tm_nBorderColor = g_RGB(c.Color_b.r, c.Color_b.g, c.Color_b.b);\r\n'
+     b'\tm_nDrawBorderWithDeffColor = true;\r\n',
+     'vien chu khong tat khi alpha 0')
+
 
 # DOI HANH VI: cai that nut "Do sang" trong bang Tuy chon.
 #
