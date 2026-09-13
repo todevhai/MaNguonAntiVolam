@@ -4734,6 +4734,35 @@ for f, n in (('S3Client/Ui/UiCase/UiChangePWBox.cpp', 3), ('S3Client/Ui/UiCase/U
          _crlf(b'\tif (szBuff2[0] && strcmp(szBuff1, szBuff2))\t/* o trong: de trong, dung ep thanh 0 */\n'),
          'o nhap mat khau trong khong bi ep thanh 0 (' + f + ')')
 
+# ------------------------------------------------ bam vat the (ruong) mot lan
+# Bam ruong chua do phai bam HAI lan: KNpcAI::FollowObject chi gui lenh bam khi
+# nhan vat vao trong PLAYER_PICKUP_CLIENT_DISTANCE (63 diem) quanh goc vat the.
+# Ruong la vat can nen duong di dung truoc no mot khoang (A* dung khi con cach
+# dich duoi AP_GOAL_NEAR o) -> khong bao gio vao 63 -> lenh bam mat. Bam lan hai
+# thi dang dung sat nen di thang them duoc vai buoc.
+# Sua: nhan vat da DUNG YEN ma con giu vat the lam dich thi gui lenh neu con trong
+# tam may chu chap nhan (defMAX_EXEC_OBJ_SCRIPT_DISTANCE = 200 o
+# KProtocolProcess::ObjMouseClick); lay 160 de chua le lech vi tri hai ben.
+edit('Core/Src/KNpcAI.cpp',
+     b'#include "KCore.h"',
+     b'#include "KCore.h"\r\n#include "KEngine.h"\t/* g_DebugLog */',
+     'KNpcAI dung g_DebugLog')
+edit('Core/Src/KNpcAI.cpp',
+     _crlf(b'\tif ((nX1 - nX2) * (nX1 - nX2) + (nY1 - nY2) * (nY1 - nY2) < PLAYER_PICKUP_CLIENT_DISTANCE * PLAYER_PICKUP_CLIENT_DISTANCE)\n'
+           b'\t{\n'),
+     _crlf(b'\tint nKc2 = (nX1 - nX2) * (nX1 - nX2) + (nY1 - nY2) * (nY1 - nY2);\n'
+           b'\tint bDungYenGan = (Npc[m_nIndex].m_Doing == do_stand && nKc2 < 160 * 160);\n'
+           b'\tif (nKc2 < PLAYER_PICKUP_CLIENT_DISTANCE * PLAYER_PICKUP_CLIENT_DISTANCE || bDungYenGan)\n'
+           b'\t{\n'
+           b'\t\tg_DebugLog("[vat-the] bam %d kind=%d cach2=%d dungyen=%d", nIdx, Object[nIdx].m_nKind, nKc2, bDungYenGan);\n'),
+     'bam vat the: dung yen trong tam may chu thi gui lenh luon')
+edit('Core/Src/CoreShell.cpp',
+     _crlf(b'\tif (nTargetIndex <= 0)\t//\xc8\xa1\xcf\xfbLock\n\t\tNpc[nIndex].m_nObjectIdx = 0;\n\telse\n\t\tNpc[nIndex].m_nObjectIdx = nTargetIndex;\n'),
+     _crlf(b'\tif (nTargetIndex <= 0)\t//\xc8\xa1\xcf\xfbLock\n\t\tNpc[nIndex].m_nObjectIdx = 0;\n\telse\n\t{\n'
+           b'\t\tNpc[nIndex].m_nObjectIdx = nTargetIndex;\n'
+           b'\t\tg_DebugLog("[vat-the] khoa dich %d kind=%d", nTargetIndex, Object[nTargetIndex].m_nKind);\n\t}\n'),
+     'log khoa dich vat the')
+
 # ===========================================================================
 # A* TOAN CUC cho player auto-di (client-only, CoreClient.dll).
 # Van de: click dich (minimap/khung game) -> GotoWhere -> di theo VECTOR, gap tuong
