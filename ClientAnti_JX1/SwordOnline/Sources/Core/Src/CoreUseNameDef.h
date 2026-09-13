@@ -327,6 +327,10 @@ enum enumMSG_ID
 	enumMSG_ID_COMP_ERITEM,
 	/* Bao diem kinh nghiem vua an. Than goi mang mot int la so diem. */
 	enumMSG_ID_NHAN_KINH_NGHIEM,	/* = 38, phai trung so ben may chu */
+	/* Mot dong chu TCVN3 do may chu soan san (than goi la chuoi, khong co 0 cuoi).
+	   SendSystemInfo khong dung duoc cho viec nay: no gui channelid = -1 ma client
+	   khong co kenh ch_GM nen tin bi bo im lang. */
+	enumMSG_ID_VAN_BAN,				/* = 39, phai trung so ben may chu */
 	enumMSG_ID_NUM,
 };
 

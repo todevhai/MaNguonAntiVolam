@@ -2390,6 +2390,23 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 
 	switch (pShowMsg->m_wMsgID)
 	{
+	case enumMSG_ID_VAN_BAN:
+		{
+			KSystemMessage	sMsg;
+			int nDai = (int)pShowMsg->m_wLength + 1 - (int)(sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID));
+			if (nDai <= 0)
+				break;
+			if (nDai >= (int)sizeof(sMsg.szMessage))
+				nDai = sizeof(sMsg.szMessage) - 1;
+			memcpy(sMsg.szMessage, pMsg + sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID), nDai);
+			sMsg.szMessage[nDai] = 0;
+			sMsg.eType = SMT_NORMAL;	/* dong nhac nho duoi khung chat, nhu kinh nghiem */
+			sMsg.byConfirmType = SMCT_NONE;
+			sMsg.byPriority = 0;
+			sMsg.byParamSize = 0;
+			CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
+		}
+		break;
 	case enumMSG_ID_NHAN_KINH_NGHIEM:
 		{
 			/* Dong "nhac nho" duoi khung chat, khong phai kenh chat. */
