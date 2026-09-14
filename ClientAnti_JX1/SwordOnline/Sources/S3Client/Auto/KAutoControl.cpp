@@ -9,6 +9,7 @@
 #include "../Ui/UiCase/UiItem.h"
 #include "../Ui/UiCase/UiMiniMap.h"		// mo ban do lon (WORLD_MAP) de verify tim duong xa
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
+#include "../Ui/UiBase.h"				// nap-giao-dien: g_UiBase.ReloadCurScheme
 #include "../../core/src/coreshell.h"
 #include "../../core/src/gamedatadef.h"	// PA_RIDE
 /* Wine day WM_MOUSEMOVE cua con tro THAT vao ngay sau lenh hover, xoa vi tri vua dat - thu
@@ -111,6 +112,12 @@ void KAutoControl::RunLine(const char* szLine)
 			g_uAutoGiuChuotDen = GetTickCount() + 3000;
 			g_DebugLog("[AUTO] hover %d,%d", x, y);
 		}
+	}
+	else if (!strcmp(szCmd, "nap-giao-dien"))
+	{
+		// jxstudio vua ghi ini giao dien: doc lai bo giao dien cho cac cua so dang song.
+		g_UiBase.ReloadCurScheme();
+		g_DebugLog("[AUTO] nap-giao-dien");
 	}
 	else if (!strcmp(szCmd, "enter"))
 	{

@@ -83,6 +83,9 @@ public:
 	int		SchemeCount();									//获得界面方案的数目
 	int		GetScheme(int nIndex, char* pName, char* pPath);//获得某个界面方案的名称与路径
 	int		GetCurSchemePath(char* pBuffer, int nSize);		//获得当前界面方案的路径
+	// Doc lai ini bo giao dien cho moi cua so chinh (lenh auto nap-giao-dien, cho jxstudio chinh
+	// giao dien khong phai khoi dong lai client). Cua so tao moi moi lan mo thi tu doc lai khi mo.
+	void	ReloadCurScheme() { LoadSchemeForEachWnd(); }
 	
 	//操作配置、设定文件
 	KIniFile*	GetCommSettingFile();						//打开保存界面公共设置的文件
