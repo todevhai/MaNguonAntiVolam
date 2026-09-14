@@ -11,6 +11,8 @@
 extern iCoreShell*		g_pCoreShell;
 
 #define	SCHEME_INI_MERIDIAN	"UiStatusMeridian.ini"
+#define	MAU_CHON			0xffe1d52b	// chu nut dang chon: SelectColor 225,213,43 cua jx9tn
+#define	MAU_THUONG			0xffffffff
 #define	CONFIRM_MS			5000	// bam Xung huyet lan hai trong 5 giay moi gui (moi lan ton 50 van)
 
 KUiStatusMeridianPage::KUiStatusMeridianPage()
@@ -146,7 +148,10 @@ void KUiStatusMeridianPage::SelectWay(int nWay)
 		CancelConfirm();
 	m_nWay = nWay;
 	for (int i = 0; i < MERIDIAN_PAGE_WAYS; i++)
+	{
 		m_BtnWay[i].CheckButton(i == nWay);
+		m_BtnWay[i].SetLabelColor(i == nWay ? MAU_CHON : MAU_THUONG);
+	}
 }
 
 int KUiStatusMeridianPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
@@ -234,7 +239,10 @@ void KUiStatusMeridianPage::Refresh()
 
 	int i, nLevel = Info.nLevel[m_nMeridian - 1];
 	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
+	{
 		m_BtnMeridian[i].CheckButton(i + 1 == m_nMeridian);
+		m_BtnMeridian[i].SetLabelColor(i + 1 == m_nMeridian ? MAU_CHON : MAU_THUONG);
+	}
 	for (i = 0; i < MERIDIAN_PAGE_ACUPS; i++)
 		m_Acup[i].CheckButton(i < nLevel);		// khung 1 = huyet da xung (sang)
 	SelectWay(m_nWay);
