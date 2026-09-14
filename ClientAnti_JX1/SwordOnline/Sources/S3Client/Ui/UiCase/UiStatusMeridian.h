@@ -34,6 +34,7 @@ public:
 private:
 	void	Select(int nMeridian);						// 0 = Khi Doanh Dan Dien, 1..8 = mach
 	void	LoadAcupointLayout(int nMeridian);
+	void	PaintAcupointLines();						// duong noi huyet + vach dan ten
 	void	Refresh();									// dua trang theo goi s2c_meridian moi nhat
 	void	OnAcupointClick(int nIndex);				// 0..15
 	void	ShowMessage(const char* pszKey);			// tin he thong, chu lay tu ini [Messages]
@@ -41,6 +42,8 @@ private:
 	KWndLabeledButton	m_BtnFullBreath;
 	KWndLabeledButton	m_BtnMeridian[MERIDIAN_PAGE_COUNT];
 	KWndButton			m_Acup[MERIDIAN_PAGE_ACUPS];
+	KWndText32			m_AcupName[MERIDIAN_PAGE_ACUPS];	// ten huyet, trai/phai theo [AcupPos] cua ini mach
+	int					m_nAcupRight[MERIDIAN_PAGE_ACUPS];	// 1 = nhan ben phai huyet
 	KWndImage			m_BreathPoint[MERIDIAN_PAGE_COUNT];
 	KWndLabeledButton	m_BtnBreathDays[MERIDIAN_BREATH_DAYS];
 	KWndText256			m_BreathInfo;
