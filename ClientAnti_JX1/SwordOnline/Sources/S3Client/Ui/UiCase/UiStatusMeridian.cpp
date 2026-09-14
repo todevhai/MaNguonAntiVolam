@@ -21,6 +21,7 @@ extern iRepresentShell*	g_pRepresentShell;
 #define	MAU_THUONG			0xffffffff
 #define	MAU_DUONG_NOI		0xff101010	// duong noi cac huyet
 #define	MAU_VACH_DAN		0xffe8e8e8	// vach tu ten toi huyet
+#define	KHOANG_VACH_CHU		4			// diem ho giua dau vach dan va mep chu ten huyet
 #define	TANG_KHI_DOANH		16			// jx9tn MIN_MERIDIAN_LEVEL: 8 mach du tang nay moi Khi Doanh
 
 KUiStatusMeridianPage::KUiStatusMeridianPage()
