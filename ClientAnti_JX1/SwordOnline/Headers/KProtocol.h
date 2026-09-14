@@ -2265,7 +2265,7 @@ typedef struct
 	int		nXueLongTeng[MERIDIAN_ITEM_LEVELS];	// index = level - 1
 	int		nXueLongDan[MERIDIAN_ITEM_LEVELS];
 	int		nMoney;
-	char	szTips[128];	// TCVN3 text from GetLevelUpTips in meridian.lua, may hold '\n'
+	char	szTips[512];	// TCVN3 text from GetLevelUpTips in meridian.lua, lines split by '\n'
 } MERIDIAN_SYNC;
 
 typedef struct

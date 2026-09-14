@@ -58,7 +58,7 @@ struct KUiMeridianInfo
 	int		nMeridian;		// mach cua ket qua / chu goi y, 0 = goi dong bo
 	int		nWay;
 	int		nResult;
-	char	szTips[128];
+	char	szTips[512];
 };
 
 struct KUiMeridianAcupDesc

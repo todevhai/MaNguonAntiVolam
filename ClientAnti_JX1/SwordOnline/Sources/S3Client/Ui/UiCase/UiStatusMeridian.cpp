@@ -4,46 +4,45 @@
 #include "KWin32.h"
 #include "KIniFile.h"
 #include "../Elem/WndMessage.h"
-#include "KEngine.h"					// g_DebugLog
+#include "../UiBase.h"
 #include "UiStatusMeridian.h"
+#include "UiMeridianConfirm.h"
+#include "UiSysMsgCentre.h"
 #include "../../../core/src/coreshell.h"
+#include "../../../core/src/gamedatadef.h"
 
 extern iCoreShell*		g_pCoreShell;
 
 #define	SCHEME_INI_MERIDIAN	"UiStatusMeridian.ini"
-#define	MAU_CHON			0xffe1d52b	// chu nut dang chon: SelectColor 225,213,43 cua jx9tn
+#define	MAU_CHON			0xffe1d52b	// chu muc dang chon: SelectColor 225,213,43 cua jx9tn
 #define	MAU_THUONG			0xffffffff
-#define	CONFIRM_MS			5000	// bam Xung huyet lan hai trong 5 giay moi gui (moi lan ton 50 van)
+#define	TANG_KHI_DOANH		16			// jx9tn MIN_MERIDIAN_LEVEL: 8 mach du tang nay moi Khi Doanh
 
 KUiStatusMeridianPage::KUiStatusMeridianPage()
 {
 	m_szScheme[0] = 0;
 	memset(m_szLayout, 0, sizeof(m_szLayout));
-	memset(m_szFormatMaterial, 0, sizeof(m_szFormatMaterial));
-	memset(m_szFormatAcup, 0, sizeof(m_szFormatAcup));
-	memset(m_szFormatAcupNone, 0, sizeof(m_szFormatAcupNone));
-	memset(m_szLabelLevelUp, 0, sizeof(m_szLabelLevelUp));
-	memset(m_szLabelConfirm, 0, sizeof(m_szLabelConfirm));
-	m_uConfirmUntil = 0;
-	m_nMeridian = 1;
-	m_nWay = 0;
+	memset(m_szFormatZhenYuan, 0, sizeof(m_szFormatZhenYuan));
+	memset(m_szFormatAcupTip, 0, sizeof(m_szFormatAcupTip));
+	memset(m_nLevel, 0, sizeof(m_nLevel));
+	m_nMeridian = 0;
 	m_nVersion = -1;
-	m_nShowAcup = 0;
 }
 
 void KUiStatusMeridianPage::Initialize()
 {
 	int i;
-	AddChild(&m_BtnLevelUp);
+	AddChild(&m_BtnFullBreath);
 	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
 		AddChild(&m_BtnMeridian[i]);
-	for (i = 0; i < MERIDIAN_PAGE_WAYS; i++)
-		AddChild(&m_BtnWay[i]);
 	for (i = 0; i < MERIDIAN_PAGE_ACUPS; i++)
 		AddChild(&m_Acup[i]);
-	AddChild(&m_Material);
-	AddChild(&m_AcupInfo);
-	AddChild(&m_Tips);
+	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
+		AddChild(&m_BreathPoint[i]);
+	for (i = 0; i < MERIDIAN_BREATH_DAYS; i++)
+		AddChild(&m_BtnBreathDays[i]);
+	AddChild(&m_BreathInfo);
+	AddChild(&m_CurZhenYuan);
 }
 
 void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
@@ -58,18 +57,16 @@ void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
 		return;
 
 	Init(&Ini, "Main");
-	m_BtnLevelUp.Init(&Ini, "BtnLevelUp");
-	Ini.GetString("BtnLevelUp", "Label", "", m_szLabelLevelUp, sizeof(m_szLabelLevelUp));
-	Ini.GetString("BtnLevelUp", "LabelConfirm", "OK?", m_szLabelConfirm, sizeof(m_szLabelConfirm));
+	m_BtnFullBreath.Init(&Ini, "BtnFullBreath");
 
-	// 8 nut mach dung chung mot mau [MeridianConfig], xep doc cach nhau Step diem.
+	// 8 nut mach dung chung mau [MeridianConfig], xep doc cach nhau Step diem.
 	int nLeft = 0, nTop = 0, nStep = 24;
 	Ini.GetInteger("MeridianConfig", "Left", 0, &nLeft);
 	Ini.GetInteger("MeridianConfig", "Top", 0, &nTop);
 	Ini.GetInteger("MeridianConfig", "Step", 24, &nStep);
 	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
 	{
-		char szKey[16], szLabel[32];
+		char szKey[32], szLabel[32];
 		m_BtnMeridian[i].Init(&Ini, "MeridianConfig");
 		m_BtnMeridian[i].SetPosition(nLeft, nTop + i * nStep);
 		sprintf(szKey, "Label_%d", i);
@@ -79,24 +76,36 @@ void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
 		sprintf(szKey, "Meridian_%d", i);
 		Ini.GetString("MeridianConfig", szKey, "", Buff, sizeof(Buff));
 		sprintf(m_szLayout[i], "%s%s", pScheme, Buff);
-	}
-	for (i = 0; i < MERIDIAN_PAGE_WAYS; i++)
-	{
-		char szSection[16];
-		sprintf(szSection, "BtnWay%d", i);
-		m_BtnWay[i].Init(&Ini, szSection);
-	}
-	m_Material.Init(&Ini, "Material");
-	m_AcupInfo.Init(&Ini, "AcupInfo");
-	m_Tips.Init(&Ini, "Tips");
-	// Chu co dau nam o ini (TCVN3); nguon chi giu ASCII.
-	Ini.GetString("Material", "Format", "%d %d %d", m_szFormatMaterial, sizeof(m_szFormatMaterial));
-	Ini.GetString("AcupInfo", "Format", "%s %d/16: %s", m_szFormatAcup, sizeof(m_szFormatAcup));
-	Ini.GetString("AcupInfo", "FormatNone", "%s %d/16", m_szFormatAcupNone, sizeof(m_szFormatAcupNone));
 
-	LoadAcupointLayout(m_nMeridian);
-	SelectWay(m_nWay);
-	m_nVersion = -1;
+		sprintf(szKey, "imgBreathPoint_%d", i);
+		m_BreathPoint[i].Init(&Ini, szKey);
+	}
+	m_BtnBreathDays[0].Init(&Ini, "Btn1DayBreath");
+	m_BtnBreathDays[1].Init(&Ini, "Btn7DaysBreath");
+	m_BtnBreathDays[2].Init(&Ini, "Btn30DaysBreath");
+	m_BreathInfo.Init(&Ini, "BreathBuffInfo");
+	{
+		// ini khong chua duoc xuong dong: cac dong Line_0.. ghep bang '\n' (chu jx9tn BUFFINFO1)
+		char szAll[512], szLine[128], szKey[16];
+		szAll[0] = 0;
+		for (i = 0; i < 8; i++)
+		{
+			sprintf(szKey, "Line_%d", i);
+			if (!Ini.GetString("BreathBuffInfo", szKey, "", szLine, sizeof(szLine)))
+				break;
+			if (i)
+				strcat(szAll, "\n");
+			if (strlen(szAll) + strlen(szLine) + 2 < sizeof(szAll))
+				strcat(szAll, szLine);
+		}
+		m_BreathInfo.SetText(szAll);
+	}
+	m_CurZhenYuan.Init(&Ini, "txtCurZYCount");
+	// Chu co dau nam o ini (TCVN3); nguon chi giu ASCII.
+	Ini.GetString("txtCurZYCount", "Format", "%d", m_szFormatZhenYuan, sizeof(m_szFormatZhenYuan));
+	Ini.GetString("Messages", "AcupTip", "%s", m_szFormatAcupTip, sizeof(m_szFormatAcupTip));
+
+	Select(m_nMeridian);
 }
 
 void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
@@ -112,46 +121,84 @@ void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
 	}
 }
 
-// Trang vua duoc chon (KWndPageSet::ActivePage): xin may chu cap + goi y cua mach dang chon.
+// Trang vua duoc chon (KWndPageSet::ActivePage): xin may chu cap 8 mach + Chan Nguyen moi nhat.
 void KUiStatusMeridianPage::Show()
 {
 	KWndPage::Show();
-	RequestTips();
-}
-
-void KUiStatusMeridianPage::RequestTips()
-{
 	if (g_pCoreShell)
-		g_pCoreShell->OperationRequest(GOI_MERIDIAN, m_nMeridian, m_nWay | UI_MERIDIAN_TIPS_ONLY);
+		g_pCoreShell->OperationRequest(GOI_MERIDIAN, 0, 0);
+	Select(m_nMeridian);		// Show() hien lai MOI con: an phan khong thuoc muc dang chon
 }
 
-void KUiStatusMeridianPage::SelectMeridian(int nMeridian)
+void KUiStatusMeridianPage::Select(int nMeridian)
 {
-	if (nMeridian < 1 || nMeridian > MERIDIAN_PAGE_COUNT)
+	if (nMeridian < 0 || nMeridian > MERIDIAN_PAGE_COUNT)
 		return;
-	CancelConfirm();
-	if (nMeridian != m_nMeridian)
+	m_nMeridian = nMeridian;
+	int i;
+	m_BtnFullBreath.SetLabelColor(nMeridian == 0 ? MAU_CHON : MAU_THUONG);
+	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
+		m_BtnMeridian[i].SetLabelColor(i + 1 == nMeridian ? MAU_CHON : MAU_THUONG);
+	// Khi Doanh: vong 8 diem + dong trang thai + nut ngay; mach: 16 huyet
+	for (i = 0; i < MERIDIAN_PAGE_ACUPS; i++)
 	{
-		m_nMeridian = nMeridian;
-		m_nShowAcup = 0;
+		if (nMeridian)
+			m_Acup[i].Show();
+		else
+			m_Acup[i].Hide();
+	}
+	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
+	{
+		if (nMeridian)
+			m_BreathPoint[i].Hide();
+		else
+			m_BreathPoint[i].Show();
+	}
+	for (i = 0; i < MERIDIAN_BREATH_DAYS; i++)
+	{
+		if (nMeridian)
+			m_BtnBreathDays[i].Hide();
+		else
+			m_BtnBreathDays[i].Show();
+	}
+	if (nMeridian)
+	{
+		m_BreathInfo.Hide();
 		LoadAcupointLayout(nMeridian);
 	}
+	else
+		m_BreathInfo.Show();
 	m_nVersion = -1;
-	RequestTips();
 }
 
-void KUiStatusMeridianPage::SelectWay(int nWay)
+void KUiStatusMeridianPage::ShowMessage(const char* pszKey)
 {
-	if (nWay < 0 || nWay >= MERIDIAN_PAGE_WAYS)
+	KSystemMessage	Msg;
+	Msg.byConfirmType = SMCT_NONE;
+	Msg.byParamSize = 0;
+	Msg.byPriority = 0;
+	Msg.eType = SMT_NORMAL;
+	Msg.uReservedForUi = 0;
+	Msg.szMessage[0] = 0;
+	char		Buff[128];
+	KIniFile	Ini;
+	sprintf(Buff, "%s\\%s", m_szScheme, SCHEME_INI_MERIDIAN);
+	if (Ini.Load(Buff) && Ini.GetString("Messages", pszKey, "", Msg.szMessage, sizeof(Msg.szMessage)) &&
+		Msg.szMessage[0])
+		KUiSysMsgCentre::AMessageArrival(&Msg, NULL);
+}
+
+void KUiStatusMeridianPage::OnAcupointClick(int nIndex)
+{
+	if (m_nMeridian < 1)
 		return;
-	if (nWay != m_nWay)
-		CancelConfirm();
-	m_nWay = nWay;
-	for (int i = 0; i < MERIDIAN_PAGE_WAYS; i++)
-	{
-		m_BtnWay[i].CheckButton(i == nWay);
-		m_BtnWay[i].SetLabelColor(i == nWay ? MAU_CHON : MAU_THUONG);
-	}
+	int nLevel = m_nLevel[m_nMeridian - 1];
+	if (nIndex < nLevel)
+		ShowMessage("AcupExist");			// jx9tn G_MERIDIAN_ACU_EXIST
+	else if (nIndex > nLevel)
+		ShowMessage("WrongOrder");			// jx9tn G_MERIDIAN_WRONG_ORDER
+	else
+		KUiMeridianConfirm::OpenWindow(m_nMeridian, nIndex + 1);
 }
 
 int KUiStatusMeridianPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
@@ -159,40 +206,16 @@ int KUiStatusMeridianPage::WndProc(unsigned int uMsg, unsigned int uParam, int n
 	if (uMsg == WND_N_BUTTON_CLICK)
 	{
 		int i;
-		if (uParam == (unsigned int)(KWndWindow*)&m_BtnLevelUp)
+		if (uParam == (unsigned int)(KWndWindow*)&m_BtnFullBreath)
 		{
-			// Hai buoc nhu hop xac nhan cua jx9tn: lan dau doi nhan thanh "Xac nhan", lan hai
-			// trong CONFIRM_MS moi gui. Doi mach / cach thi huy (xem CancelConfirm).
-			unsigned int uNow = GetTickCount();
-			if (m_uConfirmUntil && uNow < m_uConfirmUntil)
-			{
-				CancelConfirm();
-				g_DebugLog("[kinh mach] gui xung mach %d cach %d", m_nMeridian, m_nWay);
-				if (g_pCoreShell)
-					g_pCoreShell->OperationRequest(GOI_MERIDIAN, m_nMeridian, m_nWay);
-			}
-			else
-			{
-				m_uConfirmUntil = uNow + CONFIRM_MS;
-				m_BtnLevelUp.SetLabel(m_szLabelConfirm);
-			}
+			Select(0);
 			return 0;
 		}
 		for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
 		{
 			if (uParam == (unsigned int)(KWndWindow*)&m_BtnMeridian[i])
 			{
-				SelectMeridian(i + 1);
-				return 0;
-			}
-		}
-		for (i = 0; i < MERIDIAN_PAGE_WAYS; i++)
-		{
-			if (uParam == (unsigned int)(KWndWindow*)&m_BtnWay[i])
-			{
-				SelectWay(i);
-				m_nVersion = -1;
-				RequestTips();
+				Select(i + 1);
 				return 0;
 			}
 		}
@@ -200,32 +223,21 @@ int KUiStatusMeridianPage::WndProc(unsigned int uMsg, unsigned int uParam, int n
 		{
 			if (uParam == (unsigned int)(KWndWindow*)&m_Acup[i])
 			{
-				m_nShowAcup = i + 1;
-				m_nVersion = -1;		// ve lai: bam lam tat khung sang cua huyet
+				m_nVersion = -1;		// bam lam tat khung sang cua huyet: ve lai
+				OnAcupointClick(i);
+				return 0;
+			}
+		}
+		for (i = 0; i < MERIDIAN_BREATH_DAYS; i++)
+		{
+			if (uParam == (unsigned int)(KWndWindow*)&m_BtnBreathDays[i])
+			{
+				ShowMessage("BreathNotOpen");
 				return 0;
 			}
 		}
 	}
 	return KWndPage::WndProc(uMsg, uParam, nParam);
-}
-
-void KUiStatusMeridianPage::ShowAcupoint(int nLevel)
-{
-	KUiMeridianAcupDesc Desc;
-	memset(&Desc, 0, sizeof(Desc));
-	Desc.nMeridian = m_nMeridian;
-	Desc.nLevel = nLevel;
-	if (!g_pCoreShell || !g_pCoreShell->GetGameData(GDI_MERIDIAN_ACUP_DESC, (unsigned int)&Desc, 0))
-	{
-		m_AcupInfo.SetText("");
-		return;
-	}
-	char szText[384];
-	if (Desc.szDesc[0])
-		sprintf(szText, m_szFormatAcup, Desc.szName, nLevel, Desc.szDesc);
-	else
-		sprintf(szText, m_szFormatAcupNone, Desc.szName, nLevel);
-	m_AcupInfo.SetText(szText);
 }
 
 void KUiStatusMeridianPage::Refresh()
@@ -237,46 +249,40 @@ void KUiStatusMeridianPage::Refresh()
 		return;
 	m_nVersion = nVersion;
 
-	int i, nLevel = Info.nLevel[m_nMeridian - 1];
+	int i;
 	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
 	{
-		m_BtnMeridian[i].CheckButton(i + 1 == m_nMeridian);
-		m_BtnMeridian[i].SetLabelColor(i + 1 == m_nMeridian ? MAU_CHON : MAU_THUONG);
+		m_nLevel[i] = Info.nLevel[i];
+		m_BreathPoint[i].SetFrame(Info.nLevel[i] >= TANG_KHI_DOANH ? 1 : 0);
 	}
-	for (i = 0; i < MERIDIAN_PAGE_ACUPS; i++)
-		m_Acup[i].CheckButton(i < nLevel);		// khung 1 = huyet da xung (sang)
-	SelectWay(m_nWay);
 
-	char szText[256];
-	sprintf(szText, m_szFormatMaterial, Info.nZhenYuan, Info.nHuMaiDan, Info.nDaHuMaiDan);
-	m_Material.SetText(szText);
-
-	// Huyet bam chon; mac dinh huyet ke tiep (hoac huyet cuoi khi mach da day)
-	int nShow = m_nShowAcup;
-	if (nShow <= 0)
-		nShow = nLevel < MERIDIAN_PAGE_ACUPS ? nLevel + 1 : MERIDIAN_PAGE_ACUPS;
-	ShowAcupoint(nShow);
-
-	// Chu goi y chi dung cho mach dang chon; goi dong bo luc vao game khong co chu
-	if (Info.nMeridian == m_nMeridian)
-		m_Tips.SetText(Info.szTips);
-	else
-		m_Tips.SetText("");
-}
-
-void KUiStatusMeridianPage::CancelConfirm()
-{
-	if (m_uConfirmUntil)
+	if (m_nMeridian >= 1)
 	{
-		m_uConfirmUntil = 0;
-		m_BtnLevelUp.SetLabel(m_szLabelLevelUp);
+		int nLevel = m_nLevel[m_nMeridian - 1];
+		for (i = 0; i < MERIDIAN_PAGE_ACUPS; i++)
+		{
+			m_Acup[i].CheckButton(i < nLevel);		// khung 1 = huyet da xung (sang)
+			// chu khi re chuot: ten huyet
+			KUiMeridianAcupDesc Desc;
+			memset(&Desc, 0, sizeof(Desc));
+			Desc.nMeridian = m_nMeridian;
+			Desc.nLevel = i + 1;
+			if (g_pCoreShell && g_pCoreShell->GetGameData(GDI_MERIDIAN_ACUP_DESC, (unsigned int)&Desc, 0))
+			{
+				char szTip[128];
+				sprintf(szTip, m_szFormatAcupTip, Desc.szName);
+				m_Acup[i].SetToolTipInfo(szTip, (int)strlen(szTip));
+			}
+		}
 	}
+
+	char szText[128];
+	sprintf(szText, m_szFormatZhenYuan, Info.nZhenYuan);
+	m_CurZhenYuan.SetText(szText);
 }
 
 void KUiStatusMeridianPage::PaintWindow()
 {
-	if (m_uConfirmUntil && GetTickCount() >= m_uConfirmUntil)
-		CancelConfirm();
 	Refresh();
 	KWndPage::PaintWindow();
 }
