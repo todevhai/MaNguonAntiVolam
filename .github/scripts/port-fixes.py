@@ -3867,8 +3867,7 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)\r\n\t\t\tKUiFindPos::OpenWindow();',
      _crlf(b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)\n'
-           b'\t\t{\n\t\t\tm_bCamCo = !m_bCamCo;\t/* bat/tat che do cam co, khong mo hop nhap */\n'
-           b'\t\t\tg_DebugLog("[ban do nho] cam co %d anh [%s]", m_bCamCo, m_szFlagImage);\n\t\t}'),
+           b'\t\t\tm_bCamCo = !m_bCamCo;\t/* bat/tat che do cam co, khong mo hop nhap */'),
      'UiMiniMap: nut co bat che do cam co')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
@@ -3900,8 +3899,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\t\t\t\t\t\t\tCo.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
            b'\t\t\t\t\t\t\t\tCo.nISPosition = IMAGE_IS_POSITION_INIT;\n'
            b'\t\t\t\t\t\t\t\tstrcpy(Co.szImage, m_szFlagImage);\n'
-           b'\t\t\t\t\t\t\t\tCo.oPosition.nX = nDichX;\n'
-           b'\t\t\t\t\t\t\t\tCo.oPosition.nY = nDichY;\n'
+           b'\t\t\t\t\t\t\t\tCo.oPosition.nX = nDichX - 1;\t/* chan cot co (goc duoi trai anh 11x14) dung diem */\n'
+           b'\t\t\t\t\t\t\t\tCo.oPosition.nY = nDichY - 13;\n'
            b'\t\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(1, &Co, RU_T_IMAGE, true);\n'
            b'\t\t\t\t\t\t\t}\n'
            b'\t\t\t\t\t\t\telse\n'
@@ -3925,10 +3924,6 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\tWnd_GetCursorPos(&nX, &nY);\n'
            b'\tint nRelX = nX - m_nAbsoluteLeft - m_MapPos.x;\n'
            b'\tint nRelY = nY - m_nAbsoluteTop - m_MapPos.y;\n'
-           b'\tstatic unsigned int s_uLog = 0;\n'
-           b'\tif (IR_GetCurrentTime() - s_uLog > 2000)\n'
-           b'\t{\n\t\ts_uLog = IR_GetCurrentTime();\n'
-           b'\t\tg_DebugLog("[ban do nho] co theo tro %d,%d rel %d,%d ban do %dx%d", nX, nY, nRelX, nRelY, (int)m_MapSize.cx, (int)m_MapSize.cy);\n\t}\n'
            b'\tif (nRelX < 0 || nRelY < 0 || nRelX >= (int)m_MapSize.cx || nRelY >= (int)m_MapSize.cy)\n'
            b'\t\treturn;\n'
            b'\tKRUImage Co;\n'
@@ -3938,8 +3933,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\tCo.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
            b'\tCo.nISPosition = IMAGE_IS_POSITION_INIT;\n'
            b'\tstrcpy(Co.szImage, m_szFlagImage);\n'
-           b'\tCo.oPosition.nX = nX;\n'
-           b'\tCo.oPosition.nY = nY;\n'
+           b'\tCo.oPosition.nX = nX - 1;\t/* chan cot co o dau con tro */\n'
+           b'\tCo.oPosition.nY = nY - 13;\n'
            b'\tg_pRepresentShell->DrawPrimitives(1, &Co, RU_T_IMAGE, true);\n'
            b'}\n'
            b'\n'
