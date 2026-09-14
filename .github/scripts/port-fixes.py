@@ -4428,11 +4428,12 @@ edit('S3Client/Ui/Elem/WndObjContainer.cpp',
      _crlf(b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
      _crlf(b'\t\t/* To NEN o vat pham dang bay ban (da dinh gia), neu chua co mau\n'
            b'\t\t   hover/chon de khong de len. Nen ve truoc icon nen nam duoi. */\n'
-           b'\t\tif ((Shadow.Color.Color_dw == 0 || Shadow.Color.Color_dw == 0x16FF0000) && pObj->uGenre == CGOG_ITEM &&\n'
+           b'\t\tif ((Shadow.Color.Color_dw == 0 || Shadow.Color.Color_dw == 0x16FF0000) &&\n'
+           b'\t\t\t(pObj->uGenre == CGOG_ITEM || pObj->uGenre == CGOG_PLAYERSELLITEM) &&\t/* ca sap nguoi khac dang xem */\n'
            b'\t\t\tg_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)\n'
            b'\t\t\tShadow.Color.Color_dw = 0x16FFFF00;\t/* vang, mau chiem 10/32 ~ opacity .3 - xem ClearAlpha */\n'
            b'\t\tint width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;'),
-     'to nen o vat pham dang bay ban')
+     'to nen o vat pham dang bay ban (tui minh + sap dang xem)')
 
 # 4) MouseHover.h: khai bao ham + bien icon.
 edit('S3Client/Ui/Elem/MouseHover.h',
@@ -5990,6 +5991,36 @@ edit('Core/Src/Scene/KScenePlaceC.cpp',
      b'm_FocusRegion.x = m_FocusRegion.y = -SPWP_LOAD_EXTEND_RANGE;',
      b'm_FocusRegion.x = m_FocusRegion.y = -SPWP_LOAD_EXTEND_RANGE; m_FocusPosition.x = m_FocusPosition.y = SPWP_FARAWAY_COORD;',
      'doi ban do: xoa tieu diem cu de ban do moi luon xep vung nap')
+
+# ------------------------------------------------ gian hang: goi mua + con tro Ctrl
+# DOI HANH VI: PLAYER_TRADE_BUY_ITEM_COMMAND::m_Idx la BYTE ma mang chi so Item[] cua
+# MAY CHU (KSellItem::m_nIdx, int). Chi so > 255 bi cat -> chot chong nhan ban o
+# c2sTradeBuy tu choi -> mua khong duoc, khong bao gi. Doi thanh int o CA HAI phia
+# (server/linux-server/Core/KProtocol.h sua cung luc); bang kich thuoc goi dung sizeof.
+edit('../Headers/KProtocol.h',
+     b'\tBYTE\t\t\tm_Idx;',
+     b'\tint\t\t\t\tm_Idx;\t\t/* chi so Item[] may chu - BYTE cu cat mat chi so > 255 */',
+     'goi mua sap: m_Idx BYTE -> int')
+edit('Core/Src/KProtocol.cpp',
+     b'PlayerBuy.m_Idx = (BYTE)nIdx;',
+     b'PlayerBuy.m_Idx = nIdx;',
+     'goi mua sap: bo ep BYTE')
+
+# DOI HANH VI: Ctrl + re chuot qua nguoi dang bay sap -> con tro "xem sap" (PublicSetting.ini
+# [CursorList] muc 9, anh bay-ban-xem co san trong pak). Truoc day nhanh nay goi
+# GetNPCBAITAN(SelectPlayer.nIndex) ma ham do nhan ID (NpcSet.SearchID) -> luon 0, con tro
+# khong bao gio doi. Khong giu Ctrl thi re qua nguoi ban nhu nguoi thuong (bam thuong la di
+# theo, Ctrl+bam moi mo sap). Enum them muc 9 de vong nap con tro (UiBase.cpp) doc ca muc do.
+edit('S3Client/Ui/Elem/Wnds.h',
+     b'\tCURSOR_INDEX_COUNT,',
+     b'\tCURSOR_VIEW_STALL,\t\t\t/* 9: xem sap nguoi khac */\r\n\tCURSOR_INDEX_COUNT,',
+     'con tro xem sap (nap muc 9 cua CursorList)')
+edit('S3Client/Ui/UiCase/UiGame.cpp',
+     _crlf(b'\t\telse if (g_pCoreShell->GetNPCBAITAN(SelectPlayer.nIndex)) \n'
+           b'\t\t\tWnd_SwitchCursor(MOUSE_CURSOR_DIALOG);\n'),
+     _crlf(b'\t\telse if ((GetKeyState(VK_CONTROL) & 0x8000) && g_pCoreShell->GetNPCBAITAN(SelectPlayer.uId))\n'
+           b'\t\t\tWnd_SwitchCursor(CURSOR_VIEW_STALL);\t/* Ctrl + re qua nguoi ban: xem sap */\n'),
+     'Ctrl + re qua nguoi ban doi con tro xem sap')
 
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
