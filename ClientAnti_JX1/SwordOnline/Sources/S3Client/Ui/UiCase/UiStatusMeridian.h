@@ -37,6 +37,7 @@ private:
 	void	LoadAcupointLayout(int nMeridian);
 	void	RequestTips();
 	void	Refresh();									// dua trang theo goi s2c_meridian moi nhat
+	void	CancelConfirm();							// tra nut Xung huyet ve nhan thuong
 	void	ShowAcupoint(int nLevel);					// 1..16: dong thong tin huyet
 private:
 	KWndLabeledButton	m_BtnLevelUp;
@@ -49,6 +50,10 @@ private:
 	char				m_szScheme[128];
 	char				m_szFormatMaterial[96];			// chu TCVN3 lay tu ini
 	char				m_szFormatAcup[64];
+	char				m_szFormatAcupNone[64];			// huyet chi co thuoc tinh 8.x chua hieu luc
+	char				m_szLabelLevelUp[32];
+	char				m_szLabelConfirm[32];
+	unsigned int		m_uConfirmUntil;			// 0 = chua bam; >0 = GetTickCount het han xac nhan
 	char				m_szLayout[MERIDIAN_PAGE_COUNT][80];	// ini vi tri huyet cua tung mach
 	int					m_nMeridian;					// mach dang chon 1..8
 	int					m_nWay;

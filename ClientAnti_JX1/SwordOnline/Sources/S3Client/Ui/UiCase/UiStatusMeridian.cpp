@@ -4,12 +4,14 @@
 #include "KWin32.h"
 #include "KIniFile.h"
 #include "../Elem/WndMessage.h"
+#include "KEngine.h"					// g_DebugLog
 #include "UiStatusMeridian.h"
 #include "../../../core/src/coreshell.h"
 
 extern iCoreShell*		g_pCoreShell;
 
 #define	SCHEME_INI_MERIDIAN	"UiStatusMeridian.ini"
+#define	CONFIRM_MS			5000	// bam Xung huyet lan hai trong 5 giay moi gui (moi lan ton 50 van)
 
 KUiStatusMeridianPage::KUiStatusMeridianPage()
 {
@@ -17,6 +19,10 @@ KUiStatusMeridianPage::KUiStatusMeridianPage()
 	memset(m_szLayout, 0, sizeof(m_szLayout));
 	memset(m_szFormatMaterial, 0, sizeof(m_szFormatMaterial));
 	memset(m_szFormatAcup, 0, sizeof(m_szFormatAcup));
+	memset(m_szFormatAcupNone, 0, sizeof(m_szFormatAcupNone));
+	memset(m_szLabelLevelUp, 0, sizeof(m_szLabelLevelUp));
+	memset(m_szLabelConfirm, 0, sizeof(m_szLabelConfirm));
+	m_uConfirmUntil = 0;
 	m_nMeridian = 1;
 	m_nWay = 0;
 	m_nVersion = -1;
@@ -51,6 +57,8 @@ void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
 
 	Init(&Ini, "Main");
 	m_BtnLevelUp.Init(&Ini, "BtnLevelUp");
+	Ini.GetString("BtnLevelUp", "Label", "", m_szLabelLevelUp, sizeof(m_szLabelLevelUp));
+	Ini.GetString("BtnLevelUp", "LabelConfirm", "OK?", m_szLabelConfirm, sizeof(m_szLabelConfirm));
 
 	// 8 nut mach dung chung mot mau [MeridianConfig], xep doc cach nhau Step diem.
 	int nLeft = 0, nTop = 0, nStep = 24;
@@ -82,6 +90,7 @@ void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
 	// Chu co dau nam o ini (TCVN3); nguon chi giu ASCII.
 	Ini.GetString("Material", "Format", "%d %d %d", m_szFormatMaterial, sizeof(m_szFormatMaterial));
 	Ini.GetString("AcupInfo", "Format", "%s %d/16: %s", m_szFormatAcup, sizeof(m_szFormatAcup));
+	Ini.GetString("AcupInfo", "FormatNone", "%s %d/16", m_szFormatAcupNone, sizeof(m_szFormatAcupNone));
 
 	LoadAcupointLayout(m_nMeridian);
 	SelectWay(m_nWay);
@@ -118,6 +127,7 @@ void KUiStatusMeridianPage::SelectMeridian(int nMeridian)
 {
 	if (nMeridian < 1 || nMeridian > MERIDIAN_PAGE_COUNT)
 		return;
+	CancelConfirm();
 	if (nMeridian != m_nMeridian)
 	{
 		m_nMeridian = nMeridian;
@@ -132,6 +142,8 @@ void KUiStatusMeridianPage::SelectWay(int nWay)
 {
 	if (nWay < 0 || nWay >= MERIDIAN_PAGE_WAYS)
 		return;
+	if (nWay != m_nWay)
+		CancelConfirm();
 	m_nWay = nWay;
 	for (int i = 0; i < MERIDIAN_PAGE_WAYS; i++)
 		m_BtnWay[i].CheckButton(i == nWay);
@@ -144,8 +156,21 @@ int KUiStatusMeridianPage::WndProc(unsigned int uMsg, unsigned int uParam, int n
 		int i;
 		if (uParam == (unsigned int)(KWndWindow*)&m_BtnLevelUp)
 		{
-			if (g_pCoreShell)
-				g_pCoreShell->OperationRequest(GOI_MERIDIAN, m_nMeridian, m_nWay);
+			// Hai buoc nhu hop xac nhan cua jx9tn: lan dau doi nhan thanh "Xac nhan", lan hai
+			// trong CONFIRM_MS moi gui. Doi mach / cach thi huy (xem CancelConfirm).
+			unsigned int uNow = GetTickCount();
+			if (m_uConfirmUntil && uNow < m_uConfirmUntil)
+			{
+				CancelConfirm();
+				g_DebugLog("[kinh mach] gui xung mach %d cach %d", m_nMeridian, m_nWay);
+				if (g_pCoreShell)
+					g_pCoreShell->OperationRequest(GOI_MERIDIAN, m_nMeridian, m_nWay);
+			}
+			else
+			{
+				m_uConfirmUntil = uNow + CONFIRM_MS;
+				m_BtnLevelUp.SetLabel(m_szLabelConfirm);
+			}
 			return 0;
 		}
 		for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
@@ -191,7 +216,10 @@ void KUiStatusMeridianPage::ShowAcupoint(int nLevel)
 		return;
 	}
 	char szText[384];
-	sprintf(szText, m_szFormatAcup, Desc.szName, nLevel, Desc.szDesc);
+	if (Desc.szDesc[0])
+		sprintf(szText, m_szFormatAcup, Desc.szName, nLevel, Desc.szDesc);
+	else
+		sprintf(szText, m_szFormatAcupNone, Desc.szName, nLevel);
 	m_AcupInfo.SetText(szText);
 }
 
@@ -228,8 +256,19 @@ void KUiStatusMeridianPage::Refresh()
 		m_Tips.SetText("");
 }
 
+void KUiStatusMeridianPage::CancelConfirm()
+{
+	if (m_uConfirmUntil)
+	{
+		m_uConfirmUntil = 0;
+		m_BtnLevelUp.SetLabel(m_szLabelLevelUp);
+	}
+}
+
 void KUiStatusMeridianPage::PaintWindow()
 {
+	if (m_uConfirmUntil && GetTickCount() >= m_uConfirmUntil)
+		CancelConfirm();
 	Refresh();
 	KWndPage::PaintWindow();
 }
