@@ -658,6 +658,50 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 		}
 		break;
 
+	case GDI_PLAYER_STATE_SKILLS:
+		nRet = 0;
+		if (uParam && nParam > 0 && Player[CLIENT_PLAYER_INDEX].m_nIndex > 0)
+		{
+			KNpc& Me = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex];
+			KUiStateSkill* pOut = (KUiStateSkill*)uParam;
+			// Vong sang khong nam trong danh sach trang thai ma o m_ActiveAuraID, khong co han.
+			int nAuraLevel = Me.m_ActiveAuraID > 0 ? Me.m_SkillList.GetCurrentLevel(Me.m_ActiveAuraID) : 0;
+			if (nAuraLevel > 0)
+			{
+				pOut[nRet].nSkillId = Me.m_ActiveAuraID;
+				pOut[nRet].nLevel = nAuraLevel;
+				pOut[nRet].nLeftFrames = -1;
+				nRet++;
+			}
+			// Nut chi co m_StateGraphics (m_SkillID 0) la hinh trang thai cua npc khac, bo qua.
+			KStateNode* pNode = (KStateNode*)Me.m_StateSkillList.GetHead();
+			while (pNode && nRet < nParam)
+			{
+				if (pNode->m_SkillID > 0 && pNode->m_SkillID != Me.m_ActiveAuraID)
+				{
+					pOut[nRet].nSkillId = pNode->m_SkillID;
+					pOut[nRet].nLevel = pNode->m_Level;
+					pOut[nRet].nLeftFrames = pNode->m_LeftTime;
+					nRet++;
+				}
+				pNode = (KStateNode*)pNode->GetNext();
+			}
+			for (int i = 0; i < nRet; i++)
+			{
+				pOut[i].szName[0] = 0;
+				pOut[i].szIcon[0] = 0;
+				KSkill* pSkill = (KSkill*)g_SkillManager.GetSkill(pOut[i].nSkillId, pOut[i].nLevel > 0 ? pOut[i].nLevel : 1);
+				if (pSkill)
+				{
+					strncpy(pOut[i].szName, pSkill->GetSkillName(), sizeof(pOut[i].szName) - 1);
+					pOut[i].szName[sizeof(pOut[i].szName) - 1] = 0;
+					strncpy(pOut[i].szIcon, pSkill->m_szSkillIcon, sizeof(pOut[i].szIcon) - 1);
+					pOut[i].szIcon[sizeof(pOut[i].szIcon) - 1] = 0;
+				}
+			}
+		}
+		break;
+
 	case GDI_PLAYER_AVATAR:
 		nRet = Player[CLIENT_PLAYER_INDEX].m_nAvatar;
 		break;

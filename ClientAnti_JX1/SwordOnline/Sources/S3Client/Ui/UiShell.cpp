@@ -48,6 +48,7 @@
 #include "UiCase/UiTrade.h"
 #include "UiCase/UiTradeConfirmWnd.h"
 #include "UiCase/UiNewsMessage.h"
+#include "UiCase/UiMiniSkill.h"
 #include "ShortcutKey.h"
 #include "UiSoundSetting.h"
 #include "../../Represent/iRepresent/iRepresentShell.h"
@@ -409,6 +410,7 @@ void UiStartGame()
 	KUiHeaderControlBar::OpenWindow();
 	KUiToolsControlBar::OpenWindow();
 	KUiNewsMessage::OpenWindow();
+	KUiMiniSkill::OpenWindow();
 	Wnd_ShowHideGameSpace(true);
 	g_UiBase.SetStatus(UIS_S_IDLE);
 	Wnd_GameSpaceHandleInput(true);
@@ -497,6 +499,7 @@ bool UiCloseWndsInGame(bool bAll)
 		//KUiManage::CloseWindow();
 		MapSetMode(MINIMAP_M_NONE);
 		KUiNewsMessage::CloseWindow(TRUE);
+		KUiMiniSkill::CloseWindow(true);
 		g_UiInformation.Close();
 		g_UiInformation2.Close();
 	}

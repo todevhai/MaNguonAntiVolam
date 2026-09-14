@@ -46,6 +46,17 @@ x¡¢yÖ¸³ö»æÖÆ·¶Î§µÄ×óÉÏ½Ç×ø±ê£¬Width¡¢HeightnÖ¸³öÁË»æÖÆ·¶Î§µÄ´óÐ¡£¬ParamÓÃÓÚ¶îÍâµ
 // Mot huyet kinh mach cho giao dien (GDI_MERIDIAN_ACUP_DESC): ten TCVN3 va mo ta thuoc tinh
 // da ghep san (moi thuoc tinh mot dong).
 // Trang Kinh mach (GDI_MERIDIAN_INFO): ban sao goi s2c_meridian gan nhat, khong keo KProtocol.h.
+// Thanh mini skill (GDI_PLAYER_STATE_SKILLS): mot trang thai dang tac dung len nhan vat.
+#define	UI_MAX_STATE_SKILL		16
+struct KUiStateSkill
+{
+	int		nSkillId;
+	int		nLevel;
+	int		nLeftFrames;		// so nhip con lai (18 nhip/giay); -1 = khong het (vong sang)
+	char	szName[32];		// ten chieu trong skills.txt, dung khi MiniSkill.ini khong khai
+	char	szIcon[80];		// icon chieu trong skills.txt, cung de du phong
+};
+
 #define	UI_MERIDIAN_COUNT		8
 #define	UI_MERIDIAN_TIPS_ONLY	0x80	// = MERIDIAN_WAY_TIPS_ONLY: GOI_MERIDIAN chi xin chu goi y
 #define	UI_MERIDIAN_BREATH		9		// = MERIDIAN_BREATH: GOI_MERIDIAN(9, so ngay) Khi Doanh Dan Dien
@@ -281,6 +292,8 @@ enum GAMEDATA_INDEX
 	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi
 	//         da dung han (toi noi, ket, bo cuoc). Ban do dung de tat vector.
 	// Dat o DAY chu khong o cuoi enum: cuoi enum la moc neo cua port-fixes.py.
+	GDI_PLAYER_STATE_SKILLS,	// trang thai dang tac dung: uParam = (KUiStateSkill*) mang, nParam = so o
+	//Return = so trang thai da dien
 	
 	GDI_PLAYER_TK_TIME,
 	
