@@ -6033,6 +6033,87 @@ edit('Engine/Src/KLuaScript.cpp',
      b'\tm_LuaState\t\t\t\t\t= lua_open(200);\t/* 100 tran voi bang chieu tangmen/cuiyan/kunlun/tianwang */',
      'ngan xep Lua 100 -> 200 cho bang chieu lon')
 
+# ------------------------------------------------ chieu tay trai + bao khong thi trien duoc
+# DOI HANH VI (user 15/09/2026): doi vu khi thi chieu tay trai/phai GIU NGUYEN. Truoc day
+# UpdateWeaponSkill thay moi chieu IsPhysical bang don danh thuong cua vu khi moi - ma du
+# lieu 8.x danh IsPhysical = 1 cho ca chieu mon phai (Nhiep Hon Nguyet Anh...), nen moi lan
+# cam lai vu khi la tay trai ve 53. Nay chi thay khi chieu dang gan CHINH LA don danh
+# thuong cua vu khi (LaChieuVuKhi, KCore.cpp) - vd tay khong -> cam kiem.
+edit('Core/Src/KPlayer.cpp',
+     b'void KPlayer::UpdateWeaponSkill()',
+     b'extern BOOL LaChieuVuKhi(int nSkillId);\t/* KCore.cpp: don danh thuong cua mot loai vu khi */\r\n'
+     b'void KPlayer::UpdateWeaponSkill()',
+     'khai bao LaChieuVuKhi cho UpdateWeaponSkill')
+edit_after('Core/Src/KPlayer.cpp',
+     b'void KPlayer::UpdateWeaponSkill()',
+     b'if (pISkill->IsPhysical())',
+     b'if (LaChieuVuKhi(m_nLeftSkillID))\t/* giu chieu mon phai khi doi vu khi */',
+     'doi vu khi giu chieu tay trai', window=600)
+edit_after('Core/Src/KPlayer.cpp',
+     b'if (m_nRightSkillID > 0)',
+     b'if (pISkill->IsPhysical())',
+     b'if (LaChieuVuKhi(m_nRightSkillID))\t/* giu chieu mon phai khi doi vu khi */',
+     'doi vu khi giu chieu tay phai', window=400)
+
+# DOI HANH VI: chieu khong thi trien duoc vi dang cuoi ngua / sai vu khi thi bao chu nhu
+# jx9tn (truoc day im lang: bam chieu, nhan vat dung yen). KSkill::CanCastSkill kiem
+# HorseLimit (1 = cam cuoi ngua, 2 = phai cuoi) va EqtLimit (-2 = moi vu khi, 0..99 vu
+# khi can chien particular, 100.. vu khi tam xa particular + 100). Chi bao cho nhan vat
+# cua minh, toi da 2 giay mot lan vi DoSkill lap lai khi giu chuot.
+edit('Core/Src/KSkills.h',
+     b'\tBOOL\t\t\t\tIsTargetOnly()const{return m_bTargetOnly;};',
+     b'\tBOOL\t\t\t\tIsTargetOnly()const{return m_bTargetOnly;};\r\n'
+     b'\tint\t\t\t\t\tGetHorseLimited()const{return m_nHorseLimited;};\r\n'
+     b'\tint\t\t\t\t\tGetEquiptLimited()const{return m_nEquiptLimited;};',
+     'getter HorseLimit/EqtLimit cho bao khong thi trien duoc')
+edit('Core/Src/KNpc.cpp',
+     b'void KNpc::DoSkill(int nX, int nY)',
+     _crlf(b'/* CanCastSkill + bao ly do cho nguoi choi (cuoi ngua / sai vu khi). */\n'
+           b'static BOOL ThuThiTrienChieu(KNpc* pNpc, ISkill* pSkill, int& nX, int& nY)\n'
+           b'{\n'
+           b'\tif (pSkill->CanCastSkill(pNpc->m_Index, nX, nY))\n'
+           b'\t\treturn TRUE;\n'
+           b'\tif (!pNpc->IsPlayer() || pNpc->m_Index != Player[CLIENT_PLAYER_INDEX].m_nIndex)\n'
+           b'\t\treturn FALSE;\n'
+           b'\tKSkill* pK = (KSkill*)pSkill;\n'
+           b'\tconst char* szBao = NULL;\n'
+           b'\tif (pK->GetHorseLimited() == 1 && pNpc->m_bRideHorse)\n'
+           b'\t\tszBao = "V\\xe2 c\\xabng n\\xb5y kh\\xabng th\\xd3 s\\xf6 d\\xf4ng l\\xf3""c c\\xad\\xeci ng\\xf9""a.";\n'
+           b'\telse if (pK->GetHorseLimited() == 2 && !pNpc->m_bRideHorse)\n'
+           b'\t\tszBao = "V\\xe2 c\\xabng n\\xb5y ch\\xd8 thi tri\\xd3n \\xae\\xad\\xee""c khi c\\xad\\xeci ng\\xf9""a.";\n'
+           b'\telse if (pK->GetEquiptLimited() != -2)\n'
+           b'\t{\n'
+           b'\t\tint nLoai = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponType();\n'
+           b'\t\tint nRieng = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponParticular();\n'
+           b'\t\tif (nLoai == 1)\n'
+           b'\t\t\tnRieng += MAX_MELEEWEAPON_PARTICULARTYPE_NUM;\n'
+           b'\t\telse if (nLoai == -1)\n'
+           b'\t\t\tnRieng = -1;\n'
+           b'\t\tif (nRieng != pK->GetEquiptLimited())\n'
+           b'\t\t\tszBao = "V\\xe2 c\\xabng kh\\xabng th\\xd3 thi tri\\xd3n v\\xedi v\\xf2 kh\\xdd n\\xb5y.";\n'
+           b'\t}\n'
+           b'\tstatic DWORD s_dwBaoLanTruoc = 0;\n'
+           b'\tif (szBao && GetTickCount() - s_dwBaoLanTruoc >= 2000)\n'
+           b'\t{\n'
+           b'\t\ts_dwBaoLanTruoc = GetTickCount();\n'
+           b'\t\tKSystemMessage Msg;\n'
+           b'\t\tMsg.eType = SMT_NORMAL;\n'
+           b'\t\tMsg.byConfirmType = SMCT_NONE;\n'
+           b'\t\tMsg.byPriority = 0;\n'
+           b'\t\tMsg.byParamSize = 0;\n'
+           b'\t\tstrcpy(Msg.szMessage, szBao);\n'
+           b'\t\tCoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, 0);\n'
+           b'\t}\n'
+           b'\treturn FALSE;\n'
+           b'}\n'
+           b'\n'
+           b'void KNpc::DoSkill(int nX, int nY)'),
+     'ham thu thi trien chieu + bao ly do')
+edit('Core/Src/KNpc.cpp',
+     b'&& pSkill->CanCastSkill(m_Index, nX, nY) ',
+     b'&& ThuThiTrienChieu(this, pSkill, nX, nY) ',
+     'DoSkill dung ThuThiTrienChieu (bao cuoi ngua / sai vu khi)')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
