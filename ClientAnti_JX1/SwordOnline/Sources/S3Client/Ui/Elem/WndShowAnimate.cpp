@@ -29,6 +29,8 @@ void KWndShowAnimate::Clone(KWndShowAnimate* pCopy)
 }
 
 //≥ı ºªØ
+int g_nDangNapLaiGiaoDien = 0;	// dat trong KUiBase::ReloadCurScheme
+
 int KWndShowAnimate::Init(KIniFile* pIniFile, const char* pSection)
 {
 	if (KWndMovingImage::Init(pIniFile, pSection))
@@ -40,7 +42,10 @@ int KWndShowAnimate::Init(KIniFile* pIniFile, const char* pSection)
 		m_AppearRange.cx -= m_oFixPos.x;
 		m_AppearRange.cy -= m_oFixPos.y;
 
-		m_Style &= ~WND_S_VISIBLE;
+		// Nap lai bo giao dien (KUiBase::ReloadCurScheme) khi cua so dang mo: giu nguyen
+		// trang thai hien, khong thi moi lan jxstudio nap lai la F3 va cac bang khac tu dong.
+		if (!g_nDangNapLaiGiaoDien)
+			m_Style &= ~WND_S_VISIBLE;
 		
 		return true;
 	}
