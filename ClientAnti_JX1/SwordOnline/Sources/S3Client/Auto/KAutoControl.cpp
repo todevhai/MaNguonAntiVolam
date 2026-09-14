@@ -107,6 +107,13 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] hover %d,%d", x, y);
 		}
 	}
+	else if (!strcmp(szCmd, "enter"))
+	{
+		// Phim Enter vao cua so dang giu focus (vd o nhap chat: gui tin) - WM_KEYDOWN nhu go.
+		Wnd_ProcessInput(WM_KEYDOWN, VK_RETURN, 0);
+		Wnd_ProcessInput(WM_KEYUP, VK_RETURN, 0);
+		g_DebugLog("[AUTO] enter");
+	}
 	else if (!strcmp(szCmd, "go"))
 	{
 		// Go chuoi vao o nhap dang giu focus (vd o mat khau): tung ky tu la mot
