@@ -141,6 +141,7 @@ void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
 		Ini.GetInteger("AcupPos", szSection, 0, &m_nAcupRight[i]);
 		m_AcupName[i].Init(&Ini, "AcupTxt");		// co chu + kich thuoc o cua jx9tn
 		m_AcupName[i].SetCentre();
+		Ini.GetInteger("AcupTxt", "Font", 12, &m_AcupName[i].m_nCoChu);	// cung khoa KWndText::Init doc
 		m_AcupName[i].SetTextColor(0xffffffff);
 		int nX, nY, nW, nH;
 		m_Acup[i].GetPosition(&nX, &nY);

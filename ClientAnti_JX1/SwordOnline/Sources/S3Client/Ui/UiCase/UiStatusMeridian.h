@@ -33,9 +33,12 @@ public:
 	}
 	// Mep trai / phai cua chu dang ve (cung phep tinh can giua cua KWndText::PaintWindow), toa do
 	// trong cha: vach dan dung cach mep chu mot khoang deu, khong phai mep o 70 diem.
+	// m_nTextLen / m_nFontSize la private cua KWndText: do dai lay qua GetText, co chu doc lai tu ini.
+	int		m_nCoChu;
 	void	GetTextSpan(int* pLeft, int* pRight)
 	{
-		int nW = m_nTextLen * m_nFontSize / 2;
+		char szTen[32];
+		int nW = GetText(szTen, sizeof(szTen)) * m_nCoChu / 2;
 		int nLeft = m_Left + (m_Width - nW) / 2;
 		if (nLeft < m_Left)
 			nLeft = m_Left;
