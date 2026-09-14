@@ -4000,7 +4000,13 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'\treturn TEncodeText(pMsgBuff, nMsgLength);'),
      _crlf(b'\tnMsgLength = TClearSpecialCtrlInEncodedText(pMsgBuff, nMsgLength, KTC_COLOR_RESTORE);\n'
            b'\tif (memchr(pMsgBuff, KTC_INLINE_PIC, nMsgLength))\n'
-           b'\t\treturn TFilterEncodedText(pMsgBuff, nMsgLength);\n'
+           b'\t{\n'
+           b'\t\t/* TFilterEncodedText doi anh chen nam TRUOC cuoi bo dem (nReadPos + 3 < nCount):\n'
+           b'\t\t   tin chi co mot icon, hoac icon o cuoi, bi bo. Them mot byte 0 cuoi de du dieu kien;\n'
+           b'\t\t   byte 0 tu bi loc. Bo dem cua ca hai noi goi (560 byte) con du cho. */\n'
+           b'\t\tpMsgBuff[nMsgLength] = 0;\n'
+           b'\t\treturn TFilterEncodedText(pMsgBuff, nMsgLength + 1);\n'
+           b'\t}\n'
            b'\treturn TEncodeText(pMsgBuff, nMsgLength);'),
      'tin chat co icon: khong ma hoa lai lam mat anh')
 
