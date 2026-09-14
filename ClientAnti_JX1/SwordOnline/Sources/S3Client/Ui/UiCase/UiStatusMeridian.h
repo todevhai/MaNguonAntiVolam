@@ -22,15 +22,14 @@
 #define MERIDIAN_PAGE_ACUPS		16
 #define MERIDIAN_BREATH_DAYS	3
 
-// Ten huyet: KWndText chi doc canh le tu ini; ten trai can sat phai, ten phai sat trai (cho vach dan)
+// Ten huyet: KWndText chi doc canh le tu ini; user chot chu trang, canh giua moi ten.
 class KUiAcupName : public KWndText32
 {
 public:
-	void	SetHAlign(int bRight)
+	void	SetCentre()
 	{
 		m_Style &= ~(WNDTEXT_ES_HALIGN_CENTRE | WNDTEXT_ES_HALIGN_RIGHT);
-		if (bRight)
-			m_Style |= WNDTEXT_ES_HALIGN_RIGHT;
+		m_Style |= WNDTEXT_ES_HALIGN_CENTRE;
 	}
 };
 
