@@ -3961,6 +3961,36 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\t\tms_pSelf->m_ScenePos.SetText("");'),
      'UiMiniMap: toa do gop vao nut Tim')
 
+# Lenh auto "hover" giu vi tri con tro 3 giay: Wine day chuyen dong chuot THAT vao ngay sau,
+# nen thu ve theo con tro (co cam tren ban do nho) khong do duoc qua kenh lenh thu dong.
+# Nguoi choi that khong dung kenh lenh nen khong bi anh huong.
+edit('S3Client/S3Client.cpp',
+     _crlf(b'int KMyApp::HandleInput(UINT uMsg, WPARAM wParam, LPARAM lParam)\n'
+           b'{\n'
+           b'\tint nRet = 0;\n'),
+     _crlf(b'int KMyApp::HandleInput(UINT uMsg, WPARAM wParam, LPARAM lParam)\n'
+           b'{\n'
+           b'\tint nRet = 0;\n'
+           b'\t{\n'
+           b'\t\textern unsigned int g_uAutoGiuChuotDen;\t/* Auto/KAutoControl.cpp */\n'
+           b'\t\tif ((uMsg == WM_MOUSEMOVE || uMsg == 0x02A1 /* WM_MOUSEHOVER */) && GetTickCount() < g_uAutoGiuChuotDen)\n'
+           b'\t\t\treturn 0;\n'
+           b'\t}\n'),
+     'lenh auto hover: bo qua chuot that trong luc giu')
+
+# Tin "<kenh> Mo" khi bat kenh mat chu "o": chu TCVN3 cuoi chuoi la MOT byte > 0x80 ma
+# TEncodeText coi la nua ky tu GBK va bo. Them khoang trang cuoi; bo dem 32 -> 64 vi MenuText
+# da toi 32 byte, strncpy + strcat se tran.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     _crlf(b'\t\tchar Buffer[32];\n'
+           b'\t\tstrncpy(Buffer, b ? m_pSelf->m_ChannelsResource[n].cMenuText : m_pSelf->m_ChannelsResource[n].cMenuDeactivateText, 32);\n'
+           b'\t\tstrcat(Buffer, b ? " M\xeb" : " \xa7\xe3ng");'),
+     _crlf(b'\t\tchar Buffer[64];\n'
+           b'\t\tstrncpy(Buffer, b ? m_pSelf->m_ChannelsResource[n].cMenuText : m_pSelf->m_ChannelsResource[n].cMenuDeactivateText, 32);\n'
+           b'\t\tBuffer[32] = 0;\n'
+           b'\t\tstrcat(Buffer, b ? " M\xeb " : " \xa7\xe3ng");'),
+     'tin bat/tat kenh: giu chu cuoi TCVN3, bo dem du dai')
+
 # ---------------------------------------------------------------------------
 # Kenh chat do MAY CHU cap (NotifyChannelID -> KUiMsgCentrePad::OpenChannel),
 # client khop ten do voi khoa FormatName cua tung muc [CH_*] trong ini.

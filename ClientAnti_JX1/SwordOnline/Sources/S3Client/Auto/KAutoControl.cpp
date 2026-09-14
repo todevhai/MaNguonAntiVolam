@@ -11,6 +11,10 @@
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../../core/src/coreshell.h"
 #include "../../core/src/gamedatadef.h"	// PA_RIDE
+/* Wine day WM_MOUSEMOVE cua con tro THAT vao ngay sau lenh hover, xoa vi tri vua dat - thu
+   cai gi ve theo con tro (vd co tren ban do nho) khong bao gio thay. hover giu 3 giay:
+   KMyApp::HandleInput bo qua chuyen dong chuot that den luc nay. Chi lenh auto dat. */
+unsigned int g_uAutoGiuChuotDen = 0;
 #include <stdio.h>
 #include <string.h>
 
@@ -104,6 +108,7 @@ void KAutoControl::RunLine(const char* szLine)
 			// Tooltips and the system-message text wait for WM_MOUSEHOVER, which Windows only
 			// raises for the real cursor (TrackMouseEvent). Send it too so hover can show them.
 			Wnd_ProcessInput(0x02A1 /* WM_MOUSEHOVER */, 0, (int)MAKELONG((short)x, (short)y));
+			g_uAutoGiuChuotDen = GetTickCount() + 3000;
 			g_DebugLog("[AUTO] hover %d,%d", x, y);
 		}
 	}
