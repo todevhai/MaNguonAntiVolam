@@ -3867,7 +3867,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)\r\n\t\t\tKUiFindPos::OpenWindow();',
      _crlf(b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)\n'
-           b'\t\t\tm_bCamCo = !m_bCamCo;\t/* bat/tat che do cam co, khong mo hop nhap */'),
+           b'\t\t{\n\t\t\tm_bCamCo = !m_bCamCo;\t/* bat/tat che do cam co, khong mo hop nhap */\n'
+           b'\t\t\tg_DebugLog("[ban do nho] cam co %d anh [%s]", m_bCamCo, m_szFlagImage);\n\t\t}'),
      'UiMiniMap: nut co bat che do cam co')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
@@ -3924,6 +3925,10 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
            b'\tWnd_GetCursorPos(&nX, &nY);\n'
            b'\tint nRelX = nX - m_nAbsoluteLeft - m_MapPos.x;\n'
            b'\tint nRelY = nY - m_nAbsoluteTop - m_MapPos.y;\n'
+           b'\tstatic unsigned int s_uLog = 0;\n'
+           b'\tif (IR_GetCurrentTime() - s_uLog > 2000)\n'
+           b'\t{\n\t\ts_uLog = IR_GetCurrentTime();\n'
+           b'\t\tg_DebugLog("[ban do nho] co theo tro %d,%d rel %d,%d ban do %dx%d", nX, nY, nRelX, nRelY, (int)m_MapSize.cx, (int)m_MapSize.cy);\n\t}\n'
            b'\tif (nRelX < 0 || nRelY < 0 || nRelX >= (int)m_MapSize.cx || nRelY >= (int)m_MapSize.cy)\n'
            b'\t\treturn;\n'
            b'\tKRUImage Co;\n'
