@@ -156,10 +156,16 @@ void KUiMiniSkill::UpdateSlot(int nSlot, const KUiStateSkill& State, const KMini
 		g_DebugLog("[MiniSkill] o %d: chieu %d cap %d con %d nhip", nSlot, State.nSkillId, State.nLevel, State.nLeftFrames);
 	}
 
-	// Vong sang / trang thai khong han: khong ghi so.
+	// Chi dem nguoc khi con TREN 1 giay. Trang thai do vong sang tha (La Han Tran...) duoc lam
+	// moi lien tuc nen luon con ~1 giay - ghi "1s" dung yen vo nghia. Khong han (-1) / co
+	// IsAura trong ini cung khong ghi so.
 	int nSecond = -1;
 	if (State.nLeftFrames >= 0 && !Buff.bAura)
+	{
 		nSecond = (State.nLeftFrames + MINI_SKILL_FPS - 1) / MINI_SKILL_FPS;
+		if (nSecond <= 1)
+			nSecond = -1;
+	}
 	if (nSecond == m_nSlotSecond[nSlot])
 		return;
 	m_nSlotSecond[nSlot] = nSecond;
@@ -169,7 +175,7 @@ void KUiMiniSkill::UpdateSlot(int nSlot, const KUiStateSkill& State, const KMini
 	if (nSecond >= 3600)
 		sprintf(szTime, "%dh", nSecond / 3600);
 	else if (nSecond >= 60)
-		sprintf(szTime, "%dm", nSecond / 60);
+		sprintf(szTime, "%d:%02d", nSecond / 60, nSecond % 60);	// phut:giay de thay giay chay
 	else if (nSecond >= 0)
 		sprintf(szTime, "%ds", nSecond);
 	m_Time[nSlot].SetText(szTime);
