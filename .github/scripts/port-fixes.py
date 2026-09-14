@@ -6022,6 +6022,17 @@ edit('S3Client/Ui/UiCase/UiGame.cpp',
            b'\t\t\tWnd_SwitchCursor(CURSOR_VIEW_STALL);\t/* Ctrl + re qua nguoi ban: xem sap */\n'),
      'Ctrl + re qua nguoi ban doi con tro xem sap')
 
+# ------------------------------------------------ ngan xep Lua cho bang chieu
+# DOI HANH VI: KLuaScript() tao state voi lua_open(100). Than tep script/skill/tangmen.lua
+# (va cuiyan, kunlun, tianwang, wuhuntang) dung bang SKILLS long nhau can hon 100 o ->
+# "stack overflow" ngay khi chay than tep -> KSkill::LoadSkillLevelData khong co du lieu
+# -> luc tay F3 = 0/0, mo ta chieu trong. Do 15/09/2026 bang lua 4.0 cung nguon: 150 du.
+# May chu sua cung luc (server/linux-server/Engine/KLuaScript.cpp).
+edit('Engine/Src/KLuaScript.cpp',
+     b'\tm_LuaState\t\t\t\t\t= lua_open(100);',
+     b'\tm_LuaState\t\t\t\t\t= lua_open(200);\t/* 100 tran voi bang chieu tangmen/cuiyan/kunlun/tianwang */',
+     'ngan xep Lua 100 -> 200 cho bang chieu lon')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
