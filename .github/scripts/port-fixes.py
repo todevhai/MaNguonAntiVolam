@@ -5954,6 +5954,32 @@ edit_all('Core/Src/KSkills.cpp',
      b'\t\t\t\t? Npc[pSkillParam->nTargetId].m_dwID : 0;\r\n',
      'ghi ID muc tieu o moi ham sinh dan')
 
+# DOI HANH VI: doi ban do (Xa phu, NewWorld, hoi sinh) dung im 17-31 giay.
+# KScenePlaceC::Breathe cho su kien "nap canh xong" toi SPWP_SWITCH_SCENE_TIMEOUT
+# = 30000 ms tren LUONG CHINH. Do 14/09/2026: luong nap da ranh ("Process Preload
+# SPR" moi giay = khong con vung nao cho nap) ma m_bLoading van bat, su kien khong
+# bao gio den -> luong chinh ngu tron 30,004 giay, khong doc mang, khong ve; may
+# chu da dat nhan vat vao ban do moi nen quai danh chet trong luc man hinh dung.
+# Ban do va vung nap chi mat vai ms - khong phai thieu RAM hay chua nap san.
+# Sua: moi khung chi cho toi 200 ms; het han ma khong con vung nao dang cho nap
+# thi coi nhu da nap xong (dung nghia cua co). Con vung cho nap thi khung sau cho
+# tiep - toi da cham di, khong treo. Log mot dong/giay de tim goc re con lai.
+edit('Core/Src/Scene/KScenePlaceC.cpp',
+     b'WaitForSingleObject(m_hSwitchLoadFinishedEvent, SPWP_SWITCH_SCENE_TIMEOUT);',
+     _crlf(b'if (WaitForSingleObject(m_hSwitchLoadFinishedEvent, 200) == WAIT_TIMEOUT)\n'
+           b'\t\t{\n'
+           b'\t\t\tstatic DWORD s_dwLanLogChoNap = 0;\n'
+           b'\t\t\tif (GetTickCount() - s_dwLanLogChoNap > 1000)\n'
+           b'\t\t\t{\n'
+           b'\t\t\t\ts_dwLanLogChoNap = GetTickCount();\n'
+           b'\t\t\t\tg_DebugLog("[Scene]cho nap canh qua 200ms: tiep=%d vung=(%d,%d) tieu-diem=(%d,%d)",\n'
+           b'\t\t\t\t\tm_nFirstToLoadIndex, m_FocusRegion.x, m_FocusRegion.y, m_FocusPosition.x, m_FocusPosition.y);\n'
+           b'\t\t\t}\n'
+           b'\t\t\tif (m_nFirstToLoadIndex < 0)\n'
+           b'\t\t\t\tSetLoadingStatus(false);\n'
+           b'\t\t}'),
+     'doi ban do: khong ngu 30 giay cho su kien nap canh')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
