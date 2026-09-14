@@ -3825,6 +3825,125 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      'UiMiniMap: bam Tim thi mo hop nhap toa do')
 
 # ---------------------------------------------------------------------------
+# Ban do nho theo yeu cau user 14/09/2026:
+#  1) Dong toa do va chu "Tim" la MOT nut: "195/201 Tim", bam vao mo hop nhap toa do (KUiFindPos).
+#     Nut Tim (KWndPureTextBtn) mang luon chu toa do; dong ScenePos de trong.
+#  2) Nut co khong mo hop nhap nua: bat che do CAM CO - anh co nho (FlagImage cua [BtnFlag] trong
+#     ini, anh goc cua ban 8.x) di theo con tro khi con tro nam trong ban do; bam trai cam co tai
+#     do (dung duong "bam ban do -> chay toi" da co) va thoat che do; bam phai huy. Diem dich tren
+#     ban do ve bang chinh anh co thay cho co ve bang duong thang.
+edit('S3Client/Ui/UiCase/UiMiniMap.h',
+     b'\tKWndPureTextBtn\tm_BtnTim;\t/* mo hop nhap toa do */',
+     _crlf(b'\tKWndPureTextBtn\tm_BtnTim;\t/* mo hop nhap toa do */\n'
+           b'\tint\t\t\t\tm_bCamCo;\t/* dang cam co: anh co theo con tro trong ban do */\n'
+           b'\tchar\t\t\tm_szFlagImage[128];\t/* [BtnFlag] FlagImage */'),
+     'UiMiniMap: khai che do cam co')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'KUiMiniMap::KUiMiniMap()\r\n{\r\n\tm_OldPos.x = NOT_DRAGING_MAP;\r\n}',
+     _crlf(b'KUiMiniMap::KUiMiniMap()\n{\n\tm_OldPos.x = NOT_DRAGING_MAP;\n'
+           b'\tm_bCamCo = 0;\n\tm_szFlagImage[0] = 0;\n}'),
+     'UiMiniMap: khoi tao che do cam co')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\tm_BtnTim.SetText("T\xecm");',
+     _crlf(b'\tm_BtnTim.SetText("T\xecm");\n'
+           b'\tpIni->GetString("BtnFlag", "FlagImage", "", m_szFlagImage, sizeof(m_szFlagImage));'),
+     'UiMiniMap: nap anh co tu ini')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)\r\n\t\t\tKUiFindPos::OpenWindow();',
+     _crlf(b'\t\telse if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)\n'
+           b'\t\t\tm_bCamCo = !m_bCamCo;\t/* bat/tat che do cam co, khong mo hop nhap */'),
+     'UiMiniMap: nut co bat che do cam co')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\r\n\t\t\t\t\tbreak;',
+     _crlf(b'\t\t\t\t\tg_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);\n'
+           b'\t\t\t\t\tm_bCamCo = 0;\t/* co da cam */\n'
+           b'\t\t\t\t\tbreak;'),
+     'UiMiniMap: cam co xong thi thoat che do')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\tcase WM_RBUTTONDOWN:\r\n\t\tWnd_SetCapture(this);',
+     _crlf(b'\tcase WM_RBUTTONDOWN:\n'
+           b'\t\tif (m_bCamCo)\n'
+           b'\t\t{\n'
+           b'\t\t\tm_bCamCo = 0;\t/* bam phai: huy cam co, khong keo ban do */\n'
+           b'\t\t\tbreak;\n'
+           b'\t\t}\n'
+           b'\t\tWnd_SetCapture(this);'),
+     'UiMiniMap: bam phai huy cam co')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(5, co, RU_T_LINE, true);',
+     _crlf(b'\t\t\t\t\t\t\tif (m_szFlagImage[0])\n'
+           b'\t\t\t\t\t\t\t{\n'
+           b'\t\t\t\t\t\t\t\tKRUImage Co;\n'
+           b'\t\t\t\t\t\t\t\tmemset(&Co, 0, sizeof(Co));\n'
+           b'\t\t\t\t\t\t\t\tCo.nType = ISI_T_SPR;\n'
+           b'\t\t\t\t\t\t\t\tCo.Color.Color_b.a = 255;\n'
+           b'\t\t\t\t\t\t\t\tCo.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
+           b'\t\t\t\t\t\t\t\tCo.nISPosition = IMAGE_IS_POSITION_INIT;\n'
+           b'\t\t\t\t\t\t\t\tstrcpy(Co.szImage, m_szFlagImage);\n'
+           b'\t\t\t\t\t\t\t\tCo.oPosition.nX = nDichX;\n'
+           b'\t\t\t\t\t\t\t\tCo.oPosition.nY = nDichY;\n'
+           b'\t\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(1, &Co, RU_T_IMAGE, true);\n'
+           b'\t\t\t\t\t\t\t}\n'
+           b'\t\t\t\t\t\t\telse\n'
+           b'\t\t\t\t\t\t\t\tg_pRepresentShell->DrawPrimitives(5, co, RU_T_LINE, true);'),
+     'UiMiniMap: diem dich ve bang anh co')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\t\t}\r\n\t\t}\r\n\t}\r\n}\r\n\r\nvoid KUiMiniMap::Breathe()',
+     b'\t\t\t}\r\n\t\t}\r\n\t}\r\n\tPaintFlagCursor();\t/* co theo con tro, ve sau cung */\r\n}\r\n\r\nvoid KUiMiniMap::Breathe()',
+     'UiMiniMap: goi ve co theo con tro cuoi PaintWindow')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'void KUiMiniMap::Breathe()',
+     _crlf(b'/* Che do cam co: ve anh co tai con tro khi con tro nam trong vung ban do. Goi cuoi\n'
+           b'   PaintWindow nen co nam tren ban do. */\n'
+           b'void KUiMiniMap::PaintFlagCursor()\n'
+           b'{\n'
+           b'\tif (!m_bCamCo || !m_szFlagImage[0] || !g_pRepresentShell)\n'
+           b'\t\treturn;\n'
+           b'\tint nX, nY;\n'
+           b'\tWnd_GetCursorPos(&nX, &nY);\n'
+           b'\tint nRelX = nX - m_nAbsoluteLeft - m_MapPos.x;\n'
+           b'\tint nRelY = nY - m_nAbsoluteTop - m_MapPos.y;\n'
+           b'\tif (nRelX < 0 || nRelY < 0 || nRelX >= (int)m_MapSize.cx || nRelY >= (int)m_MapSize.cy)\n'
+           b'\t\treturn;\n'
+           b'\tKRUImage Co;\n'
+           b'\tmemset(&Co, 0, sizeof(Co));\n'
+           b'\tCo.nType = ISI_T_SPR;\n'
+           b'\tCo.Color.Color_b.a = 255;\n'
+           b'\tCo.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;\n'
+           b'\tCo.nISPosition = IMAGE_IS_POSITION_INIT;\n'
+           b'\tstrcpy(Co.szImage, m_szFlagImage);\n'
+           b'\tCo.oPosition.nX = nX;\n'
+           b'\tCo.oPosition.nY = nY;\n'
+           b'\tg_pRepresentShell->DrawPrimitives(1, &Co, RU_T_IMAGE, true);\n'
+           b'}\n'
+           b'\n'
+           b'void KUiMiniMap::Breathe()'),
+     'UiMiniMap: ve co theo con tro')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.h',
+     b'\tvirtual void\tBreathe();',
+     _crlf(b'\tvirtual void\tBreathe();\n'
+           b'\tvoid\tPaintFlagCursor();\t/* anh co theo con tro khi dang cam co */'),
+     'UiMiniMap: khai ve co theo con tro')
+
+edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
+     b'\t\tms_pSelf->m_ScenePos.Set2IntText(pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8, \'/\');',
+     _crlf(b'\t\t/* toa do va chu Tim la mot nut: bam vao mo hop nhap toa do */\n'
+           b'\t\tchar szToaDo[40];\n'
+           b'\t\tsprintf(szToaDo, "%d/%d T\xecm", pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8);\n'
+           b'\t\tms_pSelf->m_BtnTim.SetText(szToaDo);\n'
+           b'\t\tms_pSelf->m_ScenePos.SetText("");'),
+     'UiMiniMap: toa do gop vao nut Tim')
+
+# ---------------------------------------------------------------------------
 # Kenh chat do MAY CHU cap (NotifyChannelID -> KUiMsgCentrePad::OpenChannel),
 # client khop ten do voi khoa FormatName cua tung muc [CH_*] trong ini.
 #
