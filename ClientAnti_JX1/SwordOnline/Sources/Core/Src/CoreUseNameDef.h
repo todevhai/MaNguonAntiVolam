@@ -331,6 +331,7 @@ enum enumMSG_ID
 	   SendSystemInfo khong dung duoc cho viec nay: no gui channelid = -1 ma client
 	   khong co kenh ch_GM nen tin bi bo im lang. */
 	enumMSG_ID_VAN_BAN,				/* = 39, phai trung so ben may chu */
+	enumMSG_ID_SAT_THUONG,			/* = 40: [DWORD id npc][int sat thuong] -> so mau bay tren dau (bao cat GM) */
 	enumMSG_ID_NUM,
 };
 

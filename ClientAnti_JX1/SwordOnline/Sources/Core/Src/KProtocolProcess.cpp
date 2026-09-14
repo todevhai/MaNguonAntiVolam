@@ -2391,6 +2391,20 @@ void	KProtocolProcess::s2cShowMsg(BYTE *pMsg)
 
 	switch (pShowMsg->m_wMsgID)
 	{
+	case enumMSG_ID_SAT_THUONG:
+		{
+			/* So sat thuong THAT cua mot don len NPC (bao cat bat tu cua lenh bai GM).
+			   Binh thuong client suy so mau bay len tu % mau dong bo (SyncNpcMin); bao
+			   cat luon day mau nen may chu gui thang con so, ve bang chinh SetBlood. */
+			DWORD dwNpc = 0;
+			int nSo = 0;
+			memcpy(&dwNpc, pMsg + sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID), sizeof(DWORD));
+			memcpy(&nSo, pMsg + sizeof(SHOW_MSG_SYNC) - sizeof(LPVOID) + sizeof(DWORD), sizeof(int));
+			int nNpc = NpcSet.SearchID(dwNpc);
+			if (nNpc > 0)
+				Npc[nNpc].SetBlood(nSo);
+		}
+		break;
 	case enumMSG_ID_VAN_BAN:
 		{
 			KSystemMessage	sMsg;
