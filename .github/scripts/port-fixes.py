@@ -3791,6 +3791,19 @@ edit('S3Client/Ui/UiCase/UiFindPos.cpp',
            b'\t\t}'),
      'UiFindPos: hien vi tri hien tai khi mo hop thoai')
 
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'#include "UiFindPos.h"',
+     b'#include "UiFindPos.h"\r\n#include "UiMiniMap.h"\t/* dat hop nhap ngay duoi ban do nho */',
+     'UiFindPos: nap UiMiniMap.h')
+
+# Bam dong "x/y Tim" duoi ban do nho (user 14/09/2026): hop nhap nam NGAY DUOI ban do nho nhu ban 8.x,
+# dien san toa do dang dung. GSMOI_SCENE_TIME_INFO khong dat gia tri tra ve (luon 0) nen ban va tren
+# khong bao gio vao nhanh hien vi tri - goi roi dung ket qua, khong kiem.
+edit('S3Client/Ui/UiCase/UiFindPos.cpp',
+     b'\t\tKUiSceneTimeInfo Info;\n\t\tif (g_pCoreShell &&\n\t\t\tg_pCoreShell->SceneMapOperation(GSMOI_SCENE_TIME_INFO, (unsigned int)&Info, 0))\n\t\t{\n\t\t\tchar szTin[64];\n\t\t\t/* Dung y het dong toa do duoi ban do nho:\n\t\t\t   m_ScenePos.Set2IntText(nScenePos0 / 8, nScenePos1 / 8, ...) */\n\t\t\tsprintf(szTin, "Dang o: %d / %d", Info.nScenePos0 / 8, Info.nScenePos1 / 8);\n\t\t\tm_pSelf->m_InfoText.SetText(szTin);\n\t\t}',
+     b'\t\tKUiSceneTimeInfo Info;\n\t\tmemset(&Info, 0, sizeof(Info));\n\t\tif (g_pCoreShell)\n\t\t{\n\t\t\tg_pCoreShell->SceneMapOperation(GSMOI_SCENE_TIME_INFO, (unsigned int)&Info, 0);\n\t\t\tm_pSelf->m_X.SetIntText(Info.nScenePos0 / 8);\n\t\t\tm_pSelf->m_Y.SetIntText(Info.nScenePos1 / 8);\n\t\t}\n\t\tm_pSelf->m_InfoText.SetText("Xin nh\xcbp t\xe4a \xae\xe9 mu\xe8n \xae\xd5n");\n\t\tKUiMiniMap* pMap = KUiMiniMap::GetIfVisible();\n\t\tif (pMap)\n\t\t{\n\t\t\tint nMapX, nMapY, nMapW, nMapH, nW, nH;\n\t\t\tpMap->GetAbsolutePos(&nMapX, &nMapY);\n\t\t\tpMap->GetSize(&nMapW, &nMapH);\n\t\t\tm_pSelf->GetSize(&nW, &nH);\n\t\t\tm_pSelf->SetPosition(nMapX + (nMapW - nW) / 2, nMapY + nMapH + 2);\n\t\t}',
+     'UiFindPos: dien san toa do, dat duoi ban do nho')
+
 # ---------------------------------------------------------------------------
 # Nut "Tim" ngay canh dong toa do duoi ban do nho, dung cho nguoi choi quen tay
 # nhu ban 8.x: bam vao do moi ra hop nhap toa do, khong phai bam nut co.
