@@ -53,8 +53,6 @@ struct KUiStateSkill
 	int		nSkillId;
 	int		nLevel;
 	int		nLeftFrames;		// so nhip con lai (18 nhip/giay); -1 = khong het (vong sang)
-	char	szName[32];		// ten chieu trong skills.txt, dung khi MiniSkill.ini khong khai
-	char	szIcon[80];		// icon chieu trong skills.txt, cung de du phong
 };
 
 #define	UI_MERIDIAN_COUNT		8

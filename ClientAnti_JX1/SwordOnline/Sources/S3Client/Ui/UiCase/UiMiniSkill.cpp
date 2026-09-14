@@ -2,6 +2,7 @@
 //	Thanh mini skill - xem UiMiniSkill.h
 *****************************************************************************************/
 #include "KWin32.h"
+#include "KEngine.h"					// g_DebugLog
 #include "KIniFile.h"
 #include "../Elem/Wnds.h"
 #include "../Elem/WndMessage.h"
@@ -13,6 +14,7 @@ extern iCoreShell*	g_pCoreShell;
 
 #define	MINI_SKILL_INI			"\\Ui\\MiniSkill.ini"
 #define	MINI_SKILL_FPS			18		// nhip logic client (S3Client.cpp GAME_FPS)
+#define	MINI_SKILL_MAX_FETCH	64		// so trang thai xin tu Core moi nhip
 #define	MINI_SKILL_WARNING_SEC	10		// con it hon so giay nay thi chu doi mau canh bao
 
 KUiMiniSkill* KUiMiniSkill::m_pSelf = NULL;
@@ -139,29 +141,24 @@ const KMiniSkillBuff* KUiMiniSkill::FindBuff(int nSkillId) const
 	return NULL;
 }
 
-void KUiMiniSkill::UpdateSlot(int nSlot, const KUiStateSkill& State)
+void KUiMiniSkill::UpdateSlot(int nSlot, const KUiStateSkill& State, const KMiniSkillBuff& Buff)
 {
-	const KMiniSkillBuff* pBuff = FindBuff(State.nSkillId);
-
 	if (m_nSlotSkill[nSlot] != State.nSkillId)
 	{
 		m_nSlotSkill[nSlot] = State.nSkillId;
 		m_nSlotSecond[nSlot] = -2;
-		const char* pszImage = (pBuff && pBuff->szImage[0]) ? pBuff->szImage : State.szIcon;
-		m_Icon[nSlot].SetImage(ISI_T_SPR, pszImage);
+		m_Icon[nSlot].SetImage(ISI_T_SPR, Buff.szImage);
 		char szTip[300];
-		if (pBuff)
-			sprintf(szTip, "%s\n%s", pBuff->szName, pBuff->szDesc);
-		else
-			sprintf(szTip, "%s", State.szName);
+		sprintf(szTip, "%s\n%s", Buff.szName, Buff.szDesc);
 		m_Icon[nSlot].SetToolTipInfo(szTip, (int)strlen(szTip));
 		m_Icon[nSlot].SetPosition(nSlot * m_nIconWidth, 0);
 		m_Time[nSlot].SetPosition(nSlot * m_nIconWidth, m_nIconHeight);
+		g_DebugLog("[MiniSkill] o %d: chieu %d cap %d con %d nhip", nSlot, State.nSkillId, State.nLevel, State.nLeftFrames);
 	}
 
 	// Vong sang / trang thai khong han: khong ghi so.
 	int nSecond = -1;
-	if (State.nLeftFrames >= 0 && !(pBuff && pBuff->bAura))
+	if (State.nLeftFrames >= 0 && !Buff.bAura)
 		nSecond = (State.nLeftFrames + MINI_SKILL_FPS - 1) / MINI_SKILL_FPS;
 	if (nSecond == m_nSlotSecond[nSlot])
 		return;
@@ -177,7 +174,7 @@ void KUiMiniSkill::UpdateSlot(int nSlot, const KUiStateSkill& State)
 		sprintf(szTime, "%ds", nSecond);
 	m_Time[nSlot].SetText(szTime);
 
-	unsigned int uColor = (pBuff && pBuff->bDebuff) ? m_uDebuffColor : m_uBuffColor;
+	unsigned int uColor = Buff.bDebuff ? m_uDebuffColor : m_uBuffColor;
 	if (nSecond >= 0 && nSecond <= MINI_SKILL_WARNING_SEC)
 		uColor = m_uWarningColor;
 	m_Time[nSlot].SetTextColor(uColor);
@@ -187,16 +184,30 @@ void KUiMiniSkill::Breathe()
 {
 	if (g_pCoreShell == NULL)
 		return;
-	KUiStateSkill State[UI_MAX_STATE_SKILL];
-	int nCount = g_pCoreShell->GetGameData(GDI_PLAYER_STATE_SKILLS, (unsigned int)State, UI_MAX_STATE_SKILL);
+	// Lay nhieu hon so o hien thi: trang thai khong khai trong ini se bi loc bo ben duoi.
+	KUiStateSkill State[MINI_SKILL_MAX_FETCH];
+	int nCount = g_pCoreShell->GetGameData(GDI_PLAYER_STATE_SKILLS, (unsigned int)State, MINI_SKILL_MAX_FETCH);
 	if (nCount < 0)
 		nCount = 0;
-	if (nCount > UI_MAX_STATE_SKILL)
-		nCount = UI_MAX_STATE_SKILL;
+	if (nCount > MINI_SKILL_MAX_FETCH)
+		nCount = MINI_SKILL_MAX_FETCH;
+
+	// Chi hien buff khai trong MiniSkill.ini (chieu tay phai tac len nguoi choi - cua minh
+	// hay cua nguoi khac). Trang thai noi bo khac (chieu con, hieu ung trang bi...) bo qua:
+	// icon cua chung trong skills.txt la anh 36 diem, ve vao o 24 thi de len nhau.
+	int nShow = 0;
+	for (int i = 0; i < nCount && nShow < UI_MAX_STATE_SKILL; i++)
+	{
+		const KMiniSkillBuff* pBuff = FindBuff(State[i].nSkillId);
+		if (pBuff == NULL)
+			continue;
+		UpdateSlot(nShow, State[i], *pBuff);
+		nShow++;
+	}
+	nCount = nShow;
 
 	for (int i = 0; i < nCount; i++)
 	{
-		UpdateSlot(i, State[i]);
 		if (i >= m_nShown)
 		{
 			m_Icon[i].Show();

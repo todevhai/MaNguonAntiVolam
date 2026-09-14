@@ -686,19 +686,6 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 				}
 				pNode = (KStateNode*)pNode->GetNext();
 			}
-			for (int i = 0; i < nRet; i++)
-			{
-				pOut[i].szName[0] = 0;
-				pOut[i].szIcon[0] = 0;
-				KSkill* pSkill = (KSkill*)g_SkillManager.GetSkill(pOut[i].nSkillId, pOut[i].nLevel > 0 ? pOut[i].nLevel : 1);
-				if (pSkill)
-				{
-					strncpy(pOut[i].szName, pSkill->GetSkillName(), sizeof(pOut[i].szName) - 1);
-					pOut[i].szName[sizeof(pOut[i].szName) - 1] = 0;
-					strncpy(pOut[i].szIcon, pSkill->m_szSkillIcon, sizeof(pOut[i].szIcon) - 1);
-					pOut[i].szIcon[sizeof(pOut[i].szIcon) - 1] = 0;
-				}
-			}
 		}
 		break;
 

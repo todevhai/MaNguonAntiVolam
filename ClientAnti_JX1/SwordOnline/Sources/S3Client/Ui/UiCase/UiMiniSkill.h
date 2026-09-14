@@ -7,7 +7,7 @@
 	mau chu ([txtBuffTime] / [txtDebuffTime] / [txtWarningTime]) cung lay tu tep do.
 	Danh sach trang thai va so nhip con lai lay tu Core (GDI_PLAYER_STATE_SKILLS): may chu gui
 	thoi gian khi tac dung (STATE_EFFECT_SYNC), client tu dem lui moi nhip.
-	Chieu khong khai trong ini van hien, dung ten va icon cua skills.txt.
+	Chi hien trang thai CO khai trong ini: do la cac chieu tay phai tac len nguoi choi.
 *****************************************************************************************/
 #pragma once
 
@@ -41,7 +41,7 @@ private:
 	virtual void	Breathe();
 	virtual int		WndProc(unsigned int uMsg, unsigned int uParam, int nParam);
 	const KMiniSkillBuff*	FindBuff(int nSkillId) const;
-	void	UpdateSlot(int nSlot, const KUiStateSkill& State);
+	void	UpdateSlot(int nSlot, const KUiStateSkill& State, const KMiniSkillBuff& Buff);
 
 private:
 	static KUiMiniSkill*	m_pSelf;
