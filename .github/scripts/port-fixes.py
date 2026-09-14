@@ -3827,7 +3827,7 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\tm_BtnFlag.Init(pIni, "BtnFlag");',
      _crlf(b'\tm_BtnFlag.Init(pIni, "BtnFlag");\n'
            b'\tm_BtnTim.Init(pIni, "BtnTim");\n'
-           b'\tm_BtnTim.SetText("T\xecm");'),
+           b'\tm_BtnTim.SetText("T\xd7m");'),
      'UiMiniMap: nap nut Tim tu ini')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
@@ -3859,8 +3859,8 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      'UiMiniMap: khoi tao che do cam co')
 
 edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
-     b'\tm_BtnTim.SetText("T\xecm");',
-     _crlf(b'\tm_BtnTim.SetText("T\xecm");\n'
+     b'\tm_BtnTim.SetText("T\xd7m");',
+     _crlf(b'\tm_BtnTim.SetText("T\xd7m");\n'
            b'\tpIni->GetString("BtnFlag", "FlagImage", "", m_szFlagImage, sizeof(m_szFlagImage));'),
      'UiMiniMap: nap anh co tu ini')
 
@@ -3951,7 +3951,7 @@ edit('S3Client/Ui/UiCase/UiMiniMap.cpp',
      b'\t\tms_pSelf->m_ScenePos.Set2IntText(pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8, \'/\');',
      _crlf(b'\t\t/* toa do va chu Tim la mot nut: bam vao mo hop nhap toa do */\n'
            b'\t\tchar szToaDo[40];\n'
-           b'\t\tsprintf(szToaDo, "%d/%d T\xecm", pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8);\n'
+           b'\t\tsprintf(szToaDo, "%d/%d T\xd7m", pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8);\n'
            b'\t\tms_pSelf->m_BtnTim.SetText(szToaDo);\n'
            b'\t\tms_pSelf->m_ScenePos.SetText("");'),
      'UiMiniMap: toa do gop vao nut Tim')
