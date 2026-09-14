@@ -1,20 +1,24 @@
 /*****************************************************************************************
-//	界面--状态界面
-//	Copyright : Kingsoft 2002
-//	Author	:   Wooy(Wu yue)
-//	CreateTime:	2002-9-2
+//	Bang F3: trang thai nhan vat, dang TAB nhu ban jx9tn.
+//	Copyright : Kingsoft 2002 (ban goc Wooy); chia tab 14/09/2026.
 ------------------------------------------------------------------------------------------
-	共有11个装备摆放位置，武器2×4，衣服2×3，头部2×2，腰带2×1，
-	手镯1×1，鞋子2×2，戒指1×1，腰坠1×2，项链1×1，马2×3。
+	Khung (UiStatus.ini) giu nut tab + nut Dong; ba trang la cua so con:
+	  Thuoc tinh  UiStatusAttrib.ini   chan dung, ten, sinh/noi/the luc, 4 thuoc tinh + nut cong diem,
+	                                   sat thuong, khang
+	  Trang bi    UiStatusEquip.ini    anh nguoi nam/nu, 12 o trang bi, nut Khoa
+	  Kinh mach   UiStatusMeridian.ini xem UiStatusMeridian.h
+	Moi control van la thanh vien cua KUiStatus nhu truoc (logic giu nguyen), chi doi CHA cua
+	no sang trang tuong ung; trang chuyen tiep thong bao cua control len KUiStatus.
 *****************************************************************************************/
 #pragma once
 
 #include "../Elem/WndButton.h"
+#include "../Elem/WndLabeledButton.h"
 #include "../Elem/WndText.h"
-#include "../Elem/WndShowAnimate.h"
+#include "../Elem/WndPage.h"
 #include "../elem/WndObjContainer.h"
-#include "../Elem/WndPureTextBtn.h"
 #include "../Elem/WndImage.h"
+#include "UiStatusMeridian.h"
 
 enum UI_PLAYER_ATTRIBUTE;
 struct KUiPlayerRuntimeInfo;
@@ -23,75 +27,77 @@ struct KUiPlayerAttribute;
 
 #define _ITEM_COUNT 15
 
-class KUiStatus : public KWndShowAnimate
+// Trang cua F3: KWndPage chi chuyen tiep bam nut len cha; o trang bi con bao nhac/tha do
+// (WND_N_ITEM_PICKDROP) va bam chuot vao do - thieu la keo tha do mac khong ai nhan.
+class KUiStatusPage : public KWndPage
 {
 public:
-	//----界面面板统一的接口函数----
-	static KUiStatus*	OpenWindow();					//打开窗口，返回唯一的一个类对象实例
-	static KUiStatus*	GetIfVisible();					//如果窗口正被显示，则返回实例指针
-	static void			CloseWindow(bool bDestroy);		//关闭窗口，同时可以选则是否删除对象实例
-//	static void			LoadConfig(KIniFile* pIni);		//载入自定义配置
-	static void			LoadScheme(const char* pScheme);//载入界面方案
+	virtual int	WndProc(unsigned int uMsg, unsigned int uParam, int nParam);
+};
 
-	void	UpdateBaseData();							//更新基本数据（人名等不易变数据）
+class KUiStatus : public KWndPageSet
+{
+public:
+	//----giao dien chung cua cac bang----
+	static KUiStatus*	OpenWindow();					// mo bang, tra ve doi tuong duy nhat
+	static KUiStatus*	GetIfVisible();					// dang hien thi thi tra ve doi tuong
+	static void			CloseWindow(bool bDestroy);		// dong bang, co the huy doi tuong
+	static void			LoadScheme(const char* pScheme);// nap bo cuc giao dien
+
+	void	UpdateBaseData();							// ten, danh hieu - it doi
 	void	UpdateData();
 	void	UpdateRuntimeInfo(KUiPlayerRuntimeInfo* pInfo);
 	void	UpdateAllEquips();
 	void	UpdateRuntimeAttribute(KUiPlayerAttribute* pInfo);
 
-	void	UpdateEquip(KUiObjAtRegion* pEquip, int bAdd);	//装备变化更新
+	void	UpdateEquip(KUiObjAtRegion* pEquip, int bAdd);	// mot o trang bi doi
 
 private:
 	KUiStatus() {}
 	~KUiStatus() {}
-	void	Initialize();								//初始化	
-	void	UseRemainPoint(UI_PLAYER_ATTRIBUTE type);	//升级某项属性
-	int		WndProc(unsigned int uMsg, unsigned int uParam, int nParam);	//窗口函数
-	void	LoadScheme(class KIniFile* pIni);			//载入界面方案
+	void	Initialize();
+	void	UseRemainPoint(UI_PLAYER_ATTRIBUTE type);	// cong mot diem tiem nang
+	int		WndProc(unsigned int uMsg, unsigned int uParam, int nParam);
+	void	LoadPages(const char* pScheme);				// nap khung + ba trang
 	void	UpdateAvatar();								// doi anh chan dung khi lua chon thay doi
 	virtual void	PaintWindow();
-	void	OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);//响应界面操作引起装备的改变
+	void	OnEquiptChanged(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);
 private:
 	static KUiStatus*	m_pSelf;
 
 private:
+	KWndLabeledButton	m_BtnAttribPage, m_BtnEquipPage, m_BtnMeridianPage;
+	KUiStatusPage		m_AttribPage;
+	KUiStatusPage		m_EquipPage;
+	KUiStatusMeridianPage	m_MeridianPage;
+	KWndButton	m_Close;
+
+	// ---- trang Thuoc tinh ----
 	KWndImage	m_Face;		// o ve chan dung (anh doi theo lua chon)
 	int			m_nAvatarVe;	// chan dung dang ve, de khoi doi anh moi khung
-	KWndText32	m_Agname;
+	KWndButton		m_Avatar;
+	KWndText512		m_AvatarText;
 	KWndText32	m_Name;
 	KWndText32	m_Title;
-	
-	KWndText32	m_Money;
-	
 	KWndText32	m_Life;
 	KWndText32	m_Mana;
 	KWndText32	m_Experience;
-	KWndText32	m_Angry;
 	KWndText32	m_Stamina;
-
 	int			m_nRemainPoint;
 	KWndText32	m_RemainPoint;
-
 	KWndText32	m_Strength, m_Dexterity, m_Vitality, m_Energy;
 	KWndButton	m_AddStrength, m_AddDexterity, m_AddVitality, m_AddEnergy;
-
 	KWndText32	m_LeftDamage, m_RightDamage, m_Attack, m_Defence, m_MoveSpeed, m_AttackSpeed;
 	KWndText32	m_PhyDef, m_CoolDef, m_LightDef, m_FireDef, m_PoisonDef;
 	KWndText32	m_Level, m_StatusDesc;
-
-	KWndButton	m_OpenItemPad;
-	KWndButton	m_Close;
-
-	KWndText32	m_nPk;
 	KWndText32	m_nRepute;
 	KWndText32	m_nFuYuan;
 	KWndText32  m_nPaiMing;
+
+	// ---- trang Trang bi ----
+	KWndText32	m_EquipName;
+	KWndText32	m_nPk;
 	KWndText32  m_ReBorn;
 	KWndButton	m_UnlockBtn;
-	KWndButton	Dinh;
-	KWndButton	Thao;
-	KWndButton		m_Avatar;
-	KWndText512		m_AvatarText;
 	KWndObjectBox	m_EquipBox[_ITEM_COUNT];
-
 };

@@ -266,6 +266,7 @@ copy debug\Game.exe ..\..\..\bin\Client\debug\Game.exe
     <ClCompile Include="Ui\UiCase\UiSkills.cpp" />
     <ClCompile Include="Ui\UiCase\UiSkillTree.cpp" />
     <ClCompile Include="Ui\UiCase\UiStatus.cpp" />
+    <ClCompile Include="Ui\UiCase\UiStatusMeridian.cpp" />
     <ClCompile Include="Ui\uicase\UiStoreBox.cpp" />
     <ClCompile Include="Ui\UiCase\UiStrengthRank.cpp" />
     <ClCompile Include="Ui\UiCase\UiSysMsgCentre.cpp" />
@@ -404,6 +405,7 @@ copy debug\Game.exe ..\..\..\bin\Client\debug\Game.exe
     <ClInclude Include="Ui\UiCase\UiSkills.h" />
     <ClInclude Include="Ui\UiCase\UiSkillTree.h" />
     <ClInclude Include="Ui\UiCase\UiStatus.h" />
+    <ClInclude Include="Ui\UiCase\UiStatusMeridian.h" />
     <ClInclude Include="Ui\uicase\UiStoreBox.h" />
     <ClInclude Include="Ui\UiCase\UiStrengthRank.h" />
     <ClInclude Include="Ui\UiCase\UiSysMsgCentre.h" />

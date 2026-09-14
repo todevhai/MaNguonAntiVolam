@@ -162,6 +162,11 @@ public:
 	// Chan dung may chu bao ve (s2c_setavatar). Chi co ben CLIENT: may chu giu
 	// no trong bien nhiem vu luu-dai chu khong trong KPlayer.
 	int				m_nAvatar;					// 0 = chua chon, 1..defMAX_AVATAR
+	// Kinh mach: goi s2c_meridian gan nhat (cap 8 mach, vat lieu, chu goi y). May chu gui khi
+	// vao the gioi va moi lan hoi; client dung cap de tu cong thuoc tinh huyet (ReCalcMeridian).
+	MERIDIAN_SYNC	m_Meridian;
+	int				m_nMeridianVersion;			// tang moi goi, trang Kinh mach ve lai khi doi
+	void			ReCalcMeridian();			// KPlayerMeridian.cpp
 #endif
 	KItemList		m_ItemList;					// 玩家的装备列表
 	BuySellInfo		m_BuyInfo;					// 进行的交易列表

@@ -2246,10 +2246,7 @@ edit('S3Client/Ui/UiCase/UiStoreBox.cpp',
            b'int KUiStoreBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)\n'),
      'nhan nut Khoa o ruong theo trang thai that')
 
-edit('S3Client/Ui/UiCase/UiStatus.cpp',
-     b'void KUiStatus::PaintWindow()\r\n{\r\n\tUpdateAvatar();\r\n',
-     b'void KUiStatus::PaintWindow()\r\n{\r\n\tUpdateAvatar();\r\n\tif (g_pCoreShell)\t/* nhan nut Khoa theo trang thai that, xem ruong */\r\n\t\tm_UnlockBtn.CheckButton(!g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0));\r\n',
-     'nhan nut Khoa o F3 theo trang thai that')
+# Nhan nut Khoa o F3: da viet thang vao UiStatus.cpp khi F3 chuyen sang dang tab (14/09/2026).
 
 # ------------------------------------------------ ruong mo rong dang trang
 # DOI HANH VI (user chot 14/09/2026): ruong co 6 trang - trang 0 la cua so ruong,

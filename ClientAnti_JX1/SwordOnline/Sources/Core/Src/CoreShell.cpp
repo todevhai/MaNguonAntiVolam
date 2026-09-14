@@ -662,6 +662,33 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 		nRet = Player[CLIENT_PLAYER_INDEX].m_nAvatar;
 		break;
 
+	case GDI_MERIDIAN_ACUP_DESC:
+		{
+			extern BOOL MeridianAcupDesc(KUiMeridianAcupDesc* pDesc);
+			nRet = MeridianAcupDesc((KUiMeridianAcupDesc*)uParam);
+		}
+		break;
+
+	case GDI_MERIDIAN_INFO:
+		if (uParam)
+		{
+			const MERIDIAN_SYNC& s = Player[CLIENT_PLAYER_INDEX].m_Meridian;
+			KUiMeridianInfo* pInfo = (KUiMeridianInfo*)uParam;
+			for (int m = 0; m < UI_MERIDIAN_COUNT && m < MERIDIAN_COUNT; m++)
+				pInfo->nLevel[m] = s.btLevel[m];
+			pInfo->nZhenYuan = s.nZhenYuan;
+			pInfo->nHuMaiDan = s.nHuMaiDan;
+			pInfo->nDaHuMaiDan = s.nDaHuMaiDan;
+			pInfo->nMoney = s.nMoney;
+			pInfo->nMeridian = s.btMeridian;
+			pInfo->nWay = s.btWay;
+			pInfo->nResult = s.btResult;
+			memcpy(pInfo->szTips, s.szTips, sizeof(pInfo->szTips));
+			pInfo->szTips[sizeof(pInfo->szTips) - 1] = 0;
+		}
+		nRet = Player[CLIENT_PLAYER_INDEX].m_nMeridianVersion;
+		break;
+
 	case GDI_PLAYER_IS_BAITAN:
 		nRet = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_BaiTan;
 		break;
@@ -1745,6 +1772,16 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 		break;
 	case GOI_PKVALUE:
 		SendClientPKValue(uParam);
+		break;
+	case GOI_MERIDIAN:
+		{
+			MERIDIAN_COMMAND Msg;
+			Msg.ProtocolType = (BYTE)c2s_meridian;
+			Msg.btMeridian = (BYTE)uParam;
+			Msg.btWay = (BYTE)nParam;
+			if (g_pClient)
+				g_pClient->SendPackToServer((BYTE*)&Msg, sizeof(MERIDIAN_COMMAND));
+		}
 		break;
 	case GOI_SET_AVATAR:
 		{

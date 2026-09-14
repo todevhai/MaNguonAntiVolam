@@ -148,6 +148,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_itemdurabilitychange] = ItemChangeDurability;
 	ProcessFunc[s2c_setavatar] = SetAvatar;
 	ProcessFunc[s2c_lientram] = LienTram;
+	ProcessFunc[s2c_meridian] = MeridianSync;
 	ProcessFunc[s2c_opentremble] = OpenTremble;
 	ProcessFunc[s2c_rankname] = NetCommandSetRankFF;
 
@@ -3563,6 +3564,21 @@ void	KProtocolProcess::SetAvatar(BYTE* pMsg)
 	SET_AVATAR* pSet = (SET_AVATAR*)pMsg;
 	if (pSet->nAvatar <= defMAX_AVATAR)
 		Player[CLIENT_PLAYER_INDEX].m_nAvatar = (int)pSet->nAvatar;
+}
+
+// Kinh mach: cat nguyen goi vao KPlayer, dung lai thuoc tinh (cap mach co the vua doi) va bao
+// giao dien. Trang Kinh mach o F3 doc qua GDI_MERIDIAN_INFO khi m_nMeridianVersion doi.
+void	KProtocolProcess::MeridianSync(BYTE* pMsg)
+{
+	KPlayer& p = Player[CLIENT_PLAYER_INDEX];
+	memcpy(&p.m_Meridian, pMsg, sizeof(MERIDIAN_SYNC));
+	p.m_Meridian.szTips[sizeof(p.m_Meridian.szTips) - 1] = 0;
+	p.m_nMeridianVersion++;
+	if (p.m_nIndex > 0)
+	{
+		p.UpdataCurData();	// suc manh qua ChangeCurStrength tu dat lai sat thuong
+		CoreDataChanged(GDCNI_PLAYER_RT_ATTRIBUTE, 0, 0);
+	}
 }
 
 /* May chu bao chuoi ha guc lien tiep vua dai them mot nac. Dan so nac vao

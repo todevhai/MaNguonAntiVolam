@@ -400,6 +400,7 @@ copy ClientDebug\CoreClient.lib ..\..\lib\debug\CoreClient.lib
     <ClCompile Include="Src\KPartnerSkill.cpp" />
     <ClCompile Include="Src\KPlayer.cpp" />
     <ClCompile Include="Src\KPlayerChat.cpp" />
+    <ClCompile Include="Src\KPlayerMeridian.cpp" />
     <ClCompile Include="Src\KPlayerDBFuns.cpp" />
     <ClCompile Include="Src\KPlayerFaction.cpp" />
     <ClCompile Include="Src\KPlayerFuYuan.cpp" />

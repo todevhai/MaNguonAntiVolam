@@ -2225,6 +2225,49 @@ typedef struct
 	BYTE	nSoNac;		// so nac cua chuoi
 } LIEN_TRAM_SYNC;
 
+#define	MERIDIAN_COUNT				8
+#define	MERIDIAN_MAX_LEVEL			16
+#define	MERIDIAN_ITEM_LEVELS		16
+
+// Meridian (kinh mach). btMeridian 0 only asks for a MERIDIAN_SYNC. Otherwise btWay's low bits are
+// the jx9tn MERIDIAN_LEVELUP_WAY_* (0 normal, 1 Huyet Long Dang protection, 2 Long Hon Ho The,
+// 3 Dai Ho Mach Don) and MERIDIAN_WAY_TIPS_ONLY asks for the cost / rate text of the next acupoint
+// of btMeridian instead of trying to open it.
+#define	MERIDIAN_WAY_TIPS_ONLY	0x80
+typedef struct
+{
+	BYTE	ProtocolType;
+	BYTE	btMeridian;
+	BYTE	btWay;
+} MERIDIAN_COMMAND;
+
+enum MERIDIAN_RESULT
+{
+	meridian_sync = 0,		// plain refresh, nothing was tried
+	meridian_success,
+	meridian_failed,		// materials spent, level may have rolled back
+	meridian_not_enough,	// refused: materials, money, lock, or the way does not apply
+	meridian_max_level,
+	meridian_error,			// bad meridian, tables or script missing
+};
+
+// Server -> client. Same layout on both sides (see server/linux-server/Core/KProtocol.h).
+typedef struct
+{
+	BYTE	ProtocolType;
+	BYTE	btMeridian;		// meridian the result / tips are about, 0 for a plain sync
+	BYTE	btWay;
+	BYTE	btResult;		// MERIDIAN_RESULT
+	BYTE	btLevel[MERIDIAN_COUNT];
+	int		nZhenYuan;
+	int		nHuMaiDan;
+	int		nDaHuMaiDan;
+	int		nXueLongTeng[MERIDIAN_ITEM_LEVELS];	// index = level - 1
+	int		nXueLongDan[MERIDIAN_ITEM_LEVELS];
+	int		nMoney;
+	char	szTips[128];	// TCVN3 text from GetLevelUpTips in meridian.lua, may hold '\n'
+} MERIDIAN_SYNC;
+
 typedef struct
 {
 	BYTE			ProtocolType;		// 协议类型			

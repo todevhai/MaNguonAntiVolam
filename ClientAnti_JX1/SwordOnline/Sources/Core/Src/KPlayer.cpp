@@ -110,6 +110,8 @@ void	KPlayer::Release()
 	m_MouseDown[1] = FALSE;
 	m_nImageNpcID = 0;
 	m_nAvatar = 0;		// may chu se gui s2c_setavatar khi vao the gioi
+	memset(&m_Meridian, 0, sizeof(m_Meridian));
+	m_nMeridianVersion = 0;
 #endif
 	m_dwID = 0;
 	m_nIndex = 0;
@@ -2584,6 +2586,7 @@ void	KPlayer::UpdataCurData()
 	Npc[m_nIndex].m_CurrentSerisesEnhance = 0;
 	Npc[m_nIndex].m_CurrentDamageReduce = 0;
 	ReCalcEquip();
+	ReCalcMeridian();	// thuoc tinh huyet, cung luat voi may chu
 	ReCalcState();
 }
 

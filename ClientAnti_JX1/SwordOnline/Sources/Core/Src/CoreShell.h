@@ -43,6 +43,32 @@ x¡¢yÖ¸³ö»æÖÆ·¶Î§µÄ×óÉÏ½Ç×ø±ê£¬Width¡¢HeightnÖ¸³öÁË»æÖÆ·¶Î§µÄ´óÐ¡£¬ParamÓÃÓÚ¶îÍâµ
 //=========================================================
 //¸÷Êý¾ÝÏîË÷ÒýµÄÏà¹Ø²ÎÊýuParamÓënParamÈç¹ûÔÚ×¢ÊÍÖÐÎ´Ìá¼°£¬Ôò´«µÝ¶¨Öµ0¡£
 //Èç¹ûÌØ±ðÖ¸Ã÷·µ»ØÖµº¬Òå£¬Ôò³É¹¦»ñÈ¡Êý¾Ý·µ»Ø1£¬Î´³É¹¦·µ»Ø0¡£
+// Mot huyet kinh mach cho giao dien (GDI_MERIDIAN_ACUP_DESC): ten TCVN3 va mo ta thuoc tinh
+// da ghep san (moi thuoc tinh mot dong).
+// Trang Kinh mach (GDI_MERIDIAN_INFO): ban sao goi s2c_meridian gan nhat, khong keo KProtocol.h.
+#define	UI_MERIDIAN_COUNT		8
+#define	UI_MERIDIAN_TIPS_ONLY	0x80	// = MERIDIAN_WAY_TIPS_ONLY: GOI_MERIDIAN chi xin chu goi y
+struct KUiMeridianInfo
+{
+	int		nLevel[UI_MERIDIAN_COUNT];
+	int		nZhenYuan;
+	int		nHuMaiDan;
+	int		nDaHuMaiDan;
+	int		nMoney;
+	int		nMeridian;		// mach cua ket qua / chu goi y, 0 = goi dong bo
+	int		nWay;
+	int		nResult;
+	char	szTips[128];
+};
+
+struct KUiMeridianAcupDesc
+{
+	int		nMeridian;
+	int		nLevel;
+	char	szName[32];
+	char	szDesc[256];
+};
+
 enum GAMEDATA_INDEX
 {
 	GDI_GAME_OBJ_DESC = 1,		//ÓÎÏ·¶ÔÏóÃèÊöËµÃ÷ÎÄ±¾´®
@@ -241,6 +267,11 @@ enum GAMEDATA_INDEX
 	GDI_PLAYER_IS_BAITAN,
 
 	GDI_PLAYER_AVATAR,		// chan dung dang chon: 0 = chua chon, 1..defMAX_AVATAR
+
+	GDI_MERIDIAN_INFO,		// kinh mach: uParam = (KUiMeridianInfo*) nhan goi gan nhat (co the 0)
+							// Return = so lan da nhan goi (doi -> giao dien ve lai)
+	GDI_MERIDIAN_ACUP_DESC,	// huyet: uParam = (KUiMeridianAcupDesc*) da dien nMeridian 1..8, nLevel 1..16
+							// Return = 1 neu co huyet do
 
 	GDI_PLAYER_GOING_TO_DEST,	// con dang tren duong toi dich vua chon?
 	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi
@@ -735,6 +766,9 @@ enum GAMEOPERATION_INDEX
 	GOI_FINDPOS,
 	
 	GOI_PKVALUE,
+
+	GOI_MERIDIAN,		// kinh mach; uParam = mach 0..8 (0 = chi xin dong bo), nParam = cach
+						// (0..3), cong MERIDIAN_WAY_TIPS_ONLY de chi xin chu goi y
 
 	GOI_SET_AVATAR,		// chon chan dung; uParam = so hieu 1..defMAX_AVATAR,
 						// 0 = chi HOI may chu chan dung dang luu
