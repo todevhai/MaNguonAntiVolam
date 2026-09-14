@@ -48,6 +48,8 @@ x¡¢yÖ¸³ö»æÖÆ·¶Î§µÄ×óÉÏ½Ç×ø±ê£¬Width¡¢HeightnÖ¸³öÁË»æÖÆ·¶Î§µÄ´óÐ¡£¬ParamÓÃÓÚ¶îÍâµ
 // Trang Kinh mach (GDI_MERIDIAN_INFO): ban sao goi s2c_meridian gan nhat, khong keo KProtocol.h.
 #define	UI_MERIDIAN_COUNT		8
 #define	UI_MERIDIAN_TIPS_ONLY	0x80	// = MERIDIAN_WAY_TIPS_ONLY: GOI_MERIDIAN chi xin chu goi y
+#define	UI_MERIDIAN_BREATH		9		// = MERIDIAN_BREATH: GOI_MERIDIAN(9, so ngay) Khi Doanh Dan Dien
+#define	UI_MERIDIAN_BREATH_PERCENT	15
 struct KUiMeridianInfo
 {
 	int		nLevel[UI_MERIDIAN_COUNT];
@@ -58,6 +60,8 @@ struct KUiMeridianInfo
 	int		nMeridian;		// mach cua ket qua / chu goi y, 0 = goi dong bo
 	int		nWay;
 	int		nResult;
+	int		nBreathSeconds;	// Khi Doanh Dan Dien con lai (giay), 0 = khong
+	int		nSeries;		// he nhan vat 0..4 (chu he bi khac o trang Khi Doanh)
 	char	szTips[512];
 };
 

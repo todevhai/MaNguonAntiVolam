@@ -683,6 +683,10 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 			pInfo->nMeridian = s.btMeridian;
 			pInfo->nWay = s.btWay;
 			pInfo->nResult = s.btResult;
+			// goi chi mang so giay luc gui: tru thoi gian da troi tu luc nhan
+			int nDaQua = (int)((GetTickCount() - Player[CLIENT_PLAYER_INDEX].m_uMeridianTick) / 1000);
+			pInfo->nBreathSeconds = s.nBreathSeconds > nDaQua ? s.nBreathSeconds - nDaQua : 0;
+			pInfo->nSeries = Player[CLIENT_PLAYER_INDEX].m_nIndex > 0 ? Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Series : 0;
 			memcpy(pInfo->szTips, s.szTips, sizeof(pInfo->szTips));
 			pInfo->szTips[sizeof(pInfo->szTips) - 1] = 0;
 		}

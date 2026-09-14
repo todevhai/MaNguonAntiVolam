@@ -165,6 +165,7 @@ public:
 	// Kinh mach: goi s2c_meridian gan nhat (cap 8 mach, vat lieu, chu goi y). May chu gui khi
 	// vao the gioi va moi lan hoi; client dung cap de tu cong thuoc tinh huyet (ReCalcMeridian).
 	MERIDIAN_SYNC	m_Meridian;
+	unsigned int	m_uMeridianTick;			// GetTickCount luc nhan goi (dem nguoc Khi Doanh)
 	int				m_nMeridianVersion;			// tang moi goi, trang Kinh mach ve lai khi doi
 	void			ReCalcMeridian();			// KPlayerMeridian.cpp
 #endif

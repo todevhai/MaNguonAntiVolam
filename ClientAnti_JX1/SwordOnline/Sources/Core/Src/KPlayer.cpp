@@ -112,6 +112,7 @@ void	KPlayer::Release()
 	m_nAvatar = 0;		// may chu se gui s2c_setavatar khi vao the gioi
 	memset(&m_Meridian, 0, sizeof(m_Meridian));
 	m_nMeridianVersion = 0;
+	m_uMeridianTick = 0;
 #endif
 	m_dwID = 0;
 	m_nIndex = 0;

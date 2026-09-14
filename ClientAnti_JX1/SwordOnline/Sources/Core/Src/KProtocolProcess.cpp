@@ -3574,6 +3574,7 @@ void	KProtocolProcess::MeridianSync(BYTE* pMsg)
 	memcpy(&p.m_Meridian, pMsg, sizeof(MERIDIAN_SYNC));
 	p.m_Meridian.szTips[sizeof(p.m_Meridian.szTips) - 1] = 0;
 	p.m_nMeridianVersion++;
+	p.m_uMeridianTick = GetTickCount();
 	if (p.m_nIndex > 0)
 	{
 		p.UpdataCurData();	// suc manh qua ChangeCurStrength tu dat lai sat thuong

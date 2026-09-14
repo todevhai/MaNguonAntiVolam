@@ -32,6 +32,10 @@ KUiStatusMeridianPage::KUiStatusMeridianPage()
 	memset(m_nLevel, 0, sizeof(m_nLevel));
 	m_nMeridian = 0;
 	m_nVersion = -1;
+	memset(m_szBreathLine, 0, sizeof(m_szBreathLine));
+	memset(m_szUnit, 0, sizeof(m_szUnit));
+	memset(m_szTarget, 0, sizeof(m_szTarget));
+	m_uBreathPainted = 0;
 }
 
 void KUiStatusMeridianPage::Initialize()
@@ -94,20 +98,19 @@ void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
 	m_BtnBreathDays[2].Init(&Ini, "Btn30DaysBreath");
 	m_BreathInfo.Init(&Ini, "BreathBuffInfo");
 	{
-		// ini khong chua duoc xuong dong: cac dong Line_0.. ghep bang '\n' (chu jx9tn BUFFINFO1)
-		char szAll[512], szLine[128], szKey[16];
-		szAll[0] = 0;
-		for (i = 0; i < 8; i++)
+		// Chu jx9tn G_STR_FULL_BREATH_BUFFINFO*, tach dong vi ini khong chua duoc xuong dong
+		static const char* s_pszKey[4] = { "Duration", "Add", "Minus", "None" };
+		static const char* s_pszUnit[3] = { "UnitDay", "UnitHour", "UnitMinute" };
+		char szKey[16];
+		for (i = 0; i < 4; i++)
+			Ini.GetString("BreathBuffInfo", s_pszKey[i], "", m_szBreathLine[i], sizeof(m_szBreathLine[i]));
+		for (i = 0; i < 3; i++)
+			Ini.GetString("BreathBuffInfo", s_pszUnit[i], "", m_szUnit[i], sizeof(m_szUnit[i]));
+		for (i = 0; i < 5; i++)
 		{
-			sprintf(szKey, "Line_%d", i);
-			if (!Ini.GetString("BreathBuffInfo", szKey, "", szLine, sizeof(szLine)))
-				break;
-			if (i)
-				strcat(szAll, "\n");
-			if (strlen(szAll) + strlen(szLine) + 2 < sizeof(szAll))
-				strcat(szAll, szLine);
+			sprintf(szKey, "%d_Target", i);
+			Ini.GetString("EffectTarget", szKey, "", m_szTarget[i], sizeof(m_szTarget[i]));
 		}
-		m_BreathInfo.SetText(szAll);
 	}
 	m_CurZhenYuan.Init(&Ini, "txtCurZYCount");
 	// Chu co dau nam o ini (TCVN3); nguon chi giu ASCII.
@@ -312,7 +315,10 @@ int KUiStatusMeridianPage::WndProc(unsigned int uMsg, unsigned int uParam, int n
 		{
 			if (uParam == (unsigned int)(KWndWindow*)&m_BtnBreathDays[i])
 			{
-				ShowMessage("BreathNotOpen");
+				static const int s_nDays[MERIDIAN_BREATH_DAYS] = { 1, 7, 30 };
+				if (g_pCoreShell)
+					g_pCoreShell->OperationRequest(GOI_MERIDIAN, UI_MERIDIAN_BREATH, s_nDays[i]);
+				m_uBreathPainted = 0;
 				return 0;
 			}
 		}
@@ -361,8 +367,49 @@ void KUiStatusMeridianPage::Refresh()
 	m_CurZhenYuan.SetText(szText);
 }
 
+// jx9tn BUFFINFO1..4: "duy tri: Khong" / "%d ngay|gio|phut" + he bi khac tang/giam 15%.
+void KUiStatusMeridianPage::RefreshBreathInfo()
+{
+	unsigned int uNow = GetTickCount();
+	if (m_uBreathPainted && uNow - m_uBreathPainted < 1000)
+		return;
+	m_uBreathPainted = uNow ? uNow : 1;
+	KUiMeridianInfo Info;
+	memset(&Info, 0, sizeof(Info));
+	if (g_pCoreShell)
+		g_pCoreShell->GetGameData(GDI_MERIDIAN_INFO, (unsigned int)&Info, 0);
+	const char* pszTarget = (Info.nSeries >= 0 && Info.nSeries < 5) ? m_szTarget[Info.nSeries] : "";
+	char szTime[32], szAdd[96], szMinus[96], szText[256];
+	if (Info.nBreathSeconds > 0)
+	{
+		int nDays = Info.nBreathSeconds / 86400, nHours = Info.nBreathSeconds / 3600;
+		if (nDays > 0)
+			sprintf(szTime, "%d %s", nDays, m_szUnit[0]);
+		else if (nHours > 0)
+			sprintf(szTime, "%d %s", nHours, m_szUnit[1]);
+		else
+			sprintf(szTime, "%d %s", (Info.nBreathSeconds + 59) / 60, m_szUnit[2]);
+		char szPercent[16];
+		sprintf(szPercent, "%d%%", UI_MERIDIAN_BREATH_PERCENT);
+		sprintf(szAdd, m_szBreathLine[1], pszTarget, szPercent);
+		sprintf(szMinus, m_szBreathLine[2], pszTarget, szPercent);
+	}
+	else
+	{
+		strcpy(szTime, m_szBreathLine[3]);
+		sprintf(szAdd, m_szBreathLine[1], pszTarget, m_szBreathLine[3]);
+		sprintf(szMinus, m_szBreathLine[2], pszTarget, m_szBreathLine[3]);
+	}
+	char szDuration[96];
+	sprintf(szDuration, m_szBreathLine[0], szTime);
+	sprintf(szText, "%s\n\n%s\n\n%s", szDuration, szAdd, szMinus);
+	m_BreathInfo.SetText(szText);
+}
+
 void KUiStatusMeridianPage::PaintWindow()
 {
+	if (m_nMeridian == 0)
+		RefreshBreathInfo();
 	Refresh();
 	KWndPage::PaintWindow();
 	PaintAcupointLines();

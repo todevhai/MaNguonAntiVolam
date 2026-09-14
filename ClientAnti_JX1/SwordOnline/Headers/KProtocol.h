@@ -2234,6 +2234,10 @@ typedef struct
 // 3 Dai Ho Mach Don) and MERIDIAN_WAY_TIPS_ONLY asks for the cost / rate text of the next acupoint
 // of btMeridian instead of trying to open it.
 #define	MERIDIAN_WAY_TIPS_ONLY	0x80
+// btMeridian MERIDIAN_BREATH: Khi Doanh Dan Dien, btWay = days (1, 7 or 30).
+#define	MERIDIAN_BREATH			9
+#define	MERIDIAN_BREATH_PERCENT	15	// jx9tn AttributeAdd / AttributeMinus
+#define	MERIDIAN_BREATH_MIN_LEVEL	16	// all 8 meridians (jx9tn MIN_MERIDIAN_LEVEL)
 typedef struct
 {
 	BYTE	ProtocolType;
@@ -2265,6 +2269,7 @@ typedef struct
 	int		nXueLongTeng[MERIDIAN_ITEM_LEVELS];	// index = level - 1
 	int		nXueLongDan[MERIDIAN_ITEM_LEVELS];
 	int		nMoney;
+	int		nBreathSeconds;	// Khi Doanh Dan Dien time left, 0 = none
 	char	szTips[512];	// TCVN3 text from GetLevelUpTips in meridian.lua, lines split by '\n'
 } MERIDIAN_SYNC;
 
