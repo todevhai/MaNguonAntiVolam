@@ -5980,6 +5980,17 @@ edit('Core/Src/Scene/KScenePlaceC.cpp',
            b'\t\t}'),
      'doi ban do: khong ngu 30 giay cho su kien nap canh')
 
+# GOC RE cua lan dung im tren (log ban va tren in "tiep=-1 vung=(-3,-3)" kem tieu
+# diem TRUNG vi tri cu): OpenPlace dat lai m_FocusRegion ve (-3,-3) nhung KHONG xoa
+# m_FocusPosition. KSubWorld::LoadMap goi SetFocusPosition(goc vung dich) - neu trung
+# toa do tieu diem cu thi ham thoat ngay dong dau, khong xep vung nao de nap, m_bLoading
+# (OpenPlace vua bat) khong bao gio tat. Xoa tieu diem ve toa do "rat xa" (chinh hang
+# so ma dong khoi tao da de trong chu thich) de lan dat dau tien tren ban do moi luon nap.
+edit('Core/Src/Scene/KScenePlaceC.cpp',
+     b'm_FocusRegion.x = m_FocusRegion.y = -SPWP_LOAD_EXTEND_RANGE;',
+     b'm_FocusRegion.x = m_FocusRegion.y = -SPWP_LOAD_EXTEND_RANGE; m_FocusPosition.x = m_FocusPosition.y = SPWP_FARAWAY_COORD;',
+     'doi ban do: xoa tieu diem cu de ban do moi luon xep vung nap')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
