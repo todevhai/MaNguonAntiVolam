@@ -6114,6 +6114,16 @@ edit('Core/Src/KNpc.cpp',
      b'&& ThuThiTrienChieu(this, pSkill, nX, nY) ',
      'DoSkill dung ThuThiTrienChieu (bao cuoi ngua / sai vu khi)')
 
+# ------------------------------------------------ gioi han so pak
+# DOI HANH VI: KPakList chi nap 32 pak dau (MAX_PAK 32) ma config.ini ban Viet hoa da khai
+# 33 (0..32) -> adultpermit.pak o 32 bi bo qua im lang, va khong con cho cho pak bo sung cua
+# ta (data/minimap-bosung.pak - anh minimap dung tu du lieu ban do, client/tao-minimap-tu-ban-do.py).
+# Chi so pak la int (XPackElemFileRef::nPackIndex), khong bi nen bit, nen chi can noi mang.
+edit('Engine/Src/KPakList.h',
+     b'#define MAX_PAK\t\t32',
+     b'#define MAX_PAK\t\t64\t/* 32 bo qua pak thu 33 tro di */',
+     'MAX_PAK 32 -> 64')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
