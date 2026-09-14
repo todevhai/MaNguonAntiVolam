@@ -3991,6 +3991,19 @@ edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
            b'\t\tstrcat(Buffer, b ? " M\xeb " : " \xa7\xe3ng");'),
      'tin bat/tat kenh: giu chu cuoi TCVN3, bo dem du dai')
 
+# Icon chat mat khi toi nguoi nhan: ben gui da TEncodeText "<pic=N>" thanh byte KTC_INLINE_PIC
+# (0x06) + WORD; ben nhan FilterTextColor lai TEncodeText lan nua, ham nay coi 0x06 < 0x20 la
+# rac va bo ca ba byte. Tin da co anh chen thi chi loc bang TFilterEncodedText (giu anh, chi so
+# anh do KInlinePicSink kiem gioi han); tin khac giu duong cu vi tin may chu con the <color=> tho.
+edit('S3Client/Ui/UiCase/UiMsgCentrePad.cpp',
+     _crlf(b'\tnMsgLength = TClearSpecialCtrlInEncodedText(pMsgBuff, nMsgLength, KTC_COLOR_RESTORE);\n'
+           b'\treturn TEncodeText(pMsgBuff, nMsgLength);'),
+     _crlf(b'\tnMsgLength = TClearSpecialCtrlInEncodedText(pMsgBuff, nMsgLength, KTC_COLOR_RESTORE);\n'
+           b'\tif (memchr(pMsgBuff, KTC_INLINE_PIC, nMsgLength))\n'
+           b'\t\treturn TFilterEncodedText(pMsgBuff, nMsgLength);\n'
+           b'\treturn TEncodeText(pMsgBuff, nMsgLength);'),
+     'tin chat co icon: khong ma hoa lai lam mat anh')
+
 # ---------------------------------------------------------------------------
 # Kenh chat do MAY CHU cap (NotifyChannelID -> KUiMsgCentrePad::OpenChannel),
 # client khop ten do voi khoa FormatName cua tung muc [CH_*] trong ini.
