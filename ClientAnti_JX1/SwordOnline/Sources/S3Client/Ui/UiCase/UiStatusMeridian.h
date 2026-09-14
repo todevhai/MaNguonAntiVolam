@@ -22,6 +22,18 @@
 #define MERIDIAN_PAGE_ACUPS		16
 #define MERIDIAN_BREATH_DAYS	3
 
+// Ten huyet: KWndText chi doc canh le tu ini; ten trai can sat phai, ten phai sat trai (cho vach dan)
+class KUiAcupName : public KWndText32
+{
+public:
+	void	SetHAlign(int bRight)
+	{
+		m_Style &= ~(WNDTEXT_ES_HALIGN_CENTRE | WNDTEXT_ES_HALIGN_RIGHT);
+		if (bRight)
+			m_Style |= WNDTEXT_ES_HALIGN_RIGHT;
+	}
+};
+
 class KUiStatusMeridianPage : public KWndPage
 {
 public:
@@ -43,7 +55,7 @@ private:
 	KWndLabeledButton	m_BtnFullBreath;
 	KWndLabeledButton	m_BtnMeridian[MERIDIAN_PAGE_COUNT];
 	KWndButton			m_Acup[MERIDIAN_PAGE_ACUPS];
-	KWndText32			m_AcupName[MERIDIAN_PAGE_ACUPS];	// ten huyet, trai/phai theo [AcupPos] cua ini mach
+	KUiAcupName			m_AcupName[MERIDIAN_PAGE_ACUPS];	// ten huyet, trai/phai theo [AcupPos] cua ini mach
 	int					m_nAcupRight[MERIDIAN_PAGE_ACUPS];	// 1 = nhan ben phai huyet
 	KWndImage			m_BreathPoint[MERIDIAN_PAGE_COUNT];
 	KWndLabeledButton	m_BtnBreathDays[MERIDIAN_BREATH_DAYS];

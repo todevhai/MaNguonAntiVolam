@@ -131,10 +131,6 @@ void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
 	Ini.GetInteger("AcupTxt", "Height", 16, &nTxtH);
 	Ini.GetInteger("AcupTxt", "LeftX", 0, &nLeftX);
 	Ini.GetInteger("AcupTxt", "RightX", 0, &nRightX);
-	KIniFile Style;			// canh le: ten trai sat phai, ten phai sat trai (cho vach dan)
-	char Buff[128];
-	sprintf(Buff, "%s\%s", m_szScheme, SCHEME_INI_MERIDIAN);
-	Style.Load(Buff);
 	for (int i = 0; i < MERIDIAN_PAGE_ACUPS; i++)
 	{
 		char szSection[32];
@@ -142,8 +138,8 @@ void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
 		m_Acup[i].Init(&Ini, szSection);
 		sprintf(szSection, "Acup_%d", i);
 		Ini.GetInteger("AcupPos", szSection, 0, &m_nAcupRight[i]);
-		m_AcupName[i].Init(&Style, m_nAcupRight[i] ? "AcupNameRight" : "AcupNameLeft");
-		m_AcupName[i].SetSize(nTxtW, nTxtH);
+		m_AcupName[i].Init(&Ini, "AcupTxt");		// co chu, mau cua jx9tn
+		m_AcupName[i].SetHAlign(!m_nAcupRight[i]);
 		int nX, nY, nW, nH;
 		m_Acup[i].GetPosition(&nX, &nY);
 		m_Acup[i].GetSize(&nW, &nH);
@@ -382,10 +378,11 @@ void KUiStatusMeridianPage::RefreshBreathInfo()
 	char szTime[32], szAdd[96], szMinus[96], szText[256];
 	if (Info.nBreathSeconds > 0)
 	{
-		int nDays = Info.nBreathSeconds / 86400, nHours = Info.nBreathSeconds / 3600;
-		if (nDays > 0)
+		// lam tron len: vua them 7 ngay thi hien 7, khong phai 6 ngay 23 gio
+		int nDays = (Info.nBreathSeconds + 86399) / 86400, nHours = (Info.nBreathSeconds + 3599) / 3600;
+		if (Info.nBreathSeconds >= 86400)
 			sprintf(szTime, "%d %s", nDays, m_szUnit[0]);
-		else if (nHours > 0)
+		else if (Info.nBreathSeconds >= 3600)
 			sprintf(szTime, "%d %s", nHours, m_szUnit[1]);
 		else
 			sprintf(szTime, "%d %s", (Info.nBreathSeconds + 59) / 60, m_szUnit[2]);
