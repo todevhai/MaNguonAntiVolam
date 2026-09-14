@@ -82,6 +82,7 @@ private:
 	char				m_szUnit[3][16];				// ngay / gio / phut
 	char				m_szTarget[5][16];				// [EffectTarget] he bi khac theo he nhan vat
 	unsigned int		m_uBreathPainted;				// GetTickCount lan ve dong Khi Doanh
+	int					m_nAcupOffsetX;				// [MeridianConfig] AcupOffsetX: doi ca cum huyet + ten
 	int					m_nMeridian;					// 0 Khi Doanh, 1..8 mach dang chon
 	int					m_nVersion;						// GDI_MERIDIAN_INFO da ve
 	int					m_nLevel[MERIDIAN_PAGE_COUNT];	// cap 8 mach theo goi moi nhat

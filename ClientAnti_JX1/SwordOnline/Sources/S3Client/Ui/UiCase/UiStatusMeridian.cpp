@@ -37,6 +37,7 @@ KUiStatusMeridianPage::KUiStatusMeridianPage()
 	memset(m_szUnit, 0, sizeof(m_szUnit));
 	memset(m_szTarget, 0, sizeof(m_szTarget));
 	m_uBreathPainted = 0;
+	m_nAcupOffsetX = 0;
 }
 
 void KUiStatusMeridianPage::Initialize()
@@ -78,6 +79,8 @@ void KUiStatusMeridianPage::LoadScheme(const char* pScheme)
 	Ini.GetInteger("MeridianConfig", "Left", 0, &nLeft);
 	Ini.GetInteger("MeridianConfig", "Top", 0, &nTop);
 	Ini.GetInteger("MeridianConfig", "Step", 24, &nStep);
+	// Doi ca cum huyet + ten sang phai cho nam trong khung hinh nguoi (vi tri goc trong pak lech trai)
+	Ini.GetInteger("MeridianConfig", "AcupOffsetX", 0, &m_nAcupOffsetX);
 	for (i = 0; i < MERIDIAN_PAGE_COUNT; i++)
 	{
 		char szKey[32], szLabel[32];
@@ -137,6 +140,11 @@ void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
 		char szSection[32];
 		sprintf(szSection, "btnAcupuncturePoint_%d", i);
 		m_Acup[i].Init(&Ini, szSection);
+		{
+			int nAX, nAY;
+			m_Acup[i].GetPosition(&nAX, &nAY);
+			m_Acup[i].SetPosition(nAX + m_nAcupOffsetX, nAY);
+		}
 		sprintf(szSection, "Acup_%d", i);
 		Ini.GetInteger("AcupPos", szSection, 0, &m_nAcupRight[i]);
 		m_AcupName[i].Init(&Ini, "AcupTxt");		// co chu + kich thuoc o cua jx9tn
@@ -146,7 +154,7 @@ void KUiStatusMeridianPage::LoadAcupointLayout(int nMeridian)
 		int nX, nY, nW, nH;
 		m_Acup[i].GetPosition(&nX, &nY);
 		m_Acup[i].GetSize(&nW, &nH);
-		m_AcupName[i].SetPosition(m_nAcupRight[i] ? nRightX : nLeftX, nY + (nH - nTxtH) / 2);
+		m_AcupName[i].SetPosition((m_nAcupRight[i] ? nRightX : nLeftX) + m_nAcupOffsetX, nY + (nH - nTxtH) / 2);
 		KUiMeridianAcupDesc Desc;
 		memset(&Desc, 0, sizeof(Desc));
 		Desc.nMeridian = nMeridian;
