@@ -31,6 +31,17 @@ public:
 		m_Style &= ~(WNDTEXT_ES_HALIGN_CENTRE | WNDTEXT_ES_HALIGN_RIGHT);
 		m_Style |= WNDTEXT_ES_HALIGN_CENTRE;
 	}
+	// Mep trai / phai cua chu dang ve (cung phep tinh can giua cua KWndText::PaintWindow), toa do
+	// trong cha: vach dan dung cach mep chu mot khoang deu, khong phai mep o 70 diem.
+	void	GetTextSpan(int* pLeft, int* pRight)
+	{
+		int nW = m_nTextLen * m_nFontSize / 2;
+		int nLeft = m_Left + (m_Width - nW) / 2;
+		if (nLeft < m_Left)
+			nLeft = m_Left;
+		*pLeft = nLeft;
+		*pRight = nLeft + nW;
+	}
 };
 
 class KUiStatusMeridianPage : public KWndPage

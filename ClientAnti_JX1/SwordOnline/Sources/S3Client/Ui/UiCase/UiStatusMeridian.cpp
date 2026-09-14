@@ -182,12 +182,11 @@ void KUiStatusMeridianPage::PaintAcupointLines()
 		}
 		nPrevX = nCX;
 		nPrevY = nCY;
-		int nTX, nTY, nTW, nTH;
-		m_AcupName[i].GetPosition(&nTX, &nTY);
-		m_AcupName[i].GetSize(&nTW, &nTH);
+		int nTextLeft, nTextRight;
+		m_AcupName[i].GetTextSpan(&nTextLeft, &nTextRight);
 		KRULine& v = Lines[nCount++];
 		v.Color.Color_dw = MAU_VACH_DAN;
-		v.oPosition.nX = nX0 + (m_nAcupRight[i] ? nTX : nTX + nTW);
+		v.oPosition.nX = nX0 + (m_nAcupRight[i] ? nTextLeft - KHOANG_VACH_CHU : nTextRight + KHOANG_VACH_CHU);
 		v.oPosition.nY = nCY;	v.oPosition.nZ = 0;
 		v.oEndPos.nX = nX0 + (m_nAcupRight[i] ? nX + nW : nX);
 		v.oEndPos.nY = nCY;		v.oEndPos.nZ = 0;
