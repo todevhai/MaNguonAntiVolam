@@ -31,10 +31,16 @@ KBuySell::KBuySell()
 	m_Width = 0;
 	m_Height = 0;
 	m_MaxItem = 0;
+	m_pGiaGocXu = NULL;
+	m_pGiaThucXu = NULL;
 }
 
 KBuySell::~KBuySell()
 {
+	delete [] m_pGiaGocXu;
+	m_pGiaGocXu = NULL;
+	delete [] m_pGiaThucXu;
+	m_pGiaThucXu = NULL;
 #ifndef _SERVER
 	if (m_pShopRoom)
 	{
@@ -159,6 +165,31 @@ BOOL KBuySell::Init()
 		}
 	}
 
+	/* Gia Ky Tran Cac theo TEN cot (goods.txt cac ban 8.x lech so cot). Ten GBK: tien dong,
+	   gia hien tai. Phai khop may chu (server/linux-server/Core/KBuySell.cpp). Gan gia vao
+	   mon de tooltip va kiem du xu dung cung mot con so. */
+	delete [] m_pGiaGocXu;
+	delete [] m_pGiaThucXu;
+	m_pGiaGocXu = new int[m_MaxItem];
+	m_pGiaThucXu = new int[m_MaxItem];
+	{
+		char szCotGoc[] = "\xCD\xAD\xC7\xAE";
+		char szCotThuc[] = "\xC9\xCC\xC6\xB7\xCF\xD6\xBC\xDB";
+		int nCotGoc = GoodsFile.FindColumn(szCotGoc);
+		int nCotThuc = GoodsFile.FindColumn(szCotThuc);
+		for (int k = 0; k < m_MaxItem; k++)
+		{
+			m_pGiaGocXu[k] = 0;
+			m_pGiaThucXu[k] = 0;
+			if (nCotGoc > 0)
+				GoodsFile.GetInteger(k + 2, nCotGoc, 0, &m_pGiaGocXu[k]);
+			if (nCotThuc > 0)
+				GoodsFile.GetInteger(k + 2, nCotThuc, 0, &m_pGiaThucXu[k]);
+			if (GetGiaXu(k) > 0)
+				m_Item[k].SetPriceXu(GetGiaXu(k));
+		}
+	}
+
 #ifndef _SERVER
 	if (!m_pShopRoom)
 	{
@@ -175,6 +206,22 @@ KItem* KBuySell::GetItem(int nIndex)
 		return NULL;
 
 	return &m_Item[nIndex];
+}
+
+int KBuySell::GetGiaGocXu(int nItemIdx)
+{
+	if (nItemIdx < 0 || nItemIdx >= m_MaxItem || !m_pGiaGocXu)
+		return 0;
+	return m_pGiaGocXu[nItemIdx];
+}
+
+int KBuySell::GetGiaXu(int nItemIdx)
+{
+	if (nItemIdx < 0 || nItemIdx >= m_MaxItem || !m_pGiaThucXu)
+		return 0;
+	if (m_pGiaThucXu[nItemIdx] > 0)
+		return m_pGiaThucXu[nItemIdx];
+	return GetGiaGocXu(nItemIdx);
 }
 
 int KBuySell::GetItemIndex(int nShop, int nIndex)

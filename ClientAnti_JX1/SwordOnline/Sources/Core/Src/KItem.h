@@ -182,6 +182,7 @@ public:
 	int		GetHeight() const { return m_CommonAttrib.nHeight; };
 	int		GetPrice() const { return m_CommonAttrib.nPrice; };
 	int		GetPriceXu() const { return m_CommonAttrib.nPriceXu;};
+	void	SetPriceXu(int nPriceXu) { m_CommonAttrib.nPriceXu = nPriceXu; };
 	char*	GetName() const { return (char *)m_CommonAttrib.szItemName; };
 	int		GetObjIdx() { return m_CommonAttrib.nObjIdx;};
 	void*	GetRequirement(IN int);

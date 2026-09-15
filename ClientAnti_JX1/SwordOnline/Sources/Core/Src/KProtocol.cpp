@@ -312,6 +312,22 @@ void SendClientCmdSell(int nId)
 	Player[CLIENT_PLAYER_INDEX].m_ItemList.LockOperation();
 }
 
+/* Mua o Ky Tran Cac khong LockOperation: may chu bo qua o client gui, tu tim o va xu ly
+   tung goi tuan tu. Khoa thi gio hang chi gui duoc dong dau (dong sau bi IsLockOperation
+   nuot im lang cho toi khi may chu tra ve). */
+void SendClientCmdBuyMarket(int nBuyIdx, int nCount)
+{
+	PLAYER_BUY_ITEM_COMMAND PlayerBuy;
+	PlayerBuy.ProtocolType = c2s_playerbuyitem;
+	PlayerBuy.m_BuyIdx = (BYTE)nBuyIdx;
+	PlayerBuy.m_Place = (BYTE)pos_equiproom;
+	PlayerBuy.m_X = 0;
+	PlayerBuy.m_Y = 0;
+	PlayerBuy.m_Count = (BYTE)nCount;
+	if (g_pClient)
+		g_pClient->SendPackToServer((BYTE*)&PlayerBuy, sizeof(PLAYER_BUY_ITEM_COMMAND));
+}
+
 void SendClientCmdBuy(int nBuyIdx, int nPlace, int nX, int nY)
 {
 	if (Player[CLIENT_PLAYER_INDEX].m_ItemList.IsLockOperation())
@@ -322,6 +338,7 @@ void SendClientCmdBuy(int nBuyIdx, int nPlace, int nX, int nY)
 	PlayerBuy.m_Place = (BYTE)nPlace;
 	PlayerBuy.m_X = (BYTE)nX;
 	PlayerBuy.m_Y = (BYTE)nY;
+	PlayerBuy.m_Count = 1;
 	if (g_pClient)
 		g_pClient->SendPackToServer((BYTE*)&PlayerBuy, sizeof(PLAYER_BUY_ITEM_COMMAND));
 	Player[CLIENT_PLAYER_INDEX].m_ItemList.LockOperation();
@@ -379,11 +396,12 @@ void SendClientCPChangeCmd(int oldPW, int newPW)
 		g_pClient->SendPackToServer((BYTE*)&ChangePWCmd, sizeof(PLAYER_REQUEST_CP_CHANGE));
 }
 
-void SendClientOpenMarket()
+void SendClientOpenMarket(int nTab)
 {
 	PLAYER_REQUEST_OPEN_MARKET Market;
 
 	Market.ProtocolType = c2s_market;
+	Market.nTab = (BYTE)nTab;
 	if (g_pClient)
 		g_pClient->SendPackToServer((BYTE*)&Market, sizeof(PLAYER_REQUEST_OPEN_MARKET));
 }

@@ -28,7 +28,11 @@ public:
 	int				GetHeight() { return m_Height; }
 	KItem*			GetItem(int nIndex);
 	int				GetItemIndex(int nShop, int nIndex);
+	int				GetGiaGocXu(int nItemIdx);	// Ky Tran Cac: cot tien dong cua goods.txt
+	int				GetGiaXu(int nItemIdx);		// gia phai tra: gia thuc neu co, khong thi gia goc
 private:
+	int*			m_pGiaGocXu;
+	int*			m_pGiaThucXu;
 	int**			m_SellItem;
 	KItem*			m_Item;
 	int				m_Width;

@@ -235,6 +235,7 @@ copy debug\Game.exe ..\..\..\bin\Client\debug\Game.exe
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Ui\UiCase\UiMarket.cpp" />
+    <ClCompile Include="Ui\UiCase\UiMarketCart.cpp" />
     <ClCompile Include="Ui\UiCase\UiMarketPage.cpp" />
     <ClCompile Include="Ui\uicase\UiMiniMap.cpp" />
     <ClCompile Include="Ui\uicase\UiMsgCentrePad.cpp" />
@@ -379,6 +380,7 @@ copy debug\Game.exe ..\..\..\bin\Client\debug\Game.exe
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </CustomBuild>
     <ClInclude Include="Ui\UiCase\UiMarket.h" />
+    <ClInclude Include="Ui\UiCase\UiMarketCart.h" />
     <ClInclude Include="Ui\UiCase\UiMarketPage.h" />
     <ClInclude Include="Ui\uicase\UiMiniMap.h" />
     <ClInclude Include="Ui\UiCase\UiMsgCentrePad.h" />

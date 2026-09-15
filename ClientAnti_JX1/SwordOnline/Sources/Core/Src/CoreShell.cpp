@@ -266,7 +266,10 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 			}
 			else if (pObj->eContainer == UOC_MARKET)
 			{
-				pInfo->nPriceXu = pItem->GetPriceXu();
+				// Ky Tran Cac: nPriceXu = gia phai tra, nPrice = gia goc (goods.txt)
+				int nKtcIdx = BuySell.GetItemIndex(Player[CLIENT_PLAYER_INDEX].m_BuyInfo.m_nBuyIdx, pObj->Obj.uId);
+				pInfo->nPriceXu = BuySell.GetGiaXu(nKtcIdx);
+				pInfo->nPrice = BuySell.GetGiaGocXu(nKtcIdx);
 			}
 			else
 			{
@@ -1567,6 +1570,32 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 	return nRet;
 }
 
+/* Ky Tran Cac: mua nSoLuong mon o vi tri nViTri cua shop dang mo. Gia la xu (item Tien Dong)
+   theo goods.txt - KHONG kiem bac va KHONG tim o trong: may chu tu tim o, tu tru xu va bao
+   lai. Chi chan som khi so xu dang biet khong du ca dong. */
+static int MuaKyTranCac(int nViTri, int nSoLuong)
+{
+	int nIdx = BuySell.GetItemIndex(Player[CLIENT_PLAYER_INDEX].m_BuyInfo.m_nBuyIdx, nViTri);
+	if (!BuySell.GetItem(nIdx))
+		return 0;
+	if (nSoLuong < 1)
+		nSoLuong = 1;
+	int nGia = BuySell.GetGiaXu(nIdx);
+	if (nGia <= 0 || Player[CLIENT_PLAYER_INDEX].m_ItemList.GetEquipmentXu() < nGia * nSoLuong)
+	{
+		KSystemMessage	sMsg;
+		strcpy(sMsg.szMessage, MSG_SHOP_NO_XU);
+		sMsg.eType = SMT_SYSTEM;
+		sMsg.byConfirmType = SMCT_CLICK;
+		sMsg.byPriority = 1;
+		sMsg.byParamSize = 0;
+		CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
+		return 0;
+	}
+	SendClientCmdBuyMarket(nViTri, nSoLuong);
+	return 1;
+}
+
 //--------------------------------------------------------------------------
 //	功能：向游戏发送操作
 //	参数：unsigned int uDataId --> Core外部客户对core的操作请求的索引定义
@@ -1596,7 +1625,7 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 		{
 				if(Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_FightMode == 0)
 				{
-						SendClientOpenMarket();
+						SendClientOpenMarket((int)uParam);	// uParam = tab
 				}
 				else
 				{
@@ -1844,6 +1873,11 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 			KUiObjAtContRegion* pObject1 = (KUiObjAtContRegion*)uParam;
 			if (CGOG_NPCSELLITEM != pObject1->Obj.uGenre)
 					break;
+			if (pObject1->eContainer == UOC_MARKET)
+			{
+				nRet = MuaKyTranCac(pObject1->Obj.uId, nParam);	// nParam = so luong
+				break;
+			}
 
 			int nIdx = 0;
 			KItem* pItem = NULL;

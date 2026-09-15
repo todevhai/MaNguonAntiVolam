@@ -696,6 +696,7 @@ typedef struct
 	BYTE			m_Place;			// 放在身上哪个地方
 	BYTE			m_X;				// 坐标X
 	BYTE			m_Y;				// 坐标Y
+	BYTE			m_Count;			// so mon mua mot lan (Ky Tran Cac); 0/1 = mot mon
 } PLAYER_BUY_ITEM_COMMAND;
 
 typedef struct
@@ -2380,6 +2381,7 @@ typedef struct
 typedef struct
 {
 	BYTE			ProtocolType;
+	BYTE			nTab;			// tab Ky Tran Cac (thu tu dong trong settings/shop/type.txt)
 }PLAYER_REQUEST_OPEN_MARKET;
 
 typedef struct
@@ -2392,6 +2394,8 @@ typedef struct
 void SendClientCmdSell(int nID);
 // 在调用这支函数之前必须判断是否处于交易状态，如果正在交易，不能调用这支函数
 void SendClientCmdBuy(int nBuyIdx, int nPlace, int nX, int nY);
+// Ky Tran Cac: mua nCount mon, may chu tu tim o; KHONG khoa thao tac (xem KProtocol.cpp)
+void SendClientCmdBuyMarket(int nBuyIdx, int nCount);
 // 在调用这支函数之前必须判断是否处于交易状态，如果正在交易，不能调用这支函数
 void SendClientCmdRun(int nX, int nY);
 // 在调用这支函数之前必须判断是否处于交易状态，如果正在交易，不能调用这支函数
@@ -2404,7 +2408,7 @@ void SendClientCPUnlockCmd(int CP_IntPW);
 void SendClientCPLockCmd();
 void SendClientCPChangeCmd(int oldPW, int newPW);
 void SendClientCPResetCmd(int resetPW);
-void SendClientOpenMarket();
+void SendClientOpenMarket(int nTab);
 void SendClientString(int nstt);//stringbox
 void SendClientDaTau(int nstt);
 void SendClientCmdMoveItem(void* pDownPos, void* pUpPos);
