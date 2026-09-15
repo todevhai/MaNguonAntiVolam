@@ -902,15 +902,18 @@ void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)
 	g_pRepresent->DrawPrimitives(1, &m_Image, RU_T_IMAGE, TRUE);
 
 	
-	if (m_CommonAttrib.bStack && bStack)
+	// Ve bo dem xep chong: item nao co so luong > 1 thi hien so (server chi
+	// day stacknum > 1 cho item chong duoc). Bo yeu cau m_CommonAttrib.bStack
+	// (quest item client dat bStack=0), noi cap 999 -> 9999 (buffer szNum[8]).
+	if (bStack)
 	{
 		int nNum = m_CommonAttrib.nStackNum;
-		if (nNum > 1 && nNum < 1000)
+		if (nNum > 1 && nNum < 10000)
 		{
 			int nFontSize = 12;
-			char szNum[4];
+			char szNum[8];
 			int nLen = sprintf(szNum, "%d", nNum);
-			szNum[3] = 0;
+			szNum[7] = 0;
 			g_pRepresent->OutputText(nFontSize, szNum, KRF_ZERO_END,
 				nX + (m_CommonAttrib.nWidth * 27) - nLen * (nFontSize ) / 2,
 				nY + (m_CommonAttrib.nHeight) + nFontSize + 1, 0xFFFFFF00);
