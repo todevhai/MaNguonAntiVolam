@@ -1737,6 +1737,13 @@ int KItem::EnChance( int nEnChance /*= 1*/ )
 			}
 		}
 	
+	// So luong xep chong (item chong duoc, > 1)
+	if (m_CommonAttrib.nStackNum > 1)
+	{
+		char szSL[48];
+		sprintf(szSL, "\n<color=White>So luong: %d", m_CommonAttrib.nStackNum);
+		strcat(pszMsg, szSL);
+	}
 	return 1;
 }
 
