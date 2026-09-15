@@ -576,8 +576,9 @@ int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			PopupChannelMenu(x, y);
 		}
 		else if (uParam == (unsigned int)(KWndWindow*)&m_Market)
-			if (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0))
-			{
+		{
+			/* Nut Bao Vat -> Ky Tran Cac. Bo dieu kien chest-unlocked cu (khong lien quan
+			   shop): bam la mo/dong hop Ky Tran Cac. May chu tra s2c_openmarketbox + xu. */
 			if (KUiMarket::GetIfVisible() && KUiItem::GetIfVisible())
 			{
 				KUiMarket::CloseWindow();
@@ -585,9 +586,7 @@ int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			}
 			else
 				KUiMarketPage::OpenWindow();
-			}
-			else	
-			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, CN_GH, 0);
+		}
 		else if (uParam == (unsigned int)(KWndWindow*)&m_DichChuyen)
 			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, HT_CN, 0);
 		else if (uParam == (unsigned int)(KWndWindow*)&m_TongKim)
