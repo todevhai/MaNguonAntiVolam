@@ -1590,6 +1590,14 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		strcat(pszMsg,sOrice);
 		strcat(pszMsg,"\n");
 	}
+	// So luong xep chong (chong duoc, > 1) - hien cuoi tooltip
+	if (m_CommonAttrib.nStackNum > 1)
+	{
+		char szSL[48];
+		sprintf(szSL, "<color=White>So luong: %d", m_CommonAttrib.nStackNum);
+		strcat(pszMsg, szSL);
+		strcat(pszMsg, "\n");
+	}
 }
 #endif
 
@@ -1736,14 +1744,6 @@ int KItem::EnChance( int nEnChance /*= 1*/ )
 				}
 			}
 		}
-	
-	// So luong xep chong (item chong duoc, > 1)
-	if (m_CommonAttrib.nStackNum > 1)
-	{
-		char szSL[48];
-		sprintf(szSL, "\n<color=White>So luong: %d", m_CommonAttrib.nStackNum);
-		strcat(pszMsg, szSL);
-	}
 	return 1;
 }
 
