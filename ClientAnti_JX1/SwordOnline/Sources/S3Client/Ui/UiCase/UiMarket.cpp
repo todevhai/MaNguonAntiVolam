@@ -123,6 +123,7 @@ void KUiMarket::LoadScheme(const char* pScheme)
 			m_pSelf->m_CloseBtn.Init(&Ini, "CloseBtn");
 			m_pSelf->m_ItemsBox.EnablePickPut(false);
 			m_pSelf->m_DanhSachText.Init(&Ini, "DanhSach");
+			m_pSelf->m_Xu.Init(&Ini, "Xu");
 			m_pSelf->m_DanhSachText.SetText("Danh s¸ch vËt phÈm");
 		}
 	}

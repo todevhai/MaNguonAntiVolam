@@ -585,7 +585,7 @@ int KUiPlayerBar::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 				KUiItem::CloseWindow(false);
 			}
 			else
-				KUiMarketPage::OpenWindow();
+				g_pCoreShell->OperationRequest(GOI_MARKET, 0, 0);   // mo thang KUiMarket (bo trang chon 3 nut)
 		}
 		else if (uParam == (unsigned int)(KWndWindow*)&m_DichChuyen)
 			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, HT_CN, 0);
