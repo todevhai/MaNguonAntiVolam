@@ -28,13 +28,6 @@ static const char* const AUTO_CMD_FILE = "lenh-auto.txt";
 // Mo mot bang dung nhu bam phim tat, nhung goi thang OpenWindow() nen luon MO
 // (khong bat/tat lai) va khong qua cong kiem tra nao -- tien cho viec verify.
 //---------------------------------------------------------------------------
-static bool s_bGiaLapShift = false;
-
-bool KAutoControl::DangGiaLapShift()
-{
-	return s_bGiaLapShift;
-}
-
 void KAutoControl::OpenByName(const char* szName)
 {
 	if      (!strcmp(szName, "status")) KUiStatus::OpenWindow();
@@ -113,11 +106,19 @@ void KAutoControl::RunLine(const char* szLine)
 		int x = 0, y = 0;
 		if (sscanf(szArg, "%d %d", &x, &y) == 2)
 		{
+			/* Cay cua so doc phim bang GetKeyState(VK_SHIFT) - doc BANG TRANG THAI cua
+			   luong, ma SetKeyboardState ghi duoc. Dat co, bom click, tra lai nhu cu;
+			   khong phai sua UiItem.cpp (dong do la MO NEO cua mot ban va trong CI). */
+			BYTE aPhim[256];
 			int nPos = (int)MAKELONG((short)x, (short)y);
-			s_bGiaLapShift = true;
+			GetKeyboardState(aPhim);
+			BYTE cu = aPhim[VK_SHIFT];
+			aPhim[VK_SHIFT] = (BYTE)0x80;
+			SetKeyboardState(aPhim);
 			Wnd_ProcessInput(WM_RBUTTONDOWN, 0, nPos);
 			Wnd_ProcessInput(WM_RBUTTONUP,   0, nPos);
-			s_bGiaLapShift = false;
+			aPhim[VK_SHIFT] = cu;
+			SetKeyboardState(aPhim);
 			g_DebugLog("[AUTO] shift-rclick %d,%d", x, y);
 		}
 	}
