@@ -3107,9 +3107,47 @@ void	KPlayer::ObjMouseClick(int nObjIndex)
 #endif
 
 #ifndef _SERVER
+/* Thong bao chu thuong o khung tin (TCVN3). */
+static void BaoTinVatPham(const char* szTin)
+{
+	KSystemMessage	sMsg;
+	sMsg.eType = SMT_NORMAL;
+	sMsg.byConfirmType = SMCT_NONE;
+	sMsg.byPriority = 0;
+	sMsg.byParamSize = 0;
+	strcpy(sMsg.szMessage, szTin);
+	CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
+}
+
 // DownPos ������ϵ���Ʒ�ĵ�ǰ���꣬UpPos ������������Ʒ�ŵ�����ϵ�����
 void	KPlayer::MoveItem(ItemPos DownPos, ItemPos UpPos)
 {
+	/* Dat mot mon vao o trang bi ma khong mac duoc (sai o, thieu cap/phai/gioi tinh...).
+	   Truoc day van gui len may chu; may chu tu choi im lang, client da nha hinh keo nen
+	   mon nam vo hinh tren tay, phai bam ra nen dat moi roi. Nay kiem ngay tai day bang
+	   CUNG KItemList::CanEquip ma may chu dung, bao ly do va KHONG gui gi:
+	   - keo-tha (mon dang tren tay): ve lai mon len con tro;
+	   - chuot phai tu tui (tay trong, move cheo): mon cu nam yen trong tui. */
+	if (UpPos.nPlace == pos_equip && !CheckTrading())
+	{
+		int nMon = 0;
+		if (DownPos.nPlace == pos_equip)
+			nMon = m_ItemList.Hand();
+		else if (DownPos.nPlace == pos_equiproom && m_ItemList.Hand() == 0)
+			nMon = m_ItemList.m_Room[room_equipment].FindItem(DownPos.nX, DownPos.nY);
+		if (nMon > 0 && Item[nMon].GetGenre() == item_equip &&
+			UpPos.nX >= 0 && UpPos.nX < itempart_num && !m_ItemList.CanEquip(nMon, UpPos.nX))
+		{
+			if (m_ItemList.CanEquip(nMon, -1))	// du dieu kien -> chi sai o
+				BaoTinVatPham("Kh\xabng th\xd3 \xae\xc6t v\xcbt ph\xc8m v\xb5o \xab n\xb5y!");
+			else
+				BaoTinVatPham("Ch\xad" "a \xae\xf1 \xaei\xd2u ki\xd6n \xae\xd3 trang b\xde v\xcbt ph\xc8m n\xb5y!");
+			if (DownPos.nPlace == pos_equip)
+				m_ItemList.MenuSetMouseItem();
+			return;
+		}
+	}
+
 	if (this->CheckTrading() && DownPos.nPlace == pos_traderoom)
 	{
 		if (this->m_cTrade.m_nTradeLock)

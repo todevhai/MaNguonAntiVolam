@@ -3000,6 +3000,12 @@ void	KProtocolProcess::s2cItemAutoMove(BYTE* pMsg)
 void KProtocolProcess::FinishedItemExchange(BYTE* pMsg)
 {
 	Player[CLIENT_PLAYER_INDEX].m_ItemList.UnlockOperation();
+	/* May chu tu choi mot thao tac (vd mac do khong du dieu kien) thi khong gui goi
+	   di chuyen nao, chi gui goi nay. Mon van nam tren tay cua core nhung hinh keo da
+	   bi nha -> mon vo hinh. Ve lai theo tay cua core; tay trong thi khong dung toi
+	   con tro (tranh xoa hinh keo cua thu khac nhu chieu dang keo ra thanh phim tat). */
+	if (Player[CLIENT_PLAYER_INDEX].m_ItemList.Hand())
+		Player[CLIENT_PLAYER_INDEX].m_ItemList.MenuSetMouseItem();
 }
 
 extern IClientCallback* l_pDataChangedNotifyFunc;
