@@ -71,6 +71,15 @@ BOOL KItemGenerator::Init()
 		case equip_mask:	// mat na
 			m_EquipNumOfEntries[i] = m_BPTLib.GetMaskRecordNumber();
 			break;
+		case equip_mantle:
+			m_EquipNumOfEntries[i] = m_BPTLib.GetMantleRecordNumber();
+			break;
+		case equip_signet:
+			m_EquipNumOfEntries[i] = m_BPTLib.GetSignetRecordNumber();
+			break;
+		case equip_shipin:
+			m_EquipNumOfEntries[i] = m_BPTLib.GetShipinRecordNumber();
+			break;
 		}
 	}
 	m_MedNumOfEntries = m_BPTLib.GetMedicineRecordNumber();
@@ -276,6 +285,15 @@ BOOL KItemGenerator::Gen_Equipment(IN int nDetailType,
 		break;
 	case equip_mask:	// mat na
 		pEqu = m_BPTLib.GetMaskRecord(i);
+		break;
+	case equip_mantle:
+		pEqu = m_BPTLib.GetMantleRecord(i);
+		break;
+	case equip_signet:
+		pEqu = m_BPTLib.GetSignetRecord(i);
+		break;
+	case equip_shipin:
+		pEqu = m_BPTLib.GetShipinRecord(i);
 		break;
 	default:
 		break;
@@ -872,6 +890,15 @@ BOOL KItemGenerator::GetEquipmentCommonAttrib(IN int nDetailType, IN int nPartic
 	case equip_mask:	// mat na
 		pEqu = m_BPTLib.GetMaskRecord(i);
 		break;
+	case equip_mantle:
+		pEqu = m_BPTLib.GetMantleRecord(i);
+		break;
+	case equip_signet:
+		pEqu = m_BPTLib.GetSignetRecord(i);
+		break;
+	case equip_shipin:
+		pEqu = m_BPTLib.GetShipinRecord(i);
+		break;
 	default:
 		break;
 	}
@@ -962,6 +989,15 @@ BOOL KItemGenerator::Gen_ExistEquipment(IN int nDetailType,
 		break;
 	case equip_mask:	// mat na
 		pEqu = m_BPTLib.GetMaskRecord(i);
+		break;
+	case equip_mantle:
+		pEqu = m_BPTLib.GetMantleRecord(i);
+		break;
+	case equip_signet:
+		pEqu = m_BPTLib.GetSignetRecord(i);
+		break;
+	case equip_shipin:
+		pEqu = m_BPTLib.GetShipinRecord(i);
 		break;
 	default:
 		break;

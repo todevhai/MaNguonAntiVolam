@@ -55,6 +55,11 @@ enum ITEM_PART
 	itempart_pendant,
 	itempart_horse,
 	itempart_mask,	// mat na
+	/* Ba o them 16/09/2026 - THU TU PHAI KHOP MAY CHU (server/linux-server/Core/GameDataDef.h):
+	   lech thi goi VIEW_EQUIP_SYNC (m_sInfo[itempart_num]) lech kich thuoc. */
+	itempart_mantle,	// phi phong
+	itempart_signet,	// an
+	itempart_shipin,	// trang suc
 	itempart_num,
 };
 
@@ -603,6 +608,9 @@ enum UI_EQUIPMENT_POSITION
 	UIEP_FOOT = 9,		//½Å²È
 	UIEP_HORSE = 10,	//ÂíÆ¥
 	UIEP_MASK = 11,		// mat na
+	UIEP_MANTLE = 12,	// phi phong
+	UIEP_SIGNET = 13,	// an
+	UIEP_SHIPIN = 14,	// trang suc
 };
 
 //==================================

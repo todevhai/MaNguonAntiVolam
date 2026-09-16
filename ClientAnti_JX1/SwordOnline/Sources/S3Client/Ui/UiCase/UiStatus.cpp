@@ -43,8 +43,10 @@ static struct UE_CTRL_MAP
 	{ UIEP_WAIST_DECOR,	"Pendant"	},
 	{ UIEP_FOOT,		"Shoes"		},
 	{ UIEP_HORSE,		"Horse"		},
-	{ UIEP_MASK,		"Mask"		}
-	// Engine 2003 khong co an / trang suc / phi phong: ba o cuoi de trong
+	{ UIEP_MASK,		"Mask"		},
+	{ UIEP_MANTLE,		"Mantle"	},	// phi phong
+	{ UIEP_SIGNET,		"Signet"	},	// an
+	{ UIEP_SHIPIN,		"Shipin"	}	// trang suc
 };
 
 int KUiStatusPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)

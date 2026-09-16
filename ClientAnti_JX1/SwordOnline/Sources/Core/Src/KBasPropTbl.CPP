@@ -34,6 +34,9 @@
 #define		TABFILE_MAGICATTRIB			"magicattrib.txt"
 #define		TABFILE_GOLDITEM			"GoldItem.txt"
 #define		TABFILE_MASK				"Mask.txt"	// mat na
+#define		TABFILE_MANTLE				"mantle.txt"	// phi phong
+#define		TABFILE_SIGNET				"signet.txt"	// an
+#define		TABFILE_SHIPIN				"shipin.txt"	// trang suc
 
 // 以下定义的结构用于辅助从tabfile中读出属性的初始值
 typedef struct tagPROPINFO
@@ -63,6 +66,9 @@ char*	TABFILE_EQUIPMENT[] =
 	TABFILE_PENDANT,		//"Pendant.txt",
 	TABFILE_HORSE,			//"Horse.txt",
 	TABFILE_MASK,			//"Mask.txt"	// mat na
+	TABFILE_MANTLE,
+	TABFILE_SIGNET,
+	TABFILE_SHIPIN,
 };
 
 //int GetRandomNumber(int nMin, int nMax);
@@ -137,6 +143,9 @@ BOOL KLibOfBPT::Init()
 											&m_BPTPendant,
 											&m_BPTHorse,
 											&m_BPTMask,	// mat na
+											&m_BPTMantle,
+											&m_BPTSignet,
+											&m_BPTShipin,
 											&m_GoldItem,
 											&m_BPTMedicine,
 											&m_BPTQuest,
@@ -148,7 +157,7 @@ BOOL KLibOfBPT::Init()
 	const int cbNumOfTables = sizeof(paryBPT)/sizeof(paryBPT[0]);
 	for (int i = 0; i < cbNumOfTables; i++)
 	{
-		if (i < 12)	// 装备特殊处理
+		if (i < (int)(sizeof(TABFILE_EQUIPMENT) / sizeof(TABFILE_EQUIPMENT[0])))	// 装备特殊处理
 		{
 			KBPT_Equipment* pTemp = (KBPT_Equipment *)paryBPT[i];
 			pTemp->Init(i);
@@ -550,6 +559,36 @@ const KBASICPROP_EQUIPMENT* KLibOfBPT::GetMaskRecord(IN int i) const
 const int KLibOfBPT::GetMaskRecordNumber() const
 {
 	return m_BPTMask.NumOfEntries();
+}
+
+const KBASICPROP_EQUIPMENT* KLibOfBPT::GetMantleRecord(IN int i) const
+{
+	return m_BPTMantle.GetRecord(i);
+}
+
+const int KLibOfBPT::GetMantleRecordNumber() const
+{
+	return m_BPTMantle.NumOfEntries();
+}
+
+const KBASICPROP_EQUIPMENT* KLibOfBPT::GetSignetRecord(IN int i) const
+{
+	return m_BPTSignet.GetRecord(i);
+}
+
+const int KLibOfBPT::GetSignetRecordNumber() const
+{
+	return m_BPTSignet.NumOfEntries();
+}
+
+const KBASICPROP_EQUIPMENT* KLibOfBPT::GetShipinRecord(IN int i) const
+{
+	return m_BPTShipin.GetRecord(i);
+}
+
+const int KLibOfBPT::GetShipinRecordNumber() const
+{
+	return m_BPTShipin.NumOfEntries();
 }
 //
 const int KLibOfBPT::GetMineRecordNumber() const

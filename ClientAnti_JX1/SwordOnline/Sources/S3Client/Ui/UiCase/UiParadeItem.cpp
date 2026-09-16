@@ -38,7 +38,10 @@ static struct UE_CTRL_MAP
 	{ UIEP_WAIST_DECOR,	"Pendant"	},	//装备-腰缀
 	{ UIEP_FOOT,		"Shoes"		},	//装备-鞋子
 	{ UIEP_HORSE,		"Horse"		},	//装备-马
-	{ UIEP_MASK,		"Mask"		}	//装备-面具	// mat na
+	{ UIEP_MASK,		"Mask"		},	//装备-面具	// mat na
+	{ UIEP_MANTLE,		"Mantle"	},	// phi phong
+	{ UIEP_SIGNET,		"Signet"	},	// an
+	{ UIEP_SHIPIN,		"Shipin"	}	// trang suc
 //	{ UIEP_QUANAN,		"QuanAn"	},	//quan an
 //	{ UIEP_TRANGSUC,	"TrangSuc"	},	//trang suc
 //	{ UIEP_PHIPHONG,	"PhiPhong"	},	//phi phong

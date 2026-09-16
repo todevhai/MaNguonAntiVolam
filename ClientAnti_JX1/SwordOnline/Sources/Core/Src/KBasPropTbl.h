@@ -520,6 +520,9 @@ protected:
 	KBPT_Equipment			m_BPTCuff;
 	KBPT_Equipment			m_BPTPendant;
 	KBPT_Equipment			m_BPTMask;	// mat na
+	KBPT_Equipment			m_BPTMantle;	// phi phong
+	KBPT_Equipment			m_BPTSignet;	// an
+	KBPT_Equipment			m_BPTShipin;	// trang suc
 	
     KBPT_MagicAttrib_TF		m_BPTMagicAttrib;
 	// Add by flying
@@ -579,6 +582,12 @@ public:
 	const int					GetMineRecordNumber() const;
 	const KBASICPROP_EQUIPMENT* GetMaskRecord(IN int) const;	// mat na
 	const int					GetMaskRecordNumber() const;	// mat na
+	const KBASICPROP_EQUIPMENT* GetMantleRecord(IN int) const;
+	const int					GetMantleRecordNumber() const;
+	const KBASICPROP_EQUIPMENT* GetSignetRecord(IN int) const;
+	const int					GetSignetRecordNumber() const;
+	const KBASICPROP_EQUIPMENT* GetShipinRecord(IN int) const;
+	const int					GetShipinRecordNumber() const;
 
 // 	const KBASICPROP_EQUIPMENT_GOLD*	GetGoldRecord(IN int) const;
 // 	const int					GetGoldRecordNumber(IN int) const;

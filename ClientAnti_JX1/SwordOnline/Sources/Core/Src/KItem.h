@@ -82,6 +82,9 @@ enum EQUIPDETAILTYPE
 	equip_pendant,
 	equip_horse,
 	equip_mask,	// mat na
+	equip_mantle,	// phi phong (mantle.txt, DetailType 12)
+	equip_signet,	// an (signet.txt, 13)
+	equip_shipin,	// trang suc (shipin.txt, 14)
 	equip_detailnum,
 };
 
