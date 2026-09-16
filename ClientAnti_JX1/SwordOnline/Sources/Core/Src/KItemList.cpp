@@ -21,7 +21,9 @@
 #define		defEQUIP_POWER
 #ifdef defEQUIP_POWER
 	int		g_nEquipPower[itempart_num] =
-	{2, 4, 2, 4, 1, 1, 1, 1, 1, 1, 0};
+	/* Bon o them 16/09/2026 (mat na, phi phong, an, trang suc) an 0: khong tinh vao
+	   trong so roi do khi PK, giong o ngua. */
+	{2, 4, 2, 4, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0};
 #endif
 
 int KItemList::ms_ActiveEquip[itempart_num][MAX_ITEM_ACTIVE] = 
@@ -37,6 +39,10 @@ int KItemList::ms_ActiveEquip[itempart_num][MAX_ITEM_ACTIVE] =
 	{ itempart_amulet, itempart_body },	//	itempart_ring2,
 	{ itempart_belt, itempart_ring2 },	//	itempart_pendant,
 	{ itempart_horse, itempart_horse },	//	itempart_horse,
+	{ itempart_mask, itempart_mask },	//	itempart_mask
+	{ itempart_mantle, itempart_mantle },	//	itempart_mantle
+	{ itempart_signet, itempart_signet },	//	itempart_signet
+	{ itempart_shipin, itempart_shipin },	//	itempart_shipin
 };
 
 int KItemList::ms_ActivedEquip[itempart_num][MAX_ITEM_ACTIVE] =
@@ -52,6 +58,10 @@ int KItemList::ms_ActivedEquip[itempart_num][MAX_ITEM_ACTIVE] =
 	{ itempart_cuff, itempart_pendant },//	itempart_ring2,
 	{ itempart_foot, itempart_ring1 },	//	itempart_pendant,
 	{ itempart_horse, itempart_horse },	//	itempart_horse,
+	{ itempart_mask, itempart_mask },	//	itempart_mask
+	{ itempart_mantle, itempart_mantle },	//	itempart_mantle
+	{ itempart_signet, itempart_signet },	//	itempart_signet
+	{ itempart_shipin, itempart_shipin },	//	itempart_shipin
 };
 
 KItemList::KItemList()
@@ -300,7 +310,10 @@ int KItemList::Add(int nIdx, int nPlace, int nX, int nY, BOOL bInit)
 		UIEP_FINGER2,
 		UIEP_WAIST_DECOR,
 		UIEP_HORSE,
-		UIEP_MASK,	// mat na
+		UIEP_MASK,
+		UIEP_MANTLE,
+		UIEP_SIGNET,
+		UIEP_SHIPIN,
 	};
 
 	pInfo.Obj.uGenre = CGOG_ITEM;	//Դװ��
@@ -520,7 +533,10 @@ BOOL KItemList::Remove(int nGameIdx)
 		UIEP_FINGER2,
 		UIEP_WAIST_DECOR,
 		UIEP_HORSE,
-		UIEP_MASK,	// mat na
+		UIEP_MASK,
+		UIEP_MANTLE,
+		UIEP_SIGNET,
+		UIEP_SHIPIN,
 	};
 
 	pInfo.Obj.uGenre = CGOG_ITEM;
@@ -2607,7 +2623,10 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 			UIEP_FINGER2,
 			UIEP_WAIST_DECOR,
 			UIEP_HORSE,
-			UIEP_MASK	// mat na
+			UIEP_MASK,
+			UIEP_MANTLE,
+			UIEP_SIGNET,
+			UIEP_SHIPIN
 		};
 
 		switch(SrcPos->nPlace)

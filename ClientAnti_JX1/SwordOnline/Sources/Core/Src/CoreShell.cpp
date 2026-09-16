@@ -842,7 +842,9 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 				UIEP_FOOT,		UIEP_FINESSE,
 				UIEP_NECK,		UIEP_FINGER1,
 				UIEP_FINGER2,	UIEP_WAIST_DECOR,
-				UIEP_HORSE,		UIEP_MASK,	// mat na
+				UIEP_HORSE,		UIEP_MASK,
+				UIEP_MANTLE,	UIEP_SIGNET,
+				UIEP_SHIPIN,
 			};
 
 			int nCount = 0;
@@ -885,7 +887,9 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 				UIEP_FOOT,		UIEP_FINESSE,
 				UIEP_NECK,		UIEP_FINGER1,
 				UIEP_FINGER2,	UIEP_WAIST_DECOR,
-				UIEP_HORSE,		UIEP_MASK,	// mat na
+				UIEP_HORSE,		UIEP_MASK,
+				UIEP_MANTLE,	UIEP_SIGNET,
+				UIEP_SHIPIN,
 			};
 
 			int nCount = 0;
@@ -1085,7 +1089,9 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 					itempart_body,		itempart_belt,
 					itempart_ring1,		itempart_ring2,
 					itempart_pendant,	itempart_foot,
-					itempart_horse,		itempart_mask,	// mat na
+					itempart_horse,		itempart_mask,
+					itempart_mantle,	itempart_signet,
+					itempart_shipin,
 				};
 
 				_ASSERT(pObj->eContainer < itempart_num);
@@ -2073,7 +2079,9 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 				itempart_body,		itempart_belt,
 				itempart_ring1,		itempart_ring2,
 				itempart_pendant,	itempart_foot,
-				itempart_horse,		itempart_mask,	// mat na
+				itempart_horse,		itempart_mask,
+				itempart_mantle,	itempart_signet,
+				itempart_shipin,
 			};
 			KUiObjAtContRegion* pObject1 = (KUiObjAtContRegion*)uParam;
 			KUiObjAtContRegion* pObject2 = (KUiObjAtContRegion*)nParam;
