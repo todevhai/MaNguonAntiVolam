@@ -17,6 +17,8 @@
 //                  Ca hai qua Wnd_ProcessInput -- KHONG dung con tro macOS.
 //   hover <x> <y>  re con tro UI toi o (WM_MOUSEMOVE) de hien tooltip mon do
 //   ride           len/xuong ngua (PA_RIDE) -- dung hanh dong cua phim M.
+//   xemdo <x> <y>  xin xem trang bi cua nguoi choi dung o (x,y) man hinh
+//                  (menu chuot phai len nguoi chua duoc noi, nen day la duong duy nhat)
 //
 // Day la ma CUA TA (khong phai nguon Kingsoft goc), nen commit thang vao kho.
 // Chi phan noi day (them vao S3Client.vcxproj + 1 dong o UiHeartBeat) di qua

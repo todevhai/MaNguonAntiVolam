@@ -122,6 +122,26 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] shift-rclick %d,%d", x, y);
 		}
 	}
+	else if (!strcmp(szCmd, "xemdo"))
+	{
+		/* Xin xem trang bi cua nguoi choi dung tai (x,y) man hinh. Trong game khong co
+		   duong nao khac: PopUpContextPeopleMenu (menu chuot phai len nguoi) chua duoc
+		   noi vao dau ca, nen o trang bi cua nguoi khac khong the do bang tay. */
+		int x = 0, y = 0;
+		if (sscanf(szArg, "%d %d", &x, &y) == 2 && g_pCoreShell)
+		{
+			KUiPlayerItem Chon;
+			int nLoai = -1;
+			memset(&Chon, 0, sizeof(Chon));
+			if (g_pCoreShell->FindSelectNPC(x, y, relation_all, true, &Chon, nLoai) && Chon.uId)
+			{
+				g_pCoreShell->OperationRequest(GOI_VIEW_PLAYERITEM, (unsigned int)Chon.uId, 0);
+				g_DebugLog("[AUTO] xemdo %d,%d -> %s (id %u)", x, y, Chon.Name, Chon.uId);
+			}
+			else
+				g_DebugLog("[AUTO] xemdo %d,%d: khong co ai o do", x, y);
+		}
+	}
 	else if (!strcmp(szCmd, "keo") || !strcmp(szCmd, "drag"))
 	{
 		/* Keo-tha PASSIVE: nhac o (x1,y1) roi tha xuong (x2,y2) - dung de do gop chong,
