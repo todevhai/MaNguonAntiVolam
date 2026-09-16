@@ -209,8 +209,22 @@ int		KPlayer::GetPlayerIndex()
 //-------------------------------------------------------------------------
 //	���ܣ����ÿ����Ϸѭ������Ҫ�����Ķ���
 //-------------------------------------------------------------------------
+#ifndef _SERVER
+/* Thao tac keo-tha bi client chan (vd dat trang bi khong mac duoc) -> ve lai mon dang cam
+   o NHIP SAU. Khong ve ngay duoc: lop nen o do (KWndObjectBox, ban va CI) goi
+   Wnd_DragFinished() NGAY SAU DropObject, xoa luon hinh vua ve lai. */
+static BOOL s_bVeLaiTaySau = FALSE;
+#endif
+
 void	KPlayer::Active()
 {
+#ifndef _SERVER
+	if (s_bVeLaiTaySau && this == &Player[CLIENT_PLAYER_INDEX])
+	{
+		s_bVeLaiTaySau = FALSE;
+		m_ItemList.MenuSetMouseItem();
+	}
+#endif
 #ifdef _SERVER
 	if (m_nNetConnectIdx == -1 || m_bExchangeServer)
 		return;
@@ -3143,7 +3157,7 @@ void	KPlayer::MoveItem(ItemPos DownPos, ItemPos UpPos)
 			else
 				BaoTinVatPham("Ch\xad" "a \xae\xf1 \xaei\xd2u ki\xd6n \xae\xd3 trang b\xde v\xcbt ph\xc8m n\xb5y!");
 			if (DownPos.nPlace == pos_equip)
-				m_ItemList.MenuSetMouseItem();
+				s_bVeLaiTaySau = TRUE;	// ve lai o nhip sau, xem s_bVeLaiTaySau
 			return;
 		}
 	}

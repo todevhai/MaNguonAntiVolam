@@ -7359,6 +7359,10 @@ void	KNpc::ReSetRes(int nMark)
 		{
 			strcpy(szNpcTypeName, "ÄÐÖ÷½Ç");
 			/*			strcpy(szNpcTypeName, "ani018");*/
+			/* Ten GBK tren khong co trong bang loai nhan vat cua ta (cot CharacterName ghi
+			   MainMan/MainLady) -> KNpcRes::Init hong -> go mat na la mat hinh. Lay theo
+			   dong bang giong KNpc::Load. */
+			g_NpcKindFile.GetString(2, "", "", szNpcTypeName, sizeof(szNpcTypeName));
 			m_StandFrame = NpcSet.GetPlayerStandFrame(TRUE);
 			m_WalkFrame = NpcSet.GetPlayerWalkFrame(TRUE);
 			m_RunFrame = NpcSet.GetPlayerRunFrame(TRUE);
@@ -7366,6 +7370,7 @@ void	KNpc::ReSetRes(int nMark)
 		else
 		{
 			strcpy(szNpcTypeName, "Å®Ö÷½Ç");
+			g_NpcKindFile.GetString(3, "", "", szNpcTypeName, sizeof(szNpcTypeName));
 			m_StandFrame = NpcSet.GetPlayerStandFrame(FALSE);
 			m_WalkFrame = NpcSet.GetPlayerWalkFrame(FALSE);
 			m_RunFrame = NpcSet.GetPlayerRunFrame(FALSE);
