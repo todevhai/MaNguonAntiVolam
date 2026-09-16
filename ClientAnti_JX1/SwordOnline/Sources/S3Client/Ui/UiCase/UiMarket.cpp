@@ -182,6 +182,9 @@ void KUiMarket::LoadScheme(const char* pScheme)
 	}
 
 	g_DebugLog("[KTC] LoadScheme: tab xong");
+	/* TEN MUC INI TOI DA 29 KY TU: KIniFile::GetKeyValue dung "[" + ten + "]" vao mot
+	   char szSection[32] roi g_StrCat - ten dai hon la TRAN NGAN XEP, client tat ngay
+	   (c0000409) khong mot dong log. Vi vay muc so gia ten ngan (GiaGocSo/GiaSo). */
 	// Luoi o mon: Start = goc o dau, Diff = khoang cach giua hai o, so cot tinh tu be rong nen.
 	int nStartX = 0, nStartY = 0, nDiffX = 0, nDiffY = 0, nOW = 0, nOH = 0;
 	Ini.GetString("MarketGoods", "Start", "0,0", Buff, sizeof(Buff));
@@ -204,8 +207,8 @@ void KUiMarket::LoadScheme(const char* pScheme)
 		KtcDatTrongO(&o.Ten, &Ini, "MarketGoods_GoodsName", nX, nY);
 		KtcDatTrongO(&o.NhanGiaGoc, &Ini, "MarketGoods_OriginalPrice", nX, nY);
 		KtcDatTrongO(&o.NhanGia, &Ini, "MarketGoods_Price", nX, nY);
-		KtcDatTrongO(&o.GiaGoc, &Ini, "MarketGoods_OriginalPrice_Number", nX, nY);
-		KtcDatTrongO(&o.Gia, &Ini, "MarketGoods_Price_Number", nX, nY);
+		KtcDatTrongO(&o.GiaGoc, &Ini, "MarketGoods_GiaGocSo", nX, nY);
+		KtcDatTrongO(&o.Gia, &Ini, "MarketGoods_GiaSo", nX, nY);
 		KtcDatTrongO(&o.Mua, &Ini, "MarketGoods_Buy", nX, nY);
 		KtcDatTrongO(&o.GiamGia, &Ini, "MarketGoods_DisCount", nX, nY);
 	}
