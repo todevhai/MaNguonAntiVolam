@@ -98,6 +98,22 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] %s %d,%d", szCmd, x, y);
 		}
 	}
+	else if (!strcmp(szCmd, "keo") || !strcmp(szCmd, "drag"))
+	{
+		/* Keo-tha PASSIVE: nhac o (x1,y1) roi tha xuong (x2,y2) - dung de do gop chong,
+		   mac do, cat ruong... Cay cua so nhac do o WM_LBUTTONDOWN va tha o WM_LBUTTONUP,
+		   nen phai co MOT nhip WM_MOUSEMOVE o giua, khong thi tha ngay tai cho nhac. */
+		int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+		if (sscanf(szArg, "%d %d %d %d", &x1, &y1, &x2, &y2) == 4)
+		{
+			Wnd_ProcessInput(WM_LBUTTONDOWN, 0, (int)MAKELONG((short)x1, (short)y1));
+			Wnd_ProcessInput(WM_LBUTTONUP,   0, (int)MAKELONG((short)x1, (short)y1));
+			Wnd_ProcessInput(WM_MOUSEMOVE,   0, (int)MAKELONG((short)x2, (short)y2));
+			Wnd_ProcessInput(WM_LBUTTONDOWN, 0, (int)MAKELONG((short)x2, (short)y2));
+			Wnd_ProcessInput(WM_LBUTTONUP,   0, (int)MAKELONG((short)x2, (short)y2));
+			g_DebugLog("[AUTO] keo %d,%d -> %d,%d", x1, y1, x2, y2);
+		}
+	}
 	else if (!strcmp(szCmd, "hover"))
 	{
 		// Re con tro UI toi (x,y) client -> hien tooltip mon do (xem option) ma
