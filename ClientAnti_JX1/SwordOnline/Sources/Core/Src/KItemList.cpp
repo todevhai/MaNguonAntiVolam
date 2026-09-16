@@ -799,7 +799,9 @@ BOOL KItemList::EnoughAttrib(void* pAttrib)
 		}
 		break;
 	case magic_requiremenpai:
-		if (Player[m_PlayerIdx].m_cFaction.m_nFirstAddFaction != pData->nValue[0])
+		/* Doi hanh vi: so PHAI HIEN TAI nhu may chu (KItemList.cpp may chu), khong so phai
+		   gia nhap dau tien. Lech luat thi client cho mac ma may chu tu choi -> mon vo hinh. */
+		if (Player[m_PlayerIdx].m_cFaction.m_nCurFaction != pData->nValue[0])
 		{
 			return FALSE;
 		}
