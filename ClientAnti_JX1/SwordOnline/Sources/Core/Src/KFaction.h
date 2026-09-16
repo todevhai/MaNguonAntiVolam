@@ -32,6 +32,7 @@ public:
 		int		m_nSeries;								// 五行属性
 		int		m_nCamp;								// 阵营
 		char	m_szName[64];							// 门派名
+		char	m_szShowName[64];						// ten hien thi (ShowName, TCVN3) - vd "Thieu Lam phai"
 	}				m_sAttribute[MAX_FACTION];			// 所有门派
 
 public:

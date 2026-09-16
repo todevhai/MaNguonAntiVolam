@@ -317,8 +317,11 @@ const char* KMagicDesc::GetDesc(void *pData)
 			switch(*(pTempDesc+1))
 			{
 			case 'm':		// ÃÅÅÉ
-				strcat(m_szDesc, g_Faction.m_sAttribute[nValue].m_szName);
-				i += strlen(g_Faction.m_sAttribute[nValue].m_szName);
+				if (nValue >= 0 && nValue < MAX_FACTION)	// ten hien thi; chi so ngoai bang thi bo trong
+				{
+					strcat(m_szDesc, g_Faction.m_sAttribute[nValue].m_szShowName);
+					i += strlen(g_Faction.m_sAttribute[nValue].m_szShowName);
+				}
 				break;
 			case 's':		// ÎåÐÐ
 				switch(nValue)

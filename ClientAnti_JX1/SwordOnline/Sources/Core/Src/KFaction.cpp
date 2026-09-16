@@ -39,6 +39,7 @@ BOOL	KFaction::Init()
 		m_sAttribute[i].m_nSeries = series_metal;
 		m_sAttribute[i].m_nCamp = camp_justice;
 		m_sAttribute[i].m_szName[0] = 0;
+		m_sAttribute[i].m_szShowName[0] = 0;
 	}
 
 	if ( !Ini.Load(FACTION_FILE) )
@@ -53,6 +54,8 @@ BOOL	KFaction::Init()
 		Ini.GetString(szSection, "Name", "", m_sAttribute[i].m_szName, sizeof(m_sAttribute[i].m_szName));
 		if (m_sAttribute[i].m_szName[0] == 0)
 			continue;
+		/* Ten hien thi cho nguoi choi (mo ta vat pham "Mon phai: ..."); Name la ten noi bo. */
+		Ini.GetString(szSection, "ShowName", m_sAttribute[i].m_szName, m_sAttribute[i].m_szShowName, sizeof(m_sAttribute[i].m_szShowName));
 
 		Ini.GetString(szSection, "Series", "", szBuffer, sizeof(szBuffer));
 		for (j = 0; j < series_num; j++)
