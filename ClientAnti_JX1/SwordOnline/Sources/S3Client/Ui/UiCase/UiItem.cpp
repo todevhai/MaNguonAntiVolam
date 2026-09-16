@@ -5,6 +5,7 @@
 //	π¶ƒ‹√Ë ˆ	£∫	
 // -------------------------------------------------------------------------
 #include "KWin32.h"
+#include "../../Auto/KAutoControl.h"	// lenh auto shift-rclick (tach chong)
 #include "KIniFile.h"
 #include "../elem/wnds.h"
 #include "uitrade.h"
@@ -346,7 +347,7 @@ int KUiItem::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		break;
 	case WND_N_RIGHT_CLICK_ITEM:
-		if ((GetKeyState(VK_SHIFT) & 0x8000) == 0)
+		if ((GetKeyState(VK_SHIFT) & 0x8000) == 0 && !KAutoControl::DangGiaLapShift())
 			OnClickItem((KUiDraggedObject*)uParam, true);
 		else
 			OnBreakItem((KUiDraggedObject*)uParam);

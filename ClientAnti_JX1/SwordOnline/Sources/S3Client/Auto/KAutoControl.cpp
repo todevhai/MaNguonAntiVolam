@@ -28,6 +28,13 @@ static const char* const AUTO_CMD_FILE = "lenh-auto.txt";
 // Mo mot bang dung nhu bam phim tat, nhung goi thang OpenWindow() nen luon MO
 // (khong bat/tat lai) va khong qua cong kiem tra nao -- tien cho viec verify.
 //---------------------------------------------------------------------------
+static bool s_bGiaLapShift = false;
+
+bool KAutoControl::DangGiaLapShift()
+{
+	return s_bGiaLapShift;
+}
+
 void KAutoControl::OpenByName(const char* szName)
 {
 	if      (!strcmp(szName, "status")) KUiStatus::OpenWindow();
@@ -96,6 +103,22 @@ void KAutoControl::RunLine(const char* szLine)
 			Wnd_ProcessInput(uDown, 0, nPos);
 			Wnd_ProcessInput(uUp,   0, nPos);
 			g_DebugLog("[AUTO] %s %d,%d", szCmd, x, y);
+		}
+	}
+	else if (!strcmp(szCmd, "shift-rclick"))
+	{
+		/* Phai chuot CO GIU SHIFT (cu chi tach chong). Cay cua so doc phim that bang
+		   GetKeyState(VK_SHIFT) - bom qua Wnd_ProcessInput khong dat duoc phim that,
+		   nen dung co gia lap: KUiItem hoi them co nay. */
+		int x = 0, y = 0;
+		if (sscanf(szArg, "%d %d", &x, &y) == 2)
+		{
+			int nPos = (int)MAKELONG((short)x, (short)y);
+			s_bGiaLapShift = true;
+			Wnd_ProcessInput(WM_RBUTTONDOWN, 0, nPos);
+			Wnd_ProcessInput(WM_RBUTTONUP,   0, nPos);
+			s_bGiaLapShift = false;
+			g_DebugLog("[AUTO] shift-rclick %d,%d", x, y);
 		}
 	}
 	else if (!strcmp(szCmd, "keo") || !strcmp(szCmd, "drag"))

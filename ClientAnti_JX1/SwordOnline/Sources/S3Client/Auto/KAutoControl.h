@@ -31,6 +31,7 @@ class KAutoControl
 {
 public:
 	static void	Tick();				// goi moi khung tu UiHeartBeat (khi da vao game)
+	static bool DangGiaLapShift();	// lenh shift-rclick: coi nhu dang giu Shift
 
 private:
 	static void	RunLine(const char* szLine);
