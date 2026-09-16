@@ -41,6 +41,10 @@ class KIniFile;
 #define	ID_MANAREPLENISH		5
 */
 
+/* Tran xep chong mot o - phai KHOP may chu (server/linux-server/Core/KItem.h).
+   Ban goc ghi cung 50 o nhieu cho; lech tran hai nua thi gop xong client bi dong bo lai. */
+#define MAX_STACK_NUM	9999
+
 enum ITEMGENRE
 {
 	item_equip = 0,			// ×°±¸

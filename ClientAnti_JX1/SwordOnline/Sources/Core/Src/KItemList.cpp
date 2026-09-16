@@ -1755,8 +1755,8 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 				}
 				else
 				{
-					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - 50);
-					Item[nEquipIdx1].SetStackNum(50);
+					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - MAX_STACK_NUM);
+					Item[nEquipIdx1].SetStackNum(MAX_STACK_NUM);
 				}
 				m_Room[room_immediacy].PlaceItem(SrcPos->nX, SrcPos->nY, nEquipIdx1, Item[nEquipIdx1].GetWidth(), Item[nEquipIdx1].GetHeight());
 				
@@ -1824,8 +1824,8 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 				}
 				else
 				{
-					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - 50);
-					Item[nEquipIdx1].SetStackNum(50);
+					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - MAX_STACK_NUM);
+					Item[nEquipIdx1].SetStackNum(MAX_STACK_NUM);
 				}
 				m_Room[room_repository].PlaceItem(SrcPos->nX, SrcPos->nY, nEquipIdx1, Item[nEquipIdx1].GetWidth(), Item[nEquipIdx1].GetHeight());
 				
@@ -2199,8 +2199,8 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 				}
 				else
 				{
-					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - 50);
-					Item[nEquipIdx1].SetStackNum(50);
+					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - MAX_STACK_NUM);
+					Item[nEquipIdx1].SetStackNum(MAX_STACK_NUM);
 				}
 				m_Room[room_equipment].PlaceItem(SrcPos->nX, SrcPos->nY, nEquipIdx1, Item[nEquipIdx1].GetWidth(), Item[nEquipIdx1].GetHeight());
 				
@@ -2477,8 +2477,8 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 				}
 				else
 				{
-					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - 50);
-					Item[nEquipIdx1].SetStackNum(50);
+					Item[m_Hand].SetStackNum(Item[nEquipIdx1].GetStackNum() - MAX_STACK_NUM);
+					Item[nEquipIdx1].SetStackNum(MAX_STACK_NUM);
 				}
 				m_Room[room_give].PlaceItem(SrcPos->nX, SrcPos->nY, nEquipIdx1, Item[nEquipIdx1].GetWidth(), Item[nEquipIdx1].GetHeight());
 				

@@ -1668,7 +1668,7 @@ BOOL KItem::CanStack( int nOldIdx )
 			&& m_CommonAttrib.nParticularType == Item[nOldIdx].GetParticular()
 			&& m_CommonAttrib.nSeries == Item[nOldIdx].GetSeries()
 			&& m_CommonAttrib.nItemGenre != 1
-			&&Item[nOldIdx].GetStackNum() < 50)
+			&&Item[nOldIdx].GetStackNum() < MAX_STACK_NUM)
 		{
 			if (m_CommonAttrib.nItemGenre == item_mine && m_CommonAttrib.nParticularType == 147 && m_CommonAttrib.nLevel != Item[nOldIdx].GetLevel())
 			{
@@ -1697,7 +1697,7 @@ int KItem::Stack( int nIdx )
 {
 	m_CommonAttrib.nStackNum += nIdx;
 	
-	if (m_CommonAttrib.nStackNum > 50)
+	if (m_CommonAttrib.nStackNum > MAX_STACK_NUM)
 	{
 		return 0;
 	}

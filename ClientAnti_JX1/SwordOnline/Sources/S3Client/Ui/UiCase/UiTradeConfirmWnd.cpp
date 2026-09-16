@@ -14,6 +14,10 @@
 #include "UiPlayerShop.h"
 #include "../Elem/WndText.h"
 #include "../../../core/src/coreshell.h"
+
+/* Tran so luong tach mot lan = tran xep chong cua engine (Core/Src/KItem.h
+   MAX_STACK_NUM). Khai lai o day vi lop UI khong keo header cua Core. */
+#define UI_MAX_STACK_NUM	9999
 extern iCoreShell*		g_pCoreShell;
 
 #define	SCHEME_INI 	"UiTradeConfirmWnd.ini"
@@ -212,8 +216,12 @@ int KUiTradeConfirm::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			OnCancel();
 		else if (uParam == (unsigned int)(KWndWindow*)&m_Increase && (m_BuyImg.IsVisible() || m_BreakImg.IsVisible()) && !KUiPlayerShop::GetIfVisible())
 		{
+			/* Tran cu la 30 va vuot thi VONG ve 1 - tach mot chong lon (vd 4994 tien dong)
+			   khong the chon so lon. Nay chan o tran xep chong, khong vong. */
 			m_BuyNumber++;
-			if (m_BuyNumber > 30 || m_BuyNumber <= 1)
+			if (m_BuyNumber > UI_MAX_STACK_NUM)
+				m_BuyNumber = UI_MAX_STACK_NUM;
+			if (m_BuyNumber < 1)
 				m_BuyNumber = 1;
 			m_Money.SetMoneyText(m_PriceInfo.nPrice * m_BuyNumber);
 			int nHoldMoney = g_pCoreShell->GetGameData(GDI_PLAYER_HOLD_MONEY, 0, 0);
@@ -224,8 +232,10 @@ int KUiTradeConfirm::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		else if (uParam == (unsigned int)(KWndWindow*)&m_Decrease && (m_BuyImg.IsVisible() || m_BreakImg.IsVisible()) && !KUiPlayerShop::GetIfVisible())
 		{
 			m_BuyNumber--;
-			if (m_BuyNumber > 30 || m_BuyNumber <= 1)
-				m_BuyNumber = 30;
+			if (m_BuyNumber < 1)
+				m_BuyNumber = 1;
+			if (m_BuyNumber > UI_MAX_STACK_NUM)
+				m_BuyNumber = UI_MAX_STACK_NUM;
 			m_Money.SetMoneyText(m_PriceInfo.nPrice * m_BuyNumber);
 			int nHoldMoney = g_pCoreShell->GetGameData(GDI_PLAYER_HOLD_MONEY, 0, 0);
 			m_Money.SetTextColor((nHoldMoney >= m_PriceInfo.nPrice * m_BuyNumber) ?
