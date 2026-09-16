@@ -1974,6 +1974,7 @@ void KProtocolProcess::SyncPlayer(BYTE* pMsg)
 	Npc[nIdx].nRepute				= pPlaySync->Repute;
 	Npc[nIdx].nPKValue				= pPlaySync->PKValue;
 	Npc[nIdx].nReBorn				= pPlaySync->ReBorn;
+	Npc[nIdx].m_MantleType			= pPlaySync->MantleType;	// phi phong
 	if (nIdx == Player[CLIENT_PLAYER_INDEX].m_nIndex)
 		Player[CLIENT_PLAYER_INDEX].m_CUnlocked			= pPlaySync->CUnlocked;	
 	Npc[nIdx].m_MaskType   = pPlaySync->MaskType;	// mat na
@@ -2057,6 +2058,7 @@ void KProtocolProcess::SyncPlayerMin(BYTE* pMsg)
 	Npc[nIdx].nRepute				= pPlaySync->Repute;
 	Npc[nIdx].nPKValue				= pPlaySync->PKValue;
 	Npc[nIdx].nReBorn				= pPlaySync->ReBorn;
+	Npc[nIdx].m_MantleType			= pPlaySync->MantleType;	// phi phong
 	if (nIdx == Player[CLIENT_PLAYER_INDEX].m_nIndex)
 		Player[CLIENT_PLAYER_INDEX].m_CUnlocked			= pPlaySync->CUnlocked;
 	Npc[nIdx].m_MaskType			= pPlaySync->MaskType;

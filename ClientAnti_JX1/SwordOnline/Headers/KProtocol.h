@@ -54,6 +54,7 @@ typedef struct
 	BYTE	Repute; // danh vong tin tuc
 	BYTE	PKValue; // pk tin tuc
 	BYTE	ReBorn; // trung sinh tin tuc
+	BYTE	MantleType;	// phi phong: dong anh trong bang <nhan vat> phi phong, tinh tu 1; 0 = khong mac
 //	char	ShopName[32];
 //	BYTE	m_btPKFlag;
 //	BYTE	m_btFightMode;
@@ -87,6 +88,7 @@ typedef struct
 	BYTE	Repute; // danh vong tin tuc
 	BYTE	PKValue; // pk tin tuc
 	BYTE	ReBorn; // trung sinh tin tuc
+	BYTE	MantleType;	// phi phong: dong anh trong bang <nhan vat> phi phong, tinh tu 1; 0 = khong mac
 //	BYTE	FightMode;
 //	BYTE	m_btPKFlag;
 //	BYTE	m_btSleepMode;

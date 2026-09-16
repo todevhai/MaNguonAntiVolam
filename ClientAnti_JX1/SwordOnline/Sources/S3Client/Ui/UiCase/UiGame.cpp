@@ -324,7 +324,7 @@ char g_ActionName[][32] =
 	"Tæ ®éi",
 	"Theo sau",
 	"Cõu s¸t",
-	"Tin tøc",
+	"Xem trang bÞ",	// ACTION_VIEWITEM: xin xem trang bi (ban goc ghi "Tin tuc" nen khong ai nhan ra)
 	"Sæ ®en",
 	"Bang héi",
 };

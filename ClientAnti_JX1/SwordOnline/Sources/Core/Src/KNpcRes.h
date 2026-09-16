@@ -88,6 +88,7 @@ private:
 	int				m_nArmorType;						// 当前身体类型
 	int				m_nWeaponType;						// 当前武器类型
 	int				m_nHorseType;						// 当前马匹类型
+	int				m_nMantleType;										// phi phong (0 = khong)
 	BOOL			m_bRideHorse;						// 当前是否骑马
 	int				m_nBlurState;
 	char			m_szSoundName[80];					// 当前音效文件名
@@ -142,6 +143,8 @@ public:
 	BOOL			SetArmor(int nArmorType);							// 设定盔甲类型
 	BOOL			SetWeapon(int nWeaponType);							// 设定武器类型
 	BOOL			SetHorse(int nHorseType);							// 设定马匹类型
+	BOOL			SetMantle(int nMantleType);							// phi phong: dong anh tinh tu 1, 0 = khong mac
+	void			NapNhomPhiPhong();									// nap lai anh nhom bo phan 4 theo dong tac hien tai
 	BOOL			SetAction(int nDoing);								// 设定动作类型
 	int				GetHelm(){return m_nHelmType;};
 	int				GetArmor(){return m_nArmorType;	};

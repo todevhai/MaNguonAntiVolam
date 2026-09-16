@@ -366,6 +366,7 @@ public:
 	int					m_HorseType;				// Npc的骑马类型
 	BOOL				m_bRideHorse;				// Npc是否骑马
 	int					m_MaskType;					// Npc 面具功能
+	int					m_MantleType;				// phi phong: dong anh tinh tu 1 (0 = khong)
 	int					m_MaskMark;					// mat na
 	int					m_BaiTan;					// Npc是否在装谔
 	char				ShopName[32];

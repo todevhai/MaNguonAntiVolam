@@ -915,6 +915,9 @@ BOOL KItemList::Equip(int nIdx, int nPlace /* = -1 */)
 		if (!m_nMaskLock)
 			Npc[nNpcIdx].m_MaskType = Item[nIdx].GetBaseMagic();
 		break;
+	case itempart_mantle:	// phi phong: cap vat pham = dong anh (tinh tu 1)
+		Npc[nNpcIdx].m_MantleType = Item[nIdx].GetLevel();
+		break;
 	default:
 		break;
 	}
@@ -1043,6 +1046,9 @@ BOOL KItemList::UnEquip(int nIdx, int nPos/* = -1*/)
 	case itempart_mask:	// mat na
 		if (!m_nMaskLock)
 			Npc[nNpcIdx].m_MaskType = 0;
+		break;
+	case itempart_mantle:
+		Npc[nNpcIdx].m_MantleType = 0;
 		break;
 	default:
 		break;

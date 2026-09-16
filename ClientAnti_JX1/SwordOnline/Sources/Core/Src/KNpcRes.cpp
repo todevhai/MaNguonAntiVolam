@@ -32,6 +32,7 @@ KNpcRes::KNpcRes()
 	m_nArmorType = 0;
 	m_nWeaponType = 0;
 	m_nHorseType = 0;
+	m_nMantleType = 0;
 	m_bRideHorse = FALSE;
 	m_nBlurState = 0;
 	memset(m_szSoundName, 0, sizeof(m_szSoundName));
@@ -67,6 +68,7 @@ BOOL	KNpcRes::Init(char *lpszNpcName, KNpcResList *pNpcResList)
 	m_nArmorType = 0;
 	m_nWeaponType = 0;
 	m_nHorseType = 0;
+	m_nMantleType = 0;
 	m_bRideHorse = FALSE;
 	memset(m_szSoundName, 0, sizeof(m_szSoundName));
 	memset(m_nSortTable, 0, sizeof(m_nSortTable));
@@ -634,6 +636,7 @@ BOOL	KNpcRes::SetWeapon(int nWeaponType)
 		}
 	}
 
+	NapNhomPhiPhong();	// dong tac doi -> anh phi phong cung phai doi theo
 	return TRUE;
 }
 
@@ -665,6 +668,44 @@ BOOL	KNpcRes::SetHorse(int nHorseType)
 			m_cNpcImage[i].Release();
 		}
 	}
+	return TRUE;
+}
+
+//---------------------------------------------------------------------------
+//	Phi phong la nhom bo phan thu 5 (chi so 4) cua nhan vat chinh: <nhan vat>
+//	phi phong.txt, dong 0 la kieu dau tien. Engine 2003 chi co 4 nhom (mu, ao,
+//	vu khi, ngua) nen nhom nay nap duoc ma khong bao gio duoc gan anh.
+//---------------------------------------------------------------------------
+void	KNpcRes::NapNhomPhiPhong()
+{
+	if (!m_pcResNode)
+		return;
+	char	szBuffer[80];
+	int		nDong = m_nMantleType - 1;
+	for (int i = MAX_BODY_PART_SECT * 4; i < MAX_BODY_PART_SECT * 4 + MAX_BODY_PART_SECT; i++)
+	{
+		if (nDong >= 0 && m_pcResNode->CheckPartExist(i) &&
+			m_pcResNode->GetFileName(i, m_nAction, nDong, "", szBuffer, sizeof(szBuffer)))
+		{
+			m_cNpcImage[i].SetSprFile(szBuffer, m_pcResNode->GetTotalFrames(i, m_nAction, nDong, 16), m_pcResNode->GetTotalDirs(i, m_nAction, nDong, 16), m_pcResNode->GetInterval(i, m_nAction, nDong, 0));
+		}
+		else
+		{
+			m_cNpcImage[i].Release();
+		}
+	}
+}
+
+BOOL	KNpcRes::SetMantle(int nMantleType)
+{
+	if (!m_pcResNode)
+		return FALSE;
+	if (nMantleType < 0)
+		nMantleType = 0;
+	if (m_nMantleType == nMantleType)
+		return TRUE;
+	m_nMantleType = nMantleType;
+	NapNhomPhiPhong();
 	return TRUE;
 }
 
@@ -747,6 +788,7 @@ BOOL	KNpcRes::SetAction(int nDoing)
 		}
 	}
 
+	NapNhomPhiPhong();	// dong tac doi -> anh phi phong cung phai doi theo
 	return TRUE;
 }
 
@@ -827,6 +869,7 @@ BOOL	KNpcRes::SetRideHorse(BOOL bRideHorse)
 		}
 	}
 
+	NapNhomPhiPhong();	// dong tac doi -> anh phi phong cung phai doi theo
 	return TRUE;
 }
 

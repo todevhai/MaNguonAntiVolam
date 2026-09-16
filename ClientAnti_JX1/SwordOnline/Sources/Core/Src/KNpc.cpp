@@ -202,6 +202,7 @@ void KNpc::Init()
 	m_HorseType = -1;			// Npc的骑马类型
 	m_bRideHorse = FALSE;		// Npc是否骑马
 	m_MaskType = 0;					// Npc 面具功能
+	m_MantleType = 0;				// phi phong
 	m_MaskMark = 0;				// mat na
 	m_BaiTan = 0;
 	ZeroMemory(ShopName,32);
@@ -502,6 +503,7 @@ void KNpc::Activate()
 	m_DataRes.SetRideHorse(m_bRideHorse);
 	m_DataRes.SetArmor(m_ArmorType);
 	m_DataRes.SetHelm(m_HelmType);
+	m_DataRes.SetMantle(m_MantleType);
 	m_DataRes.SetHorse(m_HorseType);
 	m_DataRes.SetWeapon(m_WeaponType);	
 	// 处理技能产生的状态的特效
@@ -3861,6 +3863,7 @@ void KNpc::Load(int nNpcSettingIdx, int nLevel)
 	m_DataRes.SetRideHorse(m_bRideHorse);
 	m_DataRes.SetArmor(m_ArmorType);
 	m_DataRes.SetHelm(m_HelmType);
+	m_DataRes.SetMantle(m_MantleType);
 	m_DataRes.SetHorse(m_HorseType);
 	m_DataRes.SetWeapon(m_WeaponType);
 #endif
@@ -4025,6 +4028,7 @@ BOOL KNpc::SendSyncData(int nClient)
 		PlayerSync.CastSpeed		= (BYTE)m_CurrentCastSpeed;
 		PlayerSync.HelmType			= (BYTE)m_HelmType;
 		PlayerSync.MaskType			= m_MaskType;// mat na
+		PlayerSync.MantleType		= (BYTE)m_MantleType;// phi phong
 
 		if (Player[m_nPlayerIdx].m_cTong.m_szMasterName[0])
 		{
@@ -4160,6 +4164,7 @@ void KNpc::NormalSync()
 		PlayerSync.ArmorType	= (BYTE)m_ArmorType;
 		PlayerSync.WeaponType	= (BYTE)m_WeaponType;
 		PlayerSync.MaskType		= m_MaskType;// mat na
+		PlayerSync.MantleType	= (BYTE)m_MantleType;// phi phong
 
 		if (Player[m_nPlayerIdx].m_cTong.m_szMasterName[0])
 		{
@@ -7389,6 +7394,7 @@ void	KNpc::ReSetRes(int nMark)
 	m_DataRes.SetRideHorse(m_bRideHorse);
 	m_DataRes.SetArmor(m_ArmorType);
 	m_DataRes.SetHelm(m_HelmType);
+	m_DataRes.SetMantle(m_MantleType);
 	m_DataRes.SetHorse(m_HorseType);
 	m_DataRes.SetWeapon(m_WeaponType);
 #endif
