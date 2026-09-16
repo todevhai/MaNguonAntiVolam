@@ -18,7 +18,6 @@
 #include "../../../core/src/coreshell.h"
 #include "../UiSoundSetting.h"
 #include "../UiBase.h"
-#include "../../../Engine/src/KDebug.h"
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -89,9 +88,7 @@ void KUiMarket::CancelTrade()
 
 void KUiMarket::Initialize()
 {
-	g_DebugLog("[KTC] Initialize: bat dau");
 	DocTab();
-	g_DebugLog("[KTC] Initialize: DocTab xong, %d tab", m_nTabCount);
 	int i;
 	for (i = 0; i < KTC_MAX_TAB; i++)
 		AddChild(&m_Tab[i]);
@@ -121,9 +118,7 @@ void KUiMarket::Initialize()
 	Wnd_AddWindow(this);
 	char Scheme[256];
 	g_UiBase.GetCurSchemePath(Scheme, 256);
-	g_DebugLog("[KTC] Initialize: nap so do %s", Scheme);
 	LoadScheme(Scheme);
-	g_DebugLog("[KTC] Initialize: xong");
 }
 
 /* Tab = moi dong cua type.txt (TypeName, SellID). Thu tu dong la so tab gui len may chu;
@@ -163,7 +158,6 @@ void KUiMarket::LoadScheme(const char* pScheme)
 
 	KUiMarket* p = m_pSelf;
 	p->KWndShowAnimate::Init(&Ini, "Main");
-	g_DebugLog("[KTC] LoadScheme: Main xong");
 
 	// Tab: moi tab dat noi tiep ben phai tab truoc, cach nhau [SellType] Gap diem.
 	int nTabX, nTabY, nTabW, nTabH, nGap, i;
@@ -181,7 +175,6 @@ void KUiMarket::LoadScheme(const char* pScheme)
 			p->m_Tab[i].Hide();
 	}
 
-	g_DebugLog("[KTC] LoadScheme: tab xong");
 	/* TEN MUC INI TOI DA 29 KY TU: KIniFile::GetKeyValue dung "[" + ten + "]" vao mot
 	   char szSection[32] roi g_StrCat - ten dai hon la TRAN NGAN XEP, client tat ngay
 	   (c0000409) khong mot dong log. Vi vay muc so gia ten ngan (GiaGocSo/GiaSo). */
@@ -213,7 +206,6 @@ void KUiMarket::LoadScheme(const char* pScheme)
 		KtcDatTrongO(&o.GiamGia, &Ini, "MarketGoods_DisCount", nX, nY);
 	}
 
-	g_DebugLog("[KTC] LoadScheme: luoi o xong (%d cot)", nCot);
 	p->m_NapThe.Init(&Ini, "PrePaid");
 	Ini.GetString("PrePaid", "Msg", "", p->m_szNapThe, sizeof(p->m_szNapThe));
 	p->m_GioHang.Init(&Ini, "ShoppingCart");
@@ -223,7 +215,6 @@ void KUiMarket::LoadScheme(const char* pScheme)
 	p->m_Xu.Init(&Ini, "Xu");
 	p->m_CloseBtn.Init(&Ini, "CloseBtn");
 	p->m_nXu = -1;
-	g_DebugLog("[KTC] LoadScheme: nut xong, dat trang");
 	p->SetPage(p->m_nCurrentPage);
 }
 
@@ -257,7 +248,6 @@ void KUiMarket::UpdateData()
 		else
 			m_nObjCount = 0;
 	}
-	g_DebugLog("[KTC] UpdateData: %d mon", m_nObjCount);
 	m_nPageCount = (m_nObjCount + KTC_MAX_O - 1) / KTC_MAX_O;
 	if (m_nPageCount < 1)
 		m_nPageCount = 1;
@@ -299,7 +289,6 @@ void KUiMarket::SetPage(int nPage)
 		else
 			o.GiamGia.Hide();
 	}
-	g_DebugLog("[KTC] SetPage %d/%d xong", nPage, m_nPageCount);
 	char szTrang[32];
 	sprintf(szTrang, "%d/%d", m_nCurrentPage + 1, m_nPageCount);
 	m_PageInfo.SetText(szTrang);
