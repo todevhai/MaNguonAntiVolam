@@ -252,7 +252,7 @@ BOOL KMp3Music::Mp3Init()
 		return FALSE;
 
 	// parse mpeg header
-	mp3_frmbytes = mp3_decode_head(mp3_buffer, &mpeg_head);
+	mp3_frmbytes = mp3_decode_head(mp3_buffer, mp3_bufbytes, &mpeg_head);
 	if (mp3_frmbytes == 0)
 	{
 		g_MessageBox("KMp3Music: mp3 decode head fail");
@@ -308,7 +308,7 @@ DWORD KMp3Music::Mp3Decode(PBYTE lpPcmBuf, DWORD dwBufLen)
 			break;
 
 		// decode one frame to pcm buffer
-		res = mp3_decode_frame(mp3_bufptr, pcm_buffer);
+		res = mp3_decode_frame(mp3_bufptr, mp3_bufbytes, pcm_buffer);
 		if (res.in_bytes <= 0)
 		{
 			g_DebugLog("KMp3Music: bad sync in mp3 file");

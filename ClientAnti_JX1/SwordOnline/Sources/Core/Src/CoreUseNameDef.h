@@ -126,8 +126,8 @@
 #define WORLD_DOCKPRICE_TABFILE			"\\settings\\WharfPrice.txt"
 #define STRINGRESOURSE_TABFILE			"\\settings\\StringResource.txt"
 #define PLAYER_RANK_SETTING_TABFILE		"\\settings\\RankSetting.txt"	
-#define QUESTITEM_TABFILE				"\\settings\\item\\questkey.txt"
-#define MINEITEM_TABFILE				"\\settings\\item\\mine.txt"
+#define QUESTITEM_TABFILE				"\\settings\\item\\000\\questkey.txt"
+#define MINEITEM_TABFILE				"\\settings\\item\\000\\minebase.txt"
 
 //---------------------------------хннЯ--------------------------
 #define TASK_MISSION_SETTING_TABFILE	"\\settings\\task\\missions.txt"

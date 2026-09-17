@@ -203,6 +203,9 @@
     <ClCompile Include="Src\KMouse.cpp">
       <Filter>source files</Filter>
     </ClCompile>
+    <ClCompile Include="Src\KMp3LibMinimp3.c">
+      <Filter>source files</Filter>
+    </ClCompile>
     <ClCompile Include="Src\KMp3Music.cpp">
       <Filter>source files</Filter>
     </ClCompile>

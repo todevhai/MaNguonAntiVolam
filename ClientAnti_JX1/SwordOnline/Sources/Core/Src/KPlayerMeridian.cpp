@@ -6,7 +6,7 @@
 // khong cong huyet o day thi phan huyet mat ngay lan dung lai dau tien. Cap 8 mach lay tu
 // goi s2c_meridian (KPlayer::m_Meridian). Bang giong may chu:
 //   settings/meridian/meridian_level.txt  cot 2 mach, cot 3 cap, cot 7..9 ma thuoc tinh
-//   settings/item/magicattrib_ge.txt      ma thuoc tinh = so dong tinh tu 0 (dong 0 la tieu de)
+//   settings/item/000/magicattrib_ge.txt  ma thuoc tinh = so dong tinh tu 0 (dong 0 la tieu de)
 // Chi ap loai 97..100 (magic_strength_v..magic_energy_v) nhu may chu.
 
 #include "KCore.h"
@@ -38,7 +38,7 @@ static BOOL LoadMeridianAttribs()
 	s_nLoaded = -1;
 	KTabFile Level, Attrib;
 	if (!Level.Load((LPSTR)"\\settings\\meridian\\meridian_level.txt") ||
-		!Attrib.Load((LPSTR)"\\settings\\item\\magicattrib_ge.txt"))
+		!Attrib.Load((LPSTR)"\\settings\\item\\000\\magicattrib_ge.txt"))
 		return FALSE;
 	memset(s_Attrib, 0, sizeof(s_Attrib));
 	for (int r = 2; r <= Level.GetHeight(); r++)

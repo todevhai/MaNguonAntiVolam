@@ -385,6 +385,7 @@ copy release\engine.map ..\..\..\bin\server\release\engine.map
     <ClCompile Include="Src\KMemStack.cpp" />
     <ClCompile Include="Src\KMessage.cpp" />
     <ClCompile Include="Src\KMouse.cpp" />
+    <ClCompile Include="Src\KMp3LibMinimp3.c" />
     <ClCompile Include="Src\KMp3Music.cpp" />
     <ClCompile Include="Src\KMp4Audio.cpp" />
     <ClCompile Include="Src\KMp4Movie.cpp" />

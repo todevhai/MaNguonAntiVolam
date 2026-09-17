@@ -13,8 +13,10 @@
 #include "MyAssert.H"
 #include "KBasPropTbl.h"
 
-#define		TABFILE_PATH				"\\settings\\item"
-#define		TABFILE_MINE				"mine.txt"
+/* Same directory and file names as the server (server Core/KBasPropTbl.CPP) so both halves
+   read one set of item tables; client overrides live in ui-tu-viet/settings/item/000. */
+#define		TABFILE_PATH				"\\settings\\item\\000"
+#define		TABFILE_MINE				"minebase.txt"
 #define		TABFILE_TASK				"questkey.txt"
 #define		TABFILE_MEDICINE			"potion.txt"
 #define		TABFILE_MEDMATERIAL			"medmaterialbase.txt"
@@ -32,7 +34,7 @@
 #define		TABFILE_TOWNPORTAL			"TownPortal.txt"
 #define		TABFILE_EQUIPMENT_UNIQUE	"unique.txt"
 #define		TABFILE_MAGICATTRIB			"magicattrib.txt"
-#define		TABFILE_MASK				"Mask.txt"	// mat na
+#define		TABFILE_MASK				"mask.txt"	// mat na
 #define		TABFILE_MANTLE				"mantle.txt"	// phi phong
 #define		TABFILE_SIGNET				"signet.txt"	// an
 #define		TABFILE_SHIPIN				"shipin.txt"	// trang suc

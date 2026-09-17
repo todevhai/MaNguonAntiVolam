@@ -49,7 +49,8 @@ typedef struct
 }
 IN_OUT;
 //---------------------------------------------------------------------------
-int		mp3_decode_head(unsigned char *buf, MPEG_HEAD* head);
+// buf_bytes / mp3_bytes: readable bytes at the pointer (Src/KMp3LibMinimp3.c)
+int		mp3_decode_head(unsigned char *buf, int buf_bytes, MPEG_HEAD* head);
 int		mp3_decode_init(MPEG_HEAD *head,
 						int framebytes_arg,
 						int reduction_code,
@@ -57,7 +58,7 @@ int		mp3_decode_init(MPEG_HEAD *head,
 						int convert_code,
 						int freq_limit);
 void	mp3_decode_info(DEC_INFO *info);
-IN_OUT	mp3_decode_frame(unsigned char *mp3, unsigned char *pcm);
+IN_OUT	mp3_decode_frame(unsigned char *mp3, int mp3_bytes, unsigned char *pcm);
 //---------------------------------------------------------------------------
 #ifdef __cplusplus
 }
