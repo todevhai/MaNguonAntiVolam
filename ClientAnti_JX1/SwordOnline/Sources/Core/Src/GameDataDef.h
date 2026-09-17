@@ -223,7 +223,8 @@ enum ITEM_IN_ENVIRO_PROP
 	IIEP_SPECIAL,		//特定的不同情况
 };
 
-#define	GOD_MAX_OBJ_TITLE_LEN	1024	//128临时改为1024为了兼容旧代码 to be modified
+#define	GOD_MAX_OBJ_TITLE_LEN	4096	/* mo ta vat pham (Hoang Kim co bo, thuoc tinh an) vuot 1024; 4096 */
+#define	GOD_MAX_OBJ_TITLE_LEN_CU	1024	//128临时改为1024为了兼容旧代码 to be modified
 #define	GOD_MAX_OBJ_PROP_LEN	516
 #define	GOD_MAX_OBJ_DESC_LEN	516
 

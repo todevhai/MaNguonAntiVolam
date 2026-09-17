@@ -92,6 +92,7 @@ KMouseOver::KMouseOver()
 	m_nWndHeight = 0;
 	m_nIndent    = 0;
 	m_nFontSize  = 12;
+	m_nWrapLen   = 64;
 	m_pMouseHoverWnd = NULL;
 	m_nObj = 0;
 	m_ObjTitle[0]  =0;
@@ -225,7 +226,7 @@ void KMouseOver::Update(int nX, int nY)
 	if (m_nTitleLen > 0)
 	{
 		m_nTitleLineNum = TGetEncodedTextLineCount(
-			m_ObjTitle, m_nTitleLen, 0, nMaxTitleLen, m_nFontSize);
+			m_ObjTitle, m_nTitleLen, m_nWrapLen, nMaxTitleLen, m_nFontSize);
 		m_nMaxLineLen = nMaxTitleLen;
 	}
 	else
@@ -246,7 +247,7 @@ void KMouseOver::Update(int nX, int nY)
 	if (m_nDescLineNum > 0)
 	{
 		m_nDescLineNum = TGetEncodedTextLineCount(
-			m_ObjDesc, m_nDescLen, 0, nMaxDescLen, m_nFontSize);
+			m_ObjDesc, m_nDescLen, m_nWrapLen, nMaxDescLen, m_nFontSize);
 		if(m_nMaxLineLen < nMaxDescLen)
 		    m_nMaxLineLen = nMaxDescLen;
 	}
@@ -312,6 +313,10 @@ void KMouseOver::LoadScheme(const char* pScheme)
 		Ini.GetInteger("Main", "ImgHeight",   0, &m_nImgHeight);
 		Ini.GetInteger("Main", "Indent",      0, &m_nIndent);
 		Ini.GetInteger("Main", "Font",        0, &m_nFontSize);
+		/* Mo ta dai (Hoang Kim) xuong dong thay vi keo khung rong het man hinh. */
+		Ini.GetInteger("Main", "WrapLen",     64, &m_nWrapLen);
+		if (m_nWrapLen < INFO_MIN_LEN)
+			m_nWrapLen = INFO_MIN_LEN;
 
 		if(m_nImgWidth < 0)
 			m_nImgWidth = 0;
@@ -386,10 +391,10 @@ void KMouseOver::PaintMouseHoverInfo()
 		int nLineLen;
 		while(true)
 		{
-			if (TGetEncodedTextLineCount(m_ObjTitle, m_nTitleLen, 0, nLineLen, m_nFontSize, Param.nSkipLine, 1) == 0)
+			if (TGetEncodedTextLineCount(m_ObjTitle, m_nTitleLen, m_nWrapLen, nLineLen, m_nFontSize, Param.nSkipLine, 1) == 0)
 				break;
 			Param.nX = m_nLeft + m_nWndWidth / 2 - (nLineLen * m_nFontSize) / 4;
-			g_pRepresentShell->OutputRichText(m_nFontSize, &Param, m_ObjTitle, m_nTitleLen, 0);
+			g_pRepresentShell->OutputRichText(m_nFontSize, &Param, m_ObjTitle, m_nTitleLen, m_nWrapLen * m_nFontSize / 2);
 			Param.nSkipLine ++;
 			Param.nY += m_nFontSize + 1;
 		};
@@ -424,7 +429,7 @@ void KMouseOver::PaintMouseHoverInfo()
 		Param.nNumLine = m_nDescLineNum;
 		Param.nX = m_nLeft + m_nIndent;
 		Param.nY = Shadow.oPosition.nY;
-		g_pRepresentShell->OutputRichText(m_nFontSize, &Param, m_ObjDesc, m_nDescLen, 0);
+		g_pRepresentShell->OutputRichText(m_nFontSize, &Param, m_ObjDesc, m_nDescLen, m_nWrapLen * m_nFontSize / 2);
 	}
 
 	//»­µ×Í¼ºÍ±ß¿òÍ¼

@@ -37,6 +37,11 @@
 
 #include "KSellItem.h"
 
+/* Mo ta vat pham ghi vao bo dem TINH lon roi cat theo tran KGameObjDesc: KItem::GetDesc noi chuoi
+   khong gioi han, ghi thang vao KGameObjDesc tren ngan xep thi mon Hoang Kim dai (bo, thuoc tinh an)
+   tran qua 2 KB va pha ngan xep - client tat voi c0000409. */
+static char s_szMoTaVatPham[16384];
+
 #define	NPC_TRADE_BOX_WIDTH		6
 #define	NPC_TRADE_BOX_HEIGHT	10
 #define	MAX_TRADE_ITEM_WIDTH	2
@@ -298,7 +303,7 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 			{
 			case CGOG_PLAYERSELLITEM:
 				{
-					Item[pObj->Obj.uId].GetDesc(pszDescript);
+					Item[pObj->Obj.uId].GetDesc(s_szMoTaVatPham), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 					// 					char sPrice[20];
 					// 					sprintf(sPrice,"价格：%d万%d两",Item[pObj->Obj.uId].GetSetPrice()/10000,Item[pObj->Obj.uId].GetSetPrice()%10000);
 					// 					strcat(pszDescript,"<color=Yellow>");
@@ -311,10 +316,10 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 					if (pObj->eContainer == UOC_EQUIPTMENT)
 					{
 						int nActive = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetActiveAttribNum(pObj->Obj.uId);
-						Item[pObj->Obj.uId].GetDesc(pszDescript, true, BUY_SELL_SCALE, nActive);
+						Item[pObj->Obj.uId].GetDesc(s_szMoTaVatPham, true, BUY_SELL_SCALE, nActive), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 					}
 					else
-						Item[pObj->Obj.uId].GetDesc(pszDescript, true, BUY_SELL_SCALE);
+						Item[pObj->Obj.uId].GetDesc(s_szMoTaVatPham, true, BUY_SELL_SCALE), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 				}
 				break;			
 			case CGOG_NPCSELLITEM:
@@ -331,7 +336,7 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 
 					if (!pItem)
 						break;
-					pItem->GetDesc(pszDescript, true);
+					pItem->GetDesc(s_szMoTaVatPham, true), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 				}
 				break;
 			}
@@ -356,10 +361,10 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 							nActive = 3;
 						}
 
-						Item[pObj->Obj.uId].GetDesc(pszDescript, false, 1, nActive);
+						Item[pObj->Obj.uId].GetDesc(s_szMoTaVatPham, false, 1, nActive), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 					}
 					else
-						Item[pObj->Obj.uId].GetDesc(pszDescript);
+						Item[pObj->Obj.uId].GetDesc(s_szMoTaVatPham), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 				}
 				break;
 			case CGOG_SKILL:
@@ -430,12 +435,12 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 
 					if (!pItem)
 						break;
-					pItem->GetDesc(pszDescript);
+					pItem->GetDesc(s_szMoTaVatPham), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 				}
 				break;
 			case CGOG_PLAYERSELLITEM:
 				{
-					Item[pObj->Obj.uId].GetDesc(pszDescript);
+					Item[pObj->Obj.uId].GetDesc(s_szMoTaVatPham), g_StrCpyLen(pszDescript, s_szMoTaVatPham, GOD_MAX_OBJ_TITLE_LEN);
 					// 					char sPrice[20];
 					// 					sprintf(sPrice,"价格：%d万%d两",Item[pObj->Obj.uId].GetSetPrice()/10000,Item[pObj->Obj.uId].GetSetPrice()%10000);
 					// 					strcat(pszDescript,"<color=Yellow>");

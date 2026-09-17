@@ -36,6 +36,7 @@ private:
 	int		m_nWndWidth;	        //动态的窗口水平宽
 	int		m_nWndHeight;	        //动态的窗口垂直宽
 
+	int		m_nWrapLen;		// so ky tu nua be rong toi da moi dong truoc khi xuong dong (ini WrapLen)
 	int		m_nIndent;		        //文字缩进（与边框的水平相隔距离）
 	int		m_nFontSize;	        //文字字体(大小)
 
