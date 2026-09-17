@@ -264,6 +264,14 @@ void KImmediaItem::PaintWindow()
 	if (g_pCoreShell)
 	{
 		int nNum = g_pCoreShell->GetGameData(GDI_IMMEDIATEITEM_NUM, m_nIndex, 0);
+		/* So thu tu o (phim 1..9) o goc TREN TRAI, cung co chu va mau voi so dem goc duoi phai.
+		   O trong da co chu so lon ve san tren nen; o co do thi icon che mat so do nen ve lai. */
+		if (nNum >= 1 && m_nIndex >= 0 && m_nIndex < 9)
+		{
+			char szO[2] = { (char)('1' + m_nIndex), 0 };
+			g_pRepresentShell->OutputText(12, szO, KRF_ZERO_END,
+				m_nAbsoluteLeft + 2, m_nAbsoluteTop + 1, m_TextColor);
+		}
 		if (nNum > 1 && nNum < 1000)
 		{
 			int nFontSize = 12;
