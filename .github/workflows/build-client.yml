@@ -63,12 +63,24 @@ jobs:
           echo LIB=%CD%\ClientAnti_JX1\SwordOnline\Lib;%CD%\ClientAnti_JX1\SwordOnline\Lib\Release;%LIB%>> %GITHUB_ENV%
           echo CL=/I"%CD%\%SRC%" /I"%CD%\%SRC%\Engine\Src" /I"%CD%\%SRC%\Engine\Include" /I"%CD%\%SRC%\Core\Src" /I"%CD%\ClientAnti_JX1\SwordOnline\Headers">> %GITHUB_ENV%
 
-      - name: Kiem thu vien da dung san
+      # Nguon hai nua phai tu kiem soat 100%: KHONG lien ket thu vien/DLL dung san nao.
+      # Kho tung chua 740 tep .lib/.dll/.obj/.pdb/.exp dung tu doi 2003-2013; trinh lien ket
+      # tim thay chung tren duong LIB va dung am tham (LuaLibDll.lib, FilterText_StaticLib.lib...).
+      # Con mot tep la dung han o day, khong build tiep.
+      - name: Chan thu vien dung san
+        shell: powershell
         run: |
-          echo === ClientAnti_JX1\SwordOnline\Lib ===
-          dir ClientAnti_JX1\SwordOnline\Lib
-          echo === kiem magic cua .lib (phai la "!<arch>") ===
-          powershell -Command "Get-ChildItem 'ClientAnti_JX1\SwordOnline\Lib\*.lib' | ForEach-Object { $b=[System.IO.File]::ReadAllBytes($_.FullName)[0..7]; $s=-join($b|%%{[char]$_}); Write-Host ('{0,-32} {1,10} bytes  magic=[{2}]' -f $_.Name,$_.Length,$s) }"
+          $f = Get-ChildItem -Recurse -File -Path 'ClientAnti_JX1' -Include *.lib,*.dll,*.exp,*.obj,*.pdb,*.ilk,*.pch,*.idb,*.exe -ErrorAction SilentlyContinue
+          if ($f) { $f | ForEach-Object { Write-Host $_.FullName }; Write-Host "::error::$($f.Count) tep dung san trong ClientAnti_JX1 - xoa khoi kho truoc"; exit 1 }
+          Write-Host 'Khong co tep dung san.'
+
+      # Ban FilterText_StaticLib.lib dung san nhung std::basic_string cua thu vien
+      # chuan doi 2003 (cac ky hieu __declspec(dllimport) khong con ton tai trong
+      # MSVC hien dai). Repo co san nguon nen dung lai de ca solution cung mot ABI.
+      - name: 'Build FilterText_StaticLib (Release|Win32)'
+        id: filtertext
+        continue-on-error: true
+        run: msbuild "%SRC%\FilterText\FilterText_StaticLib.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=filtertext.log;verbosity=normal
 
       # Engine va Core phu thuoc VONG: nguon Engine co #pragma comment(lib,"CoreClient.lib")
       # con Core lai can Engine.lib. Vi vay phai build hai luot: luot 1 dung .lib dung san
@@ -82,6 +94,25 @@ jobs:
         continue-on-error: true
         run: msbuild "%SRC%\MultiServer\Common\Common.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /p:ForceImportBeforeCppTargets="%CD%\.github\msbuild\duong-thu-vien.props" /m /v:minimal /fl /flp:logfile=common.log;verbosity=normal
 
+      # Lua: dung tu nguon Sources/Library/LuaLib (Engine, Core, S3Client deu import LuaLibDll.dll).
+      - name: 'Build LuaLibDll (Release|Win32)'
+        id: lualib
+        continue-on-error: true
+        run: msbuild "%SRC%\Library\LuaLib\LuaLibDll.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=lualib.log;verbosity=normal
+
+      # Engine/Core/S3Client tim thu vien trong Lib/ va Lib/Release (LIB + #pragma duong tuong doi):
+      # chi dat vao do san pham VUA dung.
+      - name: 'Dua thu vien vua dung vao Lib'
+        continue-on-error: true
+        run: |
+          for %%D in ("ClientAnti_JX1\SwordOnline\Lib" "ClientAnti_JX1\SwordOnline\Lib\Release" "ClientAnti_JX1\SwordOnline\Lib\Debug") do (
+            if not exist "%%~D" mkdir "%%~D"
+            copy /Y "%SRC%\Library\LuaLib\Release\LuaLibDll.lib" "%%~D\"
+            copy /Y "%SRC%\Library\LuaLib\Release\LuaLibDll.dll" "%%~D\"
+            copy /Y "%SRC%\MultiServer\Common\Release\common.lib" "%%~D\"
+            copy /Y "%SRC%\FilterText\FilterText_StaticLib___Win32_Release\FilterText_StaticLib.lib" "%%~D\"
+          )
+
       - name: 'Build Engine (Release|Win32)'
         id: engine
         continue-on-error: true
@@ -93,15 +124,6 @@ jobs:
         env:
           CL: /FI"msvc-compat.h" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Engine\Include" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Sources\Core\Src" /I"${{ github.workspace }}\ClientAnti_JX1\SwordOnline\Headers"
         run: msbuild "%SRC%\Core\Core.vcxproj" /p:Configuration="Client Release" /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=core.log;verbosity=normal
-
-      # Ban FilterText_StaticLib.lib dung san nhung std::basic_string cua thu vien
-      # chuan doi 2003 (cac ky hieu __declspec(dllimport) khong con ton tai trong
-      # MSVC hien dai). Repo co san nguon nen dung lai de ca solution cung mot ABI.
-      - name: 'Build FilterText_StaticLib (Release|Win32)'
-        id: filtertext
-        if: always()
-        continue-on-error: true
-        run: msbuild "%SRC%\FilterText\FilterText_StaticLib.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /p:ImageHasSafeExceptionHandlers=false /m /v:minimal /fl /flp:logfile=filtertext.log;verbosity=normal
 
       - name: 'Dua san pham Engine/Core vao Lib'
         if: always()
@@ -192,6 +214,7 @@ jobs:
       - name: Tong ket
         if: always()
         run: |
+          echo LuaLibDll  = ${{ steps.lualib.outcome }}
           echo Engine     = ${{ steps.engine.outcome }}
           echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
@@ -216,7 +239,7 @@ jobs:
         if: always()
         run: |
           echo === kich thuoc san pham ===
-          powershell -Command "'Game.exe','..\..\Engine\Release\Engine.dll','..\..\Core\ClientRelease\CoreClient.dll' | ForEach-Object { $p=Join-Path '%SRC%\S3Client\Release' $_; if(Test-Path $p){ $f=Get-Item $p; Write-Host ('{0,-16} {1,10:N0} bytes' -f $f.Name,$f.Length) } else { Write-Host ('{0,-16} THIEU' -f $_) } }"
+          powershell -Command "'Game.exe','..\..\Engine\Release\Engine.dll','..\..\Core\ClientRelease\CoreClient.dll','..\..\Library\LuaLib\Release\LuaLibDll.dll' | ForEach-Object { $p=Join-Path '%SRC%\S3Client\Release' $_; if(Test-Path $p){ $f=Get-Item $p; Write-Host ('{0,-16} {1,10:N0} bytes' -f $f.Name,$f.Length) } else { Write-Host ('{0,-16} THIEU' -f $_) } }"
           powershell -Command "if (-not (Test-Path (Join-Path '%SRC%\S3Client\Release' 'Game.exe'))) { Write-Host '::error::Game.exe KHONG duoc sinh ra - build da hong du cac buoc bao xanh'; exit 1 }"
 
       # ---- Bao ve ban phat hanh (TAT SAN, bat khi len production) ----
@@ -247,6 +270,7 @@ jobs:
           path: |
             ClientAnti_JX1/SwordOnline/Sources/S3Client/Release/Game.exe
             ClientAnti_JX1/SwordOnline/Sources/Engine/Release/Engine.dll
+            ClientAnti_JX1/SwordOnline/Sources/Library/LuaLib/Release/LuaLibDll.dll
             ClientAnti_JX1/SwordOnline/Sources/Core/ClientRelease/CoreClient.dll
             ClientAnti_JX1/SwordOnline/Sources/Represent/Represent2/Release/Represent2.dll
             ClientAnti_JX1/SwordOnline/Sources/MultiServer/Rainbow/Release/Rainbow.dll

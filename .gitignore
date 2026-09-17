@@ -18,3 +18,14 @@ bin
 AutoUpdateRes
 Toolkits
 Project_ProtectJX/Tools
+
+# Nguon hai nua tu kiem soat 100%: khong dua san pham dung san vao kho (CI tu dung tu nguon).
+ClientAnti_JX1/**/*.lib
+ClientAnti_JX1/**/*.dll
+ClientAnti_JX1/**/*.exp
+ClientAnti_JX1/**/*.obj
+ClientAnti_JX1/**/*.pdb
+ClientAnti_JX1/**/*.ilk
+ClientAnti_JX1/**/*.pch
+ClientAnti_JX1/**/*.idb
+ClientAnti_JX1/**/*.exe
