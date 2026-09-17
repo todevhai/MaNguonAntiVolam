@@ -191,31 +191,36 @@ typedef struct
 
 // 以下结构用于描述黄金装备的初始属性. 相关数据由配置文件(tab file)提供
 // flying 根据策划需求修改自KBASICPROP_EQUIPMENT_UNIQUE类型
+// Hoang Kim row of settings/item/004/goldequip.txt, read by column position (KItemGoldEquip.cpp).
 typedef struct
 {
-	char		m_szName[SZBUFLEN_0];		// 名称
-	int			m_nItemGenre;				// 道具种类 (武器? 药品? 矿石?)
-	int			m_nDetailType;				// 具体类别
-	int			m_nParticularType;			// 详细类别
-//	int			m_nRarity;					// 稀有程度
-	char		m_szImageName[SZBUFLEN_0];	// 界面中的动画文件名
-	BOOL		m_bStack;					// 是否可叠放
-	int			m_nObjIdx;					// 对应物件索引
-	int			m_nWidth;					// 物品栏宽度
-	int			m_nHeight;					// 物品栏高度
-	char		m_szIntro[SZBUFLEN_1];		// 说明文字
-	int			m_nSeries;					// 五行属性
-	int			m_nPrice;					// 价格
-	int			m_nLevel;					// 等级	
-	KEQCP_BASIC	m_aryPropBasic[7];			// 基础属性
-	KEQCP_REQ	m_aryPropReq[6];			// 需求属性
-	int			m_aryMagicAttribs[6];		// 魔法属性
-	int			m_nId;						// 黄金Id
-	int			m_nSet;						// 所在套装
-	int			m_nSetId;					// 所属序号
-	int			m_nSetNum;					// 套装数量
-	int			m_nUpSet;					// 扩展套装
+	char		m_szName[SZBUFLEN_0];
+	int			m_nItemGenre;
+	int			m_nDetailType;
+	int			m_nParticularType;
+	char		m_szImageName[SZBUFLEN_0];	// column 5
+	int			m_nObjIdx;
+	int			m_nWidth;
+	int			m_nHeight;
+	char		m_szIntro[SZBUFLEN_1];		// column 9
+	int			m_nSeries;
+	int			m_nPrice;
+	int			m_nLevel;
+	KEQCP_BASIC	m_aryPropBasic[7];
+	KEQCP_REQ	m_aryPropReq[6];
+	int			m_aryMagicIdx[6];		// columns 47..52: 1-based rows of magicattrib_ge.txt
+	int			m_nSuit;				// column 53
+	int			m_nExtSuit;				// column 54
+	int			m_nExtSuitNo;			// column 55
+	int			m_aryExtSuitHidden[2];	// columns 56/57
 } KBASICPROP_EQUIPMENT_GOLD;
+
+// Row of magicattrib_ge.txt: the attribute type is fixed, each parameter is rolled in [min,max].
+typedef struct
+{
+	int			m_nType;				// column 5
+	KMINMAXPAIR	m_aryRange[3];			// columns 6..11
+} KBASICPROP_GOLDMAGIC;
 
 typedef struct
 {
@@ -441,14 +446,18 @@ class KBPT_Equipment_Gold : public KBasicPropertyTable
 public:
 	KBPT_Equipment_Gold();
 	virtual ~KBPT_Equipment_Gold();
-
-// 以下是对外接口
-public:
 	const KBASICPROP_EQUIPMENT_GOLD* GetRecord(IN int) const;
-	const KBASICPROP_EQUIPMENT_GOLD* FindRecord(IN int, IN int, IN int) const;
 	int GetRecordCount() const {return KBasicPropertyTable::NumOfEntries();};
-	void Init();
-// 以下是辅助函数
+protected:
+	virtual BOOL LoadRecord(int i, KTabFile* pTF);
+};
+
+class KBPT_GoldMagic : public KBasicPropertyTable
+{
+public:
+	KBPT_GoldMagic();
+	virtual ~KBPT_GoldMagic();
+	const KBASICPROP_GOLDMAGIC* GetRecord(IN int) const;
 protected:
 	virtual BOOL LoadRecord(int i, KTabFile* pTF);
 };
@@ -572,6 +581,7 @@ protected:
     KBPT_MagicAttrib_TF		m_BPTMagicAttrib;
 	// Add by flying
 	KBPT_Equipment_Gold		m_GoldItem;
+	KBPT_GoldMagic			m_GoldMagic;	// magicattrib_ge.txt
     // Add by Freeway Chen in 2003.5.30
 	// 四维分别为前后缀、物品类型、五行、级别
     KBPT_ClassMAIT          m_CMAIT[MATF_PREFIXPOSFIX][MATF_CBDR][MATF_SERIES][MATF_LEVEL];
@@ -592,6 +602,8 @@ public:
 	// Add by flying on 2003.6.2
 	const KBASICPROP_EQUIPMENT_GOLD*	GetGoldItemRecord(IN int nIndex) const;
 	const int							GetGoldItemNumber() const;
+	const KBASICPROP_GOLDMAGIC*		GetGoldMagicRecord(IN int nIndex) const;
+	const int							GetGoldMagicNumber() const;
 	const KBASICPROP_EQUIPMENT*	GetMeleeWeaponRecord(IN int) const;
 	const int					GetMeleeWeaponRecordNumber() const;
 	const KBASICPROP_EQUIPMENT*	GetRangeWeaponRecord(IN int) const;
@@ -641,6 +653,7 @@ public:
 protected:
 	BOOL InitMALib();
 	BOOL InitMagicScript();
+	BOOL InitGoldEquip();
     
     // Add by Freeway Chen in 2003.5.30
     BOOL InitMAIT();

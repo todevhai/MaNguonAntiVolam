@@ -57,6 +57,9 @@ enum ITEMGENRE
 	item_number,			// 类型数目
 };
 
+/* Hoang Kim in goods.txt: quality 1 in the high nibble of the genre (as jx9tn). */
+#define ITEM_GENRE_HOANG_KIM	((1 << 4) | item_equip)
+
 enum EQUIPLEVEL
 {
 	equip_normal = 0,		// 普通装备
@@ -244,10 +247,8 @@ friend class	KPlayer;
 friend class	KItemList;
 private:
 	BOOL SetAttrib_CBR(IN const KBASICPROP_EQUIPMENT*);
-	BOOL SetAttrib_CBR(IN const KBASICPROP_EQUIPMENT_GOLD*);
 	BOOL SetAttrib_MA(IN const KItemNormalAttrib*);
 	BOOL SetAttrib_MA(IN const KMACP*);
-	BOOL SetAttrib_MA(IN const int*);
 	void operator = (const KBASICPROP_EQUIPMENT&);
 	void operator = (const KBASICPROP_MEDMATERIAL&);
 	void operator = (const KBASICPROP_MINE&);

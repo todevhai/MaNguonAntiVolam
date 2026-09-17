@@ -54,10 +54,7 @@ public:
 						IN int, IN OUT KItem*,IN int,IN int);	
 	BOOL GetEquipmentCommonAttrib(IN int, IN int, IN int, IN int, IN OUT KItem*);
 	BOOL GetMedicineCommonAttrib(IN int, IN int, IN OUT KItem*);
-	// Add by flying on May.30.2003
-	// Try to get a "Gold Item" by random or by index.
-	BOOL GetGoldItemByRandom(IN int, OUT KItem*);
-	BOOL GetGoldItemByIndex(IN int, OUT KItem*, IN const int* , IN int ,IN int);
+	BOOL Gen_GoldEquipment(IN int nGoldId, IN OUT KItem* pItem);	// KItemGoldEquip.cpp
 
 	//Try to get a "DIY ITEm"
 //	BOOL GetDIYItem(IN int,IN int, IN int, OUT KItem*, IN int, IN int, IN int,IN int*, IN int);

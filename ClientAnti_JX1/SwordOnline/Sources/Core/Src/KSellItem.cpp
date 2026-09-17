@@ -130,12 +130,10 @@ void	KSellItem::GetData(BYTE* pMsg ,int nUpdate)
 				nMagicParam[j] = pView->m_sInfo[i].m_btMagicLevel[j];
 			if (pView->m_sInfo[i].m_nGoldId)
 			{
-				nItemIdx = ItemSet.Add(
+				nItemIdx = ItemSet.AddGold(
 					pView->m_sInfo[i].m_nGoldId,
-					nMagicParam,
-					pView->m_sInfo[i].m_btSeries,
-					pView->m_sInfo[i].m_bEnChance
-					);
+					pView->m_sInfo[i].m_dwRandomSeed,
+					pView->m_sInfo[i].m_bEnChance);
 			}
 			else
 			{

@@ -159,18 +159,17 @@ int KItemSet::Add(KItem* pItem)
 // Parameter: KItem * pItem
 // Parameter: IN int * pnMagicLevel
 //************************************
-int KItemSet::Add(IN int nId , IN int* pnMagicLevel , IN int nSeries,IN int nEnChance, int nYear, int nMonth, int nDay, int nHour)
+int KItemSet::AddGold(IN int nGoldId, IN UINT uRandomSeed, IN int nEnChance, int nYear, int nMonth, int nDay, int nHour)
 {
-//	KASSERT(NULL != pItem);
-	
 	int i = FindFree();
-	
 	if (!i)
 		return 0;
-	
-	KItem*	pItem = &Item[i];
 
-	ItemGen.GetGoldItemByIndex(nId,pItem,pnMagicLevel,nSeries,nEnChance);
+	KItem*	pItem = &Item[i];
+	pItem->m_GeneratorParam.uRandomSeed = uRandomSeed;
+	if (!ItemGen.Gen_GoldEquipment(nGoldId, pItem))
+		return 0;
+	pItem->EnChance(nEnChance);
 
 #ifdef _SERVER
 	SetID(i);

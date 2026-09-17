@@ -1262,10 +1262,9 @@ void KProtocolProcess::s2cSyncItem(BYTE* pMsg)
 			pItemSync->m_Time.bDay,
 			pItemSync->m_Time.bHour);
 	else
-		nIndex = ItemSet.Add(
+		nIndex = ItemSet.AddGold(
 		pItemSync->m_GoldId,
-		pnMagicParam,
-		pItemSync->m_Series,
+		pItemSync->m_RandomSeed,
 		pItemSync->m_EnChance,
 		pItemSync->m_Time.bYear,
 		pItemSync->m_Time.bMonth,

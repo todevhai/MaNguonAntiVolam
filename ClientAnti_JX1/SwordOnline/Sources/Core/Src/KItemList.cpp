@@ -1939,7 +1939,7 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 
 					if (nGoldId)
 					{
-						nIndex = ItemSet.Add(nGoldId,nItemLevel,nSeries,nEnChance + 1);
+						nIndex = ItemSet.AddGold(nGoldId,nGndrom,nEnChance + 1);
 					} 
 					else
 					{
@@ -2310,7 +2310,7 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 					
 					if (nGoldId)
 					{
-						nIndex = ItemSet.Add(nGoldId,nItemLevel,nSeries,nEnChance + 1);
+						nIndex = ItemSet.AddGold(nGoldId,nGndrom,nEnChance + 1);
 					} 
 					else
 					{
@@ -3621,7 +3621,7 @@ BOOL KItemList::GetIfActive()
 	for (int i = 0;i < itempart_num;i++)
 	{
 		bIfGet = 0;
-		if (Item[m_EquipItem[i]].GetGoldId())
+		if (Item[m_EquipItem[i]].GetGoldId() && Item[m_EquipItem[i]].GetSetNum() > 0)	// suits not applied yet: nSetNum 0
 		{
 			for (int j = 0;j < 9;j++)
 			{

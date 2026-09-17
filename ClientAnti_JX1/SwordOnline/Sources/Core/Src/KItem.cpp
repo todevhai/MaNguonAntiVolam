@@ -230,22 +230,6 @@ BOOL KItem::SetAttrib_CBR(IN const KBASICPROP_EQUIPMENT* pData)
 	return bEC;
 }
 
-BOOL KItem::SetAttrib_CBR(IN const KBASICPROP_EQUIPMENT_GOLD* pData)
-{
-	_ASSERT(pData != NULL);
-	
-	BOOL bEC = FALSE;
-	if (pData)
-	{
-		//SetAttrib_Common(pData);
-		*this = *pData;		// 运算符重载
-		SetAttrib_Base(pData->m_aryPropBasic);
-		SetAttrib_Req(pData->m_aryPropReq);
-		bEC = TRUE;
-	}
-	return bEC;
-}
-
 BOOL KItem::SetAttrib_Base(const KEQCP_BASIC* pBasic)
 {
 	for (int i = 0;
@@ -333,36 +317,6 @@ BOOL KItem::SetAttrib_MA(IN const KMACP* pMA)
 	return TRUE;
 }
 
-BOOL KItem::SetAttrib_MA(IN const int* pMA)
-{
-	if (NULL == pMA)
-	{ _ASSERT(FALSE); return FALSE; }
-	
-	KTabFile MagicTab;
-	MagicTab.Load("\\Settings\\Item\\GoldMagic.txt");
-	for (int i = 0; i < sizeof(m_aryMagicAttrib) / sizeof(m_aryMagicAttrib[0]); i++)
-	{
-		const int* pSrc;
-		KItemNormalAttrib* pDst;
-		pSrc = &(pMA[i]);
-		pDst = &(m_aryMagicAttrib[i]);
-		
-		int nType,nLow,nHigh;
-		MagicTab.GetInteger(*pSrc + 1,"属性调整类别",0,&nType);
-		pDst->nAttribType = nType;
-		MagicTab.GetInteger(*pSrc + 1,"参数1最小值",0,&nLow);
-		MagicTab.GetInteger(*pSrc + 1,"参数1最大值",0,&nHigh);
-		pDst->nValue[0] =  ::GetRandomNumber(nLow, nHigh);
-		MagicTab.GetInteger(*pSrc + 1,"参数2最小值",0,&nLow);
-		MagicTab.GetInteger(*pSrc + 1,"参数2最大值",0,&nHigh);
-		pDst->nValue[1] =  ::GetRandomNumber(nLow, nHigh);
-		MagicTab.GetInteger(*pSrc + 1,"参数3最小值",0,&nLow);
-		MagicTab.GetInteger(*pSrc + 1,"参数3最大值",0,&nHigh);
-		pDst->nValue[2] =  ::GetRandomNumber(nLow, nHigh);
-	}
-	MagicTab.Clear();
-	return TRUE;
-}
 
 void KItem::operator = (const KBASICPROP_EQUIPMENT& sData)
 {
@@ -764,49 +718,6 @@ void KItem::operator = (const KBASICPROP_EQUIPMENT_UNIQUE& sData)
 	::strcpy(pCA->szImageName, sData.m_szImageName);
 	::strcpy(pCA->szIntro,	   sData.m_szIntro);
 
-	m_Image.Color.Color_b.a = 255;
-	m_Image.nFrame = 0;
-	m_Image.nISPosition = IMAGE_IS_POSITION_INIT;
-	m_Image.nType = ISI_T_SPR;
-	::strcpy(m_Image.szImage, pCA->szImageName);
-	m_Image.uImage = 0;
-#endif
-}
-
-//flying add this overloaded operator to generate a gold item.
-void KItem::operator = (const KBASICPROP_EQUIPMENT_GOLD& sData)
-{
-	KItemCommonAttrib* pCA = &m_CommonAttrib;	
-	pCA->nItemGenre		 = sData.m_nItemGenre;
-	pCA->nDetailType	 = sData.m_nDetailType;
-	pCA->nParticularType = sData.m_nParticularType;
-	pCA->nObjIdx		 = sData.m_nObjIdx;
-	pCA->nPrice			 = sData.m_nPrice;
-	pCA->nLevel			 = sData.m_nLevel;
-	pCA->nSeries		 = sData.m_nSeries;
-	pCA->nWidth			 = sData.m_nWidth;
-	pCA->nHeight		 = sData.m_nHeight;
-	pCA->nSet			 = sData.m_nSet;
-	pCA->nSetId			 = sData.m_nSetId;
-	pCA->nSetNum		 = sData.m_nSetNum;
-	pCA->nBigSet		 = sData.m_nUpSet;
-	pCA->nGoldId		 = sData.m_nId;
-	pCA->bStack			 = 0;
-	pCA->nStackNum		 = 1;
-	pCA->nEnChance		 = 0;
-	pCA->nPoint			 = 0;
-	::strcpy(pCA->szItemName,  sData.m_szName);
-	::strcpy(pCA->szScript,	   "");
-	
-	pCA->LimitTime.bYear = 0;
-	pCA->LimitTime.bMonth = 0;
-	pCA->LimitTime.bDay = 0;
-	pCA->LimitTime.bHour = 0;
-#ifndef _SERVER
-	pCA->uPrice = 0; 
-
-	::strcpy(pCA->szImageName, sData.m_szImageName);
-	::strcpy(pCA->szIntro,	   sData.m_szIntro);
 	m_Image.Color.Color_b.a = 255;
 	m_Image.nFrame = 0;
 	m_Image.nISPosition = IMAGE_IS_POSITION_INIT;

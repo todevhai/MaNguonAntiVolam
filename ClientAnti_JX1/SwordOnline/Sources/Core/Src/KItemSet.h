@@ -61,7 +61,7 @@ public:
 	int				SearchID(IN DWORD dwID);
 	int				Add(KItem* pItem);
 	int				Add(IN int nItemGenre, IN int nSeries, IN int nLevel, IN int nLuck, IN int nDetail = -1, IN int nParticular = -1, IN int* pnMagicLevel = NULL, IN int nVersion = 0, IN UINT nRandomSeed = 0,IN int nStackNum = 1, IN int nEnChance = 0,IN int nPoint = 0, IN int nYear = 0, IN int nMonth = 0, IN int nDay = 0, IN int nHour = 0);
-	int				Add(IN int nId , IN int* pnMagicLevel = NULL , IN int nSeries = 5, IN int nEnChance = 0,  IN int nYear = 0, IN int nMonth = 0, IN int nDay = 0, IN int nHour = 0);//»Æ½ðµÄ
+	int				AddGold(IN int nGoldId, IN UINT uRandomSeed, IN int nEnChance = 0, IN int nYear = 0, IN int nMonth = 0, IN int nDay = 0, IN int nHour = 0);	// Hoang Kim: goldequip row + 1
 	void			Remove(IN int nIdx);
 	int				GetAbradeRange(IN int nType, IN int nPart);
 private:

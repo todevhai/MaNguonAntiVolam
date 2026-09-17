@@ -32,7 +32,6 @@
 #define		TABFILE_TOWNPORTAL			"TownPortal.txt"
 #define		TABFILE_EQUIPMENT_UNIQUE	"unique.txt"
 #define		TABFILE_MAGICATTRIB			"magicattrib.txt"
-#define		TABFILE_GOLDITEM			"GoldItem.txt"
 #define		TABFILE_MASK				"Mask.txt"	// mat na
 #define		TABFILE_MANTLE				"mantle.txt"	// phi phong
 #define		TABFILE_SIGNET				"signet.txt"	// an
@@ -134,7 +133,6 @@ BOOL KLibOfBPT::Init()
 											&m_BPTMantle,
 											&m_BPTSignet,
 											&m_BPTShipin,
-											&m_GoldItem,
 											&m_BPTMedicine,
 											&m_BPTQuest,
 											&m_BPTTownPortal,
@@ -150,11 +148,6 @@ BOOL KLibOfBPT::Init()
 			KBPT_Equipment* pTemp = (KBPT_Equipment *)paryBPT[i];
 			pTemp->Init(i);
 		}
-		else if (i == 12)
-		{
-			KBPT_Equipment_Gold* pGTemp = (KBPT_Equipment_Gold *)paryBPT[i];
-			pGTemp->Init();
-		}
 
 		if (FALSE == paryBPT[i]->Load())
 			{ _ASSERT(FALSE); return FALSE; }
@@ -168,6 +161,7 @@ BOOL KLibOfBPT::Init()
     InitMAIT();
 
 	InitMagicScript();	// genre 6; its failure only turns genre 6 off
+	InitGoldEquip();	// Hoang Kim; its failure only turns gold items off
 
 	return TRUE;
 }
@@ -1252,150 +1246,6 @@ const KBASICPROP_EQUIPMENT* KBPT_Equipment::FindRecord( IN int nDetailType,
 	return pData;
 }
 
-//============================================================================
-// 黄金装备的实现
-// flying
-KBPT_Equipment_Gold::KBPT_Equipment_Gold()
-{
-	m_nSizeOfEntry = sizeof(KBASICPROP_EQUIPMENT_GOLD);
-	// Copy the gold item information file's name into the buffer
-}
-
-KBPT_Equipment_Gold::~KBPT_Equipment_Gold()
-{
-	return;
-}
-
-BOOL KBPT_Equipment_Gold::LoadRecord(int i, KTabFile* pTF)
-{
-	_ASSERT(pTF != NULL);
-	_ASSERT(i >= 0 && i < m_nNumOfEntries);
-
-	// 初始化
-	KBASICPROP_EQUIPMENT_GOLD* pBuf = (KBASICPROP_EQUIPMENT_GOLD*)m_pBuf;
-	pBuf = pBuf + i;	// 读入的属性记在 pBuf 所指结构中
-	const PROPINFO	aryPI[] =
-	{
-		{ PI_VARTYPE_CHAR,			pBuf->m_szName, sizeof(pBuf->m_szName)},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nItemGenre), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nDetailType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nParticularType), 0},
-//		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nRarity), 0},		
-		{ PI_VARTYPE_CHAR,			pBuf->m_szImageName, sizeof(pBuf->m_szImageName)},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nObjIdx), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nWidth), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nHeight), 0},
-		{ PI_VARTYPE_CHAR,			pBuf->m_szIntro, sizeof(pBuf->m_szIntro)},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nSeries), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nPrice), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nLevel), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_bStack), 0},
-
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[0].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[0].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[0].sRange.nMax), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[1].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[1].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[1].sRange.nMax), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[2].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[2].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[2].sRange.nMax), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[3].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[3].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[3].sRange.nMax), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[4].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[4].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[4].sRange.nMax), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[5].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[5].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[5].sRange.nMax), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[6].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[6].sRange.nMin), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropBasic[6].sRange.nMax), 0},
-
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[0].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[0].nPara), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[1].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[1].nPara), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[2].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[2].nPara), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[3].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[3].nPara), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[4].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[4].nPara), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[5].nType), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryPropReq[5].nPara), 0},
-
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryMagicAttribs[0]), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryMagicAttribs[1]), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryMagicAttribs[2]), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryMagicAttribs[3]), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryMagicAttribs[4]), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_aryMagicAttribs[5]), 0},
-
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nId), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nSet), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nSetNum), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nUpSet), 0},
-		{ PI_VARTYPE_INT,  (char*)&(pBuf->m_nSetId), 0},
-	};
-
-	// 逐个读入各项属性
-	return ::LoadRecord(pTF, i, aryPI, sizeof(aryPI)/ sizeof(aryPI[0]));
-}
-
-/******************************************************************************
-	功能:	获取指定的装备的属性
-	入口:	i: 要求获取第i项装备的属性
-	出口:	成功时返回指向该装备属性的指针(一个KBASICPROP_EQUIPMENT结构)
-			失败时返回NULL
-******************************************************************************/
-const KBASICPROP_EQUIPMENT_GOLD* KBPT_Equipment_Gold::GetRecord(int i) const
-{
-	_ASSERT(this != NULL);
-	_ASSERT(i >= 0 && i < m_nNumOfEntries);
-	return (i >= 0 && i < m_nNumOfEntries) ?
-		(((KBASICPROP_EQUIPMENT_GOLD*)m_pBuf) + i) : NULL;
-}
-
-/******************************************************************************
-	功能:	获取指定的唯一装备属性记录
-	入口:	nDetailType: 具体类别
-			nParticularType: 详细类别
-			nLevel: 等级
-	出口:	成功时返回指向该记录的指针
-			失败时返回NULL
-******************************************************************************/
-const KBASICPROP_EQUIPMENT_GOLD*
-		KBPT_Equipment_Gold::FindRecord(IN int nDetailType,
-										  IN int nParticularType,
-										  IN int nLevel) const
-{
-	_ASSERT(this != NULL);
-	
-	const KBASICPROP_EQUIPMENT_GOLD* pData = NULL;
-	for (int i = 0; i < m_nNumOfEntries; i++)
-	{
-		const KBASICPROP_EQUIPMENT_GOLD* pEqu;
-		pEqu = GetRecord(i);
-		_ASSERT(NULL != pEqu);
-		if (NULL == pEqu)
-			continue;
-		if (nDetailType == pEqu->m_nDetailType &&
-			nParticularType == pEqu->m_nParticularType &&
-			nLevel == pEqu->m_nLevel)
-		{
-			pData = pEqu;
-			break;
-		}
-	}
-	return pData;
-}
-
-void KBPT_Equipment_Gold::Init()
-{
-	::strcpy(m_szTabFile, TABFILE_GOLDITEM);
-}
 //============================================================================
 KBPT_Equipment_Unique::KBPT_Equipment_Unique()
 {

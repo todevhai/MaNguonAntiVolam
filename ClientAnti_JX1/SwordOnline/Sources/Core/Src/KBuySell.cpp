@@ -129,6 +129,9 @@ BOOL KBuySell::Init()
 			ItemGen.Gen_Quest(ItemGenerator.nDetailType,
 				&m_Item[k],1);
 			break;
+		case ITEM_GENRE_HOANG_KIM:	// DetailType = goldequip row + 1; shop copy uses seed 0
+			ItemGen.Gen_GoldEquipment(ItemGenerator.nDetailType, &m_Item[k]);
+			break;
 		case item_magicscript:
 			ItemGen.Gen_MagicScript(ItemGenerator.nDetailType, ItemGenerator.nParticularType,
 				ItemGenerator.nLevel, NULL, &m_Item[k], 1);
