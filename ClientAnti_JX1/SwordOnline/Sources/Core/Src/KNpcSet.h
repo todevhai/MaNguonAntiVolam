@@ -113,7 +113,8 @@ public:
 	int				SearchID(DWORD dwID);
 	int				SearchNameID(DWORD dwID);
 	BOOL			IsNpcExist(int nIdx, DWORD dwId);
-	int				Add(int nNpcSetingIdxInfo, int nSubWorld, int nRegion, int nMapX, int nMapY, int nOffX = 0, int nOffY = 0);
+	int				Add(int nNpcSetingIdxInfo, int nSubWorld, int nRegion, int nMapX, int nMapY, int nOffX = 0, int nOffY = 0, int nSeries = -1);
+	int				AddCoHe(int nNpcSetingIdxInfo, int nSubWorld, int nMpsX, int nMpsY, int nSeries);	// he rieng, -1 = he cua npcs.txt
 	int				Add(int nNpcSetingIdxInfo, int nSubWorld, int nMpsX, int nMpsY);
 	int				Add(int nSubWorld, void* pNpcInfo);
 	void			Remove(int nIdx);

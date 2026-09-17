@@ -120,6 +120,8 @@ KNpc	Npc[MAX_NPC];
 
 
 KNpcTemplate	* g_pNpcTemplate[MAX_NPCSTYLE][MAX_NPC_LEVEL]; //0,0为起点
+/* Mau cap NPC cho he KHAC he goc cua npcs.txt: khoa (mau*series_num + he)*MAX_NPC_LEVEL + cap. */
+std::map<int, KNpcTemplate*>	g_NpcTemplateTheoHe;
 
 //-----------------------------------------------------------------------
 
@@ -3794,7 +3796,7 @@ BOOL KNpc::IsReachFrame(int nPercent)
 }
 
 //客户端从网络得到的NpcSettingIdx是包含高16位Npc的模板号与低16位为等级
-void KNpc::Load(int nNpcSettingIdx, int nLevel)
+void KNpc::Load(int nNpcSettingIdx, int nLevel, int nSeries)
 {
 	m_PathFinder.Init(m_Index);
 	if (nLevel <= 0) 
@@ -3833,7 +3835,7 @@ void KNpc::Load(int nNpcSettingIdx, int nLevel)
 	}
 	else
 	{
-		GetNpcCopyFromTemplate(nNpcSettingIdx, nLevel);
+		GetNpcCopyFromTemplate(nNpcSettingIdx, nLevel, nSeries);
 
 #ifndef _SERVER	
 		g_NpcSetting.GetString(nNpcSettingIdx + 2, "NpcResType", "", szNpcTypeName, sizeof(szNpcTypeName));
@@ -5600,26 +5602,37 @@ BOOL KNpc::CheckHitTarget(int nAR, int nDf, int nIngore/* = 0*/)
 	return bRet;
 }
 
-void KNpc::GetNpcCopyFromTemplate(int nNpcTemplateId, int nLevel)
+void KNpc::GetNpcCopyFromTemplate(int nNpcTemplateId, int nLevel, int nSeries)
 {
 	if (nNpcTemplateId < 0 || nLevel < 1 ) 
 		return ;
-	
-	if (g_pNpcTemplate[nNpcTemplateId][nLevel]) //数据有效则拷贝，否则重新生成
-		LoadDataFromTemplate(nNpcTemplateId, nLevel);
-	else
+
+	if (!g_pNpcTemplate[nNpcTemplateId][0])
 	{
-		if (!g_pNpcTemplate[nNpcTemplateId][0])
-		{
-			g_pNpcTemplate[nNpcTemplateId][0] = new KNpcTemplate;
-			g_pNpcTemplate[nNpcTemplateId][0]->InitNpcBaseData(nNpcTemplateId);
-			g_pNpcTemplate[nNpcTemplateId][0]->m_NpcSettingIdx = nNpcTemplateId;
-			g_pNpcTemplate[nNpcTemplateId][0]->m_bHaveLoadedFromTemplate = TRUE;
-		}
+		g_pNpcTemplate[nNpcTemplateId][0] = new KNpcTemplate;
+		g_pNpcTemplate[nNpcTemplateId][0]->InitNpcBaseData(nNpcTemplateId);
+		g_pNpcTemplate[nNpcTemplateId][0]->m_NpcSettingIdx = nNpcTemplateId;
+		g_pNpcTemplate[nNpcTemplateId][0]->m_bHaveLoadedFromTemplate = TRUE;
+	}
+
+	/* He cua NPC (cSeries cua ban do, hoac he trong goi dong bo o client) co the khac cot Series
+	   cua npcs.txt. Kich ban cap NPC tinh mau/khang/sat thuong THEO HE, nen ban 8.x
+	   (KNpc::GetNpcCopyFromTemplate cua ban6) giu mau cap rieng cho tung he. He khac he goc thi
+	   dung mau rieng, luu luoi trong g_NpcTemplateTheoHe; cung he (hoac khong chi he) giu duong cu. */
+	int nHeGoc = g_pNpcTemplate[nNpcTemplateId][0]->m_Series;
+	BOOL bHeRieng = (nSeries >= series_metal && nSeries < series_num && nSeries != nHeGoc);
+	KNpcTemplate** ppMau = NULL;
+	if (bHeRieng)
+		ppMau = &g_NpcTemplateTheoHe[(nNpcTemplateId * series_num + nSeries) * MAX_NPC_LEVEL + nLevel];
+	else
+		ppMau = &g_pNpcTemplate[nNpcTemplateId][nLevel];
+
+	if (!*ppMau)
+	{
 		KLuaScript * pLevelScript = NULL;		
 
 #ifdef _SERVER
-			pLevelScript = (KLuaScript*)g_GetScript(
+		pLevelScript = (KLuaScript*)g_GetScript(
 			g_pNpcTemplate[nNpcTemplateId][0]->m_dwLevelSettingScript
 			);
 		
@@ -5634,25 +5647,27 @@ void KNpc::GetNpcCopyFromTemplate(int nNpcTemplateId, int nLevel)
 			LevelScript.Init();
 			if (!LevelScript.Load(g_pNpcTemplate[nNpcTemplateId][0]->m_szLevelSettingScript))
 			{
-				g_DebugLog ("[error]致命错误,无法正确读取%s", g_pNpcTemplate[nNpcTemplateId][0]->m_szLevelSettingScript);
-				_ASSERT(0);
+				g_DebugLog ("[npc cap] khong nap duoc %s", g_pNpcTemplate[nNpcTemplateId][0]->m_szLevelSettingScript);
 				pLevelScript = g_pNpcLevelScript;
 			}
 			else
 				pLevelScript = &LevelScript;
 		}
-
 #endif
-		g_pNpcTemplate[nNpcTemplateId][nLevel] = new KNpcTemplate;
-		*g_pNpcTemplate[nNpcTemplateId][nLevel] = *g_pNpcTemplate[nNpcTemplateId][0];
-		g_pNpcTemplate[nNpcTemplateId][nLevel]->m_nLevel = nLevel;
-		g_pNpcTemplate[nNpcTemplateId][nLevel]->InitNpcLevelData(&g_NpcKindFile, nNpcTemplateId, pLevelScript, nLevel);
-		g_pNpcTemplate[nNpcTemplateId][nLevel]->m_bHaveLoadedFromTemplate = TRUE;
-		LoadDataFromTemplate(nNpcTemplateId,nLevel);
+		KNpcTemplate* pMoi = new KNpcTemplate;
+		*pMoi = *g_pNpcTemplate[nNpcTemplateId][0];
+		if (bHeRieng)
+			pMoi->m_Series = nSeries;
+		pMoi->m_nLevel = nLevel;
+		if (pLevelScript)
+			pMoi->InitNpcLevelData(&g_NpcKindFile, nNpcTemplateId, pLevelScript, nLevel);
+		pMoi->m_bHaveLoadedFromTemplate = TRUE;
+		*ppMau = pMoi;
 	}
+	LoadDataFromTemplate(nNpcTemplateId, nLevel, *ppMau);
 }
 
-void	KNpc::LoadDataFromTemplate(int nNpcTemplateId, int nLevel)
+void	KNpc::LoadDataFromTemplate(int nNpcTemplateId, int nLevel, KNpcTemplate* pMau)
 {
 	if (nNpcTemplateId < 0 )
 	{
@@ -5660,7 +5675,9 @@ void	KNpc::LoadDataFromTemplate(int nNpcTemplateId, int nLevel)
 		return ;
 	}
 	
-	KNpcTemplate * pNpcTemp = g_pNpcTemplate[nNpcTemplateId][nLevel];
+	KNpcTemplate * pNpcTemp = pMau ? pMau : g_pNpcTemplate[nNpcTemplateId][nLevel];
+	if (!pNpcTemp)
+		return;
 
 	strcpy(Name,pNpcTemp->Name);
 	m_Kind = pNpcTemp->m_Kind;

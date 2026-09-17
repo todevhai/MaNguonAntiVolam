@@ -187,6 +187,7 @@ struct KItemDropRate
 };
 #endif
 
+class KNpcTemplate;
 class KNpc
 {
 	friend class KNpcSet;
@@ -613,7 +614,7 @@ public:
 	BOOL				IsMatch(DWORD dwID)	{ return dwID == m_dwID; };	// 是否ID与该Index匹配
 	BOOL				Cost(NPCATTRIB nType, int nCost, BOOL bOnlyCheckCanCast = FALSE);				// 消耗内力体力等,如果OnlyCheckCanCost为TRUE,表示只是检查当前的内力等是否够消耗，并不实际的扣
 	void				SelfDamage(int nDamage);						// 自身的伤害，如牺牲攻击
-	void				Load(int nNpcSettingIdx, int nLevel);						// 从TabFile中加载
+	void				Load(int nNpcSettingIdx, int nLevel, int nSeries = -1);						// 从TabFile中加载
 	void				GetMpsPos(int * pPosX, int *pPosY);
 	BOOL				SetActiveSkill(int nSkillIdx);
 	void				SetAuraSkill(int nSkillID);
@@ -653,7 +654,7 @@ public:
 	void				SetSeries(int nSeries);// 设定此 npc 的五行属性（内容还没完成）
 //	int					GetNpcLevelDataFromScript(KLuaScript * pScript, char * szDataName, int nLevel, char * szParam);
 //	int					SkillString2Id(char * szSkillString);
-	void				GetNpcCopyFromTemplate(int nNpcTemplateId, int nLevel);
+	void				GetNpcCopyFromTemplate(int nNpcTemplateId, int nLevel, int nSeries = -1);
 //	void				InitNpcLevelData(KTabFile * pTabFile, int nNpcTemplateId, KLuaScript * pLevelScript, int nLevel);
 //	void				InitNpcBaseData(int nNpcTemplateId);
 	void				SetPhysicsDamage(int nMinDamage, int nMaxDamage);	// 设定物理攻击的最大最小值
@@ -662,7 +663,7 @@ public:
 //	void				SetBaseWalkSpeed(int nSpeed);							// 设定行走速度
 //	void				SetBaseRunSpeed(int nSpeed);							// 设定跑步速度
 	int					GetCurActiveWeaponSkill();
-	void				LoadDataFromTemplate(int nNpcTemplateId, int nLevel);
+	void				LoadDataFromTemplate(int nNpcTemplateId, int nLevel, KNpcTemplate* pMau = NULL);
 
 	void				ReSetRes(int nMark);
 	void				GetFrameCopyFromTemplate(int nNpcTemplateId, int nLevel);

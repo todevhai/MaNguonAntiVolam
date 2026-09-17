@@ -1547,7 +1547,8 @@ void KProtocolProcess::SyncNpc(BYTE* pMsg)
 	int nIdx = NpcSet.SearchID(NpcSync->ID);
 	if (!nIdx)
 	{
-		nIdx = NpcSet.Add(NpcSync->NpcSettingIdx, 0, NpcSync->MapX, NpcSync->MapY);
+		/* Dung mau cap theo he that cua NPC (may chu dua theo goi) - cung chi so voi may chu. */
+		nIdx = NpcSet.AddCoHe(NpcSync->NpcSettingIdx, 0, NpcSync->MapX, NpcSync->MapY, NpcSync->m_bySeries);
 		Npc[nIdx].m_dwID = NpcSync->ID;
 		Npc[nIdx].m_Kind = NpcSync->m_btKind;
 		Npc[nIdx].m_Height = 0;

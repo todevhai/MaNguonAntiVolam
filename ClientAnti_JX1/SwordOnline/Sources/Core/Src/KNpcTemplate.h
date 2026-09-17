@@ -1,5 +1,6 @@
 #ifndef	_KNPCTEMPLATE_H
 #define	_KNPCTEMPLATE_H
+#include <map>
 
 #ifdef _SERVER
 class KItemDropRateNode
@@ -114,6 +115,7 @@ public:
 };
 
 extern KNpcTemplate	* g_pNpcTemplate[MAX_NPCSTYLE][MAX_NPC_LEVEL]; //0,0ÎªÆðµã
+extern std::map<int, KNpcTemplate*>	g_NpcTemplateTheoHe;
 
 #endif
 

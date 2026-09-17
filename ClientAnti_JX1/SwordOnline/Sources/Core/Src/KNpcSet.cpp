@@ -310,7 +310,8 @@ int KNpcSet::Add(int nSubWorld, void* pNpcInfo)
 	int nMpsY = pKSNpcInfo->nPositionY;
 	int	nNpcSettingIdxInfo = MAKELONG(pKSNpcInfo->nLevel, pKSNpcInfo->nTemplateID);
 
-	int nRet = Add(nNpcSettingIdxInfo, nSubWorld, nMpsX, nMpsY);
+	/* Mau cap theo he cua ban do (ban6 KNpcSet::Add dua cSeries vao KNpc::Load). */
+	int nRet = AddCoHe(nNpcSettingIdxInfo, nSubWorld, nMpsX, nMpsY, pKSNpcInfo->cSeries);
 	
 	if (nRet)
 	{
@@ -351,16 +352,21 @@ int KNpcSet::Add(int nSubWorld, void* pNpcInfo)
 
 int KNpcSet::Add(int nNpcSettingIdxInfo, int nSubWorld, int nMpsX, int nMpsY)
 {
+	return AddCoHe(nNpcSettingIdxInfo, nSubWorld, nMpsX, nMpsY, -1);
+}
+
+int KNpcSet::AddCoHe(int nNpcSettingIdxInfo, int nSubWorld, int nMpsX, int nMpsY, int nSeries)
+{
 	int nRegion, nMapX, nMapY, nOffX, nOffY;
 	if (nSubWorld < 0 || nSubWorld >= MAX_SUBWORLD)
 		return 0;
 	SubWorld[nSubWorld].Mps2Map(nMpsX, nMpsY, &nRegion, &nMapX, &nMapY, &nOffX, &nOffY);
 	if (nRegion < 0)
 		return 0;
-	return Add(nNpcSettingIdxInfo, nSubWorld, nRegion, nMapX, nMapY, nOffX, nOffY);
+	return Add(nNpcSettingIdxInfo, nSubWorld, nRegion, nMapX, nMapY, nOffX, nOffY, nSeries);
 }
 
-int KNpcSet::Add(int nNpcSettingIdxInfo, int nSubWorld, int nRegion, int nMapX, int nMapY, int nOffX /* = 0 */, int nOffY /* = 0 */)
+int KNpcSet::Add(int nNpcSettingIdxInfo, int nSubWorld, int nRegion, int nMapX, int nMapY, int nOffX /* = 0 */, int nOffY /* = 0 */, int nSeries /* = -1 */)
 {
 	int i = FindFree();
 
@@ -378,7 +384,7 @@ int KNpcSet::Add(int nNpcSettingIdxInfo, int nSubWorld, int nRegion, int nMapX, 
 
 	Npc[i].m_Index = i;
 	Npc[i].m_SkillList.m_nNpcIndex = i;
-	Npc[i].Load(nNpcSettingIdx, nLevel);
+	Npc[i].Load(nNpcSettingIdx, nLevel, nSeries);
 	Npc[i].m_SubWorldIndex = nSubWorld;
 	Npc[i].m_RegionIndex = nRegion;
 #ifndef _SERVER
