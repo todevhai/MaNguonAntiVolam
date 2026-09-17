@@ -40,7 +40,8 @@ private:
 	KLinkArray	m_UseIdx;
 	int			m_nListCurIdx;									// ���� GetFirstItem �� GetNextItem
 
-	BOOL		m_bActiveSet;
+	int			m_nBoKichHoat;			// Hoang Kim: active suit id, -1 = none (KItemGoldSuit.cpp)
+	std::map<int, int>	m_DemBoMoRong;	// Hoang Kim: worn gold items per extended suit id
 	BOOL		m_nMaskLock;	// mat na
 #ifndef _SERVER
 	BOOL		m_bLockOperation;
@@ -51,10 +52,14 @@ public:
 private:
 	int			FindFree();
 	int			FindSame(int nGameIdx);							// nGameIdxָ��Ϸ�����е�������ı��
-	int			GetEquipPlace(int nType);						// ȡ��ĳ����װ��Ӧ�÷ŵ�λ��
+	static int	GetEquipPlace(int nType);						// ȡ��ĳ����װ��Ӧ�÷ŵ�λ��
 	BOOL		Fit(int nIdx, int nPlace);						// ����Ƿ����װ����
 	BOOL		Fit(KItem* pItem, int nPlace);
-	int			GetEquipEnhance(int nPlace);					// ȡ��װ���ļ�����������
+	int			GetEquipEnhance(int nPlace, BOOL bThat = FALSE);	// bThat: wuxing chain even when a suit is active
+	int			TimBoKichHoat();
+	int			CapBoMoRong();
+	void		DoiCapMoRong(int nIdx, int nTu, int nDen);
+	void		BatLaiBoMoRong();
 	int			GetActiveEquipPlace(int nPlace, int nCount);	// ȡ��nPlace��װ������ĵ�nCount��װ��λ��
 	void		InfectionNextEquip(int nPlace, BOOL bEquip = FALSE);
 	// ��room_equipment�в���ָ��Genre��DetailType����Ʒ���õ�ItemIdx��λ��

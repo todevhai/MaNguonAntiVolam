@@ -11,6 +11,9 @@
 #ifndef	KBasPropTblH
 #define	KBasPropTblH
 
+#include <map>
+#include <vector>
+
 #define		SZBUFLEN_0	80		// 典型的字符串缓冲区长度
 #define		SZBUFLEN_1	128		// 典型的字符串缓冲区长度
 
@@ -221,6 +224,22 @@ typedef struct
 	int			m_nType;				// column 5
 	KMINMAXPAIR	m_aryRange[3];			// columns 6..11
 } KBASICPROP_GOLDMAGIC;
+
+// Hoang Kim suits (KItemGoldSuit.cpp). Index into aryDong: equipment slot 0..14, or for a ring
+// 14 + level + 10 * series (so two different rings are two parts), hence 65.
+#define		MAX_O_BO_TRANG_BI	65
+typedef struct
+{
+	int					nSoBoPhan;							// distinct indexes that have a row
+	std::vector<int>	aryDong[MAX_O_BO_TRANG_BI];			// goldequip/platinaequip row numbers (0-based)
+} KGOLD_SUITE;
+
+typedef struct
+{
+	int		nDong;		// goldequip row (goldId - 1)
+	int		nO;			// index as above
+	BOOL	bNhan;		// ring: counts once per index
+} KMON_TRONG_BO;
 
 typedef struct
 {
@@ -582,6 +601,9 @@ protected:
 	// Add by flying
 	KBPT_Equipment_Gold		m_GoldItem;
 	KBPT_GoldMagic			m_GoldMagic;	// magicattrib_ge.txt
+	std::map<int, KGOLD_SUITE>	m_GoldSuit;			// suit id -> parts
+	std::map<int, int>		m_SuitActivate;			// suite_activate_count.txt
+	std::map<int, int>		m_ExtSuitActivate[2];	// ext_suite_activate_count.txt
     // Add by Freeway Chen in 2003.5.30
 	// 四维分别为前后缀、物品类型、五行、级别
     KBPT_ClassMAIT          m_CMAIT[MATF_PREFIXPOSFIX][MATF_CBDR][MATF_SERIES][MATF_LEVEL];
@@ -604,6 +626,8 @@ public:
 	const int							GetGoldItemNumber() const;
 	const KBASICPROP_GOLDMAGIC*		GetGoldMagicRecord(IN int nIndex) const;
 	const int							GetGoldMagicNumber() const;
+	int								FindGoldSuite(const KMON_TRONG_BO* pMon, int nSoMon) const;
+	int								GetExtSuitActivate(int nExtSuit, int nCap) const;
 	const KBASICPROP_EQUIPMENT*	GetMeleeWeaponRecord(IN int) const;
 	const int					GetMeleeWeaponRecordNumber() const;
 	const KBASICPROP_EQUIPMENT*	GetRangeWeaponRecord(IN int) const;
@@ -654,6 +678,7 @@ protected:
 	BOOL InitMALib();
 	BOOL InitMagicScript();
 	BOOL InitGoldEquip();
+	void InitGoldSuite();
     
     // Add by Freeway Chen in 2003.5.30
     BOOL InitMAIT();

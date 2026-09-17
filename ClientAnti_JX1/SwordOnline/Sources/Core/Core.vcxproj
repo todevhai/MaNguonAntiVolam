@@ -366,6 +366,7 @@ copy ClientDebug\CoreClient.lib ..\..\lib\debug\CoreClient.lib
     <ClCompile Include="Src\KItemGenerator.CPP" />
     <ClCompile Include="Src\KItemList.cpp" />
     <ClCompile Include="Src\KItemGoldEquip.cpp" />
+    <ClCompile Include="Src\KItemGoldSuit.cpp" />
     <ClCompile Include="Src\KItemMagicScript.cpp" />
     <ClCompile Include="Src\KItemSet.cpp" />
     <ClCompile Include="Src\KLadder.cpp" />

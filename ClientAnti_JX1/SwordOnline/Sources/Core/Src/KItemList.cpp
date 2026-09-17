@@ -69,6 +69,7 @@ KItemList::KItemList()
 {
 	m_PlayerIdx = 0;
 	m_nListCurIdx = 0;
+	m_nBoKichHoat = -1;
 }
 
 KItemList::~KItemList()
@@ -666,6 +667,8 @@ int KItemList::FindSame(int nGameIdx)
 BOOL KItemList::Init(int nPlayerIdx)
 {
 	m_PlayerIdx = nPlayerIdx;
+	m_nBoKichHoat = -1;
+	m_DemBoMoRong.clear();
 	m_Hand = 0;
 	m_nBackHand = 0;
 	m_nMaskLock = FALSE;	// mat na
@@ -943,7 +946,10 @@ BOOL KItemList::Equip(int nIdx, int nPlace /* = -1 */)
 		Player[m_PlayerIdx].SetNpcDamageAttrib();
 	}
 	
-	GetIfActive();
+	/* Suit state first; UpdataCurData then rebuilds every attribute with it. */
+	if (Item[nIdx].GetGoldId() > 0)
+		m_DemBoMoRong[Item[nIdx].GetExtSuit()]++;
+	m_nBoKichHoat = TimBoKichHoat();
 	Player[m_PlayerIdx].UpdataCurData();
 
 //#endif
@@ -961,7 +967,7 @@ BOOL KItemList::Equip(int nIdx, int nPlace /* = -1 */)
 *****************************************************************************/
 void KItemList::InfectionNextEquip(int nEquipPlace, BOOL bEquip/* = FALSE */)
 {
-	if (m_PlayerIdx <= 0)
+	if (m_PlayerIdx <= 0 || nEquipPlace >= itempart_horse)	// slots 10..14 are not in the wuxing chain
 		return;
 
 	int nNpcIdx = Player[m_PlayerIdx].m_nIndex;
@@ -1023,13 +1029,14 @@ BOOL KItemList::UnEquip(int nIdx, int nPos/* = -1*/)
 	}
 	// �Ƴ���װ����NPC�����Ե���
 	int nActive = GetEquipEnhance(i);
-	if (m_bActiveSet)
-		nActive = 3;
 	Item[nIdx].RemoveMagicAttribFromNPC(&Npc[nNpcIdx], nActive);
 	// �Ƴ���װ�����ܶ��������װ����Ӱ�졣
 	InfectionNextEquip(i, FALSE);
 	// ��仰һ��Ҫ������һ��󣬱�֤�����װ�������װ���������Ը����������ȷ��
 	m_EquipItem[i] = 0;
+	if (Item[nIdx].GetGoldId() > 0)
+		m_DemBoMoRong[Item[nIdx].GetExtSuit()]--;
+	m_nBoKichHoat = TimBoKichHoat();
 	// ��װ
 	switch(i)
 	{
@@ -1065,8 +1072,7 @@ BOOL KItemList::UnEquip(int nIdx, int nPos/* = -1*/)
 		Player[m_PlayerIdx].SetNpcDamageAttrib();
 	}	
 
-	if (!GetIfActive())
-			Player[m_PlayerIdx].UpdataCurData();
+	Player[m_PlayerIdx].UpdataCurData();
 #ifdef _SERVER
 			for (i = 1;i < MAX_NPCSKILL;i++)
 			{
@@ -1286,10 +1292,16 @@ BOOL KItemList::Fit(KItem* pItem, int nPlace)
 	return bRet;
 }
 
-int KItemList::GetEquipEnhance(int nPlace)
+int KItemList::GetEquipEnhance(int nPlace, BOOL bThat)
 {
 	if (m_PlayerIdx <= 0)
 		return FALSE;
+	/* jx9tn/ban6: horse and the slots after it always open all 3 hidden attributes, and so does
+	   every slot while a Hoang Kim suit is active (bThat asks for the wuxing chain instead). */
+	if (nPlace >= itempart_horse && nPlace < itempart_num)
+		return 3;
+	if (!bThat && m_nBoKichHoat != -1)
+		return 3;
 
 	int nNpcIdx = Player[m_PlayerIdx].m_nIndex;
 
@@ -3616,44 +3628,7 @@ void KItemList::Abrade(int nType)
 
 BOOL KItemList::GetIfActive()
 {
-	int nSet[9][2],bIfGet,nNum = 0;
-	ZeroMemory(nSet,sizeof(nSet));
-	for (int i = 0;i < itempart_num;i++)
-	{
-		bIfGet = 0;
-		if (Item[m_EquipItem[i]].GetGoldId() && Item[m_EquipItem[i]].GetSetNum() > 0)	// suits not applied yet: nSetNum 0
-		{
-			for (int j = 0;j < 9;j++)
-			{
-				if (nSet[j][0] == Item[m_EquipItem[i]].GetSet())
-				{
-					nSet[j][1]++;
-					bIfGet = 1;
-					if (nSet[j][1] >= Item[m_EquipItem[i]].GetSetNum())
-					{
-						m_bActiveSet = TRUE;
-						return TRUE;
-					}
-				}
-			}
-			if (!bIfGet)
-			{
-				nSet[nNum][0] = Item[m_EquipItem[i]].GetSet();
-				nSet[nNum][1] = 1;
-				
-				if (nSet[nNum][1] >= Item[m_EquipItem[i]].GetSetNum())
-				{
-					m_bActiveSet = TRUE;
-					return TRUE;
-				}
-				nNum++;
-			}
-		}
-	}
-	m_bActiveSet = FALSE;
-	return FALSE;
-
-
+	return m_nBoKichHoat != -1;	// Hoang Kim suit rules: KItemGoldSuit.cpp
 }
 #ifndef _SERVER
 int KItemList::GetGoldColor(int nSet,int nId )

@@ -160,6 +160,9 @@ private:
 	KItemNormalAttrib	m_aryBaseAttrib[7];		// 道具的基础属性
 	KItemNormalAttrib	m_aryRequireAttrib[6];	// 道具的需求属性
 	KItemNormalAttrib	m_aryMagicAttrib[6];	// 道具的魔法属性
+	KItemNormalAttrib	m_aryExtSuitAttrib[2];	// Hoang Kim: hidden attributes of the extended suit (goldequip 56/57)
+	int					m_nSuit;				// Hoang Kim: suit id (goldequip 53), 0 = none
+	int					m_nExtSuit;				// Hoang Kim: extended suit id (goldequip 54), -1 = empty cell
 
 // 以下是辅助性的成员变量
 public:
@@ -177,6 +180,9 @@ public:
 	void	RemoveMagicAttribFromNPC(IN KNpc*, IN int = 0) const;
 	void	ApplyHiddenMagicAttribToNPC(IN KNpc*, IN int) const;
 	void	RemoveHiddenMagicAttribFromNPC(IN KNpc*, IN int) const;
+	void	ApplyExtSuitAttribToNPC(IN KNpc*, IN int nCap, IN BOOL bBat) const;	// Hoang Kim extended suit, nCap 0/1
+	int		GetExtSuit() const { return m_nExtSuit; };
+	int		GetSuit() const { return m_nSuit; };
 	KItemGeneratorParam * GetItemParam(){return &m_GeneratorParam;};
 	void	SetID(DWORD dwID) { m_dwID = dwID; };
 	DWORD	GetID() const { return m_dwID; };

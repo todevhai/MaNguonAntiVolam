@@ -2608,6 +2608,7 @@ void	KPlayer::UpdataCurData()
 void KPlayer::ReCalcEquip()
 {
 	_ASSERT(m_nIndex > 0 && m_nIndex < MAX_NPC);
+	m_ItemList.BatLaiBoMoRong();	// Hoang Kim extended suit attributes are not in ApplyMagicAttribToNPC
 	
 	for (int i = 0; i < itempart_num; i++)
 	{
@@ -2616,10 +2617,6 @@ void KPlayer::ReCalcEquip()
 			continue;
 		int nActive = m_ItemList.GetEquipEnhance(i);
 
-		if (m_ItemList.m_bActiveSet)
-		{
-			nActive = 3;
-		}
 
 		if (i != itempart_horse || Npc[m_nIndex].m_bRideHorse)
 				Item[nIdx].ApplyMagicAttribToNPC(&Npc[m_nIndex], nActive);

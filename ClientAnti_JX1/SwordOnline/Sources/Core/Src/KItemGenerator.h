@@ -54,6 +54,8 @@ public:
 						IN int, IN OUT KItem*,IN int,IN int);	
 	BOOL GetEquipmentCommonAttrib(IN int, IN int, IN int, IN int, IN OUT KItem*);
 	BOOL GetMedicineCommonAttrib(IN int, IN int, IN OUT KItem*);
+	int FindGoldSuite(const KMON_TRONG_BO* pMon, int nSoMon) const { return m_BPTLib.FindGoldSuite(pMon, nSoMon); }
+	int GetExtSuitActivate(int nExtSuit, int nCap) const { return m_BPTLib.GetExtSuitActivate(nExtSuit, nCap); }
 	BOOL Gen_GoldEquipment(IN int nGoldId, IN OUT KItem* pItem);	// KItemGoldEquip.cpp
 
 	//Try to get a "DIY ITEm"

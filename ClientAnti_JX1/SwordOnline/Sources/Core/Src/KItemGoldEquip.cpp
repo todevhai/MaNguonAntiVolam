@@ -7,7 +7,7 @@
 //   - numbers are rolled from the item's random seed, in the server's order: 7 base attributes,
 //     then 3 parameters for each magic slot whose row exists and has a type > 0. Any change here
 //     must be made on the server too, or the tooltip shows numbers the server does not use.
-// Suits (column 53) are not applied yet on either side: nSet/nSetNum stay 0.
+// Suits and extended suits: KItemGoldSuit.cpp (the client keeps the state, UpdataCurData applies it).
 
 #include "KCore.h"
 #include "KTabFile.h"
@@ -159,6 +159,8 @@ const KBASICPROP_GOLDMAGIC* KBPT_GoldMagic::GetRecord(int i) const
 BOOL KLibOfBPT::InitGoldEquip()
 {
 	BOOL bOk = m_GoldItem.Load() && m_GoldMagic.Load();
+	if (bOk)
+		InitGoldSuite();
 	g_DebugLog("[hoang kim] nap %s: %s, %d mon, %d thuoc tinh", TABFILE_GOLD_DIR,
 		bOk ? "xong" : "HONG", m_GoldItem.NumOfEntries(), m_GoldMagic.NumOfEntries());
 	return bOk;
@@ -237,22 +239,42 @@ BOOL KItemGenerator::Gen_GoldEquipment(IN int nGoldId, IN OUT KItem* pItem)
 	pItem->SetAttrib_Base(pRec->m_aryPropBasic);
 	pItem->SetAttrib_Req(pRec->m_aryPropReq);
 
+	// All 6 slots roll 3 numbers, empty ones too (range 0..0 still moves the seed), as in the binary.
 	int nSoThuocTinh = m_BPTLib.GetGoldMagicNumber();
 	for (int i = 0; i < 6; i++)
 	{
-		KItemNormalAttrib* pDst = &pItem->m_aryMagicAttrib[i];
-		pDst->nAttribType = 0;
-		pDst->nValue[0] = pDst->nValue[1] = pDst->nValue[2] = 0;
-
 		int nIdx = pRec->m_aryMagicIdx[i];
 		const KBASICPROP_GOLDMAGIC* pMA = (nIdx > 0 && nIdx <= nSoThuocTinh) ? m_BPTLib.GetGoldMagicRecord(nIdx - 1) : NULL;
-		if (NULL == pMA || pMA->m_nType <= 0)
-			continue;
-		pDst->nAttribType = pMA->m_nType;
+		KItemNormalAttrib* pDst = &pItem->m_aryMagicAttrib[i];
+		pDst->nAttribType = pMA ? pMA->m_nType : 0;
 		for (int k = 0; k < 3; k++)
-			pDst->nValue[k] = ::GetRandomNumber(pMA->m_aryRange[k].nMin, pMA->m_aryRange[k].nMax);
+			pDst->nValue[k] = pMA ? ::GetRandomNumber(pMA->m_aryRange[k].nMin, pMA->m_aryRange[k].nMax) : ::GetRandomNumber(0, 0);
 		if (pDst->nAttribType == magic_indestructible_b)
 			pItem->SetDurability(-1);
+	}
+
+	// Extended suit hidden attributes (columns 56/57): each one reseeds with the item's seed,
+	// rolls its 3 numbers and puts the seed back, so they do not depend on the rolls above.
+	pItem->m_nSuit = pRec->m_nSuit > 0 ? pRec->m_nSuit : 0;
+	pItem->m_nExtSuit = pRec->m_nExtSuit;
+	for (int i = 0; i < 2; i++)
+	{
+		KItemNormalAttrib* pDst = &pItem->m_aryExtSuitAttrib[i];
+		pDst->nAttribType = 0;
+		pDst->nValue[0] = pDst->nValue[1] = pDst->nValue[2] = 0;
+		int nIdx = pRec->m_aryExtSuitHidden[i];
+		const KBASICPROP_GOLDMAGIC* pMA = (nIdx > 0 && nIdx <= nSoThuocTinh) ? m_BPTLib.GetGoldMagicRecord(nIdx - 1) : NULL;
+		if (NULL == pMA || pMA->m_nType == -1)
+			continue;
+		UINT uHatTruoc = g_GetRandomSeed();
+		g_RandomSeed(pItem->m_GeneratorParam.uRandomSeed);
+		pDst->nAttribType = pMA->m_nType;
+		for (int k = 0; k < 3; k++)
+		{
+			int nMin = pMA->m_aryRange[k].nMin, nMax = pMA->m_aryRange[k].nMax;
+			pDst->nValue[k] = g_Random(nMin > nMax ? 10001 - nMin : nMax - nMin + 1) + nMin;	// binary quirk for min > max
+		}
+		g_RandomSeed(uHatTruoc);
 	}
 
 	g_RandomSeed(uHatCu);
@@ -267,7 +289,11 @@ BOOL KItemGenerator::Gen_GoldEquipment(IN int nGoldId, IN OUT KItem* pItem)
 		if (pItem->m_aryMagicAttrib[m].nAttribType > 0)
 			nViet += sprintf(szDong + nViet, " ma%d=%d/%d/%d", pItem->m_aryMagicAttrib[m].nAttribType, pItem->m_aryMagicAttrib[m].nValue[0],
 				pItem->m_aryMagicAttrib[m].nValue[1], pItem->m_aryMagicAttrib[m].nValue[2]);
-	sprintf(szDong + nViet, " ben=%d", pItem->GetDurability());
+	for (int e = 0; e < 2; e++)
+		if (pItem->m_aryExtSuitAttrib[e].nAttribType > 0)
+			nViet += sprintf(szDong + nViet, " an%d=%d/%d/%d", pItem->m_aryExtSuitAttrib[e].nAttribType, pItem->m_aryExtSuitAttrib[e].nValue[0],
+				pItem->m_aryExtSuitAttrib[e].nValue[1], pItem->m_aryExtSuitAttrib[e].nValue[2]);
+	sprintf(szDong + nViet, " bo=%d mr=%d ben=%d", pItem->m_nSuit, pItem->m_nExtSuit, pItem->GetDurability());
 	g_DebugLog("%s", szDong);
 	return TRUE;
 }
