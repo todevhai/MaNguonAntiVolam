@@ -256,5 +256,18 @@ BOOL KItemGenerator::Gen_GoldEquipment(IN int nGoldId, IN OUT KItem* pItem)
 	}
 
 	g_RandomSeed(uHatCu);
+
+	// Same line as the server's VLTK_LOG_HOANG_KIM: compare the two to check both halves roll alike.
+	char szDong[512];
+	int nViet = sprintf(szDong, "[hoang kim] dung mon %d hat %u:", nGoldId, pItem->m_GeneratorParam.uRandomSeed);
+	for (int b = 0; b < 7; b++)
+		if (pItem->m_aryBaseAttrib[b].nAttribType > 0)
+			nViet += sprintf(szDong + nViet, " co%d=%d", pItem->m_aryBaseAttrib[b].nAttribType, pItem->m_aryBaseAttrib[b].nValue[0]);
+	for (int m = 0; m < 6; m++)
+		if (pItem->m_aryMagicAttrib[m].nAttribType > 0)
+			nViet += sprintf(szDong + nViet, " ma%d=%d/%d/%d", pItem->m_aryMagicAttrib[m].nAttribType, pItem->m_aryMagicAttrib[m].nValue[0],
+				pItem->m_aryMagicAttrib[m].nValue[1], pItem->m_aryMagicAttrib[m].nValue[2]);
+	sprintf(szDong + nViet, " ben=%d", pItem->GetDurability());
+	g_DebugLog("%s", szDong);
 	return TRUE;
 }
