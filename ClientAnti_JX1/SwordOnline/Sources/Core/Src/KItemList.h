@@ -52,7 +52,6 @@ public:
 private:
 	int			FindFree();
 	int			FindSame(int nGameIdx);							// nGameIdxָ��Ϸ�����е�������ı��
-	static int	GetEquipPlace(int nType);						// ȡ��ĳ����װ��Ӧ�÷ŵ�λ��
 	BOOL		Fit(int nIdx, int nPlace);						// ����Ƿ����װ����
 	BOOL		Fit(KItem* pItem, int nPlace);
 	int			GetEquipEnhance(int nPlace, BOOL bThat = FALSE);	// bThat: wuxing chain even when a suit is active
@@ -68,6 +67,7 @@ private:
 
 public:
 	KItemList();
+	static int	GetEquipPlace(int nType);					// slot for a DetailType (public: suit table, as on the server)
 	~KItemList();
 	int			Init(int nIdx);
 	int			GetEquipment(int nIdx) { return m_EquipItem[nIdx]; }
