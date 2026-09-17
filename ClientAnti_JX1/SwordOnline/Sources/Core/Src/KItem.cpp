@@ -1078,7 +1078,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		(m_CommonAttrib.nParticularType >= 200 && m_CommonAttrib.nParticularType <= 205)
 		))
 	{
-		char szLevel[32];
+		char szLevel[128];	/* chuoi mau 49 byte */
 		sprintf(szLevel, "<color=Blue>Ph»m ch t thuÈc t›nh: %d<color=White>", m_CommonAttrib.nLevel);
 		strcat(pszMsg, szLevel);
 		strcat(pszMsg, "\n");	
@@ -1092,7 +1092,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		}
 		if (m_aryBaseAttrib[i].nAttribType == magic_durability_v)
 		{
-			char	szDurInfo[32];
+			char	szDurInfo[128];	/* "<color=Yellow>Khong the pha huy<color=White>" 44 byte: do Hoang Kim 43 tran 32 -> c0000409 */
 			if (m_nCurrentDur == -1)
 				sprintf(szDurInfo, "<color=Yellow>Kh´ng th” ph∏ hÒy<color=White>");
 			else
@@ -1183,7 +1183,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		time ( &rawtime );
 		timeinfo = localtime ( &rawtime );
 
-		char sTmp[64];
+		char sTmp[160];	/* chuoi han dung ~70 byte */
 		sprintf(sTmp,"<color=Green>VÀt ph»m sœ h’t hπn vµo lÛc: %d giÍ ngµy %d th∏ng %d n®m %d",
 			m_CommonAttrib.LimitTime.bHour,
 			m_CommonAttrib.LimitTime.bDay,
@@ -1483,7 +1483,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 	{
 		strcat(pszMsg,"\n");
 		strcat(pszMsg, "<color=Yellow>");
-		char sOrice[16];
+		char sOrice[128];	/* "Gia niem yet: ..." ~40 byte */
 		int nN = m_CommonAttrib.uPrice / 100000000;
 		int nW = m_CommonAttrib.uPrice % 100000000 / 10000;
 		int nG = m_CommonAttrib.uPrice % 10000;
