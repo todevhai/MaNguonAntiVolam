@@ -2673,7 +2673,7 @@ void KPlayer::LevelAddBaseLifeMax()
 //-------------------------------------------------------------------------
 void KPlayer::LevelAddBaseStaminaMax()
 {
-	Npc[m_nIndex].m_StaminaMax += PlayerSet.m_cLevelAdd.GetStaminaPerLevel(Npc[m_nIndex].m_Series);
+	Npc[m_nIndex].m_StaminaMax += PlayerSet.m_cLevelAdd.GetStaminaPerLevel(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_nSex);
 	Npc[m_nIndex].m_CurrentStaminaMax = Npc[m_nIndex].m_StaminaMax;
 }
 

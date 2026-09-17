@@ -29,6 +29,7 @@ private:
 	int		m_nLevelExp[MAX_LEVEL];				// 升级经验
 	int		m_nLifePerLevel[MAX_SERIES];			// 每个系升级加生命点
 	int		m_nStaminaPerLevel[MAX_SERIES];			// 每个系升级加体力点
+	int		m_nStaminaFemalePerLevel[MAX_SERIES];	// column 4 (m_nStaminaPerLevel = male, column 3)
 	int		m_nManaPerLevel[MAX_SERIES];			// 每个系升级加内力点
 	int		m_nLifePerVitality[MAX_SERIES];			// 每个系活力点增加一点后生命点增长
 	int		m_nStaminaPerVitality[MAX_SERIES];		// 每个系活力点增加一点后体力点增长
@@ -44,7 +45,7 @@ public:
 	BOOL		Init();
 	int			GetLevelExp(int nLevel);
 	int			GetLifePerLevel(int nSeries);
-	int			GetStaminaPerLevel(int nSeries);
+	int			GetStaminaPerLevel(int nSeries, int nSex = 0);
 	int			GetManaPerLevel(int nSeries);
 	int			GetLifePerVitality(int nSeries);
 	int			GetStaminaPerVitality(int nSeries);

@@ -87,7 +87,7 @@
 #define		CHANGERES_ARMOR_FILE			"\\settings\\item\\ArmorRes.txt"
 #define		CHANGERES_HELM_FILE				"\\settings\\item\\HelmRes.txt"
 #define		CHANGERES_HORSE_FILE			"\\settings\\item\\HorseRes.txt"
-#define		CHANCERES_GOLD_FILE				"\\settings\\item\\GolditemRes.txt"
+#define		CHANCERES_GOLD_FILE				"\\settings\\item\\goldequipres.txt"
 #define		ITEM_ABRADE_FILE				"\\settings\\item\\AbradeRate.ini"
 
 //--------------- npc skill missles 设定文件，用于生成模板 -------------

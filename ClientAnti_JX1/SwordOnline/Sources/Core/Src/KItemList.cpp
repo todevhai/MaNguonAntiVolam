@@ -865,46 +865,26 @@ BOOL KItemList::Equip(int nIdx, int nPlace /* = -1 */)
 	switch(nEquipPlace)
 	{
 	case itempart_head:
-		if (Item[nIdx].GetGoldId())
-		{
-			nType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
-		}
-
-		if (nType)
-			Npc[nNpcIdx].m_HelmType = nType;
+		if (Item[nIdx].GetGoldId() > 0)	/* Hoang Kim: goldequipres.txt even when it gives 0 or -1 (binary GetFeatureType) */
+			Npc[nNpcIdx].m_HelmType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
 		else
 			Npc[nNpcIdx].m_HelmType = g_ItemChangeRes.GetHelmRes(Item[nIdx].GetParticular(), Item[nIdx].GetLevel());
 		break;
 	case itempart_body:
-		if (Item[nIdx].GetGoldId())
-		{
-			nType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
-		}
-
-		if (nType)
-			Npc[nNpcIdx].m_ArmorType = nType;
+		if (Item[nIdx].GetGoldId() > 0)	/* Hoang Kim: goldequipres.txt even when it gives 0 or -1 (binary GetFeatureType) */
+			Npc[nNpcIdx].m_ArmorType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
 		else
 			Npc[nNpcIdx].m_ArmorType = g_ItemChangeRes.GetArmorRes(Item[nIdx].GetParticular(), Item[nIdx].GetLevel());
 		break;
 	case itempart_weapon:
-		if (Item[nIdx].GetGoldId())
-		{
-			nType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
-		}
-
-		if (nType)
-			Npc[nNpcIdx].m_WeaponType = nType;
+		if (Item[nIdx].GetGoldId() > 0)	/* Hoang Kim: goldequipres.txt even when it gives 0 or -1 (binary GetFeatureType) */
+			Npc[nNpcIdx].m_WeaponType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
 		else
 			Npc[nNpcIdx].m_WeaponType = g_ItemChangeRes.GetWeaponRes(Item[nIdx].GetDetailType(), Item[nIdx].GetParticular(), Item[nIdx].GetLevel());
 		break;
 	case itempart_horse:
-		if (Item[nIdx].GetGoldId())
-		{
-			nType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
-		}
-
-		if (nType)
-			Npc[nNpcIdx].m_HorseType = nType;
+		if (Item[nIdx].GetGoldId() > 0)	/* Hoang Kim: goldequipres.txt even when it gives 0 or -1 (binary GetFeatureType) */
+			Npc[nNpcIdx].m_HorseType = g_ItemChangeRes.GetGoldItemRes(Item[nIdx].GetGoldId());
 		else
 			Npc[nNpcIdx].m_HorseType = g_ItemChangeRes.GetHorseRes(Item[nIdx].GetParticular(), Item[nIdx].GetLevel());
 

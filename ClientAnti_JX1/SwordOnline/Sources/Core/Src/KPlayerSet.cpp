@@ -552,12 +552,15 @@ BOOL	KLevelAdd::Init()
 	for (i = 0; i < series_num; i++)
 	{
 		LevelAdd.GetInteger(i + 2, 2, 0, &m_nLifePerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 3, 0, &m_nStaminaPerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 4, 0, &m_nManaPerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 5, 0, &m_nLifePerVitality[i]);
-		LevelAdd.GetInteger(i + 2, 6, 0, &m_nStaminaPerVitality[i]);
-		LevelAdd.GetInteger(i + 2, 7, 0, &m_nManaPerEnergy[i]);
-		LevelAdd.GetInteger(i + 2, 8, 0, &m_nLeadExpShare[i]);
+		/* Column positions of the 8.x level_add.txt, as the jx9tn/ban6/voz2 KLevelAdd::Init: the 2003
+		   reader predates the male/female stamina split, so from column 4 on it read the column before. */
+		LevelAdd.GetInteger(i + 2, 3, 0, &m_nStaminaPerLevel[i]);			// StaminaMalePerLevel
+		LevelAdd.GetInteger(i + 2, 4, 0, &m_nStaminaFemalePerLevel[i]);	// StaminaFemalePerLevel
+		LevelAdd.GetInteger(i + 2, 5, 0, &m_nManaPerLevel[i]);
+		LevelAdd.GetInteger(i + 2, 6, 0, &m_nLifePerVitality[i]);
+		LevelAdd.GetInteger(i + 2, 7, 0, &m_nStaminaPerVitality[i]);
+		LevelAdd.GetInteger(i + 2, 8, 0, &m_nManaPerEnergy[i]);
+		LevelAdd.GetInteger(i + 2, 9, 0, &m_nLeadExpShare[i]);
 		/* 8.x level_add.txt: col 10..14 = fireres..physicres (col 9 is LeadExpShare). The 2003 reader
 		   took col 9..13, so every resist came from the column before it. */
 		LevelAdd.GetInteger(i + 2, 10, 0, &m_nFireResistPerLevel[i]);
@@ -594,11 +597,11 @@ int		KLevelAdd::GetLifePerLevel(int nSeries)
 //---------------------------------------------------------------------------
 //	功能：获得每个系升级加体力点
 //---------------------------------------------------------------------------
-int		KLevelAdd::GetStaminaPerLevel(int nSeries)
+int		KLevelAdd::GetStaminaPerLevel(int nSeries, int nSex)
 {
 	if (nSeries < 0 || nSeries >= series_num)
 		return 0;
-	return m_nStaminaPerLevel[nSeries];
+	return nSex ? m_nStaminaFemalePerLevel[nSeries] : m_nStaminaPerLevel[nSeries];	// sex 0 = male
 }
 
 //---------------------------------------------------------------------------

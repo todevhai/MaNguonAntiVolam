@@ -26,8 +26,7 @@ BOOL KItemChangeRes::Init()
 		return FALSE;
 	if (!m_Horse.Load(CHANGERES_HORSE_FILE))
 		return FALSE;
-	if (!m_Gold.Load(CHANCERES_GOLD_FILE))
-		return FALSE;
+	m_Gold.Load(CHANCERES_GOLD_FILE);	// missing only loses gold appearances (same as the server)
 	return TRUE;
 }
 
@@ -91,12 +90,13 @@ int KItemChangeRes::GetHorseRes(int nParti, int nLevel)
 	return nRet - 2;
 }
 
+/* Hoang Kim appearance, as the binary KItemChangeRes::GetGoldEquipRes: column 2 of the row of
+   that id, minus 2 (an empty cell counts as 2 -> 0); no row -> -1. Same code on the server. */
 int	KItemChangeRes::GetGoldItemRes(int nGoldId)
 {
 	int nRet;
-	int nRow = nGoldId + 1;
-
-	m_Gold.GetInteger(nRow, 2, 2, &nRet);
-
+	if (nGoldId <= 0 || nGoldId + 1 > m_Gold.GetHeight())
+		return -1;
+	m_Gold.GetInteger(nGoldId + 1, 2, 2, &nRet);
 	return nRet - 2;
 }
