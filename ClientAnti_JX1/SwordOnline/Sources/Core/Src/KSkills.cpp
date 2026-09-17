@@ -2520,7 +2520,7 @@ BOOL	KSkill::ParseString2MagicAttrib(unsigned long ulLevel, char * szMagicAttrib
 	//nValue2 当值为-1时为永久性状态，0为非状态，其它值为有时效性状态魔法效果
 	//需要将状态数据与非状态数据分离出来，放入相应的数组内，并记录总数量
 	
-	for (int i  = 0 ; i <= magic_normal_end; i ++)
+	for (int i  = 0 ; i < magic_end; i ++)
 	{
 		if (!strcmp(szMagicAttribName, MagicAttrib2String(i)))
 		{

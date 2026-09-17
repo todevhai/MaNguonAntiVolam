@@ -125,7 +125,6 @@ KNpcAttribModify::KNpcAttribModify()
 	ProcessFunc[magic_poison2decmana_p] = &KNpcAttribModify::poison2decmanaP;
 	ProcessFunc[magic_skill_appendskill] = &KNpcAttribModify::skill_appendskil;
 	ProcessFunc[magic_hide] = &KNpcAttribModify::hide;
-	ProcessFunc[magic_clearnegativestate] = &KNpcAttribModify::clearnegativestate;
 	ProcessFunc[magic_returnres_p] = &KNpcAttribModify::returnresP;
 	ProcessFunc[magic_dec_percasttimehorse] = &KNpcAttribModify::decPercasttimehorse;
 	ProcessFunc[magic_dec_percasttime] = &KNpcAttribModify::decPercasttime;
@@ -152,7 +151,7 @@ void KNpcAttribModify::ModifyAttrib(KNpc* pNpc, void* pData)
 
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
 
-	if (pMagic->nAttribType < 0 || pMagic->nAttribType >= magic_normal_end || NULL == ProcessFunc[pMagic->nAttribType])
+	if (pMagic->nAttribType < 0 || pMagic->nAttribType >= magic_end || NULL == ProcessFunc[pMagic->nAttribType])
 		return;
 	
 	(this->*ProcessFunc[pMagic->nAttribType])(pNpc, pData);

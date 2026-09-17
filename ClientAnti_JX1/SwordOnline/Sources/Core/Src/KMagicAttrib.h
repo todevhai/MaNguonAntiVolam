@@ -5,225 +5,357 @@
 // 枚举类型最后一个字母表示该数值的类型，v为整型，直接加的点数，p为百分比，b为布尔型
 enum MAGIC_ATTRIB
 {
-//改变技能的属性
-	magic_skill_begin,
-	magic_skill_cost_v,								// 消耗MANA
-	magic_skill_costtype_v,							//	
-	magic_skill_mintimepercast_v,					// 每次发魔法的间隔时间
-	magic_skill_misslenum_v,						// 
-	magic_skill_misslesform_v,		
-	magic_skill_param1_v,		
-	magic_skill_param2_v,
-	magic_skill_reserve1,
-	magic_skill_reserve2,
-	magic_skill_reserve3,
-	magic_skill_desc,
-	magic_skill_eventskilllevel,
-	magic_skill_end,
-//改变发出子弹的属性
-	magic_missle_begin,
-	magic_missle_movekind_v,						// 子弹格式
-	magic_missle_speed_v,							// 子弹飞行速度
-	magic_missle_lifetime_v,						// 子弹的生命时间
-	magic_missle_height_v,							// 子弹的高度
-	magic_missle_damagerange_v,						// 子弹破坏范围
-	magic_missle_radius_v,							// 子弹飞行半径
-	magic_missle_reserve1,
-	magic_missle_reserve2,
-	magic_missle_reserve3,
-	magic_missle_reserve4,
-	magic_missle_reserve5,
-	magic_missle_end,
-//装备属性	
-	magic_item_begin,
-	magic_weapondamagemin_v,
-	magic_weapondamagemax_v,
-	magic_armordefense_v,
-	magic_durability_v,
-	magic_requirestr,
-	magic_requiredex,
-	magic_requirevit,
-	magic_requireeng,
-	magic_requirelevel,
-	magic_requireseries,
-	magic_requiresex,
-	magic_requiremenpai,
-	magic_weapondamageenhance_p,
-	magic_armordefenseenhance_p,
-	magic_requirementreduce_p,
-	magic_indestructible_b,
-	magic_item_reserve1,
-	magic_item_reserve2,
-	magic_item_reserve3,
-	magic_item_reserve4,
-	magic_item_reserve5,
-	magic_item_reserve6,
-	magic_item_reserve7,
-	magic_item_reserve8,
-	magic_item_reserve9,
-	magic_item_reserve10,
-	magic_item_end,
-//主动攻击伤害属性
-	magic_damage_begin,		
-	magic_attackrating_v,
-	magic_attackrating_p,
-	magic_ignoredefense_p,
-	magic_physicsdamage_v,
-	magic_colddamage_v,
-	magic_firedamage_v,
-	magic_lightingdamage_v,
-	magic_poisondamage_v,
-	magic_magicdamage_v,
-	magic_physicsenhance_p,
-	magic_steallife_p,
-	magic_stealmana_p,
-	magic_stealstamina_p,
-	magic_knockback_p,
-	magic_deadlystrike_p,
-	magic_fatallystrike_p,
-	magic_stun_p,
-	magic_damage_reserve1,
-	magic_damage_reserve2,
-	magic_damage_reserve3,
-	magic_damage_reserve4,
-	magic_damage_reserve5,
-	magic_damage_reserve6,
-	magic_damage_reserve7,
-	magic_damage_reserve8,
-	magic_autoattackskill,
-	magic_seriesdamage_p,
-	magic_damage_end,
-//被动、状态、光环类属性
-	magic_normal_begin,
-	magic_lifemax_v,
-	magic_lifemax_p,
-	magic_life_v,
-	magic_lifereplenish_v,
-	magic_manamax_v,
-	magic_manamax_p,
-	magic_mana_v,
-	magic_manareplenish_v,
-	magic_staminamax_v,
-	magic_staminamax_p,
-	magic_stamina_v,
-	magic_staminareplenish_v,
-	magic_strength_v,
-	magic_dexterity_v,
-	magic_vitality_v,
-	magic_energy_v,
-	magic_poisonres_p,
-	magic_fireres_p,
-	magic_lightingres_p,
-	magic_physicsres_p,
-	magic_coldres_p,
-	magic_freezetimereduce_p,
-	magic_burntimereduce_p,
-	magic_poisontimereduce_p,
-	magic_poisondamagereduce_v,
-	magic_stuntimereduce_p,
-	magic_fastwalkrun_p,
-	magic_visionradius_p,
-	magic_fasthitrecover_v,
-	magic_allres_p,
-	magic_attackspeed_v,
-	magic_castspeed_v,
-	magic_meleedamagereturn_v,
-	magic_meleedamagereturn_p,
-	magic_rangedamagereturn_v,
-	magic_rangedamagereturn_p,
-	magic_addphysicsdamage_v,
-	magic_addfiredamage_v,
-	magic_addcolddamage_v,
-	magic_addlightingdamage_v,
-	magic_addpoisondamage_v,
-	magic_addphysicsdamage_p,
-	magic_slowmissle_b,
-	magic_changecamp_b,
-	magic_physicsarmor_v,
-	magic_coldarmor_v,
-	magic_firearmor_v,
-	magic_poisonarmor_v,
-	magic_lightingarmor_v,
-	magic_damagetomana_p,
-	magic_lucky_v,
-	magic_steallifeenhance_p,
-	magic_stealmanaenhance_p,
-	magic_stealstaminaenhance_p,
-	magic_allskill_v,
-	magic_metalskill_v,
-	magic_woodskill_v,
-	magic_waterskill_v,
-	magic_fireskill_v,
-	magic_earthskill_v,
-	magic_knockbackenhance_p,
-	magic_deadlystrikeenhance_p,
-	magic_stunenhance_p,
-	magic_badstatustimereduce_v,
-	magic_manashield_p,
-	magic_adddefense_v,
-	magic_adddefense_p,
-	magic_fatallystrikeenhance_p,
-	magic_lifepotion_v,
-	magic_manapotion_v,
-	magic_physicsresmax_p,
-	magic_coldresmax_p,
-	magic_fireresmax_p,
-	magic_lightingresmax_p,
-	magic_poisonresmax_p,
-	magic_allresmax_p,
-	magic_coldenhance_p,
-	magic_fireenhance_p,
-	magic_lightingenhance_p,
-	magic_poisonenhance_p,
-	magic_magicenhance_p,
-	magic_attackratingenhance_v,
-	magic_attackratingenhance_p,
-	magic_addphysicsmagic_v,	// 内功
-	magic_addcoldmagic_v,
-	magic_addfiremagic_v,
-	magic_addlightingmagic_v,
-	magic_addpoisonmagic_v,
-	magic_fatallystrikeres_p,	// 致命一击抵抗力
-	magic_addskilldamage1,		// 对「#l1-」技能加成#d3-%
-	magic_addskilldamage2,
-	magic_expenhance_p,
-	magic_addskilldamage3,
-	magic_addskilldamage4,
-	magic_addskilldamage5,
-	magic_addskilldamage6,
-	magic_dynamicmagicshield_v,		// 化解伤害点数
-	magic_addstealfeatureskill,		// 伪装技能剩余使用次数
-	magic_lifereplenish_p,			// 生命回复效率提升
-	magic_ignoreskill_p,					// 无视降低抗性诅咒的概率
-	magic_poisondamagereturn_v,				// 受到毒伤害时反弹 点
-	magic_poisondamagereturn_p,				// 受到毒伤害时反弹 %
-	magic_returnskill_p,					// 反弹所受到诅咒的概率
-	magic_autoreplyskill,							// 击中时以<color=orange>#d9-%<color>的概率自动施放
-//	magic_skill_mintimepercast_v,	// 释放间隔时间
-	magic_mintimepercastonhorse_v,	// 骑马释放间隔时间
-	magic_poison2decmana_p,			// 使目标受到毒伤害的同时以
-	magic_skill_appendskill,		// 包含技能<color=water>#l1-<color>，最高等级<color=orange>#d3-级<color>
-	magic_hide,						// 隐身<color=orange>#f2-秒<color>，释放任意武功后显形
-	magic_clearnegativestate,
-	magic_returnres_p,
-	magic_dec_percasttimehorse,
-	magic_dec_percasttime,
-	magic_enhance_709_auto,
-	magic_enhance_708_life_p,
-	magic_enhance_93_life_v,
-	magic_enhance_711_auto,
-	magic_enhance_714_auto,
-	magic_enhance_717_auto,
-	magic_enhance_723_miss_p,
-	magic_no,
-	magic_skill_collideevent,
-	magic_skill_vanishedevent,
-	magic_skill_startevent,
-	magic_skill_flyevent,
-	magic_normal_end,
+	/* Numbered exactly like jx9tn (jx_linux_y attribute name table, 0..340): 8.x item and skill
+	   data store these numbers. Generated by server/cong-cu/sinh-bang-ma-thuoc-tinh.py from
+	   server/cong-cu/ma-thuoc-tinh-jx9tn.txt - edit that table, not this block. */
+	magic_skill_begin,						// 0
+	magic_skill_cost_v,						// 1
+	magic_skill_costtype_v,					// 2
+	magic_skill_mintimepercast_v,				// 3
+	magic_skill_misslenum_v,					// 4
+	magic_skill_misslesform_v,				// 5
+	magic_skill_param1_v,						// 6
+	magic_skill_param2_v,						// 7
+	magic_skill_skillexp_v,					// 8
+	magic_skill_waittime,						// 9
+	magic_skill_mintimepercastonhorse_v,		// 10
+	magic_skill_appendskill,					// 11
+	magic_skill_eventskilllevel,				// 12
+	magic_skill_end,							// 13
+	magic_missle_begin,						// 14
+	magic_missle_movekind_v,					// 15
+	magic_missle_speed_v,						// 16
+	magic_missle_lifetime_v,					// 17
+	magic_missle_height_v,					// 18
+	magic_missle_damagerange_v,				// 19
+	magic_missle_radius_v,					// 20
+	magic_missle_missrate,					// 21
+	magic_missle_hitcount,					// 22
+	magic_missle_reserve3,					// 23
+	magic_missle_reserve4,					// 24
+	magic_missle_reserve5,					// 25
+	magic_missle_end,							// 26
+	magic_item_begin,							// 27
+	magic_weapondamagemin_v,					// 28
+	magic_weapondamagemax_v,					// 29
+	magic_armordefense_v,						// 30
+	magic_durability_v,						// 31
+	magic_requirestr,							// 32
+	magic_requiredex,							// 33
+	magic_requirevit,							// 34
+	magic_requireeng,							// 35
+	magic_requirelevel,						// 36
+	magic_requireseries,						// 37
+	magic_requiresex,							// 38
+	magic_requiremenpai,						// 39
+	magic_weapondamageenhance_p,				// 40
+	magic_armordefenseenhance_p,				// 41
+	magic_requirementreduce_p,				// 42
+	magic_indestructible_b,					// 43
+	magic_item_usagetime_v,					// 44
+	magic_req_levelortranslife,				// 45
+	magic_require_translife,					// 46
+	magic_require_fortune_value,				// 47
+	magic_item_reserve5,						// 48
+	magic_item_reserve6,						// 49
+	magic_item_reserve7,						// 50
+	magic_item_reserve8,						// 51
+	magic_item_reserve9,						// 52
+	magic_item_reserve10,						// 53
+	magic_item_end,							// 54
+	magic_damage_begin,						// 55
+	magic_attackrating_v,						// 56
+	magic_attackrating_p,						// 57
+	magic_ignoredefense_p,					// 58
+	magic_physicsdamage_v,					// 59
+	magic_colddamage_v,						// 60
+	magic_firedamage_v,						// 61
+	magic_lightingdamage_v,					// 62
+	magic_poisondamage_v,						// 63
+	magic_magicdamage_v,						// 64
+	magic_physicsenhance_p,					// 65
+	magic_steallife_p,						// 66
+	magic_stealmana_p,						// 67
+	magic_stealstamina_p,						// 68
+	magic_knockback_p,						// 69
+	magic_deadlystrike_p,						// 70
+	magic_fatallystrike_p,					// 71
+	magic_stun_p,								// 72
+	magic_addskillexp1,						// 73
+	magic_addskillexp2,						// 74
+	magic_seriesdamage_p,						// 75
+	magic_damage_reserve4,					// 76
+	magic_damage_reserve5,					// 77
+	magic_damage_reserve6,					// 78
+	magic_damage_reserve7,					// 79
+	magic_damage_reserve8,					// 80
+	magic_damage_reserve9,					// 81
+	magic_damage_reserve10,					// 82
+	magic_damage_end,							// 83
+	magic_normal_begin,						// 84
+	magic_lifemax_v,							// 85
+	magic_lifemax_p,							// 86
+	magic_life_v,								// 87
+	magic_lifereplenish_v,					// 88
+	magic_manamax_v,							// 89
+	magic_manamax_p,							// 90
+	magic_mana_v,								// 91
+	magic_manareplenish_v,					// 92
+	magic_staminamax_v,						// 93
+	magic_staminamax_p,						// 94
+	magic_stamina_v,							// 95
+	magic_staminareplenish_v,					// 96
+	magic_strength_v,							// 97
+	magic_dexterity_v,						// 98
+	magic_vitality_v,							// 99
+	magic_energy_v,							// 100
+	magic_poisonres_p,						// 101
+	magic_fireres_p,							// 102
+	magic_lightingres_p,						// 103
+	magic_physicsres_p,						// 104
+	magic_coldres_p,							// 105
+	magic_freezetimereduce_p,					// 106
+	magic_burntimereduce_p,					// 107
+	magic_poisontimereduce_p,					// 108
+	magic_poisondamagereduce_v,				// 109
+	magic_stuntimereduce_p,					// 110
+	magic_fastwalkrun_p,						// 111
+	magic_visionradius_p,						// 112
+	magic_fasthitrecover_v,					// 113
+	magic_allres_p,							// 114
+	magic_attackspeed_v,						// 115
+	magic_castspeed_v,						// 116
+	magic_meleedamagereturn_v,				// 117
+	magic_meleedamagereturn_p,				// 118
+	magic_rangedamagereturn_v,				// 119
+	magic_rangedamagereturn_p,				// 120
+	magic_addphysicsdamage_v,					// 121
+	magic_addfiredamage_v,					// 122
+	magic_addcolddamage_v,					// 123
+	magic_addlightingdamage_v,				// 124
+	magic_addpoisondamage_v,					// 125
+	magic_addphysicsdamage_p,					// 126
+	magic_slowmissle_b,						// 127
+	magic_changecamp_b,						// 128
+	magic_physicsarmor_v,						// 129
+	magic_coldarmor_v,						// 130
+	magic_firearmor_v,						// 131
+	magic_poisonarmor_v,						// 132
+	magic_lightingarmor_v,					// 133
+	magic_damage2addmana_p,					// 134
+	magic_lucky_v,							// 135
+	magic_steallifeenhance_p,					// 136
+	magic_stealmanaenhance_p,					// 137
+	magic_stealstaminaenhance_p,				// 138
+	magic_allskill_v,							// 139
+	magic_metalskill_v,						// 140
+	magic_woodskill_v,						// 141
+	magic_waterskill_v,						// 142
+	magic_fireskill_v,						// 143
+	magic_earthskill_v,						// 144
+	magic_knockbackenhance_p,					// 145
+	magic_deadlystrikeenhance_p,				// 146
+	magic_stunenhance_p,						// 147
+	magic_badstatustimereduce_v,				// 148
+	magic_manashield_p,						// 149
+	magic_adddefense_v,						// 150
+	magic_adddefense_p,						// 151
+	magic_fatallystrikeenhance_p,				// 152
+	magic_lifepotion_v,						// 153
+	magic_manapotion_v,						// 154
+	magic_physicsresmax_p,					// 155
+	magic_coldresmax_p,						// 156
+	magic_fireresmax_p,						// 157
+	magic_lightingresmax_p,					// 158
+	magic_poisonresmax_p,						// 159
+	magic_allresmax_p,						// 160
+	magic_coldenhance_p,						// 161
+	magic_fireenhance_p,						// 162
+	magic_lightingenhance_p,					// 163
+	magic_poisonenhance_p,					// 164
+	magic_magicenhance_p,						// 165
+	magic_attackratingenhance_v,				// 166
+	magic_attackratingenhance_p,				// 167
+	magic_addphysicsmagic_v,					// 168
+	magic_addcoldmagic_v,						// 169
+	magic_addfiremagic_v,						// 170
+	magic_addlightingmagic_v,					// 171
+	magic_addpoisonmagic_v,					// 172
+	magic_fatallystrikeres_p,					// 173
+	magic_statusimmunity_b,					// 174
+	magic_expenhance_v,						// 175
+	magic_expenhance_p,						// 176
+	magic_seriesres_p,						// 177
+	magic_seriesenhance_p,					// 178
+	magic_createnpc,							// 179
+	magic_autoattacknpc,						// 180
+	magic_dynamicmagicshield_v,				// 181
+	magic_nomovespeed,						// 182
+	magic_execscript,							// 183
+	magic_changefeature1,						// 184
+	magic_changefeature2,						// 185
+	magic_stealfeature,						// 186
+	magic_addstealfeatureskill,				// 187
+	magic_lucky_v_partner,					// 188
+	magic_listen_msg,							// 189
+	magic_lifereplenish_p,					// 190
+	magic_ignoreskill_p,						// 191
+	magic_returnskill_p,						// 192
+	magic_poisondamagereturn_v,				// 193
+	magic_poisondamagereturn_p,				// 194
+	magic_autoreplyskill,						// 195
+	magic_autoattackskill,					// 196
+	magic_autorescueskill,					// 197
+	magic_autodeathskill,						// 198
+	magic_randmove,							// 199
+	magic_hide,								// 200
+	magic_ignorenegativestate_p,				// 201
+	magic_poison2decmana_p,					// 202
+	magic_staticmagicshield_v,				// 203
+	magic_staticmagicshield_p,				// 204
+	magic_returnres_p,						// 205
+	magic_add120skillexpenhance_p,			// 206
+	magic_dec_percasttimehorse,				// 207
+	magic_dec_percasttime,					// 208
+	magic_enhance_709_auto,					// 209
+	magic_enhance_708_life_p,					// 210
+	magic_enhance_93_life_v,					// 211
+	magic_enhance_711_auto,					// 212
+	magic_enhance_714_auto,					// 213
+	magic_enhance_717_auto,					// 214
+	magic_enhance_723_miss_p,					// 215
+	magic_showpersoninfo,						// 216
+	magic_ignoredamage,						// 217
+	magic_sorbdamage_p,						// 218
+	magic_anti_hitrecover,					// 219
+	magic_anti_stuntimereduce_p,				// 220
+	magic_anti_poisonres_p,					// 221
+	magic_anti_fireres_p,						// 222
+	magic_anti_lightingres_p,					// 223
+	magic_anti_physicsres_p,					// 224
+	magic_anti_coldres_p,						// 225
+	magic_block_rate,							// 226
+	magic_enhancehit_rate,					// 227
+	magic_poisonres_yan_p,					// 228
+	magic_lightingres_yan_p,					// 229
+	magic_fireres_yan_p,						// 230
+	magic_physicsres_yan_p,					// 231
+	magic_coldres_yan_p,						// 232
+	magic_lifemax_yan_v,						// 233
+	magic_lifemax_yan_p,						// 234
+	magic_manamax_yan_v,						// 235
+	magic_manamax_yan_p,						// 236
+	magic_sorbdamage_yan_p,					// 237
+	magic_fastwalkrun_yan_p,					// 238
+	magic_attackspeed_yan_v,					// 239
+	magic_castspeed_yan_v,					// 240
+	magic_allres_yan_p,						// 241
+	magic_anti_maxres_p,						// 242
+	magic_skill_enhance,						// 243
+	magic_magicdamage_p,						// 244
+	magic_fasthitrecover_yan_v,				// 245
+	magic_five_elements_enhance_v,			// 246
+	magic_five_elements_resist_v,				// 247
+	magic_manareplenish_p,					// 248
+	magic_add_damage_p,						// 249
+	magic_forbit_attack,						// 250
+	magic_frozen_action,						// 251
+	magic_forbit_takemedicine,				// 252
+	magic_invincibility,						// 253
+	magic_not_add_pkvalue_p,					// 254
+	magic_add_boss_damage,					// 255
+	magic_pk_punish_weaken,					// 256
+	magic_pk_punish_enhance,					// 257
+	magic_anti_poisontimereduce_p,			// 258
+	magic_do_hurt_p,							// 259
+	magic_anti_do_hurt_p,						// 260
+	magic_do_stun_p,							// 261
+	magic_anti_do_stun_p,						// 262
+	magic_anti_physicsres_yan_p,				// 263
+	magic_anti_poisonres_yan_p,				// 264
+	magic_anti_coldres_yan_p,					// 265
+	magic_anti_fireres_yan_p,					// 266
+	magic_anti_lightingres_yan_p,				// 267
+	magic_anti_allres_yan_p,					// 268
+	magic_anti_sorbdamage_yan_p,				// 269
+	magic_anti_block_rate,					// 270
+	magic_anti_enhancehit_rate,				// 271
+	magic_autocastskill,						// 272
+	magic_transfigure,						// 273
+	magic_oncastskill,						// 274
+	magic_enhancehiteffect_rate,				// 275
+	magic_me2metaldamage_p,					// 276
+	magic_metal2medamage_p,					// 277
+	magic_me2wooddamage_p,					// 278
+	magic_wood2medamage_p,					// 279
+	magic_me2waterdamage_p,					// 280
+	magic_water2medamage_p,					// 281
+	magic_me2firedamage_p,					// 282
+	magic_fire2medamage_p,					// 283
+	magic_me2earthdamage_p,					// 284
+	magic_earth2medamage_p,					// 285
+	magic_meleedamagereturnmana_p,			// 286
+	magic_rangedamagereturnmana_p,			// 287
+	magic_reduceskillcd1,						// 288
+	magic_reduceskillcd2,						// 289
+	magic_reduceskillcd3,						// 290
+	magic_clearallcd,							// 291
+	magic_addblockrate,						// 292
+	magic_walkrunshadow,						// 293
+	magic_reserve_294,						// 294
+	magic_candetonate1,						// 295
+	magic_candetonate2,						// 296
+	magic_candetonate3,						// 297
+	magic_manatoskill_enhance,				// 298
+	magic_melee_returnres_p,					// 299
+	magic_range_returnres_p,					// 300
+	magic_forbit_usetownportal,				// 301
+	magic_normal_end,							// 302
+	magic_skillexpbegin,						// 303
+	magic_addskilldamage1,					// 304
+	magic_addskilldamage2,					// 305
+	magic_addskilldamage3,					// 306
+	magic_addskilldamage4,					// 307
+	magic_addskilldamage5,					// 308
+	magic_addskilldamage6,					// 309
+	magic_skill_attackradius,					// 310
+	magic_skill_startevent,					// 311
+	magic_skill_flyevent,						// 312
+	magic_skill_collideevent,					// 313
+	magic_skill_vanishedevent,				// 314
+	magic_skill_dohurt,						// 315
+	magic_skill_bymissle,						// 316
+	magic_skill_showevent,					// 317
+	magic_skill_desc,							// 318
+	magic_reserve_319,						// 319
+	magic_reserve_320,						// 320
+	magic_reserve_321,						// 321
+	magic_reserve_322,						// 322
+	magic_skillexpend,						// 323
+	magic_missle_exp_begin,					// 324
+	magic_missle_range,						// 325
+	magic_missle_dmginterval,					// 326
+	magic_missle_zspeed,						// 327
+	magic_missle_ablility,					// 328
+	magic_missle_param,						// 329
+	magic_missle_wait,						// 330
+	magic_missle_fly,							// 331
+	magic_missle_collide,						// 332
+	magic_missle_vanish,						// 333
+	magic_missle_exp_rev1,					// 334
+	magic_missle_exp_rev2,					// 335
+	magic_missle_exp_rev3,					// 336
+	magic_missle_exp_rev4,					// 337
+	magic_missle_exp_rev5,					// 338
+	magic_missle_exp_end,						// 339
+	magic_end,								// 340
 };
 
-extern const char MAGIC_ATTRIB_STRING[magic_normal_end + 1][100] ; 
+/* Names this tree used before the jx9tn numbering. */
+#define magic_damagetomana_p	magic_damage2addmana_p
+#define magic_mintimepercastonhorse_v	magic_skill_mintimepercastonhorse_v
+
+extern const char MAGIC_ATTRIB_STRING[magic_end + 1][100] ; 
 
 
 #endif

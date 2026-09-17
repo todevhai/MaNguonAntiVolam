@@ -11,7 +11,7 @@ public:
 	void	ModifyAttrib(KNpc* pNpc, void* pData);
 	void	MixPoisonDamage(KMagicAttrib* pDes, KMagicAttrib* pSrc);
 private:
-	void	(KNpcAttribModify::*ProcessFunc[magic_normal_end])(KNpc* pNpc, void* pData);	
+	void	(KNpcAttribModify::*ProcessFunc[magic_end])(KNpc* pNpc, void* pData);	
 	void	AllResMaxP(KNpc* pNpc, void* pData);
 	void	PhysicsResMaxP(KNpc* pNpc, void* pData);
 	void	ColdResMaxP(KNpc* pNpc, void* pData);
