@@ -2774,6 +2774,28 @@ void	KSkill::DrawSkillIcon(int x, int y, int Width, int Height)
 	m_RUIconImage.oPosition.nY = y;
 	m_RUIconImage.oPosition.nZ = 0;
 	m_RUIconImage.nFrame = 0;
+	/* Icon chieu (40x40) to hon o phim tat (32x35): engine 2D khong co gian duoc SPR, nen o nho hon
+	   icon thi ve PHAN GIUA vua khit o thay vi tran ra ngoai va che so thu tu o. */
+	KImageParam Param;
+	Param.nWidth = 0;
+	Param.nHeight = 0;
+	if (Width > 0 && Height > 0 &&
+		g_pRepresent->GetImageParam(m_RUIconImage.szImage, &Param, ISI_T_SPR) &&
+		(Param.nWidth > Width || Param.nHeight > Height))
+	{
+		KRUImagePart Phan;
+		(KRUImage&)Phan = m_RUIconImage;
+		int nW = Param.nWidth > Width ? Width : Param.nWidth;
+		int nH = Param.nHeight > Height ? Height : Param.nHeight;
+		Phan.oImgLTPos.nX = (Param.nWidth - nW) / 2;
+		Phan.oImgLTPos.nY = (Param.nHeight - nH) / 2;
+		Phan.oImgRBPos.nX = Phan.oImgLTPos.nX + nW;
+		Phan.oImgRBPos.nY = Phan.oImgLTPos.nY + nH;
+		Phan.oPosition.nX = x + (Width - nW) / 2;
+		Phan.oPosition.nY = y + (Height - nH) / 2;
+		g_pRepresent->DrawPrimitives(1, &Phan, RU_T_IMAGE_PART, 1);
+		return;
+	}
 	g_pRepresent->DrawPrimitives(1, &m_RUIconImage, RU_T_IMAGE, 1);
 }
 
