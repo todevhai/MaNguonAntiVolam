@@ -622,12 +622,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Library Include="Src\USBKey\EP1KDL20.LIB">
-      <Filter>USBKey</Filter>
-    </Library>
-    <Library Include="Src\USBKey\EpsForJoLib.lib">
-      <Filter>USBKey</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="Src\KNewProtocolProcess.h">
