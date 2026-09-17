@@ -284,7 +284,7 @@ BOOL KItemGenerator::Gen_Equipment(IN int nDetailType,
 		pEqu = m_BPTLib.GetHorseRecord(i);
 		break;
 	case equip_mask:	// mat na
-		pEqu = m_BPTLib.GetMaskRecord(i);
+		pEqu = m_BPTLib.GetMaskRecord(nParticularType);	/* mask.txt has ONE row per particular (0..n-1, no 10 grades like weapons/armour): index by particular, same in jx9tn */
 		break;
 	case equip_mantle:
 		pEqu = m_BPTLib.GetMantleRecord(i);
@@ -888,7 +888,7 @@ BOOL KItemGenerator::GetEquipmentCommonAttrib(IN int nDetailType, IN int nPartic
 		pEqu = m_BPTLib.GetHorseRecord(i);
 		break;
 	case equip_mask:	// mat na
-		pEqu = m_BPTLib.GetMaskRecord(i);
+		pEqu = m_BPTLib.GetMaskRecord(nParticularType);	/* mask.txt has ONE row per particular (0..n-1, no 10 grades like weapons/armour): index by particular, same in jx9tn */
 		break;
 	case equip_mantle:
 		pEqu = m_BPTLib.GetMantleRecord(i);
@@ -988,7 +988,7 @@ BOOL KItemGenerator::Gen_ExistEquipment(IN int nDetailType,
 		pEqu = m_BPTLib.GetHorseRecord(i);
 		break;
 	case equip_mask:	// mat na
-		pEqu = m_BPTLib.GetMaskRecord(i);
+		pEqu = m_BPTLib.GetMaskRecord(nParticularType);	/* mask.txt has ONE row per particular (0..n-1, no 10 grades like weapons/armour): index by particular, same in jx9tn */
 		break;
 	case equip_mantle:
 		pEqu = m_BPTLib.GetMantleRecord(i);
