@@ -1025,7 +1025,7 @@ void KNpcAttribModify::AddColdMagic( KNpc* pNpc, void* pData )
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
 	pNpc->m_CurrentMagicColdDamage.nValue[0] += pMagic->nValue[0];
 	pNpc->m_CurrentMagicColdDamage.nValue[2] += pMagic->nValue[0];
-	if (pNpc->m_CurrentMagicColdDamage.nValue[0] > 0 && pNpc->m_CurrentColdDamage.nValue[2] > 0)
+	if (pNpc->m_CurrentMagicColdDamage.nValue[0] > 0 && pNpc->m_CurrentMagicColdDamage.nValue[2] > 0)
 		pNpc->m_CurrentMagicColdDamage.nValue[1] = defNORMAL_COLD_TIME;
 	else
 	{
