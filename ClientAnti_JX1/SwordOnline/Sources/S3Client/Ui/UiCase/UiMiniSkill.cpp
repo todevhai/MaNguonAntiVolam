@@ -68,7 +68,8 @@ void KUiMiniSkill::Initialize()
 		AddChild(&m_Time[i]);
 	}
 	LoadScheme();
-	Wnd_AddWindow(this, WL_TOPMOST);
+	/* Lop HUD nhu khung chat: F3/F4 va cac bang khac phai de len tren o chieu nho, khong bi no che. */
+	Wnd_AddWindow(this, WL_LOWEST);
 }
 
 void KUiMiniSkill::LoadScheme()

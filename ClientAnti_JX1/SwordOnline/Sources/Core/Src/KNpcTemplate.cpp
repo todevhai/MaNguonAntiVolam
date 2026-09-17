@@ -186,27 +186,31 @@ void KNpcTemplate::InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KL
 		//¼¼ÄÜ
 		char szValue1[MAX_VALUE_LEN];
 		char szValue2[MAX_VALUE_LEN];
-		g_NpcSetting.GetString(nNpcTempRow, "Skill1",	"", szValue1, MAX_VALUE_LEN);
-		g_NpcSetting.GetString(nNpcTempRow, "Level1", "", szValue2, MAX_VALUE_LEN);
-		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(1, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level1", nLevel, szValue2));
-		
-		g_NpcSetting.GetString(nNpcTempRow, "Skill2",	"", szValue1, MAX_VALUE_LEN);
-		g_NpcSetting.GetString(nNpcTempRow, "Level2", "", szValue2, MAX_VALUE_LEN);
-		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(2, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level2", nLevel, szValue2));
-
-		
-		g_NpcSetting.GetString(nNpcTempRow, "Skill3",	"", szValue1, MAX_VALUE_LEN);
-		g_NpcSetting.GetString(nNpcTempRow, "Level3", "", szValue2, MAX_VALUE_LEN);
-		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(3, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level3", nLevel, szValue2));
-
-
-		g_NpcSetting.GetString(nNpcTempRow, "Skill4",	"", szValue1, MAX_VALUE_LEN);
-		g_NpcSetting.GetString(nNpcTempRow, "Level4", "", szValue2, MAX_VALUE_LEN);
-		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(4, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level4", nLevel, szValue2));
+		/* Ban 8.x (ban6 KNpcTemplate::InitNpcLevelData): cot Skill1..4 cua npcs.txt KHONG phai ma chieu
+		   dung thang - no la tham so cho kich ban cap NPC, kich ban tra ma chieu THEO HE (vd standard.lua
+		   Skill2 = 419..423). Dung thang so trong bang thi moi quai danh chung chieu 53. Ma chieu hop le
+		   (1..1999) moi lay cap tu cot LevelN. AIMode/AIParam1..10 cung qua kich ban (mac dinh "0|0"). */
+		{
+			static const char* s_szChieu[4] = { "Skill1", "Skill2", "Skill3", "Skill4" };
+			static const char* s_szCap[4] = { "Level1", "Level2", "Level3", "Level4" };
+			for (int nO = 0; nO < 4; nO++)
+			{
+				g_NpcSetting.GetString(nNpcTempRow, (char*)s_szChieu[nO], "", szValue1, MAX_VALUE_LEN);
+				int nChieu = GetNpcLevelDataFromScript(m_Series, pLevelScript, (char*)s_szChieu[nO], nLevel, szValue1);
+				g_NpcSetting.GetString(nNpcTempRow, (char*)s_szCap[nO], "", szValue2, MAX_VALUE_LEN);
+				if (nChieu > 0 && nChieu < 2000)
+					m_SkillList.SetNpcSkill(nO + 1, nChieu, GetNpcLevelDataFromScript(m_Series, pLevelScript, (char*)s_szCap[nO], nLevel, szValue2));
+			}
+			g_NpcSetting.GetString(nNpcTempRow, "AIMode", "0|0", szValue1, MAX_VALUE_LEN);
+			m_AiMode = GetNpcLevelDataFromScript(m_Series, pLevelScript, "AIMode", nLevel, szValue1);
+			for (int nAi = 0; nAi < 10 && nAi < MAX_AI_PARAM - 1; nAi++)
+			{
+				char szTenAi[16];
+				sprintf(szTenAi, "AIParam%d", nAi + 1);
+				g_NpcSetting.GetString(nNpcTempRow, szTenAi, "0|0", szValue1, MAX_VALUE_LEN);
+				m_AiParam[nAi] = GetNpcLevelDataFromScript(m_Series, pLevelScript, szTenAi, nLevel, szValue1);
+			}
+		}
 		//Question  Change as 1Level , only debug version
 
 
@@ -307,10 +311,9 @@ int KNpcTemplate::GetNpcLevelDataFromScript(int nSeries, KLuaScript * pScript, c
 {
 	int nTopIndex = 0;
 	int nReturn = 0;
-	if (szParam == NULL|| szParam[0] == 0 || strlen(szParam) < 3)
-	{
-		return 0;
-	}
+	/* Ban 2003 bo qua tham so rong/ngan hon 3 ky tu -> ma chieu "53" thanh 0. ban6 goi kich ban voi moi chuoi. */
+	if (szParam == NULL)
+		szParam = (char*)"";
 	pScript->SafeCallBegin(&nTopIndex);
 	/* Kich ban cap NPC (npclevelscript) khai ham voi Series o DAU danh sach, giong may chu
 	   (server Core/KNpcTemplate.cpp). Thieu no thi moi tham so lui mot cho va ham tra 0:
