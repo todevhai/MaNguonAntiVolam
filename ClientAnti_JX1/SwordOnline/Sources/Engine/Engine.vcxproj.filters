@@ -858,16 +858,10 @@
     <CustomBuild Include="..\..\Lib\debug\LuaLibDll.lib">
       <Filter>library files\Debug</Filter>
     </CustomBuild>
-    <CustomBuild Include="..\..\Lib\debug\mp3lib.lib">
-      <Filter>library files\Debug</Filter>
-    </CustomBuild>
     <CustomBuild Include="..\..\Lib\release\JpgLib.lib">
       <Filter>library files\release</Filter>
     </CustomBuild>
     <CustomBuild Include="..\..\Lib\release\LuaLibDll.lib">
-      <Filter>library files\release</Filter>
-    </CustomBuild>
-    <CustomBuild Include="..\..\Lib\release\mp3lib.lib">
       <Filter>library files\release</Filter>
     </CustomBuild>
   </ItemGroup>

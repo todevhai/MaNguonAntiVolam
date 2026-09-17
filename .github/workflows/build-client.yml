@@ -100,6 +100,12 @@ jobs:
         continue-on-error: true
         run: msbuild "%SRC%\Library\LuaLib\LuaLibDll.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=lualib.log;verbosity=normal
 
+      # JpgLib: giai ma anh JPG cua Engine, dung tu nguon Sources/JpgLib/Src.
+      - name: 'Build JpgLib (Release|Win32)'
+        id: jpglib
+        continue-on-error: true
+        run: msbuild "%SRC%\JpgLib\JpgLib.vcxproj" /p:Configuration=Release /p:Platform=Win32 /p:PlatformToolset=v143 /m /v:minimal /fl /flp:logfile=jpglib.log;verbosity=normal
+
       # Engine/Core/S3Client tim thu vien trong Lib/ va Lib/Release (LIB + #pragma duong tuong doi):
       # chi dat vao do san pham VUA dung.
       - name: 'Dua thu vien vua dung vao Lib'
@@ -108,6 +114,7 @@ jobs:
           for %%D in ("ClientAnti_JX1\SwordOnline\Lib" "ClientAnti_JX1\SwordOnline\Lib\Release" "ClientAnti_JX1\SwordOnline\Lib\Debug") do (
             if not exist "%%~D" mkdir "%%~D"
             copy /Y "%SRC%\Library\LuaLib\Release\LuaLibDll.lib" "%%~D\"
+            copy /Y "%SRC%\JpgLib\Release\JpgLib.lib" "%%~D\"
             copy /Y "%SRC%\Library\LuaLib\Release\LuaLibDll.dll" "%%~D\"
             copy /Y "%SRC%\MultiServer\Common\Release\common.lib" "%%~D\"
             copy /Y "%SRC%\FilterText\FilterText_StaticLib___Win32_Release\FilterText_StaticLib.lib" "%%~D\"
@@ -215,6 +222,7 @@ jobs:
         if: always()
         run: |
           echo LuaLibDll  = ${{ steps.lualib.outcome }}
+          echo JpgLib     = ${{ steps.jpglib.outcome }}
           echo Engine     = ${{ steps.engine.outcome }}
           echo FilterText = ${{ steps.filtertext.outcome }}
           echo Core     = ${{ steps.core.outcome }}
