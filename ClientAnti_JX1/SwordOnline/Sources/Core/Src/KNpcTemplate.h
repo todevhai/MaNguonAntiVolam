@@ -107,8 +107,8 @@ public:
 public:
 	void	InitNpcBaseData(int nNpcTemplateId);
 	void	InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KLuaScript * pLevelScript, int nLevel);
-	static int		GetNpcLevelDataFromScript(KLuaScript * pScript, char * szDataName, int nLevel, char * szParam);
-	static int		GetNpcLevelDataFromScript(KLuaScript * pScript, char * szDataName, int nLevel, double nParam1, double nParam2, double nParam3);
+	static int		GetNpcLevelDataFromScript(int nSeries, KLuaScript * pScript, char * szDataName, int nLevel, char * szParam);
+	static int		GetNpcLevelDataFromScript(int nSeries, KLuaScript * pScript, char * szDataName, int nLevel, double nParam1, double nParam2, double nParam3);
 	static int		SkillString2Id(char * szSkillString);
 	KNpcTemplate(){	m_bHaveLoadedFromTemplate = FALSE;};
 };

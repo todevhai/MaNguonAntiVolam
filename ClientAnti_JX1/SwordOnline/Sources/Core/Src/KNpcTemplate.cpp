@@ -189,24 +189,24 @@ void KNpcTemplate::InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KL
 		g_NpcSetting.GetString(nNpcTempRow, "Skill1",	"", szValue1, MAX_VALUE_LEN);
 		g_NpcSetting.GetString(nNpcTempRow, "Level1", "", szValue2, MAX_VALUE_LEN);
 		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(1, SkillString2Id(szValue1), GetNpcLevelDataFromScript(pLevelScript, "Level1", nLevel, szValue2));
+			m_SkillList.SetNpcSkill(1, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level1", nLevel, szValue2));
 		
 		g_NpcSetting.GetString(nNpcTempRow, "Skill2",	"", szValue1, MAX_VALUE_LEN);
 		g_NpcSetting.GetString(nNpcTempRow, "Level2", "", szValue2, MAX_VALUE_LEN);
 		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(2, SkillString2Id(szValue1), GetNpcLevelDataFromScript(pLevelScript, "Level2", nLevel, szValue2));
+			m_SkillList.SetNpcSkill(2, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level2", nLevel, szValue2));
 
 		
 		g_NpcSetting.GetString(nNpcTempRow, "Skill3",	"", szValue1, MAX_VALUE_LEN);
 		g_NpcSetting.GetString(nNpcTempRow, "Level3", "", szValue2, MAX_VALUE_LEN);
 		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(3, SkillString2Id(szValue1), GetNpcLevelDataFromScript(pLevelScript, "Level3", nLevel, szValue2));
+			m_SkillList.SetNpcSkill(3, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level3", nLevel, szValue2));
 
 
 		g_NpcSetting.GetString(nNpcTempRow, "Skill4",	"", szValue1, MAX_VALUE_LEN);
 		g_NpcSetting.GetString(nNpcTempRow, "Level4", "", szValue2, MAX_VALUE_LEN);
 		if (szValue1[0] && szValue2[0])
-			m_SkillList.SetNpcSkill(4, SkillString2Id(szValue1), GetNpcLevelDataFromScript(pLevelScript, "Level4", nLevel, szValue2));
+			m_SkillList.SetNpcSkill(4, SkillString2Id(szValue1), GetNpcLevelDataFromScript(m_Series, pLevelScript, "Level4", nLevel, szValue2));
 		//Question  Change as 1Level , only debug version
 
 
@@ -219,18 +219,18 @@ void KNpcTemplate::InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KL
 		g_NpcSetting.GetFloat(nNpcTempRow, "ExpParam1", 0, &nParam1);
 		g_NpcSetting.GetFloat(nNpcTempRow, "ExpParam2", 0, &nParam2);
 		g_NpcSetting.GetFloat(nNpcTempRow, "ExpParam3", 0, &nParam3);
-		m_Experience = nParam * GetNpcLevelDataFromScript(pLevelScript, "Exp", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_Experience = nParam * GetNpcLevelDataFromScript(m_Series, pLevelScript, "Exp", nLevel, nParam1, nParam2, nParam3) / 100;
 		
 		g_NpcSetting.GetFloat(nNpcTempRow, "LifeParam", 1, &nParam);
 		g_NpcSetting.GetFloat(nNpcTempRow, "LifeParam1", 0, &nParam1);
 		g_NpcSetting.GetFloat(nNpcTempRow, "LifeParam2", 0, &nParam2);
 		g_NpcSetting.GetFloat(nNpcTempRow, "LifeParam3", 0, &nParam3);
-		m_LifeMax = nParam *  GetNpcLevelDataFromScript(pLevelScript, "Life", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_LifeMax = nParam *  GetNpcLevelDataFromScript(m_Series, pLevelScript, "Life", nLevel, nParam1, nParam2, nParam3) / 100;
 		if (m_LifeMax == 0) m_LifeMax = 100;
 		
 
 		g_NpcSetting.GetString(nNpcTempRow, "LifeReplenish", "", szValue1, MAX_VALUE_LEN);
-		m_LifeReplenish = GetNpcLevelDataFromScript(pLevelScript, "LifeReplenish", nLevel, szValue1);
+		m_LifeReplenish = GetNpcLevelDataFromScript(m_Series, pLevelScript, "LifeReplenish", nLevel, szValue1);
 
 
 
@@ -238,7 +238,7 @@ void KNpcTemplate::InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KL
 		g_NpcSetting.GetFloat(nNpcTempRow, "ARParam1", 0, &nParam1);
 		g_NpcSetting.GetFloat(nNpcTempRow, "ARParam2", 0, &nParam2);
 		g_NpcSetting.GetFloat(nNpcTempRow, "ARParam3", 0, &nParam3);
-		m_AttackRating = nParam * GetNpcLevelDataFromScript(pLevelScript, "AR", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_AttackRating = nParam * GetNpcLevelDataFromScript(m_Series, pLevelScript, "AR", nLevel, nParam1, nParam2, nParam3) / 100;
 		if (m_AttackRating == 0) m_AttackRating = 100;
 
 
@@ -246,46 +246,46 @@ void KNpcTemplate::InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KL
 		g_NpcSetting.GetFloat(nNpcTempRow, "DefenseParam1", 0, &nParam1);
 		g_NpcSetting.GetFloat(nNpcTempRow, "DefenseParam2", 0, &nParam2);
 		g_NpcSetting.GetFloat(nNpcTempRow, "DefenseParam3", 0, &nParam3);
-		m_Defend = nParam *GetNpcLevelDataFromScript(pLevelScript, "Defense", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_Defend = nParam *GetNpcLevelDataFromScript(m_Series, pLevelScript, "Defense", nLevel, nParam1, nParam2, nParam3) / 100;
 
 
 		g_NpcSetting.GetFloat(nNpcTempRow, "MinDamageParam", 1, &nParam);
 		g_NpcSetting.GetFloat(nNpcTempRow, "MinDamageParam1", 0, &nParam1);
 		g_NpcSetting.GetFloat(nNpcTempRow, "MinDamageParam2", 0, &nParam2);
 		g_NpcSetting.GetFloat(nNpcTempRow, "MinDamageParam3", 0, &nParam3);
-		m_PhysicsDamage.nValue[0] = nParam * GetNpcLevelDataFromScript(pLevelScript, "MinDamage", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_PhysicsDamage.nValue[0] = nParam * GetNpcLevelDataFromScript(m_Series, pLevelScript, "MinDamage", nLevel, nParam1, nParam2, nParam3) / 100;
 
 		g_NpcSetting.GetFloat(nNpcTempRow, "MaxDamageParam", 1, &nParam);
 		g_NpcSetting.GetFloat(nNpcTempRow, "MaxDamageParam1", 0, &nParam1);
 		g_NpcSetting.GetFloat(nNpcTempRow, "MaxDamageParam2", 0, &nParam2);
 		g_NpcSetting.GetFloat(nNpcTempRow, "MaxDamageParam3", 0, &nParam3);
-		m_PhysicsDamage.nValue[2] = nParam * GetNpcLevelDataFromScript(pLevelScript, "MaxDamage", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_PhysicsDamage.nValue[2] = nParam * GetNpcLevelDataFromScript(m_Series, pLevelScript, "MaxDamage", nLevel, nParam1, nParam2, nParam3) / 100;
 
 		
 		g_NpcSetting.GetString(nNpcTempRow, "RedLum", "", szValue1, MAX_VALUE_LEN);
-		m_RedLum = GetNpcLevelDataFromScript(pLevelScript, "RedLum", nLevel, szValue1);
+		m_RedLum = GetNpcLevelDataFromScript(m_Series, pLevelScript, "RedLum", nLevel, szValue1);
 		
 		g_NpcSetting.GetString(nNpcTempRow, "GreenLum", "", szValue1, MAX_VALUE_LEN);
-		m_GreenLum = GetNpcLevelDataFromScript(pLevelScript, "GreenLum", nLevel, szValue1);
+		m_GreenLum = GetNpcLevelDataFromScript(m_Series, pLevelScript, "GreenLum", nLevel, szValue1);
 		
 		g_NpcSetting.GetString(nNpcTempRow, "BlueLum", "", szValue1, MAX_VALUE_LEN);
-		m_BlueLum = GetNpcLevelDataFromScript(pLevelScript, "BlueLum", nLevel, szValue1);
+		m_BlueLum = GetNpcLevelDataFromScript(m_Series, pLevelScript, "BlueLum", nLevel, szValue1);
 		
 	
 		g_NpcSetting.GetString(nNpcTempRow, "FireResist", "", szValue1, MAX_VALUE_LEN);
-		m_FireResist = GetNpcLevelDataFromScript(pLevelScript, "FireResist", nLevel, szValue1);
+		m_FireResist = GetNpcLevelDataFromScript(m_Series, pLevelScript, "FireResist", nLevel, szValue1);
 
 		g_NpcSetting.GetString(nNpcTempRow, "ColdResist", "", szValue1, MAX_VALUE_LEN);
-		m_ColdResist = GetNpcLevelDataFromScript(pLevelScript, "ColdResist", nLevel, szValue1);
+		m_ColdResist = GetNpcLevelDataFromScript(m_Series, pLevelScript, "ColdResist", nLevel, szValue1);
 
 		g_NpcSetting.GetString(nNpcTempRow, "LightResist", "", szValue1, MAX_VALUE_LEN);
-		m_LightResist = GetNpcLevelDataFromScript(pLevelScript, "LightResist", nLevel, szValue1);
+		m_LightResist = GetNpcLevelDataFromScript(m_Series, pLevelScript, "LightResist", nLevel, szValue1);
 		
 		g_NpcSetting.GetString(nNpcTempRow, "PoisonResist", "", szValue1, MAX_VALUE_LEN);
-		m_PoisonResist = GetNpcLevelDataFromScript(pLevelScript, "PoisonResist", nLevel, szValue1);
+		m_PoisonResist = GetNpcLevelDataFromScript(m_Series, pLevelScript, "PoisonResist", nLevel, szValue1);
 
 		g_NpcSetting.GetString(nNpcTempRow, "PhysicsResist", "", szValue1, MAX_VALUE_LEN);
-		m_PhysicsResist = GetNpcLevelDataFromScript(pLevelScript, "PhysicsResist", nLevel, szValue1);
+		m_PhysicsResist = GetNpcLevelDataFromScript(m_Series, pLevelScript, "PhysicsResist", nLevel, szValue1);
 #endif
 #ifndef _SERVER
 		int nParam1 = 0;
@@ -296,14 +296,14 @@ void KNpcTemplate::InitNpcLevelData(KTabFile * pKindFile, int nNpcTemplateId, KL
 		g_NpcSetting.GetInteger(nNpcTempRow, "LifeParam1", 0, &nParam1);
 		g_NpcSetting.GetInteger(nNpcTempRow, "LifeParam2", 0, &nParam2);
 		g_NpcSetting.GetInteger(nNpcTempRow, "LifeParam3", 0, &nParam3);
-		m_LifeMax = nParam *  GetNpcLevelDataFromScript(pLevelScript, "Life", nLevel, nParam1, nParam2, nParam3) / 100;
+		m_LifeMax = nParam *  GetNpcLevelDataFromScript(m_Series, pLevelScript, "Life", nLevel, nParam1, nParam2, nParam3) / 100;
 		if (m_LifeMax == 0) m_LifeMax = 100;
 #endif
 	}
 	pLevelScript->SafeCallEnd(nTopIndex);
 }
 
-int KNpcTemplate::GetNpcLevelDataFromScript(KLuaScript * pScript, char * szDataName, int nLevel, char * szParam)
+int KNpcTemplate::GetNpcLevelDataFromScript(int nSeries, KLuaScript * pScript, char * szDataName, int nLevel, char * szParam)
 {
 	int nTopIndex = 0;
 	int nReturn = 0;
@@ -312,19 +312,22 @@ int KNpcTemplate::GetNpcLevelDataFromScript(KLuaScript * pScript, char * szDataN
 		return 0;
 	}
 	pScript->SafeCallBegin(&nTopIndex);
-	pScript->CallFunction("GetNpcLevelData", 1, "dss", nLevel, szDataName, szParam);
+	/* Kich ban cap NPC (npclevelscript) khai ham voi Series o DAU danh sach, giong may chu
+	   (server Core/KNpcTemplate.cpp). Thieu no thi moi tham so lui mot cho va ham tra 0:
+	   m_LifeMax roi ve 100 -> so sat thuong bay len cong lai dung 100, quai 0 chieu. */
+	pScript->CallFunction("GetNpcLevelData", 1, "ddss", nSeries, nLevel, szDataName, szParam);
 	nTopIndex = Lua_GetTopIndex(pScript->m_LuaState);
 	nReturn = (int) Lua_ValueToNumber(pScript->m_LuaState, nTopIndex);
 	pScript->SafeCallEnd(nTopIndex);
 	return nReturn;
 }
 
-int KNpcTemplate::GetNpcLevelDataFromScript(KLuaScript * pScript, char * szDataName, int nLevel, double nParam1, double nParam2, double nParam3)
+int KNpcTemplate::GetNpcLevelDataFromScript(int nSeries, KLuaScript * pScript, char * szDataName, int nLevel, double nParam1, double nParam2, double nParam3)
 {
 	int nTopIndex = 0;
 	int nReturn = 0;
 	pScript->SafeCallBegin(&nTopIndex);
-	pScript->CallFunction("GetNpcKeyData", 1, "dsnnn", nLevel, szDataName, nParam1, nParam2, nParam3);
+	pScript->CallFunction("GetNpcKeyData", 1, "ddsnnn", nSeries, nLevel, szDataName, nParam1, nParam2, nParam3);
 	nTopIndex = Lua_GetTopIndex(pScript->m_LuaState);
 	nReturn = (int) Lua_ValueToNumber(pScript->m_LuaState, nTopIndex);
 	pScript->SafeCallEnd(nTopIndex);
@@ -336,6 +339,29 @@ int KNpcTemplate::SkillString2Id(char * szSkillString)
 {
 	if (!szSkillString[0]) return 0;
 	int nSkillNum = g_OrdinSkillsSetting.GetHeight() - 1;
+	/* npcs.txt ghi chieu o cot Skill1..Skill4 bang SO (ma chieu), ham nay von chi tra TEN.
+	   Nhan ca hai dang nhu may chu; dang so phai co that trong Skills.txt. */
+	{
+		int j, nLaSo = 1;
+		for (j = 0; szSkillString[j]; j++)
+			if (szSkillString[j] < 0x30 || szSkillString[j] > 0x39)
+			{
+				nLaSo = 0;
+				break;
+			}
+		if (nLaSo && j > 0)
+		{
+			int nIdMuon = atoi(szSkillString);
+			for (j = 0; j < nSkillNum; j++)
+			{
+				int nIdBang = 0;
+				g_OrdinSkillsSetting.GetInteger(j + 2, "SkillId", 0, &nIdBang);
+				if (nIdBang == nIdMuon)
+					return nIdMuon;
+			}
+			return 0;
+		}
+	}
 	char szSkillName[100];
 	for (int i = 0 ;  i < nSkillNum; i ++)
 	{

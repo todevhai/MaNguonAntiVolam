@@ -407,14 +407,17 @@ BOOL	InitNpcSetting()
 #ifdef _SERVER
 	g_pNpcLevelScript = (KLuaScript*)g_GetScript(NPC_LEVELSCRIPT_FILENAME);
 #else
-	//g_pNpcLevelScript = new KLuaScript;
-	//g_pNpcLevelScript->Init();
-	//if (!g_pNpcLevelScript->Load(NPC_LEVELSCRIPT_FILENAME))
-	//{
-	//	g_DebugLog ("[error]致命错误,无法正确读取%s", NPC_LEVELSCRIPT_FILENAME);
-	//	delete g_pNpcLevelScript;
-	//	g_pNpcLevelScript = NULL;
-	//}
+	/* Kich ban cap NPC du phong cho moi dong npcs.txt de trong cot LevelScript (1036 dong).
+	   Thieu no, client dung mau NPC khong co chi so -> m_LifeMax = 100 -> so sat thuong bay len
+	   cua moi con quai cong lai dung 100. May chu nap cung tep nay. */
+	g_pNpcLevelScript = new KLuaScript;
+	g_pNpcLevelScript->Init();
+	if (!g_pNpcLevelScript->Load(NPC_LEVELSCRIPT_FILENAME))
+	{
+		g_DebugLog("[npc cap] khong nap duoc %s", NPC_LEVELSCRIPT_FILENAME);
+		delete g_pNpcLevelScript;
+		g_pNpcLevelScript = NULL;
+	}
 #endif
 	
 	if (!g_pNpcLevelScript) 
