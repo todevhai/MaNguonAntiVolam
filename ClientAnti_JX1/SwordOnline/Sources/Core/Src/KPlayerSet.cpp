@@ -558,11 +558,13 @@ BOOL	KLevelAdd::Init()
 		LevelAdd.GetInteger(i + 2, 6, 0, &m_nStaminaPerVitality[i]);
 		LevelAdd.GetInteger(i + 2, 7, 0, &m_nManaPerEnergy[i]);
 		LevelAdd.GetInteger(i + 2, 8, 0, &m_nLeadExpShare[i]);
-		LevelAdd.GetInteger(i + 2, 9, 0, &m_nFireResistPerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 10, 0, &m_nColdResistPerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 11, 0, &m_nPoisonResistPerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 12, 0, &m_nLightResistPerLevel[i]);
-		LevelAdd.GetInteger(i + 2, 13, 0, &m_nPhysicsResistPerLevel[i]);
+		/* 8.x level_add.txt: col 10..14 = fireres..physicres (col 9 is LeadExpShare). The 2003 reader
+		   took col 9..13, so every resist came from the column before it. */
+		LevelAdd.GetInteger(i + 2, 10, 0, &m_nFireResistPerLevel[i]);
+		LevelAdd.GetInteger(i + 2, 11, 0, &m_nColdResistPerLevel[i]);
+		LevelAdd.GetInteger(i + 2, 12, 0, &m_nPoisonResistPerLevel[i]);
+		LevelAdd.GetInteger(i + 2, 13, 0, &m_nLightResistPerLevel[i]);
+		LevelAdd.GetInteger(i + 2, 14, 0, &m_nPhysicsResistPerLevel[i]);
 	}
 
 	return TRUE;
@@ -651,14 +653,24 @@ int		KLevelAdd::GetLeadExpShare(int nSeries)
 
 //---------------------------------------------------------------------------
 //	功能：每个系某个等级的基本火抗性
+/* Base resist from level, as the jx9tn/ban6/voz2 servers (KLevelAdd::GetFireResist 0x80db5a0 in ban6):
+   level 1..200 (the old ">= MAX_LEVEL" test gave level-150 characters 0), and a negative rate stops
+   at level 120. Their floor for characters that did a translife is not ported (no translife here). */
+static int KhangTheoCap(int nMoiCap, int nLevel)
+{
+	if (nLevel < 1 || nLevel > 200)
+		return 0;
+	if (nLevel > 120 && nMoiCap < 0)
+		nLevel = 120;
+	return nMoiCap * nLevel / 100;
+}
+
 //---------------------------------------------------------------------------
 int		KLevelAdd::GetFireResist(int nSeries, int nLevel)
 {
 	if (nSeries < 0 || nSeries >= series_num)
 		return 0;
-	if (nLevel <= 0 || nLevel >= MAX_LEVEL)
-		return 0;
-	return (m_nFireResistPerLevel[nSeries] * nLevel / 100);
+	return KhangTheoCap(m_nFireResistPerLevel[nSeries], nLevel);
 }
 
 //---------------------------------------------------------------------------
@@ -668,9 +680,7 @@ int		KLevelAdd::GetColdResist(int nSeries, int nLevel)
 {
 	if (nSeries < 0 || nSeries >= series_num)
 		return 0;
-	if (nLevel <= 0 || nLevel >= MAX_LEVEL)
-		return 0;
-	return (m_nColdResistPerLevel[nSeries] * nLevel / 100);
+	return KhangTheoCap(m_nColdResistPerLevel[nSeries], nLevel);
 }
 
 //---------------------------------------------------------------------------
@@ -680,9 +690,7 @@ int		KLevelAdd::GetPoisonResist(int nSeries, int nLevel)
 {
 	if (nSeries < 0 || nSeries >= series_num)
 		return 0;
-	if (nLevel <= 0 || nLevel >= MAX_LEVEL)
-		return 0;
-	return (m_nPoisonResistPerLevel[nSeries] * nLevel / 100);
+	return KhangTheoCap(m_nPoisonResistPerLevel[nSeries], nLevel);
 }
 
 //---------------------------------------------------------------------------
@@ -692,9 +700,7 @@ int		KLevelAdd::GetLightResist(int nSeries, int nLevel)
 {
 	if (nSeries < 0 || nSeries >= series_num)
 		return 0;
-	if (nLevel <= 0 || nLevel >= MAX_LEVEL)
-		return 0;
-	return (m_nLightResistPerLevel[nSeries] * nLevel / 100);
+	return KhangTheoCap(m_nLightResistPerLevel[nSeries], nLevel);
 }
 
 //---------------------------------------------------------------------------
@@ -704,9 +710,7 @@ int		KLevelAdd::GetPhysicsResist(int nSeries, int nLevel)
 {
 	if (nSeries < 0 || nSeries >= series_num)
 		return 0;
-	if (nLevel <= 0 || nLevel >= MAX_LEVEL)
-		return 0;
-	return (m_nPhysicsResistPerLevel[nSeries] * nLevel / 100);
+	return KhangTheoCap(m_nPhysicsResistPerLevel[nSeries], nLevel);
 }
 
 //---------------------------------------------------------------------------
