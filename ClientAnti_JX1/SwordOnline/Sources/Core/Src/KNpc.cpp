@@ -5606,6 +5606,11 @@ void KNpc::GetNpcCopyFromTemplate(int nNpcTemplateId, int nLevel, int nSeries)
 {
 	if (nNpcTemplateId < 0 || nLevel < 1 ) 
 		return ;
+	/* g_pNpcTemplate chi co MAX_NPC_LEVEL o: cap vuot tran ghi ra ngoai mang. */
+	if (nNpcTemplateId >= MAX_NPCSTYLE)
+		return ;
+	if (nLevel >= MAX_NPC_LEVEL)
+		nLevel = MAX_NPC_LEVEL - 1;
 
 	if (!g_pNpcTemplate[nNpcTemplateId][0])
 	{
