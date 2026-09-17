@@ -225,6 +225,9 @@ int KItemSet::Add(int nItemGenre, int nSeries,
 	case item_townportal:
 		ItemGen.Gen_TownPortal(pItem);
 		break;
+	case item_magicscript:
+		ItemGen.Gen_MagicScript(nDetailType, nParticularType, nLevel, pnMagicLevel, pItem, nStackNum);
+		break;
 	default:
 		break;
 	}

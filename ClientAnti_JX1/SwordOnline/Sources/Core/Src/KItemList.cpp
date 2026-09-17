@@ -6,6 +6,7 @@
 #include	"KMath.h"
 #include	"KPlayer.h"
 #include	"KItemList.h"
+#include	"KItemGenerator.h"
 #include	"KItemChangeRes.h"
 #include	<time.h>
 #ifdef _SERVER
@@ -1347,7 +1348,7 @@ BOOL KItemList::EatMecidine(int nIdx)
 		Player[m_PlayerIdx].UseTownPortal();
 #endif
 	}
-	if (nGenre == item_task || nGenre == item_mine)
+	if (nGenre == item_task || nGenre == item_mine || nGenre == item_magicscript)	// magicscript: the server decides, no local stack change
 	{
 #ifdef _SERVER
 		if (Player[m_PlayerIdx].ExecuteScript(Item[nIdx].GetScript(),"main",""))
@@ -1412,6 +1413,10 @@ int KItemList::UseItem(int nIdx)
 			nRet = REQUEST_EAT_MEDICINE;
 		break;
 	case item_mine:
+		if (EatMecidine(nIdx))
+			nRet = REQUEST_EAT_MEDICINE;
+		break;
+	case item_magicscript:
 		if (EatMecidine(nIdx))
 			nRet = REQUEST_EAT_MEDICINE;
 		break;
@@ -1823,7 +1828,8 @@ void KItemList::ExchangeItem(ItemPos* SrcPos, ItemPos* DesPos)
 		if (m_Hand)
 		{
 			if (m_Room[room_immediacy].PlaceItem(DesPos->nX, DesPos->nY, m_Hand, Item[m_Hand].GetWidth(), Item[m_Hand].GetHeight())
-				&& (Item[m_Hand].GetGenre() == item_medicine || Item[m_Hand].GetGenre() == item_townportal || Item[m_Hand].GetGenre() == item_task))
+				&& (Item[m_Hand].GetGenre() == item_medicine || Item[m_Hand].GetGenre() == item_townportal || Item[m_Hand].GetGenre() == item_task
+					|| (Item[m_Hand].GetGenre() == item_magicscript && ItemGen.CoTheDatPhimTat(Item[m_Hand].GetDetailType(), Item[m_Hand].GetParticular()))))
 			{
 				int nListIdx = FindSame(m_Hand);
 				m_Items[nListIdx].nPlace = pos_immediacy;

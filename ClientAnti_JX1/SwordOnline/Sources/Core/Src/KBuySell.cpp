@@ -129,6 +129,10 @@ BOOL KBuySell::Init()
 			ItemGen.Gen_Quest(ItemGenerator.nDetailType,
 				&m_Item[k],1);
 			break;
+		case item_magicscript:
+			ItemGen.Gen_MagicScript(ItemGenerator.nDetailType, ItemGenerator.nParticularType,
+				ItemGenerator.nLevel, NULL, &m_Item[k], 1);
+			break;
 		default:
 			break;
 		}

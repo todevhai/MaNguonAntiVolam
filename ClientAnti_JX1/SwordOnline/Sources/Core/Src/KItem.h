@@ -53,6 +53,7 @@ enum ITEMGENRE
 	item_materials,			// 药材
 	item_task,				// 任务
 	item_townportal,		// 传送门
+	item_magicscript = 6,	// vat pham kich ban / dung chieu - magicscript.txt
 	item_number,			// 类型数目
 };
 
@@ -252,6 +253,7 @@ private:
 	void operator = (const KBASICPROP_MINE&);
 	void operator = (const KBASICPROP_MEDICINE&);
 	void operator = (const KBASICPROP_QUEST&);
+	void operator = (const KBASICPROP_MAGICSCRIPT&);
 	void operator = (const KBASICPROP_TOWNPORTAL&);
 	void operator = (const KBASICPROP_EQUIPMENT_UNIQUE&);
 	// flying add this overload operator.

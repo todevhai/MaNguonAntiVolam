@@ -236,6 +236,39 @@ typedef struct
 	int			m_nIsDrop;
 } KBASICPROP_QUEST;
 
+// Genre 6 row of magicscript.txt (KItemMagicScript.cpp).
+typedef struct
+{
+	char		m_szName[SZBUFLEN_0];
+	int			m_nItemGenre;
+	int			m_nDetailType;
+	int			m_nParticularType;
+	char		m_szImageName[SZBUFLEN_0];
+	int			m_nObjIdx;
+	int			m_nWidth;
+	int			m_nHeight;
+	char		m_szIntro[SZBUFLEN_1];
+	int			m_nSeries;
+	int			m_nPrice;
+	int			m_nLevel;
+	int			m_nParam[4];			// columns 16..19; [3] = allowed on the shortcut bar
+	int			m_nMaxStack;			// column 21; > 0 means stackable
+} KBASICPROP_MAGICSCRIPT;
+
+// 以下定义的结构用于辅助从tabfile中读出属性的初始值
+typedef struct tagPROPINFO
+{
+	int		m_nType;		// 属性的类型. 详见 PI_VARTYPE_...系列定义
+	union
+	{
+	char*	m_pszBuf;		// 指向字符串缓冲区的指针
+	int*	m_pnData;		// 指向int变量的指针
+	}m_pData;
+	int		m_nBufSize;		// 缓冲区的长度
+} PROPINFO;
+#define		PI_VARTYPE_CHAR		0
+#define		PI_VARTYPE_INT		1
+
 typedef struct
 {
 	char		m_szName[SZBUFLEN_0];		// 名称
@@ -264,7 +297,8 @@ protected:
 
 // 以下是辅助性的成员变量
     int         m_nSizeOfEntry;				// 每项数据的大小(即结构的大小)
-	char		m_szTabFile[MAX_PATH];		// tabfile的文件名
+	char		m_szTabFile[MAX_PATH];
+	const char*	m_pszThuMuc;				// table directory; NULL = TABFILE_PATH		// tabfile的文件名
 
 // 以下是对外接口
 public:
@@ -277,6 +311,16 @@ protected:
 	void ReleaseMemory();
 	void SetCount(int);
 	virtual BOOL LoadRecord(int i, KTabFile* pTF) = 0;
+};
+
+class KBPT_MagicScript : public KBasicPropertyTable
+{
+public:
+	KBPT_MagicScript();
+	~KBPT_MagicScript();
+	const KBASICPROP_MAGICSCRIPT* FindRecord(IN int nDetailType, IN int nParticularType) const;
+protected:
+	virtual BOOL LoadRecord(int i, KTabFile* pTF);
 };
 
 class KBPT_Mine : public KBasicPropertyTable
@@ -507,6 +551,7 @@ protected:
 	KBPT_Medicine			m_BPTMedicine;
 	KBPT_TownPortal			m_BPTTownPortal;
 	KBPT_Quest				m_BPTQuest;
+	KBPT_MagicScript		m_BPTMagicScript;	// genre 6
 	KBPT_Mine				m_BPTMine;
 	KBPT_Equipment			m_BPTHorse;
 	KBPT_Equipment			m_BPTMeleeWeapon;
@@ -574,6 +619,7 @@ public:
 	const KBASICPROP_MEDICINE*	GetMedicineRecord(IN int) const;
 	const int					GetMedicineRecordNumber() const;
 	const KBASICPROP_MEDICINE*	FindMedicine(IN int, IN int) const;
+	const KBASICPROP_MAGICSCRIPT*	FindMagicScript(IN int nDetailType, IN int nParticularType) const;
 	const KBASICPROP_QUEST*		GetQuestRecord(IN int) const;
 	const int					GetQuestRecordNumber() const;
 	const KBASICPROP_TOWNPORTAL*	GetTownPortalRecord(IN int) const;
@@ -594,6 +640,7 @@ public:
 // 以下是辅助函数
 protected:
 	BOOL InitMALib();
+	BOOL InitMagicScript();
     
     // Add by Freeway Chen in 2003.5.30
     BOOL InitMAIT();

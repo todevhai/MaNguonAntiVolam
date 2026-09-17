@@ -38,19 +38,7 @@
 #define		TABFILE_SIGNET				"signet.txt"	// an
 #define		TABFILE_SHIPIN				"shipin.txt"	// trang suc
 
-// 以下定义的结构用于辅助从tabfile中读出属性的初始值
-typedef struct tagPROPINFO
-{
-	int		m_nType;		// 属性的类型. 详见 PI_VARTYPE_...系列定义
-	union
-	{
-	char*	m_pszBuf;		// 指向字符串缓冲区的指针
-	int*	m_pnData;		// 指向int变量的指针
-	}m_pData;
-	int		m_nBufSize;		// 缓冲区的长度
-} PROPINFO;
-#define		PI_VARTYPE_CHAR		0
-#define		PI_VARTYPE_INT		1
+/* PROPINFO / PI_VARTYPE_* moved to KBasPropTbl.h (KItemMagicScript.cpp reads a table too). */
 
 char*	TABFILE_EQUIPMENT[] = 
 {
@@ -178,6 +166,8 @@ BOOL KLibOfBPT::Init()
     // 构造魔法属性索引表
     // add by Freeway Chen in 2003.5.30
     InitMAIT();
+
+	InitMagicScript();	// genre 6; its failure only turns genre 6 off
 
 	return TRUE;
 }
@@ -661,6 +651,7 @@ KBasicPropertyTable::KBasicPropertyTable()
 	m_nNumOfEntries = 0;
 	m_nSizeOfEntry = 0;
 	m_szTabFile[0] = 0;
+	m_pszThuMuc = NULL;
 }
 
 KBasicPropertyTable::~KBasicPropertyTable()
@@ -732,7 +723,7 @@ BOOL KBasicPropertyTable::Load()
 
 //	::g_SetFilePath(TABFILE_PATH);
 	char	szFileName[FILE_NAME_LENGTH];
-	g_UnitePathAndName(TABFILE_PATH, m_szTabFile, szFileName);
+	g_UnitePathAndName(m_pszThuMuc ? m_pszThuMuc : TABFILE_PATH, m_szTabFile, szFileName);
 	if (FALSE == theLoader.Load(szFileName))
 		{ _ASSERT(FALSE); return bEC; }
 

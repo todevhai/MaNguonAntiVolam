@@ -43,6 +43,8 @@ public:
 	BOOL Init();
 	BOOL Gen_Item(IN int, IN int, IN int, IN int, IN OUT KItem*, IN int = 1, IN int = 0);
 	BOOL Gen_Quest(IN int, IN OUT KItem*,IN int);
+	BOOL Gen_MagicScript(IN int nDetailType, IN int nParticularType, IN int nLevel, IN const int* pnParam, IN OUT KItem*, IN int nStackNum);
+	BOOL CoTheDatPhimTat(IN int nDetailType, IN int nParticularType) const;	// genre 6, column 19
 	BOOL Gen_Mine(IN int, IN OUT KItem*,IN int,IN int,IN int,IN int);
 	BOOL Gen_TownPortal(IN OUT KItem*);
 	BOOL Gen_Medicine(IN int, IN int, IN int, IN OUT KItem*, IN int);
