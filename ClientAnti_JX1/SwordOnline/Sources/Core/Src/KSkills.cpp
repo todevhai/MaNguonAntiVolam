@@ -197,7 +197,10 @@ relationisvalid:
 			//½üÉíÎäÆ÷
 			if (nDetailType == 0)
 			{
-				
+				/* Trien Thu (can chien particular 6) tinh la TAY KHONG: chieu quyen phap (EqtLimit -1)
+				   van phat duoc khi deo no - luat ban 8.x, KSkill::CanCastSkill cua ban6. */
+				if (nParticularType == 6)
+					nParticularType = -1;
 			}//Ô¶³ÌÎäÆ÷
 			else if (nDetailType == 1)
 			{
