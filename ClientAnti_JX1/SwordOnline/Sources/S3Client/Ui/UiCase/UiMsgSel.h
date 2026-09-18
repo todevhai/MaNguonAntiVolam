@@ -31,6 +31,8 @@ private:
 	void	OnClickMsg(int nMsg);			//响应点击消息
 	void	ChangeCurSel(bool bNext);
 	virtual void	Breathe();
+	void	PaintWindow();				/* nen ghep 4 khung: dau, than lat lai, day, duong ke */
+	void	DatCoTheoNoiDung();			/* doi chieu cao theo so dong cau hoi + cau tra loi */
 
 private:
 	static KUiMsgSel*	m_pSelf;
@@ -42,6 +44,12 @@ private:
 	bool m_bAutoUp;
 	bool m_bAutoDown;
 	unsigned int	m_uLastScrollTime;
+	/* Co gian (doc o [Main]/[InfoText] cua UiMsgSel.ini; NenThan=0 thi giu kich thuoc co dinh). */
+	static int	ms_nNenDau, ms_nNenThan, ms_nNenDay;	/* cao khung 0/1/2 cua anh nen */
+	static int	ms_nCaoToiThieu, ms_nCaoToiDa;		/* chan duoi/tren chieu cao hop thoai */
+	static int	ms_nLeDuoi, ms_nKhoangKe;			/* le duoi danh sach; khoang cach quanh duong ke */
+	static int	ms_nDongHoiToiDa, ms_nFontHoi;		/* so dong cau hoi toi da; co chu cau hoi */
+	int			m_nKeY;								/* toa do doc cua duong ke trong hop, <0 = khong ve */
 };
 
 

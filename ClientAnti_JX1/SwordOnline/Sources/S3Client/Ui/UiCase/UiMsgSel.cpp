@@ -13,12 +13,23 @@
 #include "../../../core/src/GameDataDef.h"
 #include "../UiBase.h"
 #include "../UiSoundSetting.h"
+#include "../../../Represent/iRepresent/iRepresentShell.h"
+extern iRepresentShell*	g_pRepresentShell;
 
 extern iCoreShell*		g_pCoreShell;
 
 #define	SCHEME_INI	"UiMsgSel.ini"
 
 KUiMsgSel* KUiMsgSel::m_pSelf = NULL;
+int KUiMsgSel::ms_nNenDau = 0;
+int KUiMsgSel::ms_nNenThan = 0;
+int KUiMsgSel::ms_nNenDay = 0;
+int KUiMsgSel::ms_nCaoToiThieu = 0;
+int KUiMsgSel::ms_nCaoToiDa = 0;
+int KUiMsgSel::ms_nLeDuoi = 0;
+int KUiMsgSel::ms_nKhoangKe = 0;
+int KUiMsgSel::ms_nDongHoiToiDa = 0;
+int KUiMsgSel::ms_nFontHoi = 12;
 
 //--------------------------------------------------------------------------
 //	功能：打开窗口，返回唯一的一个类对象实例
@@ -97,6 +108,16 @@ void KUiMsgSel::LoadScheme(const char* pScheme)
 		m_pSelf->m_InfoScrollList.Init(&Ini, "Info");
 		m_pSelf->m_InfoText.Init(&Ini, "InfoText");
 		m_pSelf->m_NpcSpr.Init(&Ini, "NpcSpr");
+		Ini.GetInteger("Main", "NenDau", 0, &ms_nNenDau);
+		Ini.GetInteger("Main", "NenThan", 0, &ms_nNenThan);
+		Ini.GetInteger("Main", "NenDay", 0, &ms_nNenDay);
+		Ini.GetInteger("Main", "CaoToiThieu", 120, &ms_nCaoToiThieu);
+		Ini.GetInteger("Main", "CaoToiDa", 520, &ms_nCaoToiDa);
+		Ini.GetInteger("Main", "LeDuoi", 12, &ms_nLeDuoi);
+		Ini.GetInteger("Main", "KhoangKe", 6, &ms_nKhoangKe);
+		Ini.GetInteger("Main", "DongHoiToiDa", 12, &ms_nDongHoiToiDa);
+		Ini.GetInteger("InfoText", "Font", 12, &ms_nFontHoi);
+		m_pSelf->m_nKeY = -1;
 	}
 }
 
@@ -229,6 +250,7 @@ void KUiMsgSel::Show(KUiQuestionAndAnswer* pContent)
 			}				
 		}
 	}
+	DatCoTheoNoiDung();
 	KWndShowAnimate::Show();
 	Wnd_SetExclusive((KWndWindow*)this);
 
@@ -255,5 +277,78 @@ void KUiMsgSel::Breathe()
 			ChangeCurSel(true);
 			m_uLastScrollTime = IR_GetCurrentTime();
 		}
+	}
+}
+
+/* Hop thoai doi chieu cao theo noi dung (truoc day co dinh 320: hai dong cau tra loi cung de trong
+   ca khoang lon). Cau hoi cao dung so dong cua no (toi da DongHoiToiDa), duong ke ngay duoi, danh
+   sach cau tra loi cao dung so dong cua cac muc; qua CaoToiDa thi danh sach giu chieu cao toi da va
+   cuon nhu cu. Chi doi kich thuoc, khong doi vi tri tren: hop mo xuong tu cho cu. */
+void KUiMsgSel::DatCoTheoNoiDung()
+{
+	if (ms_nNenThan <= 0)
+		return;
+	int nFont = ms_nFontHoi > 0 ? ms_nFontHoi : 12;
+	int nDongHoi = m_InfoText.GetLineCount();
+	if (nDongHoi < 1)
+		nDongHoi = 1;
+	if (ms_nDongHoiToiDa > 0 && nDongHoi > ms_nDongHoiToiDa)
+		nDongHoi = ms_nDongHoiToiDa;
+	int nTrai = 0, nTren = 0, nRong = 0, nCao = 0;
+	m_InfoText.GetPosition(&nTrai, &nTren);
+	m_InfoText.GetSize(&nRong, &nCao);
+	int nCaoHoi = nDongHoi * (nFont + 1);
+	m_InfoText.SetSize(nRong, nCaoHoi);
+	m_nKeY = nTren + nCaoHoi + ms_nKhoangKe;
+
+	KWndMessageListBox* pDs = m_MsgScrollList.GetMessageListBox();
+	int nDongDap = pDs->GetItemLineCount(pDs->GetMsgCount());
+	if (nDongDap < 1)
+		nDongDap = 1;
+	int nTrenDs = m_nKeY + ms_nKhoangKe;
+	int nCaoDs = nDongDap * pDs->GetMinHeight();
+	int nCaoDsToiDa = ms_nCaoToiDa - nTrenDs - ms_nLeDuoi;
+	if (nCaoDsToiDa > 0 && nCaoDs > nCaoDsToiDa)
+		nCaoDs = nCaoDsToiDa;
+	m_MsgScrollList.GetPosition(&nTrai, &nTren);
+	m_MsgScrollList.SetPosition(nTrai, nTrenDs);
+	m_MsgScrollList.GetSize(&nRong, &nCao);
+	m_MsgScrollList.SetSize(nRong, nCaoDs);
+	pDs->GetSize(&nRong, &nCao);
+	pDs->SetSize(nRong, nCaoDs);
+	m_MsgScrollList.GetScrollBar()->GetSize(&nRong, &nCao);
+	m_MsgScrollList.GetScrollBar()->SetSize(nRong, nCaoDs);
+
+	int nCaoHop = nTrenDs + nCaoDs + ms_nLeDuoi;
+	if (nCaoHop < ms_nCaoToiThieu)
+		nCaoHop = ms_nCaoToiThieu;
+	SetSize(m_Width, nCaoHop);
+}
+
+/* Nen: KWndShowAnimate ve khung 0 (dau) tai goc hop va lo phan truot hien; o day ve tiep khung 1
+   (than) lat lai den sat day, khung 2 (day) va khung 3 (duong ke). Anh SPR khong co gian duoc nen
+   phai ghep. Anh cu mot khung (NenThan=0) thi ve nhu truoc. */
+void KUiMsgSel::PaintWindow()
+{
+	KWndShowAnimate::PaintWindow();
+	if (ms_nNenThan <= 0 || g_pRepresentShell == NULL || m_Image.szImage[0] == 0)
+		return;
+	KUiImageRef Anh = m_Image;
+	Anh.oPosition.nX = m_nAbsoluteLeft;
+	int nDay = m_Height - ms_nNenDay;
+	Anh.nFrame = 1;
+	for (int y = ms_nNenDau; y < nDay; y += ms_nNenThan)
+	{
+		Anh.oPosition.nY = m_nAbsoluteTop + y;
+		g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
+	}
+	Anh.nFrame = 2;
+	Anh.oPosition.nY = m_nAbsoluteTop + nDay;
+	g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
+	if (m_nKeY > 0 && m_nKeY < nDay)
+	{
+		Anh.nFrame = 3;
+		Anh.oPosition.nY = m_nAbsoluteTop + m_nKeY;
+		g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
 	}
 }
