@@ -819,7 +819,9 @@ typedef struct
 	int				m_nFuYuan;
 }CURPLAYER_TASKINFO_SYNC;
 
-#define MAX_SCIRPTACTION_BUFFERNUM 300
+/* 1000 cho khop may chu (Core/KProtocol.h): menu kich ban dai hon 300 byte truoc day se chep
+   tran struct nay o client. */
+#define MAX_SCIRPTACTION_BUFFERNUM 1000
 
 typedef struct
 {
