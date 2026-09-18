@@ -82,6 +82,8 @@ extern "C"
 	int	TRemoveCtrlInEncodedText(char* pBuffer, int nCount);
 	//获取编码文本的行数与最大行宽
 	int	TGetEncodedTextLineCount(const char* pBuffer, int nCount, int nWrapCharaNum, int& nMaxLineLen, int nFontSize, int nSkipLine = 0, int nLineLimit = 0, int bPicSingleLine = false);
+	//ngat dong theo TU: doi dau cach cuoi cung thanh xuong dong truoc khi dong vuot nWrapCharaNum; tra so cho da ngat
+	int	TNgatDongTheoTu(char* pBuffer, int nCount, int nWrapCharaNum);
 	//对已经编码的文本，从指定位置开始查找指定的控制符号的位置，返回-1表示未找到
 	int	TFindSpecialCtrlInEncodedText(const char* pBuffer, int nCount, int nStartPos, char cControl);
 	//对已经编码的文本，去除指定类型的控制符

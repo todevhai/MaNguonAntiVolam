@@ -222,6 +222,12 @@ void KMouseOver::Update(int nX, int nY)
 
 	int nMaxTitleLen, nMaxPropLen, nMaxDescLen;
 
+	/* ngat dong theo tu truoc khi do (xem TNgatDongTheoTu) */
+	if (m_nWrapLen > 0)
+	{
+		TNgatDongTheoTu(m_ObjTitle, m_nTitleLen, m_nWrapLen);
+		TNgatDongTheoTu(m_ObjDesc, m_nDescLen, m_nWrapLen);
+	}
 	m_nMaxLineLen = 0;
 	if (m_nTitleLen > 0)
 	{

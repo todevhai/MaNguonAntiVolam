@@ -71,6 +71,7 @@ void	KViewItem::GetData(BYTE* pMsg)
 	if (nNpcIdx > 0)
 	{
 		m_nLevel = Npc[nNpcIdx].m_Level;
+		Npc[nNpcIdx].nReBorn = pView->m_btTrungSinh;	/* bang xem do doc qua GetGameData -> Npc[].nReBorn */
 		strcpy(m_szName, Npc[nNpcIdx].Name);
 		sPlayer.nIndex = nNpcIdx;
 		strcpy(sPlayer.Name, m_szName);

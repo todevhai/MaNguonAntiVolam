@@ -47,6 +47,8 @@ void KWndText::SetText(const char* pText, int nLen/*= -1*/)
 			if (m_Style & WNDTEXT_ES_MULTILINE)
 			{
 				int nLineLen;
+				if (m_nFontSize > 0)
+					TNgatDongTheoTu(m_pText, m_nTextLen, (m_Width * 2) / m_nFontSize);
 				m_nLineCount = TGetEncodedTextLineCount(
 					m_pText, m_nTextLen, (m_Width * 2) / m_nFontSize, nLineLen, m_nFontSize);
 			}

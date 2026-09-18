@@ -1204,3 +1204,87 @@ int TGetEncodedTextEffectCtrls(const char* pBuffer, int nSkipCount, KTP_CTRL& Ct
 	}
 	return nIndex;
 }
+
+/* Ngat dong theo TU cho chu da ma hoa. Engine goc (chu Han) ngat o bat ky ky tu nao khi dong day, nen chu
+   Viet bi cat giua tu ("dong ban|g"). Ham nay doi dau cach cuoi cung cua dong thanh KTC_ENTER truoc khi dong
+   vuot be rong, TAI CHO (khong doi do dai). Ca khau do (TGetEncodedTextLineCount) lan khau ve (KTextProcess)
+   deu thay cho xuong dong tuong minh nen tu khop nhau, khong phai sua hai thuat toan ngat.
+   Chua 4 o cuoi dong: luat "khong dat dau cau o dau dong" (TIsCharacterNotAlowAtLineHead) xet 3 o cuoi,
+   neu khong chua thi no con ngat them mot lan nua. Tu dai hon ca dong (khong co dau cach) de nguyen - engine
+   van tu ngat nhu cu. Goi lai nhieu lan khong doi gi them. Tra so cho da ngat. */
+extern "C" ENGINE_API
+int TNgatDongTheoTu(char* pBuffer, int nCount, int nWrapCharaNum)
+{
+	if (pBuffer == NULL || nCount <= 0 || nWrapCharaNum <= 8)
+		return 0;
+	int nNguong = nWrapCharaNum - 4;
+	int nRong = 0;			/* be rong dong hien tai (nua o) */
+	int nCachCuoi = -1;		/* vi tri dau cach cuoi cung cua dong, -1 = chua co */
+	int nRongSauCach = 0;	/* be rong phan sau dau cach do */
+	int nNgat = 0;
+	int i = 0;
+	while (i < nCount)
+	{
+		unsigned char c = (unsigned char)pBuffer[i];
+		if (c == 0)
+			break;
+		if (c == KTC_ENTER)
+		{
+			nRong = 0;
+			nCachCuoi = -1;
+			i++;
+			continue;
+		}
+		if (c == KTC_COLOR || c == KTC_BORDER_COLOR)
+		{
+			i += 4;
+			continue;
+		}
+		if (c == KTC_COLOR_RESTORE || c == KTC_BORDER_RESTORE)
+		{
+			i++;
+			continue;
+		}
+		int nRongKyTu = 1, nByte = 1;
+		if (c == KTC_INLINE_PIC)
+		{
+			nRongKyTu = 2;
+			nByte = 1 + sizeof(WORD);
+		}
+		else if (c > 0x80 && LaCapGbk(pBuffer, i, nCount))
+		{
+			nRongKyTu = 2;
+			nByte = 2;
+		}
+		if (c == ' ')
+		{
+			if (nRong + 1 > nNguong)
+			{
+				pBuffer[i] = KTC_ENTER;		/* dau cach ngay cho tran: ngat luon o day */
+				nNgat++;
+				nRong = 0;
+				nCachCuoi = -1;
+			}
+			else
+			{
+				nCachCuoi = i;
+				nRongSauCach = 0;
+				nRong++;
+			}
+			i++;
+			continue;
+		}
+		if (nRong + nRongKyTu > nNguong && nCachCuoi >= 0)
+		{
+			pBuffer[nCachCuoi] = KTC_ENTER;
+			nNgat++;
+			nRong = nRongSauCach;
+			nCachCuoi = -1;
+		}
+		nRong += nRongKyTu;
+		if (nCachCuoi >= 0)
+			nRongSauCach += nRongKyTu;
+		i += nByte;
+	}
+	return nNgat;
+}

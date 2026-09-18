@@ -1637,6 +1637,7 @@ typedef struct
 	BYTE			ProtocolType;
 	DWORD			m_dwNpcID;
 	SViewItemInfo	m_sInfo[itempart_num];
+	BYTE			m_btTrungSinh;	/* so lan trung sinh cua nguoi bi xem (bang xem do hien "Trung sinh n lan") - hai nua phai khop */
 } VIEW_EQUIP_SYNC;				// s2c_viewequip
 
 typedef struct//该结构是所统计的玩家的基本数据
