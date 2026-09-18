@@ -55,6 +55,11 @@ KUiTradeConfirm* KUiTradeConfirm::OpenWindow(KUiObjAtContRegion* pObj,
 			m_pSelf->m_BreakImg.Show();
 			m_pSelf->m_OkBtn.Enable(true);
 		}
+		/* Tach chong khong co gia: an dong "0 luong". */
+		if (eAction == TCA_BREAK)
+			m_pSelf->m_Money.Hide();
+		else
+			m_pSelf->m_Money.Show();
 		else
 		{
 			if (eAction == TCA_BUY)
@@ -186,6 +191,7 @@ void KUiTradeConfirm::LoadScheme(const char* pScheme)
         m_BuyImg.Init(&Ini, "BuyImg");
         m_SaleImg.Init(&Ini, "SaleImg");
         m_RepairImg.Init(&Ini, "RepairImg");
+        m_BreakImg.Init(&Ini, "BreakImg");	/* tieu de "Tach" - truoc day khong nap nen dai tieu de trong */
         m_OkBtn.Init(&Ini, "OkBtn");
         m_CancelBtn.Init(&Ini, "CancelBtn");
         m_Money.SetMoneyText(m_PriceInfo.nPrice);

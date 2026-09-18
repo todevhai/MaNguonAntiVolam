@@ -518,6 +518,10 @@ void KUiItem::OnBreakItem( KUiDraggedObject* pItem )
 	Obj.Region.Height = pItem->DataH;
 	Obj.eContainer = UOC_ITEM_TAKE_WITH;
 	
+	/* Lay TEN mon qua cung duong gia ban (GDI_TRADE_ITEM_PRICE) - truoc day de trong nen hop tach
+	   khong co chu nao. Gia bo di: tach chong khong mat tien. */
 	KUiItemBuySelInfo	Price = { 0 };
+	g_pCoreShell->GetGameData(GDI_TRADE_ITEM_PRICE, (unsigned int)(&Obj), (int)(&Price));
+	Price.nPrice = 0;
 	KUiTradeConfirm::OpenWindow(&Obj, &Price, TCA_BREAK);
 }
