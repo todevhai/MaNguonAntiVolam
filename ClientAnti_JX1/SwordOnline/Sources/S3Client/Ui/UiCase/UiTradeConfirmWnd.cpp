@@ -44,6 +44,11 @@ KUiTradeConfirm* KUiTradeConfirm::OpenWindow(KUiObjAtContRegion* pObj,
 		m_pSelf->m_SaleImg.Hide();
 		m_pSelf->m_RepairImg.Hide();
 		m_pSelf->m_BreakImg.Hide();
+		/* Tach chong khong co gia: an dong "0 luong". */
+		if (eAction == TCA_BREAK)
+			m_pSelf->m_Money.Hide();
+		else
+			m_pSelf->m_Money.Show();
 		if (eAction == TCA_SALE)
 		{
 			m_pSelf->m_SaleImg.Show();
@@ -55,11 +60,6 @@ KUiTradeConfirm* KUiTradeConfirm::OpenWindow(KUiObjAtContRegion* pObj,
 			m_pSelf->m_BreakImg.Show();
 			m_pSelf->m_OkBtn.Enable(true);
 		}
-		/* Tach chong khong co gia: an dong "0 luong". */
-		if (eAction == TCA_BREAK)
-			m_pSelf->m_Money.Hide();
-		else
-			m_pSelf->m_Money.Show();
 		else
 		{
 			if (eAction == TCA_BUY)
