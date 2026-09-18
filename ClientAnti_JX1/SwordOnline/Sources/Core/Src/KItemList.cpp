@@ -816,6 +816,12 @@ BOOL KItemList::EnoughAttrib(void* pAttrib)
 			return FALSE;
 		}
 		break;
+	case magic_require_translife:	/* so lan trung sinh toi thieu (cung luat may chu) */
+		if (Player[m_PlayerIdx].m_nTrungSinh < pData->nValue[0])
+		{
+			return FALSE;
+		}
+		break;
 	case magic_requiresex:
 		if (Npc[Player[m_PlayerIdx].m_nIndex].m_nSex != pData->nValue[0])
 		{

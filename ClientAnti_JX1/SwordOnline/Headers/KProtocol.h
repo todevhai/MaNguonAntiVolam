@@ -2219,6 +2219,14 @@ typedef struct
 	BYTE	nAvatar;		// 0 = chua chon; 1..defMAX_AVATAR
 } SET_AVATAR;
 
+// Trung sinh (server -> client): client tu dung khang goc/toi da nen can cung hai so nay.
+typedef struct
+{
+	BYTE	ProtocolType;
+	BYTE	nLan;			// so lan da trung sinh
+	BYTE	nKhangThem[5];	// khang toi da cong them, thu tu KHANG_* (vat ly, hoa, bang, loi, doc)
+} TRUNG_SINH_SYNC;
+
 // Chuoi ha guc lien tiep. May chu dem, client chi ve chu "Lien tram N"
 // tai cho muc tieu vua nga - lay toa do tu ID nen khong can gui X/Y.
 typedef struct

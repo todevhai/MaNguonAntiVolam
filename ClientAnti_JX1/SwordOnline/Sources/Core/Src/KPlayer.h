@@ -162,6 +162,11 @@ public:
 	// Chan dung may chu bao ve (s2c_setavatar). Chi co ben CLIENT: may chu giu
 	// no trong bien nhiem vu luu-dai chu khong trong KPlayer.
 	int				m_nAvatar;					// 0 = chua chon, 1..defMAX_AVATAR
+	/* Trung sinh - may chu gui qua s2c_trungsinh. */
+	int				m_nTrungSinh;
+	int				m_nKhangToiDaThem[5];
+	int				KhangGoc(int nHe);
+	int				KhangToiDa(int nHe);
 	// Kinh mach: goi s2c_meridian gan nhat (cap 8 mach, vat lieu, chu goi y). May chu gui khi
 	// vao the gioi va moi lan hoi; client dung cap de tu cong thuoc tinh huyet (ReCalcMeridian).
 	MERIDIAN_SYNC	m_Meridian;

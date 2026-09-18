@@ -121,6 +121,8 @@ void	KPlayer::Release()
 	m_cTrade.Release();
 	m_nAttributePoint = 0;
 	m_nSkillPoint = 0;
+	m_nTrungSinh = 0;
+	memset(m_nKhangToiDaThem, 0, sizeof(m_nKhangToiDaThem));
 	
 	m_nStrength = 0;
 	m_nDexterity = 0;
@@ -2444,21 +2446,21 @@ void	KPlayer::LevelUp()
 	//	Npc[m_nIndex].ResetLifeReplenish();
 	
 	// �������ֿ��Եı仯 �𡢱��������硢����
-	Npc[m_nIndex].m_FireResist				= PlayerSet.m_cLevelAdd.GetFireResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_FireResist				= KhangGoc(KHANG_HOA);
 	Npc[m_nIndex].m_CurrentFireResist		= Npc[m_nIndex].m_FireResist;
-	Npc[m_nIndex].m_ColdResist				= PlayerSet.m_cLevelAdd.GetColdResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_ColdResist				= KhangGoc(KHANG_BANG);
 	Npc[m_nIndex].m_CurrentColdResist		= Npc[m_nIndex].m_ColdResist;
-	Npc[m_nIndex].m_PoisonResist			= PlayerSet.m_cLevelAdd.GetPoisonResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_PoisonResist			= KhangGoc(KHANG_DOC);
 	Npc[m_nIndex].m_CurrentPoisonResist		= Npc[m_nIndex].m_PoisonResist;
-	Npc[m_nIndex].m_LightResist				= PlayerSet.m_cLevelAdd.GetLightResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_LightResist				= KhangGoc(KHANG_LOI);
 	Npc[m_nIndex].m_CurrentLightResist		= Npc[m_nIndex].m_LightResist;
-	Npc[m_nIndex].m_PhysicsResist			= PlayerSet.m_cLevelAdd.GetPhysicsResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_PhysicsResist			= KhangGoc(KHANG_VAT_LY);
 	Npc[m_nIndex].m_CurrentPhysicsResist	= Npc[m_nIndex].m_PhysicsResist;
-	Npc[m_nIndex].m_FireResistMax			= BASE_FIRE_RESIST_MAX;
-	Npc[m_nIndex].m_ColdResistMax			= BASE_COLD_RESIST_MAX;
-	Npc[m_nIndex].m_PoisonResistMax			= BASE_POISON_RESIST_MAX;
-	Npc[m_nIndex].m_LightResistMax			= BASE_LIGHT_RESIST_MAX;
-	Npc[m_nIndex].m_PhysicsResistMax		= BASE_PHYSICS_RESIST_MAX;
+	Npc[m_nIndex].m_FireResistMax			= KhangToiDa(KHANG_HOA);
+	Npc[m_nIndex].m_ColdResistMax			= KhangToiDa(KHANG_BANG);
+	Npc[m_nIndex].m_PoisonResistMax			= KhangToiDa(KHANG_DOC);
+	Npc[m_nIndex].m_LightResistMax			= KhangToiDa(KHANG_LOI);
+	Npc[m_nIndex].m_PhysicsResistMax		= KhangToiDa(KHANG_VAT_LY);
 	Npc[m_nIndex].m_CurrentFireResistMax	= Npc[m_nIndex].m_FireResistMax;
 	Npc[m_nIndex].m_CurrentColdResistMax	= Npc[m_nIndex].m_ColdResistMax;
 	Npc[m_nIndex].m_CurrentPoisonResistMax	= Npc[m_nIndex].m_PoisonResistMax;
@@ -2510,6 +2512,36 @@ void	KPlayer::LevelUp()
 }
 
 // need spe edit not end
+/* TRUNG SINH - cung luat voi may chu (KPlayer.cpp may chu "TRUNG SINH"): khang goc theo cap,
+   da trung sinh thi khong thap hon san [TRANSLIFE]; khang toi da 75 + phan cong them. */
+int	KPlayer::KhangGoc(int nHe)
+{
+	int nSeries = Npc[m_nIndex].m_Series, nLevel = Npc[m_nIndex].m_Level, n = 0;
+	switch (nHe)
+	{
+	case KHANG_HOA:		n = PlayerSet.m_cLevelAdd.GetFireResist(nSeries, nLevel);		break;
+	case KHANG_BANG:	n = PlayerSet.m_cLevelAdd.GetColdResist(nSeries, nLevel);		break;
+	case KHANG_DOC:		n = PlayerSet.m_cLevelAdd.GetPoisonResist(nSeries, nLevel);		break;
+	case KHANG_LOI:		n = PlayerSet.m_cLevelAdd.GetLightResist(nSeries, nLevel);		break;
+	case KHANG_VAT_LY:	n = PlayerSet.m_cLevelAdd.GetPhysicsResist(nSeries, nLevel);	break;
+	default:			return 0;
+	}
+	if (m_nTrungSinh > 0)
+	{
+		int nSan = PlayerSet.m_cLevelAdd.GetSanKhangTrungSinh(nHe);
+		if (n < nSan)
+			n = nSan;
+	}
+	return n;
+}
+
+int	KPlayer::KhangToiDa(int nHe)
+{
+	if (nHe < 0 || nHe >= KHANG_SO)
+		return BASE_FIRE_RESIST_MAX;
+	return BASE_FIRE_RESIST_MAX + m_nKhangToiDaThem[nHe];
+}
+
 void	KPlayer::UpdataCurData()
 {
 	if (m_nIndex <= 0 || m_nIndex >= MAX_NPC)
@@ -5813,21 +5845,21 @@ void	KPlayer::s2cLevelUp(BYTE* pMsg)
 	Npc[m_nIndex].m_CurrentManaMax = Npc[m_nIndex].m_ManaMax;
 	
 	// �������ֿ��Եı仯 �𡢱��������硢����
-	Npc[m_nIndex].m_FireResist				= PlayerSet.m_cLevelAdd.GetFireResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_FireResist				= KhangGoc(KHANG_HOA);
 	Npc[m_nIndex].m_CurrentFireResist		= Npc[m_nIndex].m_FireResist;
-	Npc[m_nIndex].m_ColdResist				= PlayerSet.m_cLevelAdd.GetColdResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_ColdResist				= KhangGoc(KHANG_BANG);
 	Npc[m_nIndex].m_CurrentColdResist		= Npc[m_nIndex].m_ColdResist;
-	Npc[m_nIndex].m_PoisonResist			= PlayerSet.m_cLevelAdd.GetPoisonResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_PoisonResist			= KhangGoc(KHANG_DOC);
 	Npc[m_nIndex].m_CurrentPoisonResist		= Npc[m_nIndex].m_PoisonResist;
-	Npc[m_nIndex].m_LightResist				= PlayerSet.m_cLevelAdd.GetLightResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_LightResist				= KhangGoc(KHANG_LOI);
 	Npc[m_nIndex].m_CurrentLightResist		= Npc[m_nIndex].m_LightResist;
-	Npc[m_nIndex].m_PhysicsResist			= PlayerSet.m_cLevelAdd.GetPhysicsResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_PhysicsResist			= KhangGoc(KHANG_VAT_LY);
 	Npc[m_nIndex].m_CurrentPhysicsResist	= Npc[m_nIndex].m_PhysicsResist;
-	Npc[m_nIndex].m_FireResistMax			= BASE_FIRE_RESIST_MAX;
-	Npc[m_nIndex].m_ColdResistMax			= BASE_COLD_RESIST_MAX;
-	Npc[m_nIndex].m_PoisonResistMax			= BASE_POISON_RESIST_MAX;
-	Npc[m_nIndex].m_LightResistMax			= BASE_LIGHT_RESIST_MAX;
-	Npc[m_nIndex].m_PhysicsResistMax		= BASE_PHYSICS_RESIST_MAX;
+	Npc[m_nIndex].m_FireResistMax			= KhangToiDa(KHANG_HOA);
+	Npc[m_nIndex].m_ColdResistMax			= KhangToiDa(KHANG_BANG);
+	Npc[m_nIndex].m_PoisonResistMax			= KhangToiDa(KHANG_DOC);
+	Npc[m_nIndex].m_LightResistMax			= KhangToiDa(KHANG_LOI);
+	Npc[m_nIndex].m_PhysicsResistMax		= KhangToiDa(KHANG_VAT_LY);
 	Npc[m_nIndex].m_CurrentFireResistMax	= Npc[m_nIndex].m_FireResistMax;
 	Npc[m_nIndex].m_CurrentColdResistMax	= Npc[m_nIndex].m_ColdResistMax;
 	Npc[m_nIndex].m_CurrentPoisonResistMax	= Npc[m_nIndex].m_PoisonResistMax;
@@ -6267,16 +6299,16 @@ void	KPlayer::SetBaseDefence()
 
 void	KPlayer::SetBaseResistData()
 {
-	Npc[m_nIndex].m_FireResist			= PlayerSet.m_cLevelAdd.GetFireResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
-	Npc[m_nIndex].m_ColdResist			= PlayerSet.m_cLevelAdd.GetColdResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
-	Npc[m_nIndex].m_PoisonResist		= PlayerSet.m_cLevelAdd.GetPoisonResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
-	Npc[m_nIndex].m_LightResist			= PlayerSet.m_cLevelAdd.GetLightResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
-	Npc[m_nIndex].m_PhysicsResist		= PlayerSet.m_cLevelAdd.GetPhysicsResist(Npc[m_nIndex].m_Series, Npc[m_nIndex].m_Level);
-	Npc[m_nIndex].m_FireResistMax		= BASE_FIRE_RESIST_MAX;
-	Npc[m_nIndex].m_ColdResistMax		= BASE_COLD_RESIST_MAX;
-	Npc[m_nIndex].m_PoisonResistMax		= BASE_POISON_RESIST_MAX;
-	Npc[m_nIndex].m_LightResistMax		= BASE_LIGHT_RESIST_MAX;
-	Npc[m_nIndex].m_PhysicsResistMax	= BASE_PHYSICS_RESIST_MAX;
+	Npc[m_nIndex].m_FireResist			= KhangGoc(KHANG_HOA);
+	Npc[m_nIndex].m_ColdResist			= KhangGoc(KHANG_BANG);
+	Npc[m_nIndex].m_PoisonResist		= KhangGoc(KHANG_DOC);
+	Npc[m_nIndex].m_LightResist			= KhangGoc(KHANG_LOI);
+	Npc[m_nIndex].m_PhysicsResist		= KhangGoc(KHANG_VAT_LY);
+	Npc[m_nIndex].m_FireResistMax		= KhangToiDa(KHANG_HOA);
+	Npc[m_nIndex].m_ColdResistMax		= KhangToiDa(KHANG_BANG);
+	Npc[m_nIndex].m_PoisonResistMax		= KhangToiDa(KHANG_DOC);
+	Npc[m_nIndex].m_LightResistMax		= KhangToiDa(KHANG_LOI);
+	Npc[m_nIndex].m_PhysicsResistMax	= KhangToiDa(KHANG_VAT_LY);
 }
 
 void	KPlayer::SetBaseSpeedAndRadius()

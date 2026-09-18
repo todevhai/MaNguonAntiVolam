@@ -3,7 +3,7 @@
 
 #include "KLinkArray.h"
 
-#define		MAX_LEVEL					250		// 玩家最大等级
+#define		MAX_LEVEL					200		// 玩家最大等级
 #define		MAX_SERIES					5
 #define		MAX_LEAD_LEVEL				100		// 最大统率力等级
 
@@ -56,6 +56,10 @@ public:
 	int			GetPoisonResist(int nSeries, int nLevel);
 	int			GetLightResist(int nSeries, int nLevel);
 	int			GetPhysicsResist(int nSeries, int nLevel);
+	/* San khang goc cua nhan vat DA trung sinh, chi so = KHANG_* cua KNpc.h. */
+	int			GetSanKhangTrungSinh(int nHe);
+private:
+	int		m_nSanKhangTrungSinh[5];
 };
 
 

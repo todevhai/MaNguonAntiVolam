@@ -191,6 +191,7 @@ enum s2c_PROTOCOL
 	s2c_setavatar,	// chan dung hien tai (server -> client)
 	s2c_lientram,	// chuoi ha guc lien tiep (server -> client)
 	s2c_meridian,	// kinh mach: 8 cap + vat lieu + ket qua (server -> client)
+	s2c_trungsinh,	// so lan trung sinh + khang toi da cong them (server -> client)
 //	s2c_gmgateway2relaysvr,		//GM登陆后网关通知中转服务器有合法连接的协议
 
 	s2c_extend = 250,

@@ -5,6 +5,9 @@ class ISkill;
 #include "KCore.h"
 #include "KSkillList.h"
 #include "KMagicAttrib.h"
+
+/* Chi so he khang cho trung sinh (giong KNpc.h may chu). */
+enum { KHANG_VAT_LY = 0, KHANG_HOA, KHANG_BANG, KHANG_LOI, KHANG_DOC, KHANG_SO };
 #include "GameDataDef.h"
 #include "KNpcFindPath.h"
 #include "KNpcDeathCalcExp.h"

@@ -128,6 +128,7 @@ public:
 	void	SetAvatar(BYTE* pMsg);
 	void	LienTram(BYTE* pMsg);
 	void	MeridianSync(BYTE* pMsg);
+	void	TrungSinhSync(BYTE* pMsg);
 	void	OpenTremble(BYTE* pMsg);
 	void	NetCommandSetRankFF(BYTE* pMsg);
 

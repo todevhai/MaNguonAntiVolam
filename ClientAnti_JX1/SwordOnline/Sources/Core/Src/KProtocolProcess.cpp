@@ -149,6 +149,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_setavatar] = SetAvatar;
 	ProcessFunc[s2c_lientram] = LienTram;
 	ProcessFunc[s2c_meridian] = MeridianSync;
+	ProcessFunc[s2c_trungsinh] = TrungSinhSync;
 	ProcessFunc[s2c_opentremble] = OpenTremble;
 	ProcessFunc[s2c_rankname] = NetCommandSetRankFF;
 
@@ -3600,6 +3601,26 @@ void	KProtocolProcess::MeridianSync(BYTE* pMsg)
 	if (p.m_nIndex > 0)
 	{
 		p.UpdataCurData();	// suc manh qua ChangeCurStrength tu dat lai sat thuong
+		CoreDataChanged(GDCNI_PLAYER_RT_ATTRIBUTE, 0, 0);
+	}
+}
+
+// Trung sinh: may chu gui theo nhip bao NPC. Chi dung lai thuoc tinh khi so doi.
+void	KProtocolProcess::TrungSinhSync(BYTE* pMsg)
+{
+	TRUNG_SINH_SYNC* pSync = (TRUNG_SINH_SYNC*)pMsg;
+	KPlayer& p = Player[CLIENT_PLAYER_INDEX];
+	BOOL bDoi = (p.m_nTrungSinh != (int)pSync->nLan);
+	p.m_nTrungSinh = (int)pSync->nLan;
+	for (int i = 0; i < KHANG_SO; i++)
+	{
+		if (p.m_nKhangToiDaThem[i] != (int)pSync->nKhangThem[i])
+			bDoi = TRUE;
+		p.m_nKhangToiDaThem[i] = (int)pSync->nKhangThem[i];
+	}
+	if (bDoi && p.m_nIndex > 0)
+	{
+		p.UpdataCurData();
 		CoreDataChanged(GDCNI_PLAYER_RT_ATTRIBUTE, 0, 0);
 	}
 }

@@ -546,6 +546,26 @@ BOOL	KLevelAdd::Init()
 		LevelExp.GetInteger(i + 2, 2, 0, &m_nLevelExp[i]);
 	}
 
+	/* San khang khi da trung sinh - [TRANSLIFE] cua settings/gamesetting.ini, cung cach may chu
+	   (ban6: MinPhyResist ap cho khang DOC, MinWoodResist cho khang VAT LY).
+	   Thu tu mang = KHANG_VAT_LY, KHANG_HOA, KHANG_BANG, KHANG_LOI, KHANG_DOC. */
+	{
+		m_nSanKhangTrungSinh[0] = -11;
+		m_nSanKhangTrungSinh[1] = -18;
+		m_nSanKhangTrungSinh[2] = -18;
+		m_nSanKhangTrungSinh[3] = -18;
+		m_nSanKhangTrungSinh[4] = -18;
+		KIniFile	cCaiDat;
+		if (cCaiDat.Load("\\settings\\gamesetting.ini"))
+		{
+			cCaiDat.GetInteger("TRANSLIFE", "MinWoodResist", -11, &m_nSanKhangTrungSinh[0]);
+			cCaiDat.GetInteger("TRANSLIFE", "MinFireResist", -18, &m_nSanKhangTrungSinh[1]);
+			cCaiDat.GetInteger("TRANSLIFE", "MinWaterResist", -18, &m_nSanKhangTrungSinh[2]);
+			cCaiDat.GetInteger("TRANSLIFE", "MinEarthResist", -18, &m_nSanKhangTrungSinh[3]);
+			cCaiDat.GetInteger("TRANSLIFE", "MinPhyResist", -18, &m_nSanKhangTrungSinh[4]);
+		}
+	}
+
 	KTabFile	LevelAdd;
 	if ( !LevelAdd.Load(PLAYER_LEVEL_ADD_FILE) )
 		return FALSE;
@@ -666,6 +686,13 @@ static int KhangTheoCap(int nMoiCap, int nLevel)
 	if (nLevel > 120 && nMoiCap < 0)
 		nLevel = 120;
 	return nMoiCap * nLevel / 100;
+}
+
+int		KLevelAdd::GetSanKhangTrungSinh(int nHe)
+{
+	if (nHe < 0 || nHe >= 5)
+		return 0;
+	return m_nSanKhangTrungSinh[nHe];
 }
 
 //---------------------------------------------------------------------------
