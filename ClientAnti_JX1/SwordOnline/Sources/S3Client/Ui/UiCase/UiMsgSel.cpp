@@ -13,8 +13,6 @@
 #include "../../../core/src/GameDataDef.h"
 #include "../UiBase.h"
 #include "../UiSoundSetting.h"
-#include "../../../Represent/iRepresent/iRepresentShell.h"
-extern iRepresentShell*	g_pRepresentShell;
 
 extern iCoreShell*		g_pCoreShell;
 
@@ -331,24 +329,9 @@ void KUiMsgSel::DatCoTheoNoiDung()
 void KUiMsgSel::PaintWindow()
 {
 	KWndShowAnimate::PaintWindow();
-	if (ms_nNenThan <= 0 || g_pRepresentShell == NULL || m_Image.szImage[0] == 0)
+	if (ms_nNenThan <= 0)
 		return;
-	KUiImageRef Anh = m_Image;
-	Anh.oPosition.nX = m_nAbsoluteLeft;
-	int nDay = m_Height - ms_nNenDay;
-	Anh.nFrame = 1;
-	for (int y = ms_nNenDau; y < nDay; y += ms_nNenThan)
-	{
-		Anh.oPosition.nY = m_nAbsoluteTop + y;
-		g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
-	}
-	Anh.nFrame = 2;
-	Anh.oPosition.nY = m_nAbsoluteTop + nDay;
-	g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
-	if (m_nKeY > 0 && m_nKeY < nDay)
-	{
-		Anh.nFrame = 3;
-		Anh.oPosition.nY = m_nAbsoluteTop + m_nKeY;
-		g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
-	}
+	VeNenGhep(ms_nNenDau, ms_nNenThan, ms_nNenDay);
+	if (m_nKeY > 0 && m_nKeY < m_Height - ms_nNenDay)
+		VeKhungNen(3, m_nKeY);
 }

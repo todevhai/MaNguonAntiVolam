@@ -24,6 +24,12 @@ public:
 	int		NextFrame();									//Í¼ÐÎ»»Ö¡
 	void	SetImage(short nType, const char* pszImgName, bool bAdjustWndSize = false);
 	void	SetMaxFrame(int nMaxFrame);
+	/* Ve tiep nen ghep sau PaintWindow (khung 0 = dau da ve): khung 1 (than, cao nThan) lat lai tu
+	   nDau toi sat day, khung 2 (day, cao nDay) o day cua so. Anh SPR khong co gian, cua so doi
+	   chieu cao theo noi dung thi ghep nen bang cach nay. nThan <= 0: khong lam gi. */
+	void	VeNenGhep(int nDau, int nThan, int nDay);
+	/* Ve mot khung cua anh nen tai do cao y (tinh tu dinh cua so). */
+	void	VeKhungNen(int nKhung, int y);
 	void	UpdateTimer();
 	KWndImage();
 protected:

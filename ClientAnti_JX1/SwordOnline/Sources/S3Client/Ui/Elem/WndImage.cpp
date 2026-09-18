@@ -152,4 +152,25 @@ void KWndImage::PaintWindow()
 void KWndImage::SetMaxFrame(int nMaxFrame)
 {
     m_Image.nNumFrames = nMaxFrame;
-}  
+}
+
+void KWndImage::VeKhungNen(int nKhung, int y)
+{
+	if (g_pRepresentShell == NULL || m_Image.szImage[0] == 0)
+		return;
+	KUiImageRef Anh = m_Image;
+	Anh.nFrame = nKhung;
+	Anh.oPosition.nX = m_nAbsoluteLeft;
+	Anh.oPosition.nY = m_nAbsoluteTop + y;
+	g_pRepresentShell->DrawPrimitives(1, &Anh, RU_T_IMAGE, true);
+}
+
+void KWndImage::VeNenGhep(int nDau, int nThan, int nDay)
+{
+	if (nThan <= 0)
+		return;
+	int nChanDay = m_Height - nDay;
+	for (int y = nDau; y < nChanDay; y += nThan)
+		VeKhungNen(1, y);		/* manh cuoi lo xuong phan day thi khung day ve de len */
+	VeKhungNen(2, nChanDay);
+}

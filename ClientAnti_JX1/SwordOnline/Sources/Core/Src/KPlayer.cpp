@@ -5434,12 +5434,12 @@ void	KPlayer::OnScriptAction(PLAYER_SCRIPTACTION_SYNC * pMsg)
 							*pNewAnswer = 0;
 							if (!bUsingSpeakId)
 							{
-								strcpy(pSpeakList[i].sInformation, pAnswer);
+								g_StrCpyLen(pSpeakList[i].sInformation, pAnswer, sizeof(pSpeakList[i].sInformation));
 								
 							}
 							else
 							{
-								strcpy(pSpeakList[i].sInformation, g_GetStringRes(atoi(pAnswer), szString, sizeof(szString)));
+								g_StrCpyLen(pSpeakList[i].sInformation, g_GetStringRes(atoi(pAnswer), szString, sizeof(szString)), sizeof(pSpeakList[i].sInformation));
 							}
 							
 							
@@ -5459,11 +5459,11 @@ void	KPlayer::OnScriptAction(PLAYER_SCRIPTACTION_SYNC * pMsg)
 						{
 							if (!bUsingSpeakId)
 							{
-								strcpy(pSpeakList[i].sInformation, pAnswer);
+								g_StrCpyLen(pSpeakList[i].sInformation, pAnswer, sizeof(pSpeakList[i].sInformation));
 							}
 							else
 							{
-								strcpy(pSpeakList[i].sInformation, g_GetStringRes(atoi(pAnswer), szString ,sizeof(szString)));
+								g_StrCpyLen(pSpeakList[i].sInformation, g_GetStringRes(atoi(pAnswer), szString ,sizeof(szString)), sizeof(pSpeakList[i].sInformation));
 							}
 							
 							strcpy(pSpeakList[i].sConfirmText, "Kplayer so 3");

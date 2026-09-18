@@ -366,7 +366,7 @@ struct KUiMsgParam
 
 struct KUiInformationParam
 {
-	char	sInformation[256];	//消息文字内容
+	char	sInformation[512];	//消息文字内容
 	char	sConfirmText[64];	//确认消息(按钮)的标题文字
 	short	nInforLen;			//消息文字内容的存储长度
 	bool	bNeedConfirmNotify;	//是否要发回确认消息(给core)

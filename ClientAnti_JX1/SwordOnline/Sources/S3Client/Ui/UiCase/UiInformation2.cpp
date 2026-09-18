@@ -18,6 +18,13 @@ extern iCoreShell*		g_pCoreShell;
 #define	SCHEME_INI	"UiInformation2.ini"
 
 KUiInformation2	g_UiInformation2;
+int KUiInformation2::ms_nNenDau = 0;
+int KUiInformation2::ms_nNenThan = 0;
+int KUiInformation2::ms_nNenDay = 0;
+int KUiInformation2::ms_nCaoToiDa = 0;
+int KUiInformation2::ms_nLeDuoi = 0;
+int KUiInformation2::ms_nCaoChuToiThieu = 0;
+int KUiInformation2::ms_nFont = 14;
 
 void UIMessageBox2(const char* pMsg, int nMsgLen, const char* pBtnLabel,
 				   KWndWindow* pCaller, unsigned int uParam)
@@ -94,6 +101,13 @@ void KUiInformation2::LoadScheme(const char* pScheme)
 		KWndShowAnimate::Init(&Ini, "Main");
 		m_Information .Init(&Ini, "Info");
 		m_OKBtn.Init(&Ini, "OK");
+		Ini.GetInteger("Main", "NenDau", 0, &ms_nNenDau);
+		Ini.GetInteger("Main", "NenThan", 0, &ms_nNenThan);
+		Ini.GetInteger("Main", "NenDay", 0, &ms_nNenDay);
+		Ini.GetInteger("Main", "CaoToiDa", 480, &ms_nCaoToiDa);
+		Ini.GetInteger("Main", "LeDuoi", 29, &ms_nLeDuoi);
+		Ini.GetInteger("Info", "Font", 14, &ms_nFont);
+		Ini.GetInteger("Info", "Height", 75, &ms_nCaoChuToiThieu);
 	}
 }
 
@@ -108,6 +122,7 @@ void KUiInformation2::Show(const char* pInformation, int nInforLen, const char* 
 		m_pCallerWnd = pCallerWnd;
 		m_uCallerParam = uParam;
 		m_Information.SetText(pInformation, nInforLen);
+		DatCoTheoNoiDung();
 /*		if (pBtnLabel == NULL)
 			m_OKBtn.Hide();
 		else
@@ -211,4 +226,36 @@ void KUiInformation2::Close()
 KUiInformation2::~KUiInformation2()
 {
 	Close();
+}
+
+/* Loi thoai dai hon o chu goc (5 dong co 14) truoc day bi cat. O chu cao dung so dong cua loi thoai
+   (it nhat bang o chu goc trong ini de loi ngan van can giua nhu cu), hop cao theo, kep CaoToiDa.
+   Nut xac nhan (an chu) doi xuong ngay duoi o chu. Chi doi kich thuoc, khong doi vi tri tren. */
+void KUiInformation2::DatCoTheoNoiDung()
+{
+	if (ms_nNenThan <= 0)
+		return;
+	int nTrai = 0, nTren = 0, nRong = 0, nCao = 0;
+	m_Information.GetPosition(&nTrai, &nTren);
+	m_Information.GetSize(&nRong, &nCao);
+	int nCaoChu = m_Information.GetLineCount() * (ms_nFont + 1);
+	if (nCaoChu < ms_nCaoChuToiThieu)
+		nCaoChu = ms_nCaoChuToiThieu;
+	int nCaoHop = nTren + nCaoChu + ms_nLeDuoi;
+	if (ms_nCaoToiDa > 0 && nCaoHop > ms_nCaoToiDa)
+	{
+		nCaoHop = ms_nCaoToiDa;
+		nCaoChu = nCaoHop - nTren - ms_nLeDuoi;
+	}
+	m_Information.SetSize(nRong, nCaoChu);
+	int nTraiNut = 0, nTrenNut = 0;
+	m_OKBtn.GetPosition(&nTraiNut, &nTrenNut);
+	m_OKBtn.SetPosition(nTraiNut, nTren + nCaoChu);
+	SetSize(m_Width, nCaoHop);
+}
+
+void KUiInformation2::PaintWindow()
+{
+	KWndShowAnimate::PaintWindow();
+	VeNenGhep(ms_nNenDau, ms_nNenThan, ms_nNenDay);
 }
