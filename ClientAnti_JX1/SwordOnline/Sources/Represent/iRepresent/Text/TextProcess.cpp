@@ -16,6 +16,15 @@
 
 extern IInlinePicEngineSink* g_pIInlinePicSinkRP;	//嵌入式图片的处理接口[wxb 2003-6-20]
 
+/* Cung luat voi Engine/Src/Text.cpp (LaCapGbk): byte > 0x80 chi la byte DAN GBK khi byte sau la byte
+   DUOI hop le (>= 0x40); chu Viet TCVN3 mot byte dung truoc ma dieu khien / chu so / dau cau la mot
+   byte. Hai ben phai giong nhau: MouseHover do dong bang Text.cpp roi can giua, KTextProcess cat va ve;
+   lech luat la tooltip lech dong. */
+static inline bool LaCapGbk(const char* p, int nPos, int nCount)
+{
+	return nPos + 1 < nCount && (unsigned char)p[nPos + 1] >= 0x40;
+}
+
 union	TP_COLOR
 {
 	struct {unsigned char b, g, r, a; } Color_b;
@@ -93,7 +102,7 @@ int KTextProcess::GetSimplexText(int &nSimplexStartPos, KTP_CTRL& HeadCtrl, KTP_
 	{
 		cCode = m_pBuffer[m_nReadPos];
 		//判断头一个字符是否是控制符号
-		if (cCode > 0x80)	//可能是中文字符
+		if (cCode > 0x80 && LaCapGbk(m_pBuffer, m_nReadPos, m_nCount))	//可能是中文字符
 		{	//字符串先被处理过，不会出现单个单字节数值大于0x80的字符
 			nVisibleChars += 2;
 			m_fCurrentLineLen += 2;
@@ -842,7 +851,7 @@ void KTextProcess::GetCurLineHeight(int& nSpanLines, int& nHeight, int nFontSize
 		{
 			cCode = m_pBuffer[m_nReadPos];
 			//判断头一个字符是否是控制符号
-			if (cCode > 0x80)	//可能是中文字符
+			if (cCode > 0x80 && LaCapGbk(m_pBuffer, m_nReadPos, m_nCount))	//可能是中文字符
 			{	//字符串先被处理过，不会出现单个单字节数值大于0x80的字符
 				m_fCurrentLineLen += 2;
 				m_nCurrentLineLen = (int)(m_fCurrentLineLen + 0.9999);
