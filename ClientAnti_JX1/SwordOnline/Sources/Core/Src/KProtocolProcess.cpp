@@ -150,6 +150,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_lientram] = LienTram;
 	ProcessFunc[s2c_meridian] = MeridianSync;
 	ProcessFunc[s2c_trungsinh] = TrungSinhSync;
+	ProcessFunc[s2c_kinhnghiemchieu] = KnChieuSync;
 	ProcessFunc[s2c_opentremble] = OpenTremble;
 	ProcessFunc[s2c_rankname] = NetCommandSetRankFF;
 
@@ -3603,6 +3604,13 @@ void	KProtocolProcess::MeridianSync(BYTE* pMsg)
 		p.UpdataCurData();	// suc manh qua ChangeCurStrength tu dat lai sat thuong
 		CoreDataChanged(GDCNI_PLAYER_RT_ATTRIBUTE, 0, 0);
 	}
+}
+
+// Tien do luyen chieu: chi cat vao bang, tooltip doc luc ve.
+void	KProtocolProcess::KnChieuSync(BYTE* pMsg)
+{
+	KN_CHIEU_SYNC* pSync = (KN_CHIEU_SYNC*)pMsg;
+	Player[CLIENT_PLAYER_INDEX].DatKnChieu((int)pSync->nSkillId, (int)pSync->nPhanNghin);
 }
 
 // Trung sinh: may chu gui theo nhip bao NPC. Chi dung lai thuoc tinh khi so doi.

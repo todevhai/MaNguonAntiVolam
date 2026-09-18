@@ -2837,6 +2837,24 @@ void	KSkill::GetDesc(unsigned long ulSkillId, unsigned long ulCurLevel, char * p
 	strcat(pszMsg, "<color=Yellow>");
 	strcat(pszMsg, pTempSkill->m_szName);
 	strcat(pszMsg, "\n<bclr=Black><color>");
+	/* Chieu luyen kinh nghiem: tien do toi cap sau (may chu gui qua s2c_kinhnghiemchieu), va nhac
+	   khi nhan vat chua dat cap yeu cau (chieu bi chan - xem CanCastSkill). */
+	if (pTempSkill->IsExpSkill() && nOwnerIndex == Player[CLIENT_PLAYER_INDEX].m_nIndex && ulCurLevel > 0)
+	{
+		if (ulCurLevel >= g_SkillManager.GetSkillMaxLevel(ulSkillId))
+			sprintf(szTemp, "<color=Green>Luy\xd6n: \xae\xb7 t\xe8i \xae""a<color>\n");
+		else
+		{
+			int nPn = Player[CLIENT_PLAYER_INDEX].LayKnChieu((int)ulSkillId);
+			sprintf(szTemp, "<color=Green>Luy\xd6n: %d.%d%%<color>\n", nPn / 10, nPn % 10);
+		}
+		strcat(pszMsg, szTemp);
+		if (Npc[nOwnerIndex].m_Level < (int)pTempSkill->GetSkillReqLevel())
+		{
+			sprintf(szTemp, "<color=Red>C\xc7n \xae\xb9t c\xcap %d m\xedi d\xefng \xae\xad\xee""c<color>\n", (int)pTempSkill->GetSkillReqLevel());
+			strcat(pszMsg, szTemp);
+		}
+	}
 	
 	
 #ifdef SHOW_SKILL_MORE_INFO

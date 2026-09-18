@@ -123,6 +123,8 @@ void	KPlayer::Release()
 	m_nSkillPoint = 0;
 	m_nTrungSinh = 0;
 	memset(m_nKhangToiDaThem, 0, sizeof(m_nKhangToiDaThem));
+	memset(m_nKnChieuId, 0, sizeof(m_nKnChieuId));
+	memset(m_nKnChieuPhanNghin, 0, sizeof(m_nKnChieuPhanNghin));
 	
 	m_nStrength = 0;
 	m_nDexterity = 0;
@@ -2541,6 +2543,34 @@ int	KPlayer::KhangToiDa(int nHe)
 	if (nHe < 0 || nHe >= KHANG_SO)
 		return BASE_FIRE_RESIST_MAX;
 	return BASE_FIRE_RESIST_MAX + m_nKhangToiDaThem[nHe];
+}
+
+void	KPlayer::DatKnChieu(int nSkillId, int nPhanNghin)
+{
+	int nTrong = -1;
+	for (int k = 0; k < 20; k++)
+	{
+		if (m_nKnChieuId[k] == nSkillId)
+		{
+			m_nKnChieuPhanNghin[k] = nPhanNghin;
+			return;
+		}
+		if (!m_nKnChieuId[k] && nTrong < 0)
+			nTrong = k;
+	}
+	if (nTrong >= 0)
+	{
+		m_nKnChieuId[nTrong] = nSkillId;
+		m_nKnChieuPhanNghin[nTrong] = nPhanNghin;
+	}
+}
+
+int	KPlayer::LayKnChieu(int nSkillId)
+{
+	for (int k = 0; k < 20; k++)
+		if (m_nKnChieuId[k] == nSkillId)
+			return m_nKnChieuPhanNghin[k];
+	return 0;
 }
 
 void	KPlayer::UpdataCurData()

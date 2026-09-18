@@ -2219,6 +2219,14 @@ typedef struct
 	BYTE	nAvatar;		// 0 = chua chon; 1..defMAX_AVATAR
 } SET_AVATAR;
 
+// Tien do luyen chieu IsExpSkill (server -> client), de ve dong "Luyen: x%" trong tooltip.
+typedef struct
+{
+	BYTE	ProtocolType;
+	WORD	nSkillId;
+	WORD	nPhanNghin;		// 0..999 tien do toi cap sau
+} KN_CHIEU_SYNC;
+
 // Trung sinh (server -> client): client tu dung khang goc/toi da nen can cung hai so nay.
 typedef struct
 {

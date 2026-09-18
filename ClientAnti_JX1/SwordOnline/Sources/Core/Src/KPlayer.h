@@ -167,6 +167,11 @@ public:
 	int				m_nKhangToiDaThem[5];
 	int				KhangGoc(int nHe);
 	int				KhangToiDa(int nHe);
+	/* Tien do luyen chieu IsExpSkill (phan nghin) - may chu gui qua s2c_kinhnghiemchieu. */
+	int				m_nKnChieuId[20];
+	int				m_nKnChieuPhanNghin[20];
+	void			DatKnChieu(int nSkillId, int nPhanNghin);
+	int				LayKnChieu(int nSkillId);
 	// Kinh mach: goi s2c_meridian gan nhat (cap 8 mach, vat lieu, chu goi y). May chu gui khi
 	// vao the gioi va moi lan hoi; client dung cap de tu cong thuoc tinh huyet (ReCalcMeridian).
 	MERIDIAN_SYNC	m_Meridian;
