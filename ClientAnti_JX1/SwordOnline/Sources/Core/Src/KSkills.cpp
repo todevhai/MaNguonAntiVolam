@@ -3018,7 +3018,7 @@ void	KSkill::GetDesc(unsigned long ulSkillId, unsigned long ulCurLevel, char * p
 	   khi nhan vat chua dat cap yeu cau (chieu bi chan - xem CanCastSkill). */
 	if (pTempSkill->IsExpSkill() && nOwnerIndex == Player[CLIENT_PLAYER_INDEX].m_nIndex && ulCurLevel > 0)
 	{
-		if (ulCurLevel >= g_SkillManager.GetSkillMaxLevel(ulSkillId))
+		if ((int)ulCurLevel - nAddPoint >= Player[CLIENT_PLAYER_INDEX].TranCapChieu((int)ulSkillId))
 			sprintf(szTemp, "<color=Green>Luy\xd6n: \xae\xb7 t\xe8i \xae""a<color>\n");
 		else
 		{

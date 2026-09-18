@@ -3627,6 +3627,7 @@ void	KProtocolProcess::TrungSinhSync(BYTE* pMsg)
 			bDoi = TRUE;
 		p.m_nKhangToiDaThem[i] = (int)pSync->nKhangThem[i];
 	}
+	p.m_nTranCapChieuThem = (int)pSync->nTranCapChieuThem;
 	if (bDoi && p.m_nIndex > 0)
 	{
 		p.UpdataCurData();

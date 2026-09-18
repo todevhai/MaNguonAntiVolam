@@ -167,6 +167,8 @@ public:
 	int				m_nKhangToiDaThem[5];
 	int				KhangGoc(int nHe);
 	int				KhangToiDa(int nHe);
+	int				m_nTranCapChieuThem;		// SKILLLIMIT - chi tinh khi da trung sinh
+	int				TranCapChieu(int nSkillId);
 	/* Tien do luyen chieu IsExpSkill (phan nghin) - may chu gui qua s2c_kinhnghiemchieu. */
 	int				m_nKnChieuId[20];
 	int				m_nKnChieuPhanNghin[20];

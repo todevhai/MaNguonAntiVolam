@@ -123,6 +123,7 @@ void	KPlayer::Release()
 	m_nSkillPoint = 0;
 	m_nTrungSinh = 0;
 	memset(m_nKhangToiDaThem, 0, sizeof(m_nKhangToiDaThem));
+	m_nTranCapChieuThem = 0;
 	memset(m_nKnChieuId, 0, sizeof(m_nKnChieuId));
 	memset(m_nKnChieuPhanNghin, 0, sizeof(m_nKnChieuPhanNghin));
 	
@@ -2545,6 +2546,17 @@ int	KPlayer::KhangToiDa(int nHe)
 	return BASE_FIRE_RESIST_MAX + m_nKhangToiDaThem[nHe];
 }
 
+/* Tran cap chieu = MaxLevel cua skills.txt + SKILLLIMIT khi da trung sinh (cung may chu). */
+int	KPlayer::TranCapChieu(int nSkillId)
+{
+	int n = (int)g_SkillManager.GetSkillMaxLevel(nSkillId);
+	if (n > 0 && m_nTrungSinh > 0)
+		n += m_nTranCapChieuThem;
+	if (n > MAX_SKILLLEVEL)
+		n = MAX_SKILLLEVEL;
+	return n;
+}
+
 void	KPlayer::DatKnChieu(int nSkillId, int nPhanNghin)
 {
 	int nTrong = -1;
@@ -3848,7 +3860,7 @@ void	KPlayer::AddSkillPoint(BYTE* pProtocol)
 						int nWantToBeLevel = nSkillLevel + pAdd->m_nAddPoint;
 						
 						//Limit2
-						if ((nWantToBeLevel -Npc[m_nIndex].m_SkillList.GetAddPoint(nSkillIndex)) <= g_SkillManager.GetSkillMaxLevel(pAdd->m_nSkillID) && nWantToBeLevel <= Npc[m_nIndex].m_Level - ((KSkill*)pSkill)->GetSkillReqLevel() + 1)
+						if ((nWantToBeLevel -Npc[m_nIndex].m_SkillList.GetAddPoint(nSkillIndex)) <= TranCapChieu(pAdd->m_nSkillID) && nWantToBeLevel <= Npc[m_nIndex].m_Level - ((KSkill*)pSkill)->GetSkillReqLevel() + 1)
 						{
 							if ( !Npc[m_nIndex].m_SkillList.IncreaseLevel(nSkillIndex, pAdd->m_nAddPoint) )
 								return;
@@ -3857,7 +3869,7 @@ void	KPlayer::AddSkillPoint(BYTE* pProtocol)
 						}
 						else
 						{
-							if (nWantToBeLevel >=  g_SkillManager.GetSkillMaxLevel(pAdd->m_nSkillID))
+							if ((nWantToBeLevel - Npc[m_nIndex].m_SkillList.GetAddPoint(nSkillIndex)) > TranCapChieu(pAdd->m_nSkillID))
 							{
 								char szMsg[100];
 								sprintf(szMsg, "Kü n¨ng <color=green>%s <color>®· ®¹t cÊp tèi ®a, kh«ng thÓ céng thªm!", pSkill->GetSkillName());

@@ -2235,6 +2235,7 @@ typedef struct
 	BYTE	ProtocolType;
 	BYTE	nLan;			// so lan da trung sinh
 	BYTE	nKhangThem[5];	// khang toi da cong them, thu tu KHANG_* (vat ly, hoa, bang, loi, doc)
+	BYTE	nTranCapChieuThem;	// tran cap chieu cong them (SKILLLIMIT)
 } TRUNG_SINH_SYNC;
 
 // Chuoi ha guc lien tiep. May chu dem, client chi ve chu "Lien tram N"
