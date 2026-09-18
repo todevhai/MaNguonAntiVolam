@@ -19,6 +19,15 @@
 
 
 IInlinePicEngineSink* g_pIInlinePicSink = NULL;	//嵌入式图片的处理接口[wxb 2003-6-19]
+/* Byte > 0x80 chi la byte DAN cua chu GBK hai byte khi byte sau la byte DUOI hop le (>= 0x40).
+   Du lieu hien thi ban Viet la TCVN3 mot byte (KFont2 da ve mot byte): chu Viet dung ngay truoc
+   ma dieu khien ("<color>" khi chua ma hoa, KTC_COLOR 0x02... khi da ma hoa), chu so hay dau cau
+   truoc day bi ghep cap -> nuot mat dau "<" cua the mau, hien ra chu "<color>". */
+static inline bool LaCapGbk(const char* p, int nPos, int nCount)
+{
+	return nPos + 1 < nCount && (unsigned char)p[nPos + 1] >= 0x40;
+}
+
 extern "C" ENGINE_API HRESULT 
 AdviseEngine(IInlinePicEngineSink* pSink)
 {
@@ -106,7 +115,7 @@ const char* TGetSecondVisibleCharacterThisLine(const char* pCharacter, int nPos,
 				if (bFoundFirst)
 					return (pCharacter + nPos);
 				bFoundFirst = true;
-				if (cChar > 0x80)
+				if (cChar > 0x80 && LaCapGbk(pCharacter, nPos, nLen))
 					nPos += 2;
 				else
 					nPos ++;
@@ -142,7 +151,7 @@ int TSplitString(const char* pString, int nDesirePos, int bLess)
 		nDesirePos -= 2;
 		while(nPos < nDesirePos)
 		{
-			if ((unsigned char)pString[nPos] > 0x80)
+			if ((unsigned char)pString[nPos] > 0x80 && LaCapGbk(pString, nPos, 0x7fffffff))	/* chuoi ket thuc 0 */
 				nPos += 2;
 			else if (pString[nPos])
 				nPos++;
@@ -152,7 +161,7 @@ int TSplitString(const char* pString, int nDesirePos, int bLess)
 		nDesirePos += 2;
 		while(nPos < nDesirePos)
 		{
-			if ((unsigned char)pString[nPos] > 0x80)
+			if ((unsigned char)pString[nPos] > 0x80 && LaCapGbk(pString, nPos, 0x7fffffff))	/* chuoi ket thuc 0 */
 			{
 				if (bLess && (nPos + 2 > nDesirePos))
 					break;
@@ -194,7 +203,7 @@ int	TSplitEncodedString(const char* pString, int nCount, int nDesirePos, int bLe
 			while (nPos < nDesirePos)
 			{
 				cCharacter = (unsigned char)pString[nPos];
-				if (cCharacter > 0x80)
+				if (cCharacter > 0x80 && LaCapGbk(pString, nPos, nCount))
 					nPos += 2;
 				else if (cCharacter == KTC_COLOR || cCharacter == KTC_BORDER_COLOR)
 					nPos += 4;
@@ -207,7 +216,7 @@ int	TSplitEncodedString(const char* pString, int nCount, int nDesirePos, int bLe
 			while(nPos < nDesirePos)
 			{
 				cCharacter = (unsigned char)pString[nPos];
-				if (cCharacter > 0x80)
+				if (cCharacter > 0x80 && LaCapGbk(pString, nPos, nCount))
 				{
 					if (bLess && (nPos + 2 > nDesirePos))
 						break;
@@ -336,14 +345,14 @@ int	TEncodeText(char* pBuffer, int nCount)
 			cCharacter = pBuffer[nReadPos];
 			if (cCharacter > 0x80)
 			{
-				if (nReadPos + 1 < nCount)	//是可能是中文文字
+				if (LaCapGbk(pBuffer, nReadPos, nCount))	/* chu GBK hai byte */
 				{
 					pBuffer[nShortCount++] = cCharacter;
 					pBuffer[nShortCount++] = pBuffer[nReadPos+ 1];
 					nReadPos += 2;
 				}
-				else	//大于0x80的单字节西文字符被过滤掉
-					break;
+				else	/* chu Viet TCVN3 mot byte: giu lai (truoc day bi bo va cat ca phan con lai) */
+					pBuffer[nShortCount++] = pBuffer[nReadPos++];
 			}
 			else if (cCharacter == 0x0d)	//换行
 			{
@@ -386,17 +395,14 @@ int TFilterEncodedText(char* pBuffer, int nCount)
 			cCharacter = pBuffer[nReadPos];
 			if (cCharacter > 0x80)
 			{
-				if (nReadPos + 1 < nCount)	//是可能是中文文字
+				if (LaCapGbk(pBuffer, nReadPos, nCount))	/* chu GBK hai byte */
 				{
 					pBuffer[nShortCount++] = cCharacter;
 					pBuffer[nShortCount++] = pBuffer[nReadPos+ 1];
 					nReadPos += 2;
 				}
-				else	//大于0x80的单字节西文字符被过滤掉
-				{
-					nReadPos++;
-					break;
-				}
+				else	/* chu Viet TCVN3 mot byte */
+					pBuffer[nShortCount++] = pBuffer[nReadPos++];
 			}
 			else if ((cCharacter >= 0x20 && cCharacter < 0x7F) ||
 				cCharacter == 0x0a || cCharacter == 0x09)
@@ -648,7 +654,7 @@ int	TGetEncodedTextLineCount(const char* pBuffer, int nCount, int nWrapCharaNum,
 	while(nPos < nCount)
 	{
 		cCode = pBuffer[nPos];
-		if (cCode > 0x80)	//可能是中文字符
+		if (cCode > 0x80 && LaCapGbk(pBuffer, nPos, nCount))	//可能是中文字符
 		{
 			nPos += 2;
 			if (fNumChars + 2 < nWrapCharaNum)
@@ -792,7 +798,7 @@ int TGetEncodeStringLineHeadPos(const char* pBuffer, int nCount, int nLine, int 
 	while(nPos < nCount)
 	{
 		cCode = pBuffer[nPos];
-		if (cCode > 0x80)	//可能是中文字符
+		if (cCode > 0x80 && LaCapGbk(pBuffer, nPos, nCount))	//可能是中文字符
 		{
 			nPos += 2;
 			if (fNumChars + 2 < nWrapCharaNum)
@@ -1011,7 +1017,7 @@ int	TFindSpecialCtrlInEncodedText(const char* pBuffer, int nCount, int nStartPos
 				nFindPos = nStartPos;
 				break;
 			}
-			if (cCharacter > 0x80)	//可能是中文文字
+			if (cCharacter > 0x80 && LaCapGbk(pBuffer, nStartPos, nCount))	//可能是中文文字
 				nStartPos += 2;
 			else if (cCharacter == KTC_COLOR || cCharacter == KTC_BORDER_COLOR)
 				nStartPos += 4;
@@ -1046,7 +1052,7 @@ int	TClearSpecialCtrlInEncodedText(char* pBuffer, int nCount, char cControl)
 				{
 					nReadPos += nMatchLen;
 				}
-				else if (cCharacter > 0x80)
+				else if (cCharacter > 0x80 && LaCapGbk(pBuffer, nReadPos, nCount))
 				{
 					short sTemp = *(short*)(pBuffer + nReadPos);
 					*(short*)(pBuffer + nFinalLen) = sTemp;
@@ -1095,7 +1101,7 @@ int TGetEncodedTextOutputLenPos(const char* pBuffer, int nCount, int& nLen, bool
 		{
 			cCharacter = pBuffer[nIndex];
 			//计算出当前元素的所占字节数nByteCount和在显示画面上所占宽度nCurCharLen
-			if (cCharacter > 0x80)	//可能是中文文字
+			if (cCharacter > 0x80 && LaCapGbk(pBuffer, nIndex, nCount))	//可能是中文文字
 			{
                 nByteCount  = 2;
 				nCurCharLen = 2;
