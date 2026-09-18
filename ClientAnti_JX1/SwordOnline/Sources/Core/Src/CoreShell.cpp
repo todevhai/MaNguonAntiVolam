@@ -542,7 +542,7 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 			pInfo->nPKValue = Player[CLIENT_PLAYER_INDEX].m_cPK.GetPKValue();	//tnpk
 			pInfo->nRepute = Player[CLIENT_PLAYER_INDEX].m_cRepute.GetReputeValue(); // danh vong
 			pInfo->nFuYuan = Player[CLIENT_PLAYER_INDEX].m_cFuYuan.GetFuYuanValue(); // phuc duyen
-			pInfo->nReBorn = Player[CLIENT_PLAYER_INDEX].m_cReBorn.GetReBornValue(); // trung sinh
+			pInfo->nReBorn = Player[CLIENT_PLAYER_INDEX].m_nTrungSinh; // trung sinh: so lan that dong bo tu may chu (s2c_trungsinh); m_cReBorn la he cu cua ban mod, khong ai dat
 			pInfo->nRankInWorld = Player[CLIENT_PLAYER_INDEX].m_nWorldStat;
 
 			Player[CLIENT_PLAYER_INDEX].GetEchoDamage(&pInfo->nKillMIN, &pInfo->nKillMAX, 0);				//最大最小杀伤力
