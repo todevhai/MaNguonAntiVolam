@@ -287,7 +287,7 @@ void KUiMsgSel::DatCoTheoNoiDung()
 	if (ms_nNenThan <= 0)
 		return;
 	int nFont = ms_nFontHoi > 0 ? ms_nFontHoi : 12;
-	int nDongHoi = m_InfoText.GetLineCount();
+	int nDongHoi = m_InfoText.DemDongKhiVe();
 	if (nDongHoi < 1)
 		nDongHoi = 1;
 	if (ms_nDongHoiToiDa > 0 && nDongHoi > ms_nDongHoiToiDa)

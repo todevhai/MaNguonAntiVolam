@@ -408,3 +408,14 @@ KWndText512::KWndText512()
 	m_Text[0] = m_Text[511] = 0;
 	SetTextPtr(m_Text, 511);
 }
+
+int KWndText::DemDongKhiVe()
+{
+	if ((m_Style & WNDTEXT_ES_MULTILINE) == 0 || m_pText == NULL || m_nTextLen <= 0 || m_nFontSize <= 0)
+		return m_nLineCount;
+	int nRong = m_Width - m_nFontSize;
+	if (nRong < m_nFontSize)
+		nRong = m_Width;
+	int nDaiNhat = 0;
+	return TGetEncodedTextLineCount(m_pText, m_nTextLen, (nRong * 2) / m_nFontSize, nDaiNhat, m_nFontSize);
+}

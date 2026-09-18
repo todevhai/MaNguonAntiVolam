@@ -238,7 +238,7 @@ void KUiInformation2::DatCoTheoNoiDung()
 	int nTrai = 0, nTren = 0, nRong = 0, nCao = 0;
 	m_Information.GetPosition(&nTrai, &nTren);
 	m_Information.GetSize(&nRong, &nCao);
-	int nCaoChu = m_Information.GetLineCount() * (ms_nFont + 1);
+	int nCaoChu = m_Information.DemDongKhiVe() * (ms_nFont + 1);
 	if (nCaoChu < ms_nCaoChuToiThieu)
 		nCaoChu = ms_nCaoChuToiThieu;
 	int nCaoHop = nTren + nCaoChu + ms_nLeDuoi;

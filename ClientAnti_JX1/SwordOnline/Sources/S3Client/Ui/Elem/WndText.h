@@ -41,6 +41,10 @@ public:
 	void			Set2IntText(int nNumber1, int nNumber2, char Separator);
 	int				SetTopLine(int nTopLine);				//设置从文本串的第几行开始显示
 	int				GetLineCount() { return m_nLineCount; }	//get line count of the text content
+	/* So dong khi VE (dung de doi chieu cao cua so theo chu). m_nLineCount dem theo byte, con
+	   OutputRichText ngat theo pixel va khong de dau cau dau dong nen hay ra NHIEU hon mot dong;
+	   dem lai voi be rong hep di mot chu - thua mot dong trong con hon chu tran ra ngoai khung. */
+	int				DemDongKhiVe();
 	void			Clone(KWndText* pCopy);
 protected:
 	void			SetTextPtr(char* pText, int nBuffLen);	//设置文本缓冲区指针
