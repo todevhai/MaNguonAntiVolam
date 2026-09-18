@@ -1034,7 +1034,8 @@ void KProtocolProcess::s2cGetSkillLevel(BYTE* pMsg)
 	{
 		Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.SetLevel(nSkillIndex, pSkill->m_nSkillLevel);
 	}
-	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.SetAddPoint(nSkillIndex, pSkill->m_nAddPoint);
+	/* SetAddPoint nhan MA CHIEU (tu FindSame), khong phai chi so - truyen chi so la ghi nham chieu. */
+	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.SetAddPoint(pSkill->m_nSkillID, pSkill->m_nAddPoint);
 
 //	MessageBox(0,"OK","",MB_OK);
 
