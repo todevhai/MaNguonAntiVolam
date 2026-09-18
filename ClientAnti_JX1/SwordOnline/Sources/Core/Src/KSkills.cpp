@@ -169,6 +169,10 @@ relationisvalid:
 
 	if (Npc[nLauncher].IsPlayer())
 	{
+		/* Chieu luyen kinh nghiem giu cap qua trung sinh - chi dung khi dat lai cap yeu cau
+		   (cung luat KSkill::CanCastSkill may chu). */
+		if (IsExpSkill() && Npc[nLauncher].m_Level < (int)m_usReqLevel)
+			return FALSE;
 		if (IsPhysical())
 		{
 			int nWeapoinSkill = Npc[nLauncher].GetCurActiveWeaponSkill();
@@ -2092,6 +2096,8 @@ BOOL	KSkill::GetInfoFromTabFile(KITabFile *pSkillsSettingFile, int nRow)
 	int nReqLevel = 0;
 	pSkillsSettingFile->GetInteger(nRow, "ReqLevel",		0, (int *)&nReqLevel, TRUE);
 	m_usReqLevel = (unsigned short)nReqLevel;
+	m_bIsExpSkill = 0;
+	pSkillsSettingFile->GetInteger(nRow, "IsExpSkill",	0, &m_bIsExpSkill, TRUE);
 
 
 	pSkillsSettingFile->GetInteger(nRow, "EqtLimit",		-2, (int *)&m_nEquiptLimited, TRUE);

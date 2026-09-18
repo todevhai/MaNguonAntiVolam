@@ -47,6 +47,8 @@ public:
 	char				m_szFMPreCastSoundFile[100];
 	eSkillLRInfo		m_eLRSkillInfo;			//0 表示左右键皆可，1表示只可以作右键技能，2表示左右键都不可作
 #endif
+	/* Cot IsExpSkill cua skills.txt (chieu luyen kinh nghiem) - cung luat may chu. */
+	int					m_bIsExpSkill;
 	unsigned short		m_usReqLevel;//		技能需要的最小等级
 private:
 	int					m_nCharClass;			//	属哪个系的
@@ -140,6 +142,7 @@ public:
 	int					GetMaxTimes()const{  return m_nMaxTimes;};
 	static	int			GetSkillIdFromName(char * szSkillName);
 	unsigned short		GetSkillReqLevel()const{	return m_usReqLevel;};
+	int					IsExpSkill()const{return m_bIsExpSkill;};
 	
 	int					GetParam1()const{	return m_nValue1;};
 #ifdef _SERVER
