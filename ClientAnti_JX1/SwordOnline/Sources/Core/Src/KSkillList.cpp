@@ -11,6 +11,29 @@
 #include "KSkills.h"
 #include "KPlayer.h"
 
+
+/* Chieu luyen kinh nghiem (IsExpSkill) giu cap qua trung sinh: nhan vat chua dat lai cap yeu cau
+   thi chieu bi dong khong phat (KPlayer::LevelUp phat bu dung luc toi cap). NPC khong xet. */
+static BOOL ChuaDuCapDungChieu(int nNpcIdx, KSkill * pSkill)
+{
+	if (!pSkill || nNpcIdx <= 0 || nNpcIdx >= MAX_NPC || !Npc[nNpcIdx].IsPlayer())
+		return FALSE;
+	return pSkill->IsExpSkill() && Npc[nNpcIdx].m_Level < (int)pSkill->GetSkillReqLevel();
+}
+
+void KSkillList::KichHoatBiDongTheoCap(int nCap)
+{
+	for (int i = 1; i < MAX_NPCSKILL; i++)
+	{
+		if (m_Skills[i].SkillId <= 0 || m_Skills[i].CurrentSkillLevel <= 0)
+			continue;
+		KSkill * pSkill = (KSkill *)g_SkillManager.GetSkill(m_Skills[i].SkillId, m_Skills[i].CurrentSkillLevel);
+		if (pSkill && pSkill->IsExpSkill() && pSkill->GetSkillStyle() == SKILL_SS_PassivityNpcState
+			&& (int)pSkill->GetSkillReqLevel() == nCap)
+			pSkill->Cast(m_nNpcIndex, -1, m_nNpcIndex);
+	}
+}
+
 #ifndef _SERVER
 #include "cOREsHELL.H"
 #endif
@@ -78,7 +101,8 @@ void KSkillList::SetNpcSkill(int nSkillNo, int nSkillId, int nSkillLevel)
 	
     if (pOrdinSkill->GetSkillStyle() == SKILL_SS_PassivityNpcState)
 	{
-		pOrdinSkill->Cast(m_nNpcIndex, -1, m_nNpcIndex);
+		if (!ChuaDuCapDungChieu(m_nNpcIndex, (KSkill *)(pOrdinSkill)))
+			pOrdinSkill->Cast(m_nNpcIndex, -1, m_nNpcIndex);
 	}
 	ReEnChance();
 //	if (pOrdinSkill->GetSkillStyle() == SKILL_SS_Missles || pOrdinSkill->GetSkillStyle() == SKILL_SS_Melee)
@@ -165,7 +189,8 @@ BOOL KSkillList::IncreaseLevel(int nIdx, int nLvl, BOOL Qeuip)
 
 	if (pOrdinSkill->GetSkillStyle() == SKILL_SS_PassivityNpcState && !Qeuip)
 	{
-		pOrdinSkill->Cast(m_nNpcIndex, -1, m_nNpcIndex);
+		if (!ChuaDuCapDungChieu(m_nNpcIndex, (KSkill *)(pOrdinSkill)))
+			pOrdinSkill->Cast(m_nNpcIndex, -1, m_nNpcIndex);
 	}
 	ReEnChance();
 //	if (pOrdinSkill->GetSkillStyle() == SKILL_SS_Missles || pOrdinSkill->GetSkillStyle() == SKILL_SS_Melee)
@@ -204,7 +229,8 @@ int KSkillList::Add(int nSkillID, int nLevel, int nMaxTimes, int RemainTimes, in
 			//如果改技能属于被动辅助技能时，则设置Npc状态
 			if (pSkill->GetSkillStyle() == SKILL_SS_PassivityNpcState)
 			{
-				((KSkill *)pSkill)->Cast(m_nNpcIndex, -1, m_nNpcIndex);
+				if (!ChuaDuCapDungChieu(m_nNpcIndex, (KSkill *)(((KSkill *)pSkill))))
+					((KSkill *)pSkill)->Cast(m_nNpcIndex, -1, m_nNpcIndex);
 			}
 			ReEnChance();
 //			if (pSkill->GetSkillStyle() == SKILL_SS_Missles || pSkill->GetSkillStyle() == SKILL_SS_Melee)
@@ -235,7 +261,8 @@ int KSkillList::Add(int nSkillID, int nLevel, int nMaxTimes, int RemainTimes, in
 			
 			if (pSkill->GetSkillStyle() == SKILL_SS_PassivityNpcState)
 			{
-				((KSkill*)pSkill)->Cast(m_nNpcIndex, -1, m_nNpcIndex);
+				if (!ChuaDuCapDungChieu(m_nNpcIndex, (KSkill *)(((KSkill*)pSkill))))
+					((KSkill*)pSkill)->Cast(m_nNpcIndex, -1, m_nNpcIndex);
 			}
 			ReEnChance();
 //			if (pSkill->GetSkillStyle() == SKILL_SS_Missles || pSkill->GetSkillStyle() == SKILL_SS_Melee)

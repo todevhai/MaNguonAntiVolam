@@ -100,6 +100,7 @@ public:
 	int			GetRightSkillSortList(KUiSkillData*);	// 获得角色当前右键技能排序列表
 #endif
 	BOOL		IncreaseLevel(int nIdx, int nLvl, BOOL Qeuip = FALSE);
+	void		KichHoatBiDongTheoCap(int nCap);	// phat chieu bi dong luyen kinh nghiem khi vua toi cap yeu cau
 	int			GetLevel(int nSkillID);
 	int			GetSkillIdxLevel(int nIdx) 
 	{

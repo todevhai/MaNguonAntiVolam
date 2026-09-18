@@ -2431,6 +2431,7 @@ void	KPlayer::LevelUp()
 		return;
 	Npc[m_nIndex].m_Level++;
 	m_nNextLevelExp = PlayerSet.m_cLevelAdd.GetLevelExp(Npc[m_nIndex].m_Level);
+	Npc[m_nIndex].m_SkillList.KichHoatBiDongTheoCap(Npc[m_nIndex].m_Level);
 	
 
 	// -------------------------- �ȼ�����ʱ������������ ----------------------
