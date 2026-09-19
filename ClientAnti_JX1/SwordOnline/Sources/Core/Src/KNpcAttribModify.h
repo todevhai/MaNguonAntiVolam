@@ -27,6 +27,10 @@ private:
 	void	ArmorDefenseV(KNpc* pNpc, void* pData);
 	void	LifeMaxV(KNpc* pNpc, void* pData);
 	void	LifeMaxP(KNpc* pNpc, void* pData);
+	void	LifeMaxYanV(KNpc* pNpc, void* pData);
+	void	LifeMaxYanP(KNpc* pNpc, void* pData);
+	void	ManaMaxYanV(KNpc* pNpc, void* pData);
+	void	ManaMaxYanP(KNpc* pNpc, void* pData);
 	void	LifeV(KNpc* pNpc, void* pData);
 	void	LifeReplenishV(KNpc* pNpc, void* pData);
 	void	ManaMaxV(KNpc* pNpc, void* pData);

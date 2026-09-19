@@ -32,6 +32,10 @@ KNpcAttribModify::KNpcAttribModify()
 	ProcessFunc[magic_armordefense_v] = &KNpcAttribModify::ArmorDefenseV;
 	ProcessFunc[magic_lifemax_v] = &KNpcAttribModify::LifeMaxV;
 	ProcessFunc[magic_lifemax_p] = &KNpcAttribModify::LifeMaxP;
+	ProcessFunc[magic_lifemax_yan_v] = &KNpcAttribModify::LifeMaxYanV;
+	ProcessFunc[magic_lifemax_yan_p] = &KNpcAttribModify::LifeMaxYanP;
+	ProcessFunc[magic_manamax_yan_v] = &KNpcAttribModify::ManaMaxYanV;
+	ProcessFunc[magic_manamax_yan_p] = &KNpcAttribModify::ManaMaxYanP;
 	ProcessFunc[magic_life_v] = &KNpcAttribModify::LifeV;
 	ProcessFunc[magic_lifereplenish_v] = &KNpcAttribModify::LifeReplenishV;
 	ProcessFunc[magic_manamax_v] = &KNpcAttribModify::ManaMaxV;
@@ -515,6 +519,30 @@ void KNpcAttribModify::KnockBackP(KNpc* pNpc, void* pData)
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
 	pNpc->m_CurrentKnockBack += pMagic->nValue[0];
 	g_DebugLog("[数值]%s震退百分比增加%d", pNpc->Name, pMagic->nValue[0]);	
+}
+
+/* Sinh luc / noi luc "yan" (ma 233..236, dong Hoang Kim theo jx9tn): may chu cong thang vao gioi han
+   hien tai. Client thieu 4 ham nay thi moi lan tu dung lai thuoc tinh (goi kinh mach, trung sinh)
+   ra gioi han thap hon may chu, roi goi dong bo cua may chu keo len lai -> thanh mau nhay. Cung
+   cong thuc voi server/linux-server/Core/KNpcAttribModify.cpp. */
+void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)
+{
+	pNpc->m_CurrentLifeMax += ((KMagicAttrib *)pData)->nValue[0];
+}
+
+void KNpcAttribModify::LifeMaxYanP(KNpc* pNpc, void* pData)
+{
+	pNpc->m_CurrentLifeMax += pNpc->m_LifeMax * ((KMagicAttrib *)pData)->nValue[0] / 100;
+}
+
+void KNpcAttribModify::ManaMaxYanV(KNpc* pNpc, void* pData)
+{
+	pNpc->m_CurrentManaMax += ((KMagicAttrib *)pData)->nValue[0];
+}
+
+void KNpcAttribModify::ManaMaxYanP(KNpc* pNpc, void* pData)
+{
+	pNpc->m_CurrentManaMax += pNpc->m_ManaMax * ((KMagicAttrib *)pData)->nValue[0] / 100;
 }
 
 void KNpcAttribModify::LifeMaxP(KNpc* pNpc, void* pData)
