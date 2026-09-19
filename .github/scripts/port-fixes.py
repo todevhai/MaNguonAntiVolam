@@ -922,6 +922,39 @@ edit('S3Client/Ui/UiCase/UiOptions.cpp',
      b'\t\tg_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, nBrightness);\r\n',
      'gui do sang cho ca bo ve phan mem')
 
+# Thanh keo "Do sang" bi khoa vi nguon 2003 chi cho Represent3 chay o toan man hinh.
+# Bo ve phan mem cua ta da tu ap do sang len canvas nen luon bat thanh keo.
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'\t\tm_pSelf->m_BrightnessScroll.Enable(g_bRepresent3 && g_bScreen);\r\n',
+     b'\t\t/* Luon bat thanh keo do sang - bo ve phan mem ap thang vao canvas */\r\n'
+     b'\t\tm_pSelf->m_BrightnessScroll.Enable(true);\r\n',
+     'luon bat thanh keo do sang')
+
+# Khi keo thanh do sang, ham SetBrightness bi chan boi if (g_bRepresent3).
+# Bo chan de gui gia tri ve CoreShell cho ca hai bo ve.
+edit('S3Client/Ui/UiCase/UiOptions.cpp',
+     b'void KUiOptions::SetBrightness(int n)\r\n'
+     b'{\r\n'
+     b'\tif (g_bRepresent3)\r\n'
+     b'\t{\r\n'
+     b'\t\tif (m_nBrightness != n)\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tm_nBrightness = n;\r\n'
+     b'\t\t\tg_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, m_nBrightness);\r\n'
+     b'\t\t}\r\n'
+     b'\t}\r\n'
+     b'}',
+     b'void KUiOptions::SetBrightness(int n)\r\n'
+     b'{\r\n'
+     b'\t/* Keo thanh do sang: gui ve CoreShell cho ca hai bo ve */\r\n'
+     b'\tif (m_nBrightness != n)\r\n'
+     b'\t{\r\n'
+     b'\t\tm_nBrightness = n;\r\n'
+     b'\t\tg_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, m_nBrightness);\r\n'
+     b'\t}\r\n'
+     b'}',
+     'SetBrightness gui cho ca hai bo ve')
+
 
 # DOI HANH VI: "danh quai gan nhat" uu tien con NAM TRONG KHUNG NHIN.
 #
