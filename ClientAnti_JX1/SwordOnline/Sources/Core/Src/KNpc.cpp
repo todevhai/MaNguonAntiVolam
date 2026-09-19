@@ -4953,7 +4953,9 @@ void	KNpc::SetBaseLifeMax(int nLifeMax)
 //--------------------------------------------------------------------------
 void	KNpc::AddCurLifeMax(int nLife)
 {
+	/* ban6: sinh luc tu sinh khi vao CA HAI tran (thuong 0x18ec va yan 0x18f0). */
 	m_CurrentLifeMax += nLife;
+	m_nTranSinhLucYan += nLife;
 	CanTranYan();
 }
 
@@ -5014,7 +5016,9 @@ void	KNpc::SetBaseManaMax(int nMana)
 //--------------------------------------------------------------------------
 void	KNpc::AddCurManaMax(int nMana)
 {
+	/* ban6: noi luc tu noi cong vao CA HAI tran (thuong 0x18f4 va yan 0x18f8). */
 	m_CurrentManaMax += nMana;
+	m_nTranNoiLucYan += nMana;
 	CanTranYan();
 }
 
