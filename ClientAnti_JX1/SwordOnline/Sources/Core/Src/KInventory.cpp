@@ -291,7 +291,7 @@ int		KInventory::GetNextItem(int nStartIdx, int nXpos, int nYpos, int *pX, int *
 	return 0;
 }
 
-int		KInventory::CalcSameDetailType(int nGenre, int nDetail)
+int		KInventory::CalcSameDetailType(int nGenre, int nDetail, int nParticular)
 {
 	if (!m_pArray)
 		return 0;
@@ -314,7 +314,8 @@ int		KInventory::CalcSameDetailType(int nGenre, int nDetail)
 		if (i < m_nWidth || pArray[-m_nWidth] != *pArray)
 		{
 			nCurIdx = *pArray;
-			if (Item[nCurIdx].GetGenre() == nGenre && Item[nCurIdx].GetDetailType() == nDetail)
+			if (Item[nCurIdx].GetGenre() == nGenre && Item[nCurIdx].GetDetailType() == nDetail &&
+				(nParticular < 0 || Item[nCurIdx].GetParticular() == nParticular))
 				nNum += Item[nCurIdx].GetStackNum();
 		}
 		pArray++;

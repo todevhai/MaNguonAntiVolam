@@ -34,7 +34,7 @@ public:
 	BOOL	SetXu(int nXu) { if (nXu < 0) return FALSE; m_nXu = nXu; return TRUE; }
 	////////////////////
 	int		GetNextItem(int nStartIdx, int nXpos, int nYpos, int *pX, int *pY);
-	int		CalcSameDetailType(int nGenre, int nDetail);
+	int		CalcSameDetailType(int nGenre, int nDetail, int nParticular = -1);	// nParticular < 0 = khong xet
 	BOOL	FindEmptyPlace(int nWidth, int nHeight, POINT *pPos);
 
 	// 输入物品类型和具体类型，察看Inventory里面有没有相同的物品，输出位置和编号

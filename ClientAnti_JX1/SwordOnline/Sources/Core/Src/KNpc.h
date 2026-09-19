@@ -643,6 +643,14 @@ public:
 	void				AddBaseLifeMax(int nLife);	// 增加基本最大生命点
 	void				SetBaseLifeMax(int nLifeMax); // 设置基本最大生命点
 	void				AddCurLifeMax(int nLife);
+	/* Tran "yan" (8.x, ban6 KNpc +0x18f0/+0x18f8): bat dau tu tran goc, chi thuoc tinh lifemax_yan /
+	   manamax_yan cong vao. Tran THAT = max(tran thuong, tran yan) - khong cong chong. m_CurrentLifeMax
+	   giu tran that; m_nBu*Yan la phan dang bu them de tru ra dung khi can lai. */
+	int					m_nTranSinhLucYan, m_nTranNoiLucYan;
+	int					m_nBuSinhLucYan, m_nBuNoiLucYan;
+	void				DatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; }
+	void				DatLaiYanNoiLuc() { m_nTranNoiLucYan = m_ManaMax; m_nBuNoiLucYan = 0; }
+	void				CanTranYan();	// m_Current*Max = max(thuong, yan); goi sau moi lan doi thuoc tinh
 	void				AddBaseStaminaMax(int nStamina);// 增加基本最大体力点
 	void				SetBaseStaminaMax(int nStamina);
 	void				AddCurStaminaMax(int nStamina);

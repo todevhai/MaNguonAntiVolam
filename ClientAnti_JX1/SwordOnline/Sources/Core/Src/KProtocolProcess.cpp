@@ -1045,6 +1045,7 @@ void KProtocolProcess::s2cGetSkillLevel(BYTE* pMsg)
 	SkillData.uGenre = CGOG_SKILL_FIGHT;
 	SkillData.uId = pSkill->m_nSkillID;
 	SkillData.nLevel = pSkill->m_nSkillLevel;
+	SkillData.nThem = pSkill->m_nAddPoint;
 	int nSkillPosition = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.GetSkillPosition(pSkill->m_nSkillID);
 	if(nSkillPosition < 0) return;
 	/* Don danh thuong va khinh cong khong nam trong bang vo cong (GetSkillSortList da bo). Bao doi cap

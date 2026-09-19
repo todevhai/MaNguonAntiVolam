@@ -2607,7 +2607,9 @@ void	KPlayer::UpdataCurData()
 
 	ZeroMemory(&Npc[m_nIndex].m_MagicPhysicsDamage, sizeof(KMagicAttrib));
 	Npc[m_nIndex].m_CurrentLifeMax		= Npc[m_nIndex].m_LifeMax;
+	Npc[m_nIndex].DatLaiYanSinhLuc();
 	Npc[m_nIndex].m_CurrentManaMax		= Npc[m_nIndex].m_ManaMax;
+	Npc[m_nIndex].DatLaiYanNoiLuc();
 	Npc[m_nIndex].m_CurrentStaminaMax	= Npc[m_nIndex].m_StaminaMax;
 	Npc[m_nIndex].m_CurrentAttackRating	= Npc[m_nIndex].m_AttackRating;
 	Npc[m_nIndex].m_CurrentAttackSpeed	= Npc[m_nIndex].m_AttackSpeed;
@@ -2741,6 +2743,7 @@ void KPlayer::LevelAddBaseLifeMax()
 {
 	Npc[m_nIndex].m_LifeMax += PlayerSet.m_cLevelAdd.GetLifePerLevel(Npc[m_nIndex].m_Series);
 	Npc[m_nIndex].m_CurrentLifeMax = Npc[m_nIndex].m_LifeMax;
+	Npc[m_nIndex].DatLaiYanSinhLuc();
 }
 
 //-------------------------------------------------------------------------
@@ -2759,6 +2762,7 @@ void KPlayer::LevelAddBaseManaMax()
 {
 	Npc[m_nIndex].m_ManaMax += PlayerSet.m_cLevelAdd.GetManaPerLevel(Npc[m_nIndex].m_Series);
 	Npc[m_nIndex].m_CurrentManaMax = Npc[m_nIndex].m_ManaMax;
+	Npc[m_nIndex].DatLaiYanNoiLuc();
 }
 
 //-------------------------------------------------------------------------
@@ -5884,8 +5888,10 @@ void	KPlayer::s2cLevelUp(BYTE* pMsg)
 	Npc[m_nIndex].m_ManaMax = pLevel->m_nBaseManaMax;
 	//	Npc[m_nIndex].ResetLifeReplenish();
 	Npc[m_nIndex].m_CurrentLifeMax = Npc[m_nIndex].m_LifeMax;
+	Npc[m_nIndex].DatLaiYanSinhLuc();
 	Npc[m_nIndex].m_CurrentStaminaMax = Npc[m_nIndex].m_StaminaMax;
 	Npc[m_nIndex].m_CurrentManaMax = Npc[m_nIndex].m_ManaMax;
+	Npc[m_nIndex].DatLaiYanNoiLuc();
 	
 	// �������ֿ��Եı仯 �𡢱��������硢����
 	Npc[m_nIndex].m_FireResist				= KhangGoc(KHANG_HOA);

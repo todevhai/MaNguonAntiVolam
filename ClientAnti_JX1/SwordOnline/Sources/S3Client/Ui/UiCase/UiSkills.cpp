@@ -79,7 +79,7 @@ void KUiFightSkillSubPage::UpdateRemainPoint(int nPoint)
 void KUiFightSkillSubPage::UpdateSkill(KUiSkillData* pSkill, int nIndex)
 {
 	_ASSERT(pSkill && nIndex >= 0 && nIndex < FIGHT_SKILL_COUNT_PER_PAGE);
-	m_FightSkills[nIndex].HoldObject(pSkill->uGenre, pSkill->uId, pSkill->nLevel, 0);
+	m_FightSkills[nIndex].HoldObject(pSkill->uGenre, pSkill->uId, pSkill->nLevel, pSkill->nThem);
 }
 
 //更新数据
@@ -87,7 +87,7 @@ void KUiFightSkillSubPage::UpdateData(KUiSkillData* pSkills)
 {
 	_ASSERT(pSkills);
 	for (int i = 0; i < FIGHT_SKILL_COUNT_PER_PAGE; i++)
-		m_FightSkills[i].HoldObject(pSkills[i].uGenre, pSkills[i].uId, pSkills[i].nLevel, 0);
+		m_FightSkills[i].HoldObject(pSkills[i].uGenre, pSkills[i].uId, pSkills[i].nLevel, pSkills[i].nThem);
 }
 
 //窗口函数
@@ -131,10 +131,9 @@ void KUiFightSkillSubPage::PaintWindow()
 				nTop += m_SkillTextParam.Offset.cy;
 				nLeft += (nWidth - nLen * m_SkillTextParam.nFont / 2) / 2;
 				unsigned int dwColor; 
-//				if (Obj.DataH > 0)
-//					dwColor = 0xff2e3190;
-//				else
-					dwColor = m_SkillTextParam.Color;
+				/* Cap co phan do cong them (allskill_v) thi so mau xanh, cap goc thuan mau trang
+				   (user chot 19/09/2026). DataH = KUiSkillData::nThem. */
+				dwColor = (Obj.DataH > 0) ? 0xff64b4ff : m_SkillTextParam.Color;
 
 				g_pRepresentShell->OutputText(m_SkillTextParam.nFont, szLevel, nLen, nLeft, nTop,
 					dwColor, 0);

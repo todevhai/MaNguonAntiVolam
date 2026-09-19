@@ -173,9 +173,11 @@ void KNpc::Init()
 
 	m_CurrentLife = 100;			// Npc的当前生命
 	m_CurrentLifeMax = 100;		// Npc的当前生命最大值
+	m_nTranSinhLucYan = m_nBuSinhLucYan = 0;
 	m_CurrentLifeReplenish = 0;	// Npc的当前生命回复速度
 	m_CurrentMana = 100;			// Npc的当前内力
 	m_CurrentManaMax = 100;		// Npc的当前最大内力
+	m_nTranNoiLucYan = m_nBuNoiLucYan = 0;
 	m_CurrentManaReplenish = 0;	// Npc的当前内力回复速度
 	m_CurrentStamina = 100;		// Npc的当前体力
 	m_CurrentStaminaMax = 100;	// Npc的当前最大体力
@@ -4937,6 +4939,7 @@ void	KNpc::AddBaseLifeMax(int nLife)
 {
 	m_LifeMax += nLife;
 	m_CurrentLifeMax = m_LifeMax;
+	DatLaiYanSinhLuc();
 }
 //--------------------------------------//
 void	KNpc::SetBaseLifeMax(int nLifeMax) 
@@ -4951,6 +4954,19 @@ void	KNpc::SetBaseLifeMax(int nLifeMax)
 void	KNpc::AddCurLifeMax(int nLife)
 {
 	m_CurrentLifeMax += nLife;
+	CanTranYan();
+}
+
+/* ban6 dung max(tran thuong, tran yan) o moi cho doc tran (SyncAttributes, NormalSync, ProcessState,
+   DoDeath). Ta giu tran that trong m_CurrentLifeMax/ManaMax de moi cho doc khac khong phai sua. */
+void	KNpc::CanTranYan()
+{
+	int nThuong = m_CurrentLifeMax - m_nBuSinhLucYan;
+	m_nBuSinhLucYan = m_nTranSinhLucYan > nThuong ? m_nTranSinhLucYan - nThuong : 0;
+	m_CurrentLifeMax = nThuong + m_nBuSinhLucYan;
+	nThuong = m_CurrentManaMax - m_nBuNoiLucYan;
+	m_nBuNoiLucYan = m_nTranNoiLucYan > nThuong ? m_nTranNoiLucYan - nThuong : 0;
+	m_CurrentManaMax = nThuong + m_nBuNoiLucYan;
 }
 
 //--------------------------------------------------------------------------
@@ -4984,6 +5000,7 @@ void	KNpc::AddBaseManaMax(int nMana)
 {
 	m_ManaMax += nMana;
 	m_CurrentManaMax = m_ManaMax;
+	DatLaiYanNoiLuc();
 }
 //---------------------------------------//
 void	KNpc::SetBaseManaMax(int nMana)
@@ -4998,6 +5015,7 @@ void	KNpc::SetBaseManaMax(int nMana)
 void	KNpc::AddCurManaMax(int nMana)
 {
 	m_CurrentManaMax += nMana;
+	CanTranYan();
 }
 
 /*
@@ -6457,9 +6475,11 @@ void	KNpc::RestoreNpcBaseInfo()
 
 	m_CurrentLife			= m_LifeMax;
 	m_CurrentLifeMax		= m_LifeMax;
+	DatLaiYanSinhLuc();
 	m_CurrentLifeReplenish	= m_LifeReplenish;
 	m_CurrentMana			= m_ManaMax;
 	m_CurrentManaMax		= m_ManaMax;
+	DatLaiYanNoiLuc();
 	m_CurrentManaReplenish	= m_ManaReplenish;
 	m_CurrentStamina		= m_StaminaMax;
 	m_CurrentStaminaMax		= m_StaminaMax;

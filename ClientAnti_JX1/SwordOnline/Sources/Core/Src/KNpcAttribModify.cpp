@@ -159,6 +159,7 @@ void KNpcAttribModify::ModifyAttrib(KNpc* pNpc, void* pData)
 		return;
 	
 	(this->*ProcessFunc[pMagic->nAttribType])(pNpc, pData);
+	pNpc->CanTranYan();	// tran that = max(thuong, yan) sau moi thuoc tinh
 }
 
 void KNpcAttribModify::AddColdDamageV(KNpc* pNpc, void* pData)
@@ -527,22 +528,22 @@ void KNpcAttribModify::KnockBackP(KNpc* pNpc, void* pData)
    cong thuc voi server/linux-server/Core/KNpcAttribModify.cpp. */
 void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)
 {
-	pNpc->m_CurrentLifeMax += ((KMagicAttrib *)pData)->nValue[0];
+	pNpc->m_nTranSinhLucYan += ((KMagicAttrib *)pData)->nValue[0];
 }
 
 void KNpcAttribModify::LifeMaxYanP(KNpc* pNpc, void* pData)
 {
-	pNpc->m_CurrentLifeMax += pNpc->m_LifeMax * ((KMagicAttrib *)pData)->nValue[0] / 100;
+	pNpc->m_nTranSinhLucYan += pNpc->m_LifeMax * ((KMagicAttrib *)pData)->nValue[0] / 100;
 }
 
 void KNpcAttribModify::ManaMaxYanV(KNpc* pNpc, void* pData)
 {
-	pNpc->m_CurrentManaMax += ((KMagicAttrib *)pData)->nValue[0];
+	pNpc->m_nTranNoiLucYan += ((KMagicAttrib *)pData)->nValue[0];
 }
 
 void KNpcAttribModify::ManaMaxYanP(KNpc* pNpc, void* pData)
 {
-	pNpc->m_CurrentManaMax += pNpc->m_ManaMax * ((KMagicAttrib *)pData)->nValue[0] / 100;
+	pNpc->m_nTranNoiLucYan += pNpc->m_ManaMax * ((KMagicAttrib *)pData)->nValue[0] / 100;
 }
 
 void KNpcAttribModify::LifeMaxP(KNpc* pNpc, void* pData)

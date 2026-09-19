@@ -421,6 +421,7 @@ int	KSkillList::GetSkillSortList(KUiSkillData * pSkillList)
 			pSkill->uGenre = CGOG_SKILL_FIGHT;
 			pSkill->uId = m_Skills[i].SkillId;
 			pSkill->nLevel = m_Skills[i].SkillLevel;
+			pSkill->nThem = m_Skills[i].AddPoint;
 			if ((++nCount) == 50)
 			{
 				g_DebugLog("Npc的技能数量超过了限制50！！！，请检查!!!");			

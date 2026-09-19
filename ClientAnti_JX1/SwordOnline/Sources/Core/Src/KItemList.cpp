@@ -3569,7 +3569,12 @@ int		KItemList::GetSameDetailItemNum(int nImmediatePos)
 	int		nIdx = m_Room[room_immediacy].FindItem(nImmediatePos, 0);
 	if (nIdx <= 0)
 		return 0;
-	return m_Room[room_equipment].CalcSameDetailType(Item[nIdx].GetGenre(), Item[nIdx].GetDetailType()) + Item[nIdx].GetStackNum();
+	/* Vat pham kich ban (genre 6) dung chung detail 1 cho ca nghin mon khac nhau (Hoi thanh phu, hong bao,
+	   mat tich...) nen phai so ca particular - khong thi o phim tat dem gop moi mon 6/1 trong tui. Thuoc
+	   (genre 1) giu luat goc: gop theo loai (detail), khong phan to/nho. */
+	int nParticular = (Item[nIdx].GetGenre() == item_magicscript) ? Item[nIdx].GetParticular() : -1;
+	return m_Room[room_equipment].CalcSameDetailType(Item[nIdx].GetGenre(), Item[nIdx].GetDetailType(), nParticular)
+		+ Item[nIdx].GetStackNum();
 }
 #endif
 #ifdef _SERVER

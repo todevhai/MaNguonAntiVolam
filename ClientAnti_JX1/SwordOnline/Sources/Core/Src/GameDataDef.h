@@ -634,6 +634,7 @@ struct KUiSkillData : public KUiGameObject
 		int		nLevel;
 		int		nData;
 	};
+	int		nThem;		// cap do do cong them (allskill_v) - bang vo cong to mau so cap khi > 0
 };
 
 //==================================
