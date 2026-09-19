@@ -279,8 +279,21 @@ void KProtocolProcess::ProcessNetMsg(BYTE* pMsg)
 		return;
 	}
 	g_DebugLog("[net]Msg:%c", pMsg[0]);
+	/* Tam: do mau nhay khi vao game - ghi goi nao lam doi mau/tran cua chinh minh. */
+	int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+	int nMau0 = 0, nTran0 = 0;
+	if (nMinh > 0 && nMinh < MAX_NPC)
+	{
+		nMau0 = Npc[nMinh].m_CurrentLife;
+		nTran0 = Npc[nMinh].m_CurrentLifeMax;
+	}
 	if (ProcessFunc[pMsg[0]])
 		(this->*ProcessFunc[pMsg[0]])(pMsg);
+	nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+	if (nMinh > 0 && nMinh < MAX_NPC &&
+		(Npc[nMinh].m_CurrentLife != nMau0 || Npc[nMinh].m_CurrentLifeMax != nTran0))
+		g_DebugLog("[mau] Msg:%d sinh luc %d/%d -> %d/%d", (int)pMsg[0], nMau0, nTran0,
+			Npc[nMinh].m_CurrentLife, Npc[nMinh].m_CurrentLifeMax);
 }
 #else
 void KProtocolProcess::ProcessNetMsg(int nIndex, BYTE* pMsg)
