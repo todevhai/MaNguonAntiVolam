@@ -1047,6 +1047,10 @@ void KProtocolProcess::s2cGetSkillLevel(BYTE* pMsg)
 	SkillData.nLevel = pSkill->m_nSkillLevel;
 	int nSkillPosition = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_SkillList.GetSkillPosition(pSkill->m_nSkillID);
 	if(nSkillPosition < 0) return;
+	/* Don danh thuong va khinh cong khong nam trong bang vo cong (GetSkillSortList da bo). Bao doi cap
+	   cua chung thi bang nhet chung vao o trong cuoi (GetSkillPosition tra o ke tiep). Van co o tay phai. */
+	extern BOOL LaChieuNgoaiBangVoCong(int nSkillId);
+	if (LaChieuNgoaiBangVoCong(pSkill->m_nSkillID)) return;
 	CoreDataChanged(GDCNI_SKILL_CHANGE, (unsigned int)&SkillData, nSkillPosition);
 }
 
