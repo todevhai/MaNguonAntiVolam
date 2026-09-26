@@ -6181,6 +6181,77 @@ edit('Engine/Src/KPakList.h',
      b'#define MAX_PAK\t\t64\t/* 32 bo qua pak thu 33 tro di */',
      'MAX_PAK 32 -> 64')
 
+# ------------------------------------------------ dan xuat phat tu nguoi (SKILL_MF_AtFirer)
+# DOI HANH VI: chieu co MisslesForm = 7 (SKILL_MF_AtFirer, vd Hang Long Bat Vu 14, Hoanh
+# Tao Luc Hop 11, Su Tu Hong 20...) khong goi Param2PCoordinate -> nDesPX, nDesPY = 0
+# va nTargetId = -1 -> TinhHuongDan tinh huong ve goc toa do (0,0) thay vi huong ve muc
+# tieu / chuot. Goi Param2PCoordinate de lay toa do va muc tieu that.
+edit('Core/Src/KSkills.cpp',
+     b'\tcase\tSKILL_MF_AtFirer:\t\t\t\t//\xb1\xbe\xc9\xed\t\xb6\xe0\xb8\xf6\xd7\xd3\xb5\xaf\xcd\xa3\xd4\xda\xcd\xe6\xbc\xd2\xb5\xb1\xc7\xb0\xce\xbb\xd6\xc3\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tif (nParam1 == SKILL_SPT_Direction) return FALSE;\r\n'
+     b'\t\t\t\r\n'
+     b'\t\t\tswitch(eLauncherType)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\tcase SKILL_SLT_Npc:\r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tSubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps',
+     b'\tcase\tSKILL_MF_AtFirer:\t\t\t\t//\xb1\xbe\xc9\xed\t\xb6\xe0\xb8\xf6\xd7\xd3\xb5\xaf\xcd\xa3\xd4\xda\xcd\xe6\xbc\xd2\xb5\xb1\xc7\xb0\xce\xbb\xd6\xc3\r\n'
+     b'\t\t{\r\n'
+     b'\t\t\tif (nParam1 == SKILL_SPT_Direction) return FALSE;\r\n'
+     b'\t\t\t\r\n'
+     b'\t\t\tswitch(eLauncherType)\r\n'
+     b'\t\t\t{\r\n'
+     b'\t\t\tcase SKILL_SLT_Npc:\r\n'
+     b'\t\t\t\t{\r\n'
+     b'\t\t\t\t\tnTargetId\t\t= Param2PCoordinate(nLauncher, nParam1, nParam2, &nDesPX, &nDesPY, SKILL_SLT_Npc);\r\n'
+     b'\t\t\t\t\tSubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps',
+     'SKILL_MF_AtFirer goi Param2PCoordinate de lay huong va muc tieu')
+
+# ------------------------------------------------ bo qua dau ngoac kep khi doc so
+# DOI HANH VI: KSG_StringGetInt doc so tu chuoi setting (vd AnimFileInfo trong missles.txt).
+# Truong hop chuoi bi boc dau ngoac kep (vd "15,1,1" do luu bang Excel) thi isdigit(\'"\') = false
+# -> tra ve gia tri mac dinh (100 frame, 16 huong) lam mat/sai hoat anh dan. Bo qua dau \'"\' va \'\\\'\'.
+edit('Engine/Src/KSG_StringProcess.cpp',
+     b'    while (isspace(*pcszString))\r\n        pcszString++;',
+     b'    while (isspace(*pcszString) || *pcszString == \'"\' || *pcszString == \'\\\'\')\r\n        pcszString++;',
+     'KSG_StringGetInt bo qua dau ngoac kep/don dau chuoi')
+edit('Engine/Src/KSG_StringProcess.cpp',
+     b'    while (isdigit(*pcszString))\r\n    {\r\n        nRetValueValidFlag = true;\r\n\r\n        nRetValue = nRetValue * 10 +  ((int)(*pcszString - \'0\'));\r\n\r\n        pcszString++;\r\n    }\r\n\r\n    nResult = true;',
+     b'    while (isdigit(*pcszString))\r\n    {\r\n        nRetValueValidFlag = true;\r\n\r\n        nRetValue = nRetValue * 10 +  ((int)(*pcszString - \'0\'));\r\n\r\n        pcszString++;\r\n    }\r\n    while (isspace(*pcszString) || *pcszString == \'"\' || *pcszString == \'\\\'\')\r\n        pcszString++;\r\n\r\n    nResult = true;',
+     'KSG_StringGetInt bo qua dau ngoac kep/don cuoi chuoi')
+
+# ---------------------------------------------------------------------------
+# DOI HANH VI: bang thuoc tinh (F3) khong cong diem Noi cong vao "Luc tay".
+# May chu cong m_nCurEngergy vao sat thuong TUNG HE cua chieu noi cong
+# (KNpc::AppendSkillEffect, doi chung KNpc::CalcColdAttribDamage cua ban6),
+# nhung GetEchoDamage ben client thi khong - nen nguoi choi phai noi cong cong
+# diem xong thay so dung yen. Bon khoi "bIsMagic" co san o day la ma chet: bang
+# skills.txt cua ta khong co cot IsMagic nen m_nIsMagic luon 0.
+# Cac ban va duoi deu la MOT DONG (mo neo la dong chu thich) - CRLF khong pha duoc.
+for _he, _ma in (('cold', 'magic_colddamage_v'), ('fire', 'magic_firedamage_v'),
+                 ('lighting', 'magic_lightingdamage_v'), ('poison', 'magic_poisondamage_v')):
+    _neo = ('\t// Calc %s damage' % _he).encode()
+    _moi = (('\tif (!bIsPhysical && %s == pMagicData->nAttribType && pMagicData->nValue[0] > 0) '
+             '{ *nMin += m_nCurEngergy; *nMax += m_nCurEngergy; }\t// Calc %s damage') % (_ma, _he)).encode()
+    edit('Core/Src/KPlayer.cpp', _neo, _moi,
+         'F3: Noi cong cong vao sat thuong he %s' % _he)
+
+# ---------------------------------------------------------------------------
+# missles.txt (client/ui-tu-viet) khai id dan toi 882 nhung MAX_MISSLESTYLE cua
+# client la 500: vong nap trong InitMissleSetting ghi g_MisslesLib[id] ra ngoai
+# mang, de len bien toan cuc nam sau no - hong am tham. May chu da nang 1000 va
+# chan id vuot tran (SkillDef.h, KCore.cpp); client phai cung tran moi khop.
+# Ca hai ban va la MOT DONG nen CRLF khong pha duoc.
+edit('Core/Src/SkillDef.h',
+     b'#define MAX_MISSLESTYLE  500',
+     b'#define MAX_MISSLESTYLE  1000\t// missles.txt khai id toi 882',
+     'MAX_MISSLESTYLE 500 -> 1000 nhu may chu')
+edit('Core/Src/KCore.cpp',
+     b'\t\tif (nMissleId > 0)',
+     b'\t\tif (nMissleId > 0 && nMissleId < MAX_MISSLESTYLE)\t// id vuot tran thi bo qua, dung ghi ra ngoai g_MisslesLib',
+     'InitMissleSetting bo qua id dan vuot MAX_MISSLESTYLE')
+
 # ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
