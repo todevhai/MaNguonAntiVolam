@@ -6253,6 +6253,112 @@ edit('Core/Src/KCore.cpp',
      'InitMissleSetting bo qua id dan vuot MAX_MISSLESTYLE')
 
 # ---------------------------------------------------------------------------
+# Nhom "yan" (Duong) cua khang va toc do - may chu da co (KNpcAttribModify, 8.x), client thieu nen F3 hien
+# sai: Tuy Diep Cuong Vu (130) cho khang Duong +10 nam he ma F3 van 0% / -30%. Luat may chu (jx9tn): khang hieu
+# luc = max(khang thuong, khang Duong) khi co khang Duong, roi chan tran; toc danh/toc phat/phuc hoi = max(thuong,
+# Duong). Client chi can de HIEN THI + nhip hoat anh danh cho khop may chu. Moc neo deu MOT DONG (CRLF).
+edit('Core/Src/KNpc.h',
+     b'\tvoid\t\t\t\tDatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; }',
+     _crlf(b'\tvoid\t\t\t\tDatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; }\n'
+           b'\t/* Khang / toc do "yan" (Duong) nhu may chu - thu tu he nhu m_nKhangYan cua may chu. */\n'
+           b'\tenum { KHANG_VAT_LY = 0, KHANG_HOA, KHANG_BANG, KHANG_LOI, KHANG_DOC, KHANG_SO };\n'
+           b'\tint\t\t\t\t\tm_nKhangYan[KHANG_SO];\n'
+           b'\tint\t\t\t\t\tm_nTocDanhYan, m_nTocPhatYan, m_nPhucHoiYan;\n'
+           b'\tint\t\t\t\t\tTocDanhHieuLuc() const { return m_CurrentAttackSpeed > m_nTocDanhYan ? m_CurrentAttackSpeed : m_nTocDanhYan; }\n'
+           b'\tint\t\t\t\t\tTocPhatHieuLuc() const { return m_CurrentCastSpeed > m_nTocPhatYan ? m_CurrentCastSpeed : m_nTocPhatYan; }\n'
+           b'\tint\t\t\t\t\tKhangHienThi(int nKhang, int nTran, int nHe) const\n'
+           b'\t{ int n = (m_nKhangYan[nHe] > 0 && m_nKhangYan[nHe] > nKhang) ? m_nKhangYan[nHe] : nKhang; return n > nTran ? nTran : n; }'),
+     'KNpc: khang/toc do Duong nhu may chu')
+edit('Core/Src/KNpc.cpp',
+     b'\tm_CurrentCastSpeed = 0;',
+     b'\tm_CurrentCastSpeed = 0; memset(m_nKhangYan, 0, sizeof(m_nKhangYan)); m_nTocDanhYan = m_nTocPhatYan = m_nPhucHoiYan = 0;',
+     'KNpc: khoi tao khang/toc do Duong')
+edit('Core/Src/KPlayer.cpp',
+     b'\tNpc[m_nIndex].m_CurrentCastSpeed\t= Npc[m_nIndex].m_CastSpeed;',
+     b'\tNpc[m_nIndex].m_CurrentCastSpeed\t= Npc[m_nIndex].m_CastSpeed;'
+     b' memset(Npc[m_nIndex].m_nKhangYan, 0, sizeof(Npc[m_nIndex].m_nKhangYan));'
+     b' Npc[m_nIndex].m_nTocDanhYan = Npc[m_nIndex].m_nTocPhatYan = Npc[m_nIndex].m_nPhucHoiYan = 0;',
+     'UpdataCurData: dat lai khang/toc do Duong truoc khi ap lai trang thai')
+edit('Core/Src/KNpcAttribModify.h',
+     b'\tvoid\tLifeMaxYanV(KNpc* pNpc, void* pData);',
+     b'\tvoid\tLifeMaxYanV(KNpc* pNpc, void* pData);'
+     b' void KhangYanP(KNpc* pNpc, void* pData); void TocDanhYanV(KNpc* pNpc, void* pData);'
+     b' void TocPhatYanV(KNpc* pNpc, void* pData); void PhucHoiYanV(KNpc* pNpc, void* pData);',
+     'KNpcAttribModify: khai bao ham Duong')
+edit('Core/Src/KNpcAttribModify.cpp',
+     b'\tProcessFunc[magic_lifemax_yan_v] = &KNpcAttribModify::LifeMaxYanV;',
+     b'\tProcessFunc[magic_lifemax_yan_v] = &KNpcAttribModify::LifeMaxYanV;'
+     b' ProcessFunc[magic_physicsres_yan_p] = ProcessFunc[magic_fireres_yan_p] = ProcessFunc[magic_coldres_yan_p]'
+     b' = ProcessFunc[magic_lightingres_yan_p] = ProcessFunc[magic_poisonres_yan_p] = ProcessFunc[magic_allres_yan_p]'
+     b' = &KNpcAttribModify::KhangYanP;'
+     b' ProcessFunc[magic_attackspeed_yan_v] = &KNpcAttribModify::TocDanhYanV;'
+     b' ProcessFunc[magic_castspeed_yan_v] = &KNpcAttribModify::TocPhatYanV;'
+     b' ProcessFunc[magic_fasthitrecover_yan_v] = &KNpcAttribModify::PhucHoiYanV;',
+     'KNpcAttribModify: dang ky ham Duong')
+edit('Core/Src/KNpcAttribModify.cpp',
+     b'void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)',
+     _crlf(b'/* Khang Duong: mot ham cho ca 6 ma, chon he theo loai thuoc tinh (may chu tach 6 ham). */\n'
+           b'void KNpcAttribModify::KhangYanP(KNpc* pNpc, void* pData)\n'
+           b'{\n'
+           b'\tKMagicAttrib* p = (KMagicAttrib *)pData;\n'
+           b'\tint nHe = -1;\n'
+           b'\tswitch (p->nAttribType)\n'
+           b'\t{\n'
+           b'\tcase magic_physicsres_yan_p:\tnHe = KNpc::KHANG_VAT_LY;\tbreak;\n'
+           b'\tcase magic_fireres_yan_p:\t\tnHe = KNpc::KHANG_HOA;\t\tbreak;\n'
+           b'\tcase magic_coldres_yan_p:\t\tnHe = KNpc::KHANG_BANG;\t\tbreak;\n'
+           b'\tcase magic_lightingres_yan_p:\tnHe = KNpc::KHANG_LOI;\t\tbreak;\n'
+           b'\tcase magic_poisonres_yan_p:\tnHe = KNpc::KHANG_DOC;\t\tbreak;\n'
+           b'\tcase magic_allres_yan_p:\n'
+           b'\t\tfor (int i = 0; i < KNpc::KHANG_SO; i++)\n'
+           b'\t\t\tpNpc->m_nKhangYan[i] += p->nValue[0];\n'
+           b'\t\treturn;\n'
+           b'\t}\n'
+           b'\tif (nHe >= 0)\n'
+           b'\t\tpNpc->m_nKhangYan[nHe] += p->nValue[0];\n'
+           b'}\n'
+           b'void KNpcAttribModify::TocDanhYanV(KNpc* pNpc, void* pData) { pNpc->m_nTocDanhYan += ((KMagicAttrib *)pData)->nValue[0]; }\n'
+           b'void KNpcAttribModify::TocPhatYanV(KNpc* pNpc, void* pData) { pNpc->m_nTocPhatYan += ((KMagicAttrib *)pData)->nValue[0]; }\n'
+           b'void KNpcAttribModify::PhucHoiYanV(KNpc* pNpc, void* pData) { pNpc->m_nPhucHoiYan += ((KMagicAttrib *)pData)->nValue[0]; }\n'
+           b'\n'
+           b'void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)'),
+     'KNpcAttribModify: ham khang/toc do Duong')
+# F3: khang = max(thuong, Duong) roi chan tran; toc danh/phat = max(thuong, Duong)
+for _truong, _he, _ra in ((b'Physics', b'KHANG_VAT_LY', b'nPhyDef'), (b'Cold', b'KHANG_BANG', b'nCoolDef'),
+                          (b'Light', b'KHANG_LOI', b'nLightDef'), (b'Fire', b'KHANG_HOA', b'nFireDef'),
+                          (b'Poison', b'KHANG_DOC', b'nPoisonDef')):
+    edit('Core/Src/CoreShell.cpp',
+         b'pInfo->' + _ra + b' = pNpc->m_Current' + _truong + b'Resist;',
+         b'pInfo->' + _ra + b' = pNpc->KhangHienThi(pNpc->m_Current' + _truong + b'Resist, pNpc->m_Current' + _truong
+         + b'ResistMax, KNpc::' + _he + b');',
+         'F3: khang ' + _truong.decode() + ' tinh ca Duong')
+edit('Core/Src/CoreShell.cpp',
+     b'pInfo->nAttackSpeed = pNpc->m_CurrentAttackSpeed;',
+     b'pInfo->nAttackSpeed = pNpc->TocDanhHieuLuc();',
+     'F3: toc danh tinh ca Duong')
+edit('Core/Src/CoreShell.cpp',
+     b'pInfo->nCastSpeed = pNpc->m_CurrentCastSpeed;',
+     b'pInfo->nCastSpeed = pNpc->TocPhatHieuLuc();',
+     'F3: toc phat tinh ca Duong')
+edit_all('Core/Src/KNpc.cpp',
+     b'm_AttackFrame * 100 / (100 + m_CurrentAttackSpeed)',
+     b'm_AttackFrame * 100 / (100 + TocDanhHieuLuc())',
+     'Nhip hoat anh danh dung toc danh hieu luc nhu may chu')
+
+# ---------------------------------------------------------------------------
+# SkillStyle 14 (8.x, "dan no tuc thi"): nguon 2003 dung kieu 0..13, KSkillManager::InstanceSkill chi dung
+# 0..3 -> GetSkill tra NULL cho 721/722/723/876/1322/1406/1545 (vd Con Lon 120): bang vo cong / mo ta khong co.
+# ban6 dung kieu 14 nhu KSkill thuong; may chu ta da lam CastInstantMissle, client chi can dung duoc chieu.
+edit('Core/Src/SkillDef.h',
+     b'\t\tSKILL_SS_Thief,',
+     b'\t\tSKILL_SS_Thief, SKILL_SS_InstantMissle,\t/* 14 (8.x): dan no tuc thi - may chu CastInstantMissle */',
+     'SkillDef: kieu chieu 14')
+edit('Core/Src/KSkillManager.cpp',
+     b'\tcase SKILL_SS_PassivityNpcState:',
+     _crlf(b'\tcase SKILL_SS_InstantMissle:\t/* kieu 14 dung nhu KSkill thuong (ban6) */\n\tcase SKILL_SS_PassivityNpcState:'),
+     'InstanceSkill: dung chieu kieu 14')
+
+# ---------------------------------------------------------------------------
 # Tong ket PHAI o cuoi tep. Truoc day no nam giua, nen moi ban va viet them sau
 # do khong duoc dem va - hong mot cho o phan sau van cho CI mau xanh.
 print('\n=== va %d cho, bo qua %d, HONG %d ===' % (n_ok, n_skip, n_hong))
