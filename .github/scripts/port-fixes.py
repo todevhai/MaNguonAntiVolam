@@ -6352,8 +6352,15 @@ edit_all('Core/Src/KNpc.cpp',
 # May chu bat hien hinh som thi gui lai trang thai voi thoi han 1 -> hide(-v) dat nTime = 1 -> nhip sau ve 0.
 edit('Core/Src/KNpcRes.cpp',
      b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = 255;',
-     b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = m_cDrawFile[nPos].Color.Color_b.a = (nNpcIdx > 0 && Npc[nNpcIdx].m_Hide.nTime > 0) ? 112 : 255;\t/* an than: ve mo ([i] va [nPos] lech nhau khi bo qua bo phan rong) */',
+     b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = m_cDrawFile[nPos].Color.Color_b.a = (nNpcIdx > 0 && Npc[nNpcIdx].m_Hide.nTime > 0) ? 112 : 255;\t/* an than: ve mo ([i] va [nPos] lech nhau khi bo qua bo phan rong) */'
+     b' if (nNpcIdx > 0 && Npc[nNpcIdx].IsPlayer()) { static int s_nDemAn = 0; if ((s_nDemAn++ & 255) == 0) g_DebugLog("[an than] ve npc %d hide=%d i=%d nPos=%d kieu=%d a=%d", nNpcIdx, Npc[nNpcIdx].m_Hide.nTime, i, nPos, m_cDrawFile[nPos].bRenderStyle, m_cDrawFile[nPos].Color.Color_b.a); }',
      'An than: ve chinh minh mo')
+
+# TAM (do dac an than): log ham hide cua client.
+edit('Core/Src/KNpcAttribModify.cpp',
+     b'\t\tpNpc->m_Hide.nTime = nFrame;',
+     b'\t\tpNpc->m_Hide.nTime = nFrame; g_DebugLog("[an than] hide npc %d nTime %d", pNpc->m_Index, nFrame);',
+     'TAM: log ham hide client')
 
 # ---------------------------------------------------------------------------
 # SkillStyle 14 (8.x, "dan no tuc thi"): nguon 2003 dung kieu 0..13, KSkillManager::InstanceSkill chi dung
