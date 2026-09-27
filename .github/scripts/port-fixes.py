@@ -6327,7 +6327,7 @@ edit('Core/Src/KNpcAttribModify.cpp',
            b'/* An than: may chu gui trang thai 713 kem hide cho CHINH nguoi do (nguoi khac khong nhan du lieu NPC nay).\n'
            b'   Het han / may chu bat hien hinh (gui lai trang thai voi thoi han 1) thi nut tu go -> ap -v. */\n'
            b'void KNpcAttribModify::AnThan(KNpc* pNpc, void* pData) { pNpc->m_nAnThan += ((KMagicAttrib *)pData)->nValue[0];'
-           b' if (pNpc->m_nAnThan < 0) pNpc->m_nAnThan = 0; }\n'
+           b' if (pNpc->m_nAnThan < 0) pNpc->m_nAnThan = 0; g_DebugLog("[an than] npc %d gia tri %d -> %d", pNpc->m_Index, ((KMagicAttrib *)pData)->nValue[0], pNpc->m_nAnThan); }\n'
            b'\n'
            b'void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)'),
      'KNpcAttribModify: ham khang/toc do Duong')
@@ -6358,7 +6358,8 @@ edit_all('Core/Src/KNpc.cpp',
 # chi so do, khong doi hanh vi khi khong an (255 nhu cu).
 edit('Core/Src/KNpcRes.cpp',
      b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = 255;',
-     b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = m_cDrawFile[nPos].Color.Color_b.a = (nNpcIdx > 0 && Npc[nNpcIdx].m_nAnThan > 0) ? 112 : 255;\t/* an than: ve mo ([i] va [nPos] lech nhau khi bo qua bo phan rong) */',
+     b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = m_cDrawFile[nPos].Color.Color_b.a = (nNpcIdx > 0 && Npc[nNpcIdx].m_nAnThan > 0) ? 112 : 255;\t/* an than: ve mo ([i] va [nPos] lech nhau khi bo qua bo phan rong) */'
+     b' if (nNpcIdx > 0 && Npc[nNpcIdx].m_nAnThan > 0) { static int s_nDemAn = 0; if ((s_nDemAn++ & 63) == 0) g_DebugLog("[an than] ve mo npc %d i=%d nPos=%d kieu=%d a=%d", nNpcIdx, i, nPos, m_cDrawFile[nPos].bRenderStyle, m_cDrawFile[nPos].Color.Color_b.a); }',
      'An than: ve chinh minh mo')
 
 # ---------------------------------------------------------------------------
