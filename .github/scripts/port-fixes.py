@@ -6264,6 +6264,7 @@ edit('Core/Src/KNpc.h',
            b'\tenum { KHANG_VAT_LY = 0, KHANG_HOA, KHANG_BANG, KHANG_LOI, KHANG_DOC, KHANG_SO };\n'
            b'\tint\t\t\t\t\tm_nKhangYan[KHANG_SO];\n'
            b'\tint\t\t\t\t\tm_nTocDanhYan, m_nTocPhatYan, m_nPhucHoiYan;\n'
+           b'\tint\t\t\t\t\tm_nAnThan;\t/* an than (hide, Thuy Yen 120): >0 thi ve chinh minh MO */\n'
            b'\tint\t\t\t\t\tTocDanhHieuLuc() const { return m_CurrentAttackSpeed > m_nTocDanhYan ? m_CurrentAttackSpeed : m_nTocDanhYan; }\n'
            b'\tint\t\t\t\t\tTocPhatHieuLuc() const { return m_CurrentCastSpeed > m_nTocPhatYan ? m_CurrentCastSpeed : m_nTocPhatYan; }\n'
            b'\tint\t\t\t\t\tKhangHienThi(int nKhang, int nTran, int nHe) const\n'
@@ -6271,19 +6272,21 @@ edit('Core/Src/KNpc.h',
      'KNpc: khang/toc do Duong nhu may chu')
 edit('Core/Src/KNpc.cpp',
      b'\tm_CurrentCastSpeed = 0;',
-     b'\tm_CurrentCastSpeed = 0; memset(m_nKhangYan, 0, sizeof(m_nKhangYan)); m_nTocDanhYan = m_nTocPhatYan = m_nPhucHoiYan = 0;',
+     b'\tm_CurrentCastSpeed = 0; memset(m_nKhangYan, 0, sizeof(m_nKhangYan)); m_nTocDanhYan = m_nTocPhatYan = m_nPhucHoiYan = 0; m_nAnThan = 0;',
      'KNpc: khoi tao khang/toc do Duong')
 edit('Core/Src/KPlayer.cpp',
      b'\tNpc[m_nIndex].m_CurrentCastSpeed\t= Npc[m_nIndex].m_CastSpeed;',
      b'\tNpc[m_nIndex].m_CurrentCastSpeed\t= Npc[m_nIndex].m_CastSpeed;'
      b' memset(Npc[m_nIndex].m_nKhangYan, 0, sizeof(Npc[m_nIndex].m_nKhangYan));'
-     b' Npc[m_nIndex].m_nTocDanhYan = Npc[m_nIndex].m_nTocPhatYan = Npc[m_nIndex].m_nPhucHoiYan = 0;',
+     b' Npc[m_nIndex].m_nTocDanhYan = Npc[m_nIndex].m_nTocPhatYan = Npc[m_nIndex].m_nPhucHoiYan = 0;'
+     b' Npc[m_nIndex].m_nAnThan = 0;',
      'UpdataCurData: dat lai khang/toc do Duong truoc khi ap lai trang thai')
 edit('Core/Src/KNpcAttribModify.h',
      b'\tvoid\tLifeMaxYanV(KNpc* pNpc, void* pData);',
      b'\tvoid\tLifeMaxYanV(KNpc* pNpc, void* pData);'
      b' void KhangYanP(KNpc* pNpc, void* pData); void TocDanhYanV(KNpc* pNpc, void* pData);'
-     b' void TocPhatYanV(KNpc* pNpc, void* pData); void PhucHoiYanV(KNpc* pNpc, void* pData);',
+     b' void TocPhatYanV(KNpc* pNpc, void* pData); void PhucHoiYanV(KNpc* pNpc, void* pData);'
+     b' void AnThan(KNpc* pNpc, void* pData);',
      'KNpcAttribModify: khai bao ham Duong')
 edit('Core/Src/KNpcAttribModify.cpp',
      b'\tProcessFunc[magic_lifemax_yan_v] = &KNpcAttribModify::LifeMaxYanV;',
@@ -6293,7 +6296,8 @@ edit('Core/Src/KNpcAttribModify.cpp',
      b' = &KNpcAttribModify::KhangYanP;'
      b' ProcessFunc[magic_attackspeed_yan_v] = &KNpcAttribModify::TocDanhYanV;'
      b' ProcessFunc[magic_castspeed_yan_v] = &KNpcAttribModify::TocPhatYanV;'
-     b' ProcessFunc[magic_fasthitrecover_yan_v] = &KNpcAttribModify::PhucHoiYanV;',
+     b' ProcessFunc[magic_fasthitrecover_yan_v] = &KNpcAttribModify::PhucHoiYanV;'
+     b' ProcessFunc[magic_hide] = &KNpcAttribModify::AnThan;',
      'KNpcAttribModify: dang ky ham Duong')
 edit('Core/Src/KNpcAttribModify.cpp',
      b'void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)',
@@ -6320,6 +6324,10 @@ edit('Core/Src/KNpcAttribModify.cpp',
            b'void KNpcAttribModify::TocDanhYanV(KNpc* pNpc, void* pData) { pNpc->m_nTocDanhYan += ((KMagicAttrib *)pData)->nValue[0]; }\n'
            b'void KNpcAttribModify::TocPhatYanV(KNpc* pNpc, void* pData) { pNpc->m_nTocPhatYan += ((KMagicAttrib *)pData)->nValue[0]; }\n'
            b'void KNpcAttribModify::PhucHoiYanV(KNpc* pNpc, void* pData) { pNpc->m_nPhucHoiYan += ((KMagicAttrib *)pData)->nValue[0]; }\n'
+           b'/* An than: may chu gui trang thai 713 kem hide cho CHINH nguoi do (nguoi khac khong nhan du lieu NPC nay).\n'
+           b'   Het han / may chu bat hien hinh (gui lai trang thai voi thoi han 1) thi nut tu go -> ap -v. */\n'
+           b'void KNpcAttribModify::AnThan(KNpc* pNpc, void* pData) { pNpc->m_nAnThan += ((KMagicAttrib *)pData)->nValue[0];'
+           b' if (pNpc->m_nAnThan < 0) pNpc->m_nAnThan = 0; }\n'
            b'\n'
            b'void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)'),
      'KNpcAttribModify: ham khang/toc do Duong')
@@ -6344,6 +6352,14 @@ edit_all('Core/Src/KNpc.cpp',
      b'm_AttackFrame * 100 / (100 + m_CurrentAttackSpeed)',
      b'm_AttackFrame * 100 / (100 + TocDanhHieuLuc())',
      'Nhip hoat anh danh dung toc danh hieu luc nhu may chu')
+
+# An than: ve CHINH nguoi dang an mo di (alpha 112/255 -> DrawSpriteAlpha nExAlpha 14/31, ban trong suot) - nguoi
+# khac khong thay (may chu khong gui du lieu NPC). Dong nay dat alpha cho o [i] trong vong ve bo phan nguoi; dung
+# chi so do, khong doi hanh vi khi khong an (255 nhu cu).
+edit('Core/Src/KNpcRes.cpp',
+     b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = 255;',
+     b'\t\t\t\tm_cDrawFile[i].Color.Color_b.a = m_cDrawFile[nPos].Color.Color_b.a = (nNpcIdx > 0 && Npc[nNpcIdx].m_nAnThan > 0) ? 112 : 255;\t/* an than: ve mo ([i] va [nPos] lech nhau khi bo qua bo phan rong) */',
+     'An than: ve chinh minh mo')
 
 # ---------------------------------------------------------------------------
 # SkillStyle 14 (8.x, "dan no tuc thi"): nguon 2003 dung kieu 0..13, KSkillManager::InstanceSkill chi dung
