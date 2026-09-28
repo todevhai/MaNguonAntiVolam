@@ -648,8 +648,11 @@ public:
 	   giu tran that; m_nBu*Yan la phan dang bu them de tru ra dung khi can lai. */
 	int					m_nTranSinhLucYan, m_nTranNoiLucYan;
 	int					m_nBuSinhLucYan, m_nBuNoiLucYan;
-	void				DatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; }
-	void				DatLaiYanNoiLuc() { m_nTranNoiLucYan = m_ManaMax; m_nBuNoiLucYan = 0; }
+	/* Tong rong lifemax/manamax _p/_v THUONG dang ap (ap cong, go tru). Am (vd Giang Long Chuong lifemax_p -25%)
+	   thi tru ca tran yan: thuoc tinh chieu khai tru bao nhieu thi tru bay nhieu. jx9tn/ban6 de tran yan bu lai. */
+	int					m_nThemSinhLucThuong, m_nThemNoiLucThuong;
+	void				DatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; m_nThemSinhLucThuong = 0; }
+	void				DatLaiYanNoiLuc() { m_nTranNoiLucYan = m_ManaMax; m_nBuNoiLucYan = 0; m_nThemNoiLucThuong = 0; }
 	void				CanTranYan();	// m_Current*Max = max(thuong, yan); goi sau moi lan doi thuoc tinh
 	void				AddBaseStaminaMax(int nStamina);// 增加基本最大体力点
 	void				SetBaseStaminaMax(int nStamina);

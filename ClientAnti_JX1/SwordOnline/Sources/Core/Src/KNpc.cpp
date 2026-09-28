@@ -173,11 +173,11 @@ void KNpc::Init()
 
 	m_CurrentLife = 100;			// Npc的当前生命
 	m_CurrentLifeMax = 100;		// Npc的当前生命最大值
-	m_nTranSinhLucYan = m_nBuSinhLucYan = 0;
+	m_nTranSinhLucYan = m_nBuSinhLucYan = m_nThemSinhLucThuong = 0;
 	m_CurrentLifeReplenish = 0;	// Npc的当前生命回复速度
 	m_CurrentMana = 100;			// Npc的当前内力
 	m_CurrentManaMax = 100;		// Npc的当前最大内力
-	m_nTranNoiLucYan = m_nBuNoiLucYan = 0;
+	m_nTranNoiLucYan = m_nBuNoiLucYan = m_nThemNoiLucThuong = 0;
 	m_CurrentManaReplenish = 0;	// Npc的当前内力回复速度
 	m_CurrentStamina = 100;		// Npc的当前体力
 	m_CurrentStaminaMax = 100;	// Npc的当前最大体力
@@ -4964,10 +4964,12 @@ void	KNpc::AddCurLifeMax(int nLife)
 void	KNpc::CanTranYan()
 {
 	int nThuong = m_CurrentLifeMax - m_nBuSinhLucYan;
-	m_nBuSinhLucYan = m_nTranSinhLucYan > nThuong ? m_nTranSinhLucYan - nThuong : 0;
+	int nYan = m_nTranSinhLucYan + (m_nThemSinhLucThuong < 0 ? m_nThemSinhLucThuong : 0);	/* phan am cua thuoc tinh thuong tru ca tran yan */
+	m_nBuSinhLucYan = nYan > nThuong ? nYan - nThuong : 0;
 	m_CurrentLifeMax = nThuong + m_nBuSinhLucYan;
 	nThuong = m_CurrentManaMax - m_nBuNoiLucYan;
-	m_nBuNoiLucYan = m_nTranNoiLucYan > nThuong ? m_nTranNoiLucYan - nThuong : 0;
+	nYan = m_nTranNoiLucYan + (m_nThemNoiLucThuong < 0 ? m_nThemNoiLucThuong : 0);
+	m_nBuNoiLucYan = nYan > nThuong ? nYan - nThuong : 0;
 	m_CurrentManaMax = nThuong + m_nBuNoiLucYan;
 }
 

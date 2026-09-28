@@ -549,7 +549,9 @@ void KNpcAttribModify::ManaMaxYanP(KNpc* pNpc, void* pData)
 void KNpcAttribModify::LifeMaxP(KNpc* pNpc, void* pData)
 {
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
-	pNpc->m_CurrentLifeMax += pNpc->m_LifeMax * pMagic->nValue[0] / 100;
+	int nThem = pNpc->m_LifeMax * pMagic->nValue[0] / 100;
+	pNpc->m_CurrentLifeMax += nThem;
+	pNpc->m_nThemSinhLucThuong += nThem;
 	g_DebugLog("[数值]%s生命上限增加了百分之%d(%d点)", pNpc->Name, pMagic->nValue[0], pNpc->m_LifeMax * pMagic->nValue[0] / 100);	
 }
 
@@ -557,6 +559,7 @@ void KNpcAttribModify::LifeMaxV(KNpc* pNpc, void* pData)
 {
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
 	pNpc->m_CurrentLifeMax += pMagic->nValue[0];
+	pNpc->m_nThemSinhLucThuong += pMagic->nValue[0];
 	g_DebugLog("[数值]%s生命上限增加了%d点", pNpc->Name, pMagic->nValue[0]);
 }
 
@@ -611,7 +614,9 @@ void KNpcAttribModify::LuckyV(KNpc* pNpc, void* pData)
 void KNpcAttribModify::ManaMaxP(KNpc* pNpc, void* pData)
 {
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
-	pNpc->m_CurrentManaMax += pNpc->m_ManaMax * pMagic->nValue[0] / 100;
+	int nThem = pNpc->m_ManaMax * pMagic->nValue[0] / 100;
+	pNpc->m_CurrentManaMax += nThem;
+	pNpc->m_nThemNoiLucThuong += nThem;
 	g_DebugLog("[数值]%s内力上限增加了百分之%d(%d点)", pNpc->Name, pMagic->nValue[0], pNpc->m_ManaMax * pMagic->nValue[0] / 100);	
 }
 
@@ -619,6 +624,7 @@ void KNpcAttribModify::ManaMaxV(KNpc* pNpc, void* pData)
 {
 	KMagicAttrib* pMagic = (KMagicAttrib *)pData;
 	pNpc->m_CurrentManaMax += pMagic->nValue[0];
+	pNpc->m_nThemNoiLucThuong += pMagic->nValue[0];
 	g_DebugLog("[数值]%s内力上限增加了%d点", pNpc->Name, pMagic->nValue[0]);
 }
 
