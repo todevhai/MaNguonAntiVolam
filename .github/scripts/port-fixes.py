@@ -2824,8 +2824,9 @@ edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
      b'void KUiHeaderControlBar::Breathe()',
      _crlf(b'/* Cap nhat bon thanh moi nhip tho. GDI_PLAYER_RT_INFO la duong ma\n'
            b'   KUiPlayerBar da dung san de lay mau va noi luc, dung lai o day.\n'
-           b'   Kinh nghiem tinh theo phan da di trong cap HIEN TAI, khong phai\n'
-           b'   tong tich luy - nExperienceFull la moc cua cap truoc. */\n'
+           b'   Kinh nghiem: m_nExp la phan da di trong cap HIEN TAI (LevelUp dat ve 0),\n'
+           b'   nExperienceFull = m_nNextLevelExp la nguong cua cap nay. Truoc day tru\n'
+           b'   nExperienceFull (tuong la moc cap truoc) -> mau so 0 -> luon hien 0/1. */\n'
            b'static void DatThanh(KWndImagePart& Thanh, KWndText32& Chu, int nHienTai, int nDay)\n'
            b'{\n'
            b'\tif (nDay <= 0)\n'
@@ -2853,8 +2854,7 @@ edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
            b'\tDatThanh(m_Life,    m_LifeText,    Info.nLife,    Info.nLifeFull);\n'
            b'\tDatThanh(m_Mana,    m_ManaText,    Info.nMana,    Info.nManaFull);\n'
            b'\tDatThanh(m_Exp,     m_ExpText,\n'
-           b'\t\tInfo.nExperience - Info.nExperienceFull,\n'
-           b'\t\tInfo.nCurLevelExperience - Info.nExperienceFull);'),
+           b'\t\tInfo.nExperience, Info.nExperienceFull);'),
      'cap nhat bon thanh moi nhip tho')
 
 # --------------------------------------------------------- header bu ten ham
@@ -4267,11 +4267,9 @@ edit('S3Client/Ui/UiCase/UiOptions.cpp',
 # anh nen, hai o nay la CHO DIEN SO.
 edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
      _crlf(b'\tDatThanh(m_Exp,     m_ExpText,\n'
-           b'\t\tInfo.nExperience - Info.nExperienceFull,\n'
-           b'\t\tInfo.nCurLevelExperience - Info.nExperienceFull);'),
+           b'\t\tInfo.nExperience, Info.nExperienceFull);'),
      _crlf(b'\tDatThanh(m_Exp,     m_ExpText,\n'
-           b'\t\tInfo.nExperience - Info.nExperienceFull,\n'
-           b'\t\tInfo.nCurLevelExperience - Info.nExperienceFull);\n'
+           b'\t\tInfo.nExperience, Info.nExperienceFull);\n'
            b'\t/* Cap va hang xep the gioi nam o KUiPlayerAttribute, khong phai\n'
            b'\t   KUiPlayerRuntimeInfo - phai hoi rieng. */\n'
            b'\tKUiPlayerAttribute ThuocTinh;\n'
