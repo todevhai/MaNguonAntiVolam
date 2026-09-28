@@ -2841,6 +2841,23 @@ edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
            b'\tChu.SetText(szSo);\n'
            b'}\n'
            b'\n'
+           b'/* Kinh nghiem hien PHAN TRAM (2 so le): nguong cap cao hang chuc trieu,\n'
+           b'   dang "hien tai/nguong" khong vua o chu. Nhan bang so 64 bit. */\n'
+           b'static void DatThanhPhanTram(KWndImagePart& Thanh, KWndText32& Chu, int nHienTai, int nDay)\n'
+           b'{\n'
+           b'\tDatThanh(Thanh, Chu, nHienTai, nDay);\n'
+           b'\tif (nDay <= 0)\n'
+           b'\t\tnDay = 1;\n'
+           b'\tif (nHienTai < 0)\n'
+           b'\t\tnHienTai = 0;\n'
+           b'\tif (nHienTai > nDay)\n'
+           b'\t\tnHienTai = nDay;\n'
+           b'\tint nPhanVan = (int)((__int64)nHienTai * 10000 / nDay);\n'
+           b'\tchar szSo[24];\n'
+           b'\tsprintf(szSo, "%d.%02d%%", nPhanVan / 100, nPhanVan % 100);\n'
+           b'\tChu.SetText(szSo);\n'
+           b'}\n'
+           b'\n'
            b'void KUiHeaderControlBar::Breathe()'),
      'ham dat mot thanh theo ti le')
 
@@ -2853,8 +2870,7 @@ edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
            b'\tDatThanh(m_Stamina, m_StaminaText, Info.nStamina, Info.nStaminaFull);\n'
            b'\tDatThanh(m_Life,    m_LifeText,    Info.nLife,    Info.nLifeFull);\n'
            b'\tDatThanh(m_Mana,    m_ManaText,    Info.nMana,    Info.nManaFull);\n'
-           b'\tDatThanh(m_Exp,     m_ExpText,\n'
-           b'\t\tInfo.nExperience, Info.nExperienceFull);'),
+           b'\tDatThanhPhanTram(m_Exp, m_ExpText, Info.nExperience, Info.nExperienceFull);'),
      'cap nhat bon thanh moi nhip tho')
 
 # --------------------------------------------------------- header bu ten ham
@@ -4266,10 +4282,8 @@ edit('S3Client/Ui/UiCase/UiOptions.cpp',
 # khong noi nao do chu vao - hai o luon rong. Chu "Cap"/"Hang" nam san tren
 # anh nen, hai o nay la CHO DIEN SO.
 edit('S3Client/Ui/UiCase/UiHeaderControlBar.cpp',
-     _crlf(b'\tDatThanh(m_Exp,     m_ExpText,\n'
-           b'\t\tInfo.nExperience, Info.nExperienceFull);'),
-     _crlf(b'\tDatThanh(m_Exp,     m_ExpText,\n'
-           b'\t\tInfo.nExperience, Info.nExperienceFull);\n'
+     _crlf(b'\tDatThanhPhanTram(m_Exp, m_ExpText, Info.nExperience, Info.nExperienceFull);'),
+     _crlf(b'\tDatThanhPhanTram(m_Exp, m_ExpText, Info.nExperience, Info.nExperienceFull);\n'
            b'\t/* Cap va hang xep the gioi nam o KUiPlayerAttribute, khong phai\n'
            b'\t   KUiPlayerRuntimeInfo - phai hoi rieng. */\n'
            b'\tKUiPlayerAttribute ThuocTinh;\n'
