@@ -6270,8 +6270,8 @@ edit('Core/Src/KCore.cpp',
 # luc = max(khang thuong, khang Duong) khi co khang Duong, roi chan tran; toc danh/toc phat/phuc hoi = max(thuong,
 # Duong). Client chi can de HIEN THI + nhip hoat anh danh cho khop may chu. Moc neo deu MOT DONG (CRLF).
 edit('Core/Src/KNpc.h',
-     b'\tvoid\t\t\t\tDatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; }',
-     _crlf(b'\tvoid\t\t\t\tDatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; }\n'
+     b'\tvoid\t\t\t\tDatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; m_nThemSinhLucThuong = 0; }',
+     _crlf(b'\tvoid\t\t\t\tDatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; m_nThemSinhLucThuong = 0; }\n'
            b'\t/* Khang / toc do "yan" (Duong) nhu may chu - thu tu he nhu m_nKhangYan cua may chu. */\n'
            b'\tenum { KHANG_VAT_LY = 0, KHANG_HOA, KHANG_BANG, KHANG_LOI, KHANG_DOC, KHANG_SO };\n'
            b'\tint\t\t\t\t\tm_nKhangYan[KHANG_SO];\n'
