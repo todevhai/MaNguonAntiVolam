@@ -7,7 +7,9 @@
 #ifdef  _SERVER
 #define MAX_MISSLE  20000
 #else
-#define MAX_MISSLE 500
+// Client: 500 -> 3000. Cho dong bot (30+ nguoi cung tung chieu 5-7 dan, dan song 1-2 s) da cham tran 500:
+// MissleSet Have Full lien tuc, dan bi bo, client sap ngay sau (03/10/2026). May chu da la 20000.
+#define MAX_MISSLE 3000
 #endif
 #include "KCore.h"
 #include "SkillDef.h"
