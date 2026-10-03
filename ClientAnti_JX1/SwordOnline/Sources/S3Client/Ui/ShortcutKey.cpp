@@ -1327,7 +1327,10 @@ int LuaPhimTat(Lua_State * L)
 {
 	if (Lua_GetTopIndex(L) != 1 || !g_pCoreShell)
 		return 0;
-	g_pCoreShell->OperationRequest(GOI_PHIM_TAT, (unsigned int)Lua_ValueToNumber(L, 1), 0);
+	int nLoai = (int)Lua_ValueToNumber(L, 1);
+	if (nLoai == 2)
+		KUiShop::DanhDauMoTaiCho();
+	g_pCoreShell->OperationRequest(GOI_PHIM_TAT, (unsigned int)nLoai, 0);
 	return 0;
 }
 

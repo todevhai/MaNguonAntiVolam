@@ -25,6 +25,19 @@ extern iCoreShell*		g_pCoreShell;
 
 KUiShop* KUiShop::m_pSelf = NULL;
 
+// Tiem mo bang phim tat Ctrl+X (PhimTat(2) -> c2s_phimtat): may chu tra s2c_opensalebox nhu tiem NPC, nen client tu
+// danh dau truoc khi gui. Han 5 giay de dau cu (may chu khong tra loi) khong dinh vao lan mo tiem NPC sau.
+#define MO_TAI_CHO_HAN		5000
+static unsigned int	s_uMoTaiChoLuc = 0;
+static int			s_nKhoangCachF3 = 4;	// UiShop.ini [PhimTat] KhoangCachF3: khe giua tiem va F3
+
+void KUiShop::DanhDauMoTaiCho()
+{
+	s_uMoTaiChoLuc = GetTickCount();
+	if (s_uMoTaiChoLuc == 0)
+		s_uMoTaiChoLuc = 1;
+}
+
 KUiShop::KUiShop()
 {
 	m_pObjsList = NULL;
@@ -66,6 +79,21 @@ KUiShop* KUiShop::OpenWindow()
 		else
 			UiSoundPlay(UI_SI_WND_OPENCLOSE);
 		KUiItem::OnNpcTradeMode(true);
+		// Mo tai cho: F3 mo cung tiem nhung nam DUOI tiem (cung goc trai). Dat F3 sat ben phai tiem, thang hang tren,
+		// tab Trang bi (trang 1) de nhin do dang mac khi ban / sua. Tiem mo qua NPC giu nguyen nhu cu.
+		if (s_uMoTaiChoLuc && GetTickCount() - s_uMoTaiChoLuc < MO_TAI_CHO_HAN)
+		{
+			KUiStatus* pF3 = KUiStatus::GetIfVisible();
+			if (pF3)
+			{
+				int x = 0, y = 0, w = 0, h = 0;
+				m_pSelf->GetPosition(&x, &y);
+				m_pSelf->GetSize(&w, &h);
+				pF3->SetPosition(x + w + s_nKhoangCachF3, y);
+				pF3->ActivePage(1);
+			}
+		}
+		s_uMoTaiChoLuc = 0;
 		return m_pSelf;
 	}
 	{
@@ -127,6 +155,7 @@ void KUiShop::LoadScheme(const char* pScheme)
 			m_pSelf->m_CloseBtn.Init(&Ini, "CloseBtn");
 
 			m_pSelf->m_ItemsBox.EnablePickPut(false);
+			Ini.GetInteger("PhimTat", "KhoangCachF3", 4, &s_nKhoangCachF3);
 		}
 	}
 }

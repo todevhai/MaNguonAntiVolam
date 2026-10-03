@@ -22,6 +22,7 @@ public:
 	static void			CloseWindow();				//关闭窗口，同时可以选则是否删除对象实例
 	static void			LoadScheme(const char* pScheme);	//载入界面方案
 	static void			CancelTrade();
+	static void			DanhDauMoTaiCho();		// phim tat Ctrl+X: lan mo tiem toi dat F3 canh tiem, tab Trang bi
 	void				UpdateData();	
 	int		WndProc(unsigned int uMsg, unsigned int uParam, int nParam);//窗口函数
 private:
