@@ -1191,6 +1191,10 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		{
 			continue;
 		}
+		/* Bo yeu cau Suc / Than phap / Sinh khi / Noi cong (KItemList::EnoughAttrib) - khong hien nua. */
+		int nYc = m_aryRequireAttrib[i].nAttribType;
+		if (nYc == magic_requirestr || nYc == magic_requiredex || nYc == magic_requirevit || nYc == magic_requireeng)
+			continue;
 		char* pszInfo = (char *)g_MagicDesc.GetDesc(&m_aryRequireAttrib[i]);
 		if (!pszInfo || !pszInfo[0])
 			continue;

@@ -772,29 +772,12 @@ BOOL KItemList::EnoughAttrib(void* pAttrib)
 	_ASSERT(pData);
 	switch(pData->nAttribType)
 	{
+	/* Luat rieng (user 03/10/2026): trang bi chi con yeu cau CAP (va mon phai / ngu hanh / gioi tinh);
+	   bo yeu cau Suc / Than phap / Sinh khi / Noi cong. Hai nua cung luat - client sua cung cho. */
 	case magic_requirestr:
-		if (Player[m_PlayerIdx].m_nCurStrength < pData->nValue[0])
-		{
-			return FALSE;
-		}
-		break;
 	case magic_requiredex:
-		if (Player[m_PlayerIdx].m_nCurDexterity < pData->nValue[0])
-		{
-			return FALSE;
-		}
-		break;
 	case magic_requirevit:
-		if (Player[m_PlayerIdx].m_nCurVitality < pData->nValue[0])
-		{
-			return FALSE;
-		}
-		break;
 	case magic_requireeng:
-		if (Player[m_PlayerIdx].m_nCurEngergy < pData->nValue[0])
-		{
-			return FALSE;
-		}
 		break;
 	case magic_requirelevel:
 		if (Npc[Player[m_PlayerIdx].m_nIndex].m_Level < pData->nValue[0])
