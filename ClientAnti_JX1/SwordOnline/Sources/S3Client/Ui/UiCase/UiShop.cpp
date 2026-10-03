@@ -86,10 +86,11 @@ KUiShop* KUiShop::OpenWindow()
 			KUiStatus* pF3 = KUiStatus::GetIfVisible();
 			if (pF3)
 			{
-				int x = 0, y = 0, w = 0, h = 0;
-				m_pSelf->GetPosition(&x, &y);
+				// Lay vi tri DICH (m_oFixPos), khong GetPosition: tiem dang truot vao tu StartPos (x=-211) nen luc nay
+				// GetPosition tra diem xuat phat -> F3 bi dat ve x~4, gan cho cu (user 03/10: "hau nhu khong doi").
+				int w = 0, h = 0;
 				m_pSelf->GetSize(&w, &h);
-				pF3->SetPosition(x + w + s_nKhoangCachF3, y);
+				pF3->SetPosition(m_pSelf->m_oFixPos.x + w + s_nKhoangCachF3, m_pSelf->m_oFixPos.y);
 				pF3->ActivePage(1);
 			}
 		}
