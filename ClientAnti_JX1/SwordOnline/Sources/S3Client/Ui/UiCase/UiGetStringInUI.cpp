@@ -179,7 +179,11 @@ int KUiGetStringInUI::WndProc(unsigned int uMsg, unsigned int uParam, int nParam
 void KUiGetStringInUI::OnOk()
 {
 		int inputedPassword = m_StringEdit.GetIntNumber();
-		g_pCoreShell->OperationRequest(GOI_STRINGBOX, inputedPassword, 0);
+		// Gui kem chu da go: may chu dung so (AskClientForNumber) hoac chu (AskClientForString) tuy ham da hen.
+		char szText[32];
+		szText[0] = 0;
+		m_StringEdit.GetText(szText, sizeof(szText), false);
+		g_pCoreShell->OperationRequest(GOI_STRINGBOX, inputedPassword, (int)szText);
 		CloseWindow(true);
 		return;
 }

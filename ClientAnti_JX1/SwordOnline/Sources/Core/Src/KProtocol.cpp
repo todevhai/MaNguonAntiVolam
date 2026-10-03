@@ -412,12 +412,15 @@ void SendClientOpenMarket(int nTab)
 		g_pClient->SendPackToServer((BYTE*)&Market, sizeof(PLAYER_REQUEST_OPEN_MARKET));
 }
 
-void SendClientString(int nstt) //stringbox
+void SendClientString(int nstt, const char* pszText) //stringbox
 {
 	CP_STRING StringCmd;
 
 	StringCmd.ProtocolType = c2s_string;
 	StringCmd.nbutton = nstt;
+	memset(StringCmd.szText, 0, sizeof(StringCmd.szText));
+	if (pszText)
+		strncpy(StringCmd.szText, pszText, sizeof(StringCmd.szText) - 1);
 	if (g_pClient)
 		g_pClient->SendPackToServer((BYTE*)&StringCmd, sizeof(CP_STRING));
 }

@@ -1675,7 +1675,7 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 	}
 	break;
 	case GOI_STRINGBOX:// stringbox
-		SendClientString(uParam);
+		SendClientString(uParam, (const char*)nParam);	// nParam: chu da go (KUiGetStringInUI::OnOk)
 		break;
 	case GOI_DATAU:// Da Tau
 		SendClientDaTau(uParam);

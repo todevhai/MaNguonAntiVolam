@@ -168,6 +168,7 @@ typedef struct
 {
 	BYTE	ProtocolType; //stringbox
 	int		nbutton;
+	char	szText[32];		// chu nguoi choi go (AskClientForString - lenh bai GM tim nguoi theo ten); may chu cung bo cuc
 } CP_STRING;
 
 typedef struct	
@@ -2440,7 +2441,7 @@ void SendClientCPLockCmd();
 void SendClientCPChangeCmd(int oldPW, int newPW);
 void SendClientCPResetCmd(int resetPW);
 void SendClientOpenMarket(int nTab);
-void SendClientString(int nstt);//stringbox
+void SendClientString(int nstt, const char* pszText);//stringbox
 void SendClientDaTau(int nstt);
 void SendClientCmdMoveItem(void* pDownPos, void* pUpPos);
 void SendClientCmdQueryLadder(DWORD	dwLadderID);
