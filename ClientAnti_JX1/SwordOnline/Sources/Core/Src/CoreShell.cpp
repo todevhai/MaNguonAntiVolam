@@ -1858,6 +1858,15 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 				g_pClient->SendPackToServer((BYTE*)&Msg, sizeof(MERIDIAN_COMMAND));
 		}
 		break;
+	case GOI_PHIM_TAT:
+		{
+			PHIM_TAT_COMMAND Msg;
+			Msg.ProtocolType = (BYTE)c2s_phimtat;
+			Msg.btLoai = (BYTE)uParam;
+			if (g_pClient)
+				g_pClient->SendPackToServer((BYTE*)&Msg, sizeof(PHIM_TAT_COMMAND));
+		}
+		break;
 	case GOI_SET_AVATAR:
 		{
 			// Khong tu doi m_nAvatar o day: cho may chu bao lai bang s2c_setavatar.

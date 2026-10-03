@@ -334,6 +334,7 @@ enum c2s_PROTOCOL
 	c2s_pkvalue,
 	c2s_setavatar,	// chon chan dung (client -> server)
 	c2s_meridian,	// kinh mach: xin dong bo / goi y / xung huyet (client -> server)
+	c2s_phimtat,	// phim tat yeu cau may chu: 1 mo ruong, 2 mo tiem tai cho (client -> server)
 	_c2s_begin_relay = 250,
 	c2s_extend = _c2s_begin_relay,
 	c2s_extendchat,

@@ -234,6 +234,7 @@ int	g_nProtocolSize[MAX_PROTOCOL_NUM] =
 	sizeof(CP_PKVALUE),							// c2s_pkvalue
 	sizeof(SET_AVATAR),							// c2s_setavatar
 	sizeof(MERIDIAN_COMMAND),					// c2s_meridian
+	sizeof(PHIM_TAT_COMMAND),					// c2s_phimtat
 #endif
 };
 

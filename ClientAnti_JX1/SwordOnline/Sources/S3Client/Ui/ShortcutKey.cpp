@@ -1321,6 +1321,16 @@ int LuaSetEmote(Lua_State *L)
 	return 0;
 }
 
+// PhimTat(n): xin may chu mo ruong (1) / tiem tai cho (2) ngay tai bai - c2s_phimtat. Gan phim o
+// \Ui\autoexec.lua (Ctrl+Z, Ctrl+X).
+int LuaPhimTat(Lua_State * L)
+{
+	if (Lua_GetTopIndex(L) != 1 || !g_pCoreShell)
+		return 0;
+	g_pCoreShell->OperationRequest(GOI_PHIM_TAT, (unsigned int)Lua_ValueToNumber(L, 1), 0);
+	return 0;
+}
+
 int LuaSetScreenShotFolder(Lua_State * L)
 {
 	if(Lua_GetTopIndex(L) == 1)
@@ -2228,6 +2238,7 @@ TLua_Funcs GameScriptFuns[] =
 	{"SetAddinUnitMemberStatus", LuaSetAddinUnitMemberStatus}, //char* strName, char* strMember, char* strStatus
 	{"ConvertEmotes", LuaConvertEmotes},        //Convert the WHOLE Emote File into Lua file
 	{"SetEmote", LuaSetEmote},                  //Set a emote expression, give 5 param,1 = command,2 = emote name,3 = emote expression with target,4 = emote expression without target,5 = emote index,if 5 set give,willl change the command,name,strings of emote with this index,if not give,this function will search the emote index by the command
+	{"PhimTat", LuaPhimTat},	//int nLoai: 1 ruong, 2 tiem tai cho
 	{"SetScreenShotFolder", LuaSetScreenShotFolder},//Set the ScreenShot save folder
 };
 

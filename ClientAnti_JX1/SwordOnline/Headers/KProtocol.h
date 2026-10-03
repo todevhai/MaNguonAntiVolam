@@ -2268,6 +2268,15 @@ typedef struct
 	BYTE	btWay;
 } MERIDIAN_COMMAND;
 
+// Phim tat yeu cau may chu (c2s_phimtat): mo ruong / tiem ngay tai cho (bai luyen) thay vi chay ve thon.
+#define PHIM_TAT_RUONG	1
+#define PHIM_TAT_TIEM	2
+typedef struct
+{
+	BYTE	ProtocolType;
+	BYTE	btLoai;		// PHIM_TAT_*
+} PHIM_TAT_COMMAND;
+
 enum MERIDIAN_RESULT
 {
 	meridian_sync = 0,		// plain refresh, nothing was tried

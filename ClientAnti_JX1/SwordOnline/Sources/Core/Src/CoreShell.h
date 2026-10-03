@@ -787,6 +787,8 @@ enum GAMEOPERATION_INDEX
 
 	GOI_SET_AVATAR,		// chon chan dung; uParam = so hieu 1..defMAX_AVATAR,
 						// 0 = chi HOI may chu chan dung dang luu
+
+	GOI_PHIM_TAT,		// phim tat yeu cau may chu (c2s_phimtat); uParam = PHIM_TAT_RUONG / PHIM_TAT_TIEM
 };
 
 //=========================================================
