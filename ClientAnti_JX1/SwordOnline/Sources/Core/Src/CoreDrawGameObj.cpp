@@ -107,6 +107,17 @@ void	CoreDrawGameObj(unsigned int uObjGenre, unsigned int uId, int x, int y, int
 		}
 		if (uObjGenre == CGOG_IME_ITEM)
 		{
+			// Tren da can giua theo GetWidth() * 26 (so o chiem trong tui). Voi o
+			// phim tat thi phai can theo khung THAT cua anh, khong thi icon to /
+			// nho hon 26 se lech han ra ngoai o. Do chenh giua hai cach:
+			//   (o_chiem*26 - rong_that) / 2 - offset_frame
+			// Dung cho ca hai nhanh ben tren vi ca hai deu dat goc theo o_chiem*26.
+			int nOffX = 0, nOffY = 0, nFrameW = 0, nFrameH = 0;
+			if (Item[uId].GetIconFrameBox(&nOffX, &nOffY, &nFrameW, &nFrameH))
+			{
+				x += (Item[uId].GetWidth() * ITEM_CELL_WIDTH - nFrameW) / 2 - nOffX;
+				y += (Item[uId].GetHeight() * ITEM_CELL_HEIGHT - nFrameH) / 2 - nOffY;
+			}
 			Item[uId].Paint(x, y,FALSE);
 		} 
 		else

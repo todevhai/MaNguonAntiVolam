@@ -6,6 +6,7 @@
 *****************************************************************************************/
 #define _REPRESENT_INTERNAL_SIGNATURE_
 #include "KRepresentShell2.h"
+#include <math.h>	/* pow() cho bang gamma */
 #include "../iRepresent/KRepresentUnit.h"
 #include "../../Engine/src/KColors.h"
 #include "../iRepresent/Font/KFont2.h"
@@ -20,6 +21,17 @@
 #define GET_SPR_PALETTE(pHeader)	( ((char*)pHeader) + sizeof(SPRHEAD))
 
 //=========创建一个iRepresentShell接口的实例===============
+extern "C" __declspec(dllexport)
+/* Ham xuat doi cu - dung cai nay. S3Client/S3Client.cpp:34,139 tim dung ten
+   "CreateRepresentShell" va goi khong tham so. Hai con tro vung nho cua doi
+   chong gian lan truyen NULL: ctor chi cat chung vao m_CanvasLocal/
+   m_DirectDrawLocal, ma hai bien do khong con cho nao dung nua sau hai ban va
+   ben duoi. */
+iRepresentShell* CreateRepresentShell()
+{
+	return (new KRepresentShell2(NULL, NULL));
+}
+
 extern "C" __declspec(dllexport)
 iRepresentShell* CreateRepresentDirect(unsigned int* m_Canvas, unsigned int* m_DirectDraw)
 {
@@ -80,9 +92,9 @@ unsigned int KRepresentShell2::SetAdjustColorList(unsigned int* puColorList, uns
 bool KRepresentShell2::Create(int nWidth, int nHeight, bool bFullScreen)
 {
 	m_DirectDraw.Mode(bFullScreen, nWidth, nHeight);
-	if (m_DirectDraw.Init(m_DirectDrawLocal))
+	if (m_DirectDraw.Init(NULL))
 	{
-		m_Canvas.Init(nWidth, nHeight, m_CanvasLocal);
+		m_Canvas.Init(nWidth, nHeight);
 		m_ImageStore.Init();
 		RIO_Set16BitImageFormat(m_DirectDraw.GetRGBBitMask16() == RGB_565);
 		// 初始化Gdi+
@@ -216,8 +228,21 @@ void KRepresentShell2::DrawPrimitives(int nPrimitiveCount, KRepresentUnit* pPrim
 						{
 						case IMAGE_RENDER_STYLE_ALPHA:
 						case IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT:
-						/*	m_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,
-								pFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);*/
+							/* CHINH TEP SPR KHAI CACH VE: byte 0x16 cua SPRHEAD
+							   (Reserved[1]) bang 1 thi tron SCREEN, khong thi alpha
+							   thuong. Do ma may represent2.dll ban hoan thien
+							   12/09/2026: 0x100049ca so byte do roi EP kieu ve sang so 7
+							   (KCanvas::DrawSpriteScreen), khong thi di bang nhay thuong.
+							   Quet du lieu: sprite doi 8.x (thu muc 150/, 1502/) khai 1,
+							   sprite doi 2003 khai 0. Ve nham chieu nao cung hong:
+							   alpha len sprite 8.x ra QUANG DEN, screen len sprite 2003
+							   ra KHOI MAU DAC. */
+							if (pSprHeader->Reserved[1] == 1)
+								m_Canvas.DrawSpriteAdd(nX, nY, pFrame->Width, pFrame->Height,
+									pFrame->Sprite, pPalette, 1);
+							else
+								m_Canvas.DrawSpriteAlpha(nX, nY, pFrame->Width, pFrame->Height,
+									pFrame->Sprite, pPalette, pTemp->Color.Color_b.a / 8);
 							break;
 						case IMAGE_RENDER_STYLE_3LEVEL:
 							m_Canvas.DrawSprite3LevelAlpha(nX, nY, pFrame->Width, pFrame->Height,
@@ -959,9 +984,65 @@ bool KRepresentShell2::RepresentBegin(int bClear, unsigned int Color)
 	return true;
 }
 
+/* ---- Nut "Do sang" (gamma) cho bo ve phan mem ----
+   nGamma 0..100, 50 = nguyen ven (UiOptions.cpp dat mac dinh 50).
+   Duoi 50 toi dan, tren 50 sang dan. Giu o bien tinh de khong doi bo cuc
+   lop (khoi phai va them ham dung). */
+static int s_nDoSang = 50;
+static unsigned short s_wBang5[32];
+static unsigned short s_wBang6[64];
+
+void KRepresentShell2::SetGamma(int nGamma)
+{
+	if (nGamma < 0) nGamma = 0;
+	if (nGamma > 100) nGamma = 100;
+	s_nDoSang = nGamma;
+	/* so mu: 2.2 (toi nhat) -> 1.0 (nguyen ven) -> 0.45 (sang nhat) */
+	double fMu = (nGamma <= 50) ? (1.0 + (50 - nGamma) * (1.2 / 50.0))
+								: (1.0 - (nGamma - 50) * (0.55 / 50.0));
+	int i;
+	for (i = 0; i < 32; i++)
+	{
+		int v = (int)(pow((double)i / 31.0, fMu) * 31.0 + 0.5);
+		s_wBang5[i] = (unsigned short)(v < 0 ? 0 : (v > 31 ? 31 : v));
+	}
+	for (i = 0; i < 64; i++)
+	{
+		int v = (int)(pow((double)i / 63.0, fMu) * 63.0 + 0.5);
+		s_wBang6[i] = (unsigned short)(v < 0 ? 0 : (v > 63 ? 63 : v));
+	}
+}
+
+static void g_ApDoSang(KCanvas& Canvas)
+{
+	if (s_nDoSang == 50) return;	/* nguyen ven thi khong quet lam gi */
+	int nPitch = 0;
+	void* pDau = Canvas.LockCanvas(nPitch);
+	if (pDau == NULL) return;
+	int bLa565 = (Canvas.m_nMask32 == 0x07e0f81f);
+	int nRong = Canvas.GetWidth();
+	int nCao = Canvas.GetHeight();
+	for (int y = 0; y < nCao; y++)
+	{
+		unsigned short* d = (unsigned short*)((char*)pDau + y * nPitch);
+		for (int x = 0; x < nRong; x++)
+		{
+			unsigned short w = d[x];
+			if (bLa565)
+				d[x] = (unsigned short)((s_wBang5[(w >> 11) & 31] << 11)
+					| (s_wBang6[(w >> 5) & 63] << 5) | s_wBang5[w & 31]);
+			else
+				d[x] = (unsigned short)((s_wBang5[(w >> 10) & 31] << 10)
+					| (s_wBang5[(w >> 5) & 31] << 5) | s_wBang5[w & 31]);
+		}
+	}
+	Canvas.UnlockCanvas();
+}
+
 //##ModelId=3DD20C450066
 void KRepresentShell2::RepresentEnd()
 {
+	g_ApDoSang(m_Canvas);
 	m_Canvas.Changed(true);
 	m_Canvas.UpdateScreen();
 }

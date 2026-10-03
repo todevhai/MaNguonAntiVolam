@@ -99,13 +99,19 @@ void KUiChangePWBox::LoadScheme(const char* pScheme)
 	sprintf(Buff, "%s\\%s", pScheme, SCHEME_INI_ITEM);
 	if (m_pSelf && Ini.Load(Buff))
 	{
-		m_pSelf->Init(&Ini, "Main");
+		int bCoMatKhau = (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0) & 2) != 0;
+		const char* szDuoi = bCoMatKhau ? "" : "_New";
+		char szMuc[32];
+		sprintf(szMuc, "Main%s", szDuoi);		m_pSelf->Init(&Ini, szMuc);
 		m_pSelf->m_OldPassword.Init(&Ini, "Password");
-		m_pSelf->m_NewPassword1.Init(&Ini, "NewPassword");
-		m_pSelf->m_NewPassword2.Init(&Ini, "NewPassConfirm");
+		sprintf(szMuc, "NewPassword%s", szDuoi);	m_pSelf->m_NewPassword1.Init(&Ini, szMuc);
+		sprintf(szMuc, "NewPassConfirm%s", szDuoi);	m_pSelf->m_NewPassword2.Init(&Ini, szMuc);
 		m_pSelf->m_NoticeText.Init(&Ini, "Notice");
-		m_pSelf->m_OKBtn.Init(&Ini, "Confirm");
-		m_pSelf->m_CancelBtn.Init(&Ini, "Cancel");
+		sprintf(szMuc, "Confirm%s", szDuoi);	m_pSelf->m_OKBtn.Init(&Ini, szMuc);
+		sprintf(szMuc, "Cancel%s", szDuoi);	m_pSelf->m_CancelBtn.Init(&Ini, szMuc);
+		if (!bCoMatKhau)
+			m_pSelf->m_OldPassword.Hide();
+		Wnd_SetFocusWnd(bCoMatKhau ? (KWndWindow*)&m_pSelf->m_OldPassword : (KWndWindow*)&m_pSelf->m_NewPassword1);
 		
 		//m_NoticeText.SetText("");
 	}
@@ -180,20 +186,20 @@ BOOL KUiChangePWBox::ValidPWs()
 	int oldPW  = m_OldPassword.GetIntNumber();;
 	int newPW1 = m_NewPassword1.GetIntNumber();
 	int newPW2 = m_NewPassword2.GetIntNumber();
-	if (oldPW < CHEST_PW_MIN_VALUE || oldPW > CHEST_PW_MAX_VALUE || 
+	if (oldPW < 0 || oldPW > CHEST_PW_MAX_VALUE || 	/* trong = chua dat, may chu xet */
 		newPW1 < CHEST_PW_MIN_VALUE || newPW1 > CHEST_PW_MAX_VALUE || 
 		newPW2 < CHEST_PW_MIN_VALUE || newPW2 > CHEST_PW_MAX_VALUE)
 	{		
 		
 	//	m_NoticeText.SetText(NOTICE_PW_NOT_LONG_ENOUGH);
-//		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_LONG, 0);
+		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_LONG, 0);
 		return FALSE;
 
 	}
 	if ( newPW1 != newPW2)
 	{
 		
-//		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_SAME, 0);	
+		g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PW_NOT_SAME, 0);
 		return FALSE;		
 	}
 	// Mat khau nhap vao vuot qua tat ca cac vong kiem tra
@@ -219,7 +225,7 @@ void KUiChangePWBox::OnCheckInput()
 		nPass = nPass / 10;	
 	itoa(nPass, szBuff1, 10);
 	m_OldPassword.GetText(szBuff2, sizeof(szBuff2), true);
-	if (strcmp(szBuff1, szBuff2))
+	if (szBuff2[0] && strcmp(szBuff1, szBuff2))	/* o trong: de trong, dung ep thanh 0 */
 		m_OldPassword.SetIntText(nPass);
 		
 	// Password moi 1
@@ -231,7 +237,7 @@ void KUiChangePWBox::OnCheckInput()
 		nPass = nPass / 10;	
 	itoa(nPass, szBuff1, 10);
 	m_NewPassword1.GetText(szBuff2, sizeof(szBuff2), true);
-	if (strcmp(szBuff1, szBuff2))
+	if (szBuff2[0] && strcmp(szBuff1, szBuff2))	/* o trong: de trong, dung ep thanh 0 */
 		m_NewPassword1.SetIntText(nPass);
 		
 	// Password moi 2
@@ -243,6 +249,6 @@ void KUiChangePWBox::OnCheckInput()
 		nPass = nPass / 10;	
 	itoa(nPass, szBuff1, 10);
 	m_NewPassword2.GetText(szBuff2, sizeof(szBuff2), true);
-	if (strcmp(szBuff1, szBuff2))
+	if (szBuff2[0] && strcmp(szBuff1, szBuff2))	/* o trong: de trong, dung ep thanh 0 */
 		m_NewPassword2.SetIntText(nPass);
 }

@@ -17,9 +17,9 @@
 
 extern iCoreShell*		g_pCoreShell;
 
-#define SCHEME_INI_EQUIP	"装备.ini"
-#define EQUIP_INI_PAGE		"装备分页.ini"
-#define HORSE_INI_PAGE		"装备马分页.ini"
+#define SCHEME_INI_EQUIP	"trang-bi.ini"
+#define EQUIP_INI_PAGE		"trang-bi-phan-trang.ini"
+#define HORSE_INI_PAGE		"trang-bi-ngua-phan-trang.ini"
 
 // -------------------------------------------------------------------------
 // ---> 建立控件与UIEP_*以及可接纳物品的类型的对应关系

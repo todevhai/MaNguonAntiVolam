@@ -1000,6 +1000,26 @@ void KCanvas::DrawSpriteAlpha(int nX, int nY, int nWidth, int nHeight,
 		g_DrawSpriteAlpha(&Node, this, nExAlpha);
 }
 
+void KCanvas::DrawSpriteAdd(int nX, int nY, int nWidth, int nHeight,
+							void* lpSprite, void* lpPalette, int nKieu)
+{
+	/* Kieu tron di qua BIEN trong Engine chu khong phai tham so cua
+	   g_DrawSpriteAdd: Represent2.dll khong link duoc bien cua Engine
+	   (LNK2001), nhung goi HAM thi duoc. */
+	g_nKieuTronSprite = nKieu;
+	KDrawNode	Node;
+	Node.m_pPrev = NULL;
+	Node.m_pNext = NULL;
+	Node.m_bChanged = m_bChanged;
+	Node.m_nX = nX;
+	Node.m_nY = nY;
+	Node.m_nWidth = nWidth;
+	Node.m_nHeight = nHeight;
+	Node.m_pBitmap = lpSprite;
+	Node.m_pPalette = lpPalette;
+	g_DrawSpriteAdd(&Node, this);
+}
+
 void KCanvas::DrawSpriteBorder(int nX, int nY, int nWidth, int nHeight, int nColor, void* lpSprite)
 {
 	KDrawNode	Node;

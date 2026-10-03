@@ -519,7 +519,7 @@ private:
 	int				NetCommandPlayerTalk(BYTE* pProtocol);
 
 	//Question:为单机测试版使用
-	friend			LuaInitStandAloneGame(Lua_State * L);
+	friend			int LuaInitStandAloneGame(Lua_State * L);
 #endif
 
 

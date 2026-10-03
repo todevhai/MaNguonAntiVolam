@@ -134,7 +134,7 @@ typedef struct _GUID {          // size is 16
 #endif
 
 #ifndef KSG_ATTENTION
-#define KSG_ATTENTION(MSG) __FILE__"("__TEXT_LINE__(__LINE__)") : ATTENTION "#MSG
+#define KSG_ATTENTION(MSG) __FILE__"(" __TEXT_LINE__(__LINE__)") : ATTENTION "#MSG
 #endif
 
 

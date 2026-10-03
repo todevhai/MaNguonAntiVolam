@@ -9,6 +9,7 @@
 #include "../Elem/Wnds.h"
 #include "../Elem/WndMessage.h"
 #include "UiMiniMap.h"
+#include "KDebug.h"
 #include "UiCaveList.h"
 #include "UiFindPos.h"
 #include "../UiBase.h"
@@ -48,11 +49,18 @@ const char*	s_ModeName[MINIMAP_M_COUNT] =
 
 KUiMiniMap*			KUiMiniMap::ms_pSelf = NULL;
 static MINIMAP_MODE	s_eMapMode = MINIMAP_M_NONE;
+
+/* Diem vua bam tren ban do, theo toa do KHONG GIAN. -1 = chua bam lan nao
+   hoac da toi noi. Dung ve duong chi huong trong PaintWindow. */
+int	g_nDichSpaceX = -1;
+int	g_nDichSpaceY = -1;
 static MINIMAP_MODE	s_eMapOldMode = MINIMAP_M_BRIEF_PIC;
 
 KUiMiniMap::KUiMiniMap()
 {
 	m_OldPos.x = NOT_DRAGING_MAP;
+	m_bCamCo = 0;
+	m_szFlagImage[0] = 0;
 }
 
 //--------------------------------------------------------------------------
@@ -97,6 +105,7 @@ void KUiMiniMap::Initialize()
 	AddChild(&m_CaveMapBtn);
 	AddChild(&m_ScenePos);
 	AddChild(&m_BtnFlag);
+	AddChild(&m_BtnTim);
 	AddChild(&m_Unlock);
 	m_Style &= ~WND_S_VISIBLE;
 
@@ -152,6 +161,9 @@ void KUiMiniMap::LoadScheme(KIniFile* pIni)
 	m_SwitchBtn.Init(pIni, "SwitchBtn");
 	m_WorldMapBtn.Init(pIni, "WorldMapBtn");
 	m_BtnFlag.Init(pIni, "BtnFlag");
+	m_BtnTim.Init(pIni, "BtnTim");
+	m_BtnTim.SetText("T×m");
+	pIni->GetString("BtnFlag", "FlagImage", "", m_szFlagImage, sizeof(m_szFlagImage));
 	m_CaveMapBtn.Init(pIni, "CaveMapBtn");
 	m_Unlock.Init(pIni, "Unlock");
 
@@ -181,8 +193,10 @@ int KUiMiniMap::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			MapSetMode(s_eMapMode == MINIMAP_M_BRIEF_PIC ? MINIMAP_M_BRIEF_PIC_BROWSE : MINIMAP_M_BRIEF_PIC);
 		else if (uParam == (unsigned int)(KWndWindow*)&m_WorldMapBtn)
 			MapSetMode(MINIMAP_M_WORLD_MAP);
-		else if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)
+		else if (uParam == (unsigned int)(KWndWindow*)&m_BtnTim)
 			KUiFindPos::OpenWindow();
+		else if (uParam == (unsigned int)(KWndWindow*)&m_BtnFlag)
+			m_bCamCo = !m_bCamCo;	/* bat/tat che do cam co, khong mo hop nhap */
 		else if (uParam == (unsigned int)(KWndWindow*)&m_CaveMapBtn)
 			KUiCaveList::OpenWindow();
 		else if (uParam == (unsigned int)(KWndWindow*)&m_Unlock)
@@ -200,6 +214,33 @@ int KUiMiniMap::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		break;
 	case WM_LBUTTONDOWN:
+		{
+			/* Bam trong vung ve ban do -> doi sang toa do khong gian roi chay
+			   toi. Cung phep tinh MapScroll dung cho chuot phai. */
+			/* Dung DUNG hai bien ma PaintWindow dung de dat goc ve ban do,
+			   khong dung GetAbsolutePos - hai thu nay lech nhau. */
+			int nRelX = (short)LOWORD(nParam) - m_nAbsoluteLeft - m_MapPos.x;
+			int nRelY = (short)HIWORD(nParam) - m_nAbsoluteTop  - m_MapPos.y;
+			if (g_pCoreShell && nRelX >= 0 && nRelY >= 0 &&
+				nRelX < (int)m_MapSize.cx && nRelY < (int)m_MapSize.cy)
+			{
+				KSceneMapInfo MapInfo;
+				if (g_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))
+				{
+					int nSpaceX = MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH +
+						MapInfo.nScallH * (nRelX - (int)m_MapSize.cx / 2);
+					int nSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV +
+						MapInfo.nScallV * (nRelY - (int)m_MapSize.cy / 2);
+					g_nDichSpaceX = nSpaceX;
+					g_nDichSpaceY = nSpaceY;
+					g_pCoreShell->GotoWhere(nSpaceX, nSpaceY, 10);
+					m_bCamCo = 0;	/* co da cam */
+					break;
+				}
+			}
+		}
+		Wnd_TransmitInputToGameSpace(uMsg, uParam, nParam);
+		break;
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
 	case WM_MOUSEHOVER:
@@ -226,6 +267,11 @@ int KUiMiniMap::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		break;
 	case WM_RBUTTONDOWN:
+		if (m_bCamCo)
+		{
+			m_bCamCo = 0;	/* bam phai: huy cam co, khong keo ban do */
+			break;
+		}
 		Wnd_SetCapture(this);
 		Wnd_GetCursorPos((int *)&m_OldPos.x, (int *)&m_OldPos.y);
 		break;
@@ -301,8 +347,129 @@ void KUiMiniMap::PaintWindow()
 			rect.oEndPos.nX += m_MapSize.cx;
 			rect.oEndPos.nY += m_MapSize.cy;
 			g_pRepresentShell->DrawPrimitives(1, &rect, RU_T_RECT, true);
+
+			/* Bo cuoc giua duong (ket, hoac bam trung tuong/nha nen dich khong
+			   dung duoc): nhan vat dung han ma chua toi noi -> tat vector, dung
+			   de no treo mai. Dem vai khung cho chac, tranh tat nham o khe giua
+			   hai buoc di. */
+			if (g_nDichSpaceX >= 0)
+			{
+				static int s_nDungYen = 0;
+				if (g_pCoreShell->GetGameData(GDI_PLAYER_GOING_TO_DEST, 0, 0))
+					s_nDungYen = 0;
+				else if (++s_nDungYen >= 15)
+				{
+					s_nDungYen = 0;
+					g_nDichSpaceX = -1;
+					g_nDichSpaceY = -1;
+				}
+			}
+
+			/* Duong chi huong tu nhan vat (tam ban do) toi diem vua bam. */
+			if (g_nDichSpaceX >= 0)
+			{
+				KSceneMapInfo MapInfo;
+				if (g_pCoreShell->SceneMapOperation(GSMOI_SCENE_MAP_INFO, (unsigned int)&MapInfo, 0))
+				{
+					int nTamSpaceX = MapInfo.nOrigFocusH + MapInfo.nFocusOffsetH;
+					int nTamSpaceY = MapInfo.nOrigFocusV + MapInfo.nFocusOffsetV;
+					int nDX = g_nDichSpaceX - nTamSpaceX;
+					int nDY = g_nDichSpaceY - nTamSpaceY;
+					/* Toi noi roi thi thoi ve. */
+					if (nDX > -MapInfo.nScallH && nDX < MapInfo.nScallH &&
+						nDY > -MapInfo.nScallV && nDY < MapInfo.nScallV)
+					{
+						g_nDichSpaceX = -1;
+					}
+					else if (MapInfo.nScallH && MapInfo.nScallV)
+					{
+						int nTamX = nX + m_MapSize.cx / 2;
+						int nTamY = nY + m_MapSize.cy / 2;
+						int nDichX = nTamX + nDX / MapInfo.nScallH;
+						int nDichY = nTamY + nDY / MapInfo.nScallV;
+						if (nDichX >= nX && nDichY >= nY &&
+							nDichX < nX + (int)m_MapSize.cx && nDichY < nY + (int)m_MapSize.cy)
+						{
+							KRULine line;
+							line.Color.Color_dw = 0xffffff00;
+							/* Duong bat dau tu NGUOI CHOI, khong phai tam ban do.
+							   Khi keo ban do, tam ban do = tam da keo (nOrigFocus+nFocusOffset),
+							   con nguoi choi o nOrigFocus -> pixel nguoi choi = tam - offset/scale. */
+							line.oPosition.nX = nTamX - MapInfo.nFocusOffsetH / MapInfo.nScallH;
+							line.oPosition.nY = nTamY - MapInfo.nFocusOffsetV / MapInfo.nScallV;
+							line.oPosition.nZ = 0;
+							line.oEndPos.nX = nDichX;
+							line.oEndPos.nY = nDichY;
+							line.oEndPos.nZ = 0;
+							g_pRepresentShell->DrawPrimitives(1, &line, RU_T_LINE, true);
+
+							/* La co cam o dich: mot cot doc va mot tam giac.
+							   Engine khong co phan tu "co" nao san (chi co
+							   PIC/CHARACTER/PARTNER) nen ve bang duong thang. */
+							KRULine co[5];
+							int nC;
+							for (nC = 0; nC < 5; nC++)
+							{
+								co[nC].Color.Color_dw = 0xffff3030;
+								co[nC].oPosition.nZ = 0;
+								co[nC].oEndPos.nZ = 0;
+							}
+							co[0].oPosition.nX = nDichX;      co[0].oPosition.nY = nDichY;
+							co[0].oEndPos.nX   = nDichX;      co[0].oEndPos.nY   = nDichY - 9;
+							co[1].oPosition.nX = nDichX;      co[1].oPosition.nY = nDichY - 9;
+							co[1].oEndPos.nX   = nDichX + 6;  co[1].oEndPos.nY   = nDichY - 7;
+							co[2].oPosition.nX = nDichX + 6;  co[2].oPosition.nY = nDichY - 7;
+							co[2].oEndPos.nX   = nDichX;      co[2].oEndPos.nY   = nDichY - 5;
+							co[3].oPosition.nX = nDichX;      co[3].oPosition.nY = nDichY - 8;
+							co[3].oEndPos.nX   = nDichX + 5;  co[3].oEndPos.nY   = nDichY - 7;
+							co[4].oPosition.nX = nDichX - 2;  co[4].oPosition.nY = nDichY;
+							co[4].oEndPos.nX   = nDichX + 2;  co[4].oEndPos.nY   = nDichY;
+							if (m_szFlagImage[0])
+							{
+								KRUImage Co;
+								memset(&Co, 0, sizeof(Co));
+								Co.nType = ISI_T_SPR;
+								Co.Color.Color_b.a = 255;
+								Co.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;
+								Co.nISPosition = IMAGE_IS_POSITION_INIT;
+								strcpy(Co.szImage, m_szFlagImage);
+								Co.oPosition.nX = nDichX - 1;	/* chan cot co (goc duoi trai anh 11x14) dung diem */
+								Co.oPosition.nY = nDichY - 13;
+								g_pRepresentShell->DrawPrimitives(1, &Co, RU_T_IMAGE, true);
+							}
+							else
+								g_pRepresentShell->DrawPrimitives(5, co, RU_T_LINE, true);
+						}
+					}
+				}
+			}
 		}
 	}
+	PaintFlagCursor();	/* co theo con tro, ve sau cung */
+}
+
+/* Che do cam co: ve anh co tai con tro khi con tro nam trong vung ban do. Goi cuoi
+   PaintWindow nen co nam tren ban do. */
+void KUiMiniMap::PaintFlagCursor()
+{
+	if (!m_bCamCo || !m_szFlagImage[0] || !g_pRepresentShell)
+		return;
+	int nX, nY;
+	Wnd_GetCursorPos(&nX, &nY);
+	int nRelX = nX - m_nAbsoluteLeft - m_MapPos.x;
+	int nRelY = nY - m_nAbsoluteTop - m_MapPos.y;
+	if (nRelX < 0 || nRelY < 0 || nRelX >= (int)m_MapSize.cx || nRelY >= (int)m_MapSize.cy)
+		return;
+	KRUImage Co;
+	memset(&Co, 0, sizeof(Co));
+	Co.nType = ISI_T_SPR;
+	Co.Color.Color_b.a = 255;
+	Co.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;
+	Co.nISPosition = IMAGE_IS_POSITION_INIT;
+	strcpy(Co.szImage, m_szFlagImage);
+	Co.oPosition.nX = nX - 1;	/* chan cot co o dau con tro */
+	Co.oPosition.nY = nY - 13;
+	g_pRepresentShell->DrawPrimitives(1, &Co, RU_T_IMAGE, true);
 }
 
 void KUiMiniMap::Breathe()
@@ -320,7 +487,11 @@ void KUiMiniMap::UpdateSceneTimeInfo(KUiSceneTimeInfo* pInfo)
 	if (ms_pSelf && pInfo)
 	{
 		ms_pSelf->m_SceneName.SetText(pInfo->szSceneName);
-		ms_pSelf->m_ScenePos.Set2IntText(pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8, '/');
+		/* toa do va chu Tim la mot nut: bam vao mo hop nhap toa do */
+		char szToaDo[40];
+		sprintf(szToaDo, "%d/%d T×m", pInfo->nScenePos0 / 8, pInfo->nScenePos1 / 8);
+		ms_pSelf->m_BtnTim.SetText(szToaDo);
+		ms_pSelf->m_ScenePos.SetText("");
 	}
 }
 

@@ -44,6 +44,19 @@ HWND g_FindDebugWindow(char* lpClassName, char* lpWindowName)
 void g_DebugLog(LPSTR Fmt, ...)
 {
 #ifndef __linux
+	{
+		/* Ghi ra tep de thay duoc ca khi khong co cua so go loi. */
+		char _szNhatKy[512];
+		va_list _vaNhatKy;
+		va_start(_vaNhatKy, Fmt);
+		_vsnprintf(_szNhatKy, sizeof(_szNhatKy) - 2, Fmt, _vaNhatKy);
+		va_end(_vaNhatKy);
+		_szNhatKy[sizeof(_szNhatKy) - 1] = 0;
+		{
+			FILE *_fNhatKy = fopen("engine-debug.log", "a");
+			if (_fNhatKy) { fputs(_szNhatKy, _fNhatKy); fputc(10, _fNhatKy); fclose(_fNhatKy); }
+		}
+	}
 	if (m_hWndDebug)
 	{
 		char buffer[256];

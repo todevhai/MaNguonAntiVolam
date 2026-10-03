@@ -360,7 +360,7 @@ void	KNpcRes::Draw(int nNpcIdx, int nDir, int nAllFrame, int nCurFrame, BOOL bIn
 			else
 			{
 				m_cDrawFile[i].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;
-				m_cDrawFile[i].Color.Color_b.a = 255;
+				m_cDrawFile[i].Color.Color_b.a = m_cDrawFile[nPos].Color.Color_b.a = (nNpcIdx > 0 && Npc[nNpcIdx].m_Hide.nTime > 0) ? 112 : 255;	/* an than: ve mo ([i] va [nPos] lech nhau khi bo qua bo phan rong) */
 			}
 
 			strcpy(m_cDrawFile[nPos].szImage, m_cNpcImage[m_nSortTable[i]].m_szName);
@@ -403,10 +403,15 @@ void	KNpcRes::Draw(int nNpcIdx, int nDir, int nAllFrame, int nCurFrame, BOOL bIn
 		m_cDrawFile[nPos].nFrame = m_cSpecialSpr.m_nCurFrame;
 		m_cDrawFile[nPos].oPosition.nX = nScreenX;
 		m_cDrawFile[nPos].oPosition.nY = nScreenY;
-		int nHeightOff = 0;
-		if (m_bRideHorse)
-			nHeightOff += 38;
-		m_cDrawFile[nPos].oPosition.nZ = nScreenZ + nHeightOff;
+		/* KHONG cong 38 khi cuoi ngua: hieu ung nay nam tren mat dat. */
+		m_cDrawFile[nPos].oPosition.nZ = nScreenZ;
+		/* Hieu ung phat chieu: van di duong ALPHA_NOT_BE_LIT (g_DrawSpriteAdd)
+		   nhung danh dau alpha = 254 de ham do tron kieu ALPHA thay vi CONG.
+		   Do 12/09/2026: cong lam loi lua chay trang, con DrawSpriteAlpha goc
+		   cua Represent2 lai tra ve QUANG DEN - chi cong thuc alpha trong
+		   g_DrawSpriteAdd cho ra dung mau cam. */
+		m_cDrawFile[nPos].bRenderStyle = IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT;
+		m_cDrawFile[nPos].Color.Color_b.a = 254;
 		nPos++;
 	}
 	if (m_cFrameSpr.m_szName[0])

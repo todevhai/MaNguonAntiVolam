@@ -359,6 +359,11 @@ public:
 	int					m_MapX, m_MapY, m_MapZ;			// Npc的地图坐标
 	int					m_OffX, m_OffY;					// Npc在格子中的偏移坐标（放大了1024倍）
 	int					m_DesX, m_DesY;					// Npc的目标坐标
+	int					m_AutoPathX[64], m_AutoPathY[64];	// A* waypoint (Mps) player auto-di
+	int					m_nAutoPathCnt, m_nAutoPathIdx, m_nAutoPathRecalc;	// so wp + wp dang di + so lan tinh lai
+	int					m_nAutoPathNoProg, m_nAutoPathLastDist;	// dem frame khong tien + khoang cach frame truoc (bat ket khi GetDir==1 ma va cham)
+	int					m_nAutoFarX, m_nAutoFarY, m_bAutoFar;	// dich XA that (nac-stepping toi dich ngoai vung nap)
+	int					m_nAutoLastX, m_nAutoLastY, m_nAutoStall;	// vi tri lan truoc + dem ket tuyet doi (chong giat khi ket)
 	int					m_SkillParam1, m_SkillParam2;
 	int					m_OriginX, m_OriginY;			// Npc的原始坐标
 	int					m_NextAITime;
@@ -652,6 +657,14 @@ public:
 	   thi tru ca tran yan: thuoc tinh chieu khai tru bao nhieu thi tru bay nhieu. jx9tn/ban6 de tran yan bu lai. */
 	int					m_nThemSinhLucThuong, m_nThemNoiLucThuong;
 	void				DatLaiYanSinhLuc() { m_nTranSinhLucYan = m_LifeMax; m_nBuSinhLucYan = 0; m_nThemSinhLucThuong = 0; }
+	/* Khang / toc do "yan" (Duong) nhu may chu - thu tu he nhu m_nKhangYan cua may chu. */
+	enum { KHANG_VAT_LY = 0, KHANG_HOA, KHANG_BANG, KHANG_LOI, KHANG_DOC, KHANG_SO };
+	int					m_nKhangYan[KHANG_SO];
+	int					m_nTocDanhYan, m_nTocPhatYan, m_nPhucHoiYan;
+	int					TocDanhHieuLuc() const { return m_CurrentAttackSpeed > m_nTocDanhYan ? m_CurrentAttackSpeed : m_nTocDanhYan; }
+	int					TocPhatHieuLuc() const { return m_CurrentCastSpeed > m_nTocPhatYan ? m_CurrentCastSpeed : m_nTocPhatYan; }
+	int					KhangHienThi(int nKhang, int nTran, int nHe) const
+	{ int n = (m_nKhangYan[nHe] > 0 && m_nKhangYan[nHe] > nKhang) ? m_nKhangYan[nHe] : nKhang; return n > nTran ? nTran : n; }
 	void				DatLaiYanNoiLuc() { m_nTranNoiLucYan = m_ManaMax; m_nBuNoiLucYan = 0; m_nThemNoiLucThuong = 0; }
 	void				CanTranYan();	// m_Current*Max = max(thuong, yan); goi sau moi lan doi thuoc tinh
 	void				AddBaseStaminaMax(int nStamina);// 增加基本最大体力点

@@ -8,6 +8,7 @@
 #pragma once
 #include "../Elem/WndImage.h"
 #include "../Elem/WndButton.h"
+#include "../Elem/WndPureTextBtn.h"
 #include "../Elem/WndText.h"
 #include "../Elem/WndShadow.h"
 #include "../Elem/PopupMenu.h"
@@ -57,6 +58,7 @@ private:
 	void	StopScrollMap();				//停止拖动地图
 	void	MapMoveBack();					//地图还原原始偏移
 	virtual void	Breathe();
+	void	PaintFlagCursor();	/* anh co theo con tro khi dang cam co */
 
 private:
 	static KUiMiniMap*	ms_pSelf;
@@ -71,6 +73,9 @@ private:
 	KWndButton		m_WorldMapBtn;
 	KWndButton		m_CaveMapBtn;
 	KWndButton		m_BtnFlag;
+	KWndPureTextBtn	m_BtnTim;	/* mo hop nhap toa do */
+	int				m_bCamCo;	/* dang cam co: anh co theo con tro trong ban do */
+	char			m_szFlagImage[128];	/* [BtnFlag] FlagImage */
 	KWndButton		m_Unlock;
 
 	POINT           m_OldPos;

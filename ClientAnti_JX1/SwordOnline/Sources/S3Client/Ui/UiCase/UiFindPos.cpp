@@ -9,14 +9,21 @@
 #include "KIniFile.h"
 #include "../elem/wnds.h"
 #include "UiFindPos.h"
+#include "UiMiniMap.h"	/* dat hop nhap ngay duoi ban do nho */
 #include "UiItem.h"
 #include "../../../core/src/coreshell.h"
 #include "../../../core/src/GameDataDef.h"
 #include "../UiSoundSetting.h"
 #include "../UiBase.h"
 #include <crtdbg.h>
+#include <stdlib.h>	/* atoi */
 
 extern iCoreShell*		g_pCoreShell;
+
+/* Diem dang cam co tren ban do nho, theo toa do KHONG GIAN.
+   Dinh nghia trong UiMiniMap.cpp. */
+extern int	g_nDichSpaceX;
+extern int	g_nDichSpaceY;
 
 #define SCHEME_INI_ITEM	"UiFindPos.ini"
 
@@ -49,6 +56,24 @@ KUiFindPos* KUiFindPos::OpenWindow()
 		m_pSelf->BringToTop();
 		m_pSelf->Show();
 		Wnd_GameSpaceHandleInput(false);
+		KUiSceneTimeInfo Info;
+		memset(&Info, 0, sizeof(Info));
+		if (g_pCoreShell)
+		{
+			g_pCoreShell->SceneMapOperation(GSMOI_SCENE_TIME_INFO, (unsigned int)&Info, 0);
+			m_pSelf->m_X.SetIntText(Info.nScenePos0 / 8);
+			m_pSelf->m_Y.SetIntText(Info.nScenePos1 / 8);
+		}
+		m_pSelf->m_InfoText.SetText("Xin nh藀 t鋋  mu鑞 n");
+		KUiMiniMap* pMap = KUiMiniMap::GetIfVisible();
+		if (pMap)
+		{
+			int nMapX, nMapY, nMapW, nMapH, nW, nH;
+			pMap->GetAbsolutePos(&nMapX, &nMapY);
+			pMap->GetSize(&nMapW, &nMapH);
+			m_pSelf->GetSize(&nW, &nH);
+			m_pSelf->SetPosition(nMapX + (nMapW - nW) / 2, nMapY + nMapH + 2);
+		}
 	}
 	return m_pSelf;
 }
@@ -121,6 +146,7 @@ int KUiFindPos::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		else if(uParam == (unsigned int)&m_OKBtn)
 		{
+			OnOK();
 			OnDone();
 		}
 		break;
@@ -141,6 +167,26 @@ int KUiFindPos::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 /*********************************************************************
 * 功能：响应确认按钮被按下
 **********************************************************************/
+/* Nguoi choi nhap theo O BAN DO - dung don vi hien o dong "Dang o" khi mo
+   hop thoai - con GotoWhere nhan toa do khong gian: x/256 va y/512.
+   mode 20 = da la toa do khong gian VA phai tim duong tranh vat can. */
+void KUiFindPos::OnOK()
+{
+	char szX[16], szY[16];
+	szX[0] = 0;
+	szY[0] = 0;
+	m_X.GetText(szX, sizeof(szX), true);
+	m_Y.GetText(szY, sizeof(szY), true);
+	int nO_X = atoi(szX);
+	int nO_Y = atoi(szY);
+	if (nO_X > 0 && nO_Y > 0 && g_pCoreShell)
+	{
+		g_nDichSpaceX = nO_X * 256;
+		g_nDichSpaceY = nO_Y * 512;
+		g_pCoreShell->GotoWhere(g_nDichSpaceX, g_nDichSpaceY, 10);
+	}
+}
+
 void KUiFindPos::OnDone()
 {
 	CloseWindow();

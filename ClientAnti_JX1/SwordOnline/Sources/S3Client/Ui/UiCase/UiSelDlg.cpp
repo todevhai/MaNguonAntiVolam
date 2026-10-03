@@ -14,7 +14,7 @@
 
 extern iCoreShell*		g_pCoreShell;
 
-#define	SCHEME_INI_SELDLG	"多项选择界面.ini"
+#define	SCHEME_INI_SELDLG	"chon-nhieu-muc.ini"
 
 KUiSelDlg	g_UiSelDlg;
 

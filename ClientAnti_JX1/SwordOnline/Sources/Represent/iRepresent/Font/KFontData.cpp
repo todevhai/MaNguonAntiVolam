@@ -126,6 +126,13 @@ void KFontData::Terminate()
 // Function		: KFontData::GetCharacterData
 // Purpose		: 取得单个字符的数据区
 *****************************************************************************/
+unsigned char*	KFontData::GetVietCharacterData(unsigned char cCode) const
+{
+	if (m_pFontData && (unsigned int)cCode < m_uCharCount && m_pdwOffs[cCode])
+		return (m_pFontData + m_pdwOffs[cCode]);
+	return NULL;
+}
+
 unsigned char*	KFontData::GetCharacterData(unsigned char cFirst, unsigned char cNext) const
 {
 	if (m_pFontData)

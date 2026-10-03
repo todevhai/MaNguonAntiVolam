@@ -21,8 +21,7 @@
 //                  (menu chuot phai len nguoi chua duoc noi, nen day la duong duy nhat)
 //
 // Day la ma CUA TA (khong phai nguon Kingsoft goc), nen commit thang vao kho.
-// Chi phan noi day (them vao S3Client.vcxproj + 1 dong o UiHeartBeat) di qua
-// port-fixes.py vi cham vao file goc.
+// Phan noi day: S3Client.vcxproj + 1 dong o UiHeartBeat.
 //
 // Xem docs/04-dung-client/09-kenh-lenh-dieu-khien-trong-game.md
 //---------------------------------------------------------------------------

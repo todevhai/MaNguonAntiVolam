@@ -135,6 +135,8 @@ public:
 	//BOOL				
 	BOOL				OnMissleEvent(unsigned short usEvent, KMissle * pMissle) const;
 	BOOL				IsTargetOnly()const{return m_bTargetOnly;};
+	int					GetHorseLimited()const{return m_nHorseLimited;};
+	int					GetEquiptLimited()const{return m_nEquiptLimited;};
 	BOOL				IsTargetEnemy()const{return m_bTargetEnemy;};
 	BOOL				IsTargetAlly()const{return m_bTargetAlly;};
 	BOOL				IsTargetObj()const{return m_bTargetObj;};

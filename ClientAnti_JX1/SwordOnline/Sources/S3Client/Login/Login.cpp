@@ -7,6 +7,7 @@
 *****************************************************************************************/
 #include "KWin32.h"
 #include "KEngine.h"
+#include "KDebug.h"
 #include "LoginDef.h"
 #include "Login.h"
 #include "../NetConnect/NetConnectAgent.h"
@@ -26,7 +27,7 @@ bool GetIpAddress(const char* szAddress, unsigned char* pcAddress)
 {
 	_ASSERT(pcAddress);
 	int nValue[4];
-	int nRet = sscanf(szAddress, "%d.%d.%d.%d", &nValue[0], &nValue[1], &nValue
+	int nRet = sscanf(szAddress, "%d.%d.%d.%d", &nValue[0], &nValue[1], &nValue[2]
 		, &nValue[3]);
 	if (nRet == 4 &&
 		nValue[0] >= 0 && nValue[0] < 256 &&
@@ -289,7 +290,7 @@ int	KLogin::DeleteRole(tagNotifyPlayerLogin* pResponse, const KSG_PASSWORD &crSu
 		NetCommand.cProtocol = c2s_roleserver_deleteplayer;
 		GetAccountPassword(NetCommand.szAccountName, NULL);
         NetCommand.Password = crSupperPassword;
-		strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName, sizeof((const char*)pResponse->szRoleName));
+		strncpy(NetCommand.szRoleName, (const char*)pResponse->szRoleName, sizeof(NetCommand.szRoleName));
         NetCommand.szRoleName[sizeof(NetCommand.szRoleName) - 1] = '\0';
 
 		g_NetConnectAgent.SendMsg(&NetCommand, sizeof(tagDBDelPlayer));
@@ -347,6 +348,7 @@ void KLogin::NotifyToStartGame()
 		GetAccountPassword(szAccount, NULL);
 		g_UiBase.SetUserAccount(szAccount, m_Choices.szProcessingRoleName);
 
+		g_DebugLog("[TuDong] DA VAO GAME, nhan vat=%s", m_Choices.szProcessingRoleName);
 		m_Status = LL_S_IN_GAME;
 		m_Result = LL_R_NOTHING;
 		if (m_bInAutoProgress)
@@ -376,6 +378,39 @@ void KLogin::ReturnToIdle()
 //--------------------------------------------------------------------------
 //	功能：全程自动连接
 //--------------------------------------------------------------------------
+/* Dang nhap tu dong tu tai khoan + mat khau cho san.
+   Khac AutoLogin() goc o cho khong doi ten nhan vat va ten may chu da luu:
+   danh sach nhan vat ve toi dau thi m_bInAutoProgress tu chon muc dau tien,
+   con dia chi may chu lay tu Settings\ServerList.ini. */
+int KLogin::DangNhapTuDongTheoCauHinh(const char* pszAccount, const KSG_PASSWORD& crPassword)
+{
+	if (!pszAccount || !pszAccount[0])
+		return false;
+
+	ReturnToIdle();
+	LoadLoginChoice();			/* memset m_Choices - phai goi TRUOC khi dat tai khoan */
+	SetAccountPassword(pszAccount, &crPassword);
+	m_bInAutoProgress = true;
+
+	int nCount = 0, nSel = 0;
+	/* Ham nay dong thoi dien m_Choices.AccountServer.Address tu ServerList.ini */
+	KLoginServer* pList = GetServerList(-1, nCount, nSel);
+	if (pList)
+		free(pList);
+	g_DebugLog("[TuDong] tai khoan=%s so may chu=%d dia chi=%d.%d.%d.%d",
+		pszAccount, nCount,
+		m_Choices.AccountServer.Address[0], m_Choices.AccountServer.Address[1],
+		m_Choices.AccountServer.Address[2], m_Choices.AccountServer.Address[3]);
+	if (nCount <= 0)
+	{
+		m_bInAutoProgress = false;
+		return false;
+	}
+	int nNoi = CreateConnection(m_Choices.AccountServer.Address);
+	g_DebugLog("[TuDong] CreateConnection tra %d, trang thai %d", nNoi, (int)m_Status);
+	return nNoi;
+}
+
 void KLogin::AutoLogin()
 {
 	ReturnToIdle();
@@ -645,12 +680,16 @@ void KLogin::ProcessToLoginGameServResponse(tagNotifyPlayerLogin* pResponse)
 				}		
 //		MessageBox(0,(const char*)pResponse->szAccountName,"",MB_OK);
 		if (strcmp((const char*)pResponse->szRoleName, m_Choices.szProcessingRoleName) == 0 
-			&& strcmp((const char*)pResponse->szAccountName, pzAc) == 0)
+			/* bo phep so tai khoan: pzAc dem bang 0xFF nen khong bao gio khop */)
 		{
 
 			g_NetConnectAgent.UpdateClientRequestTime(true);
 
 			// 开始与GameSvr进行连接
+			g_DebugLog("[TuDong] noi world server %d.%d.%d.%d:%d",
+				((unsigned char*)&pResponse->nIPAddr)[0], ((unsigned char*)&pResponse->nIPAddr)[1],
+				((unsigned char*)&pResponse->nIPAddr)[2], ((unsigned char*)&pResponse->nIPAddr)[3],
+				(int)pResponse->nPort);
 			if (g_NetConnectAgent.ConnectToGameSvr(
 				(const unsigned char*)&pResponse->nIPAddr,
 				pResponse->nPort, &pResponse->guid))

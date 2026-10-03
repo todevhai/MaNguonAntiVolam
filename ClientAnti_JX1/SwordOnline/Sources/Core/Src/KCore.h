@@ -72,7 +72,7 @@ extern CORE_API int g_ScreenY;
 #define __TEXT_LINE__(LINE) ITOA(LINE)
 
 //#ifdef _DEBUG
-#define ATTENTION(MSG) __FILE__"("__TEXT_LINE__(__LINE__)") : ¡ïATTENTION¡ï ¡ú "#MSG
+#define ATTENTION(MSG) __FILE__"(" __TEXT_LINE__(__LINE__)") : ¡ïATTENTION¡ï ¡ú "#MSG
 //#else
 //#define ATTENTION(MSG) __FILE__"("__TEXT_LINE__(__LINE__)") : ATTENTION!! error: "#MSG
 //#endif

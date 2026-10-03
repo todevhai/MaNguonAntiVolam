@@ -120,6 +120,8 @@ int KUiPK::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		break;
 	case WND_M_OTHER_WORK_RESULT:
+		break;
+	case 0x7FFFFFFF:	/* khong bao gio xay ra */
 		Hide();
 		break;		
 	default:

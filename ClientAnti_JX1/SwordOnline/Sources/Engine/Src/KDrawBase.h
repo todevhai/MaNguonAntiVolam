@@ -12,6 +12,8 @@
 void	g_DrawPixel(void* node, void* canvas);
 void	g_DrawPixelAlpha(void* node, void* canvas);
 void	g_DrawLine(void* node, void* canvas);
+void	g_DrawSpriteAdd(void* node, void* canvas);
+extern int g_nKieuTronSprite;	/* 1 cong, 2 alpha, 0 screen */
 void	g_DrawLineAlpha(void* node, void* canvas);
 void	g_Clear(void* node, void* canvas);
 void	g_DotClear(void* node, void* canvas);

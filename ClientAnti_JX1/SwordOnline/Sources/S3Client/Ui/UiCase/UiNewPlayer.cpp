@@ -10,6 +10,7 @@
 #include "../Elem/WndMessage.h"
 #include "../Elem/Wnds.h"
 #include "UiNewPlayer.h"
+#include "KDebug.h"
 #include "UiInformation.h"
 #include "UiLoginBg.h"
 #include "UiConnectInfo.h"
@@ -189,6 +190,13 @@ void KUiNewPlayer::LoadScheme(const char* pScheme)
 		m_Male.SetImage(ISI_T_SPR, "");
 		m_Female.SetImage(ISI_T_SPR, "");
 		m_Name  .Init(&Ini, "Name");
+		{
+			int nL = 0, nT = 0, nW = 0, nH = 0;
+			m_Name.GetPosition(&nL, &nT);
+			m_Name.GetSize(&nW, &nH);
+			g_DebugLog("[ten] o nhap: %d,%d %dx%d hien=%d",
+				nL, nT, nW, nH, (int)m_Name.IsVisible());
+		}
 		m_OK    .Init(&Ini, "OK");
 		m_Cancel.Init(&Ini, "Cancel");
 
@@ -263,9 +271,11 @@ void KUiNewPlayer::OnClickButton(KWndWindow* pWnd)
 			if (pWnd == m_propTypeInfoTable[i].pBtn)
 			{
 				m_Info.Attribute = i;
+				UiSoundPlay(UI_SI_PLAYER_ATTRIB);
+				UpdateProperty();
 				break;
 			}
-			if (i < series_num)
+			if (0)	/* nhanh nay luon dung va ve lai theo he CU - xem tren */
 			{
 				UiSoundPlay(UI_SI_PLAYER_ATTRIB);
 				UpdateProperty();
@@ -339,7 +349,8 @@ int KUiNewPlayer::GetInputInfo()
 {
 	int nLen = m_Name.GetText(m_Info.Name, sizeof(m_Info.Name), false);
 
-	for (int i = 0; i < nLen;)
+	int i = 0;
+	for (; i < nLen;)
 	{
 		unsigned char	cCode = (unsigned char)m_Info.Name[i];
 		if (cCode > 0x80)
@@ -354,7 +365,7 @@ int KUiNewPlayer::GetInputInfo()
 		else
 			i ++;
 
-		if (i < nLen)
+		if (0)	/* kiem tra nay da chuyen ra SAU vong lap */
 		{
 			CloseWindow(false);
 			//"姓名中不可以包含空格、制表格等字符！"
@@ -364,6 +375,14 @@ int KUiNewPlayer::GetInputInfo()
 	}
 	
 	// 以下判断合法性的规则有待修改
+	/* Vong lap tren break khi gap ky tu ngoai khoang cho phep; luc do i
+	   dung lai truoc cuoi chuoi. Day moi la cho kiem dung. */
+	if (i < nLen)
+	{
+		CloseWindow(false);
+		KUiConnectInfo::OpenWindow(CI_MI_INVALID_LOGIN_INPUT1, CI_NS_NEW_ROLE_WND);
+		return false;
+	}
 	if (nLen >= LOGIN_ROLE_NAME_MIN_LEN && nLen <= LOGIN_ROLE_NAME_MAX_LEN)
 		return true;
 	CloseWindow(false);

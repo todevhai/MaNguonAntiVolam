@@ -50,4 +50,7 @@ private:
 	int			m_nCurrentMovieIndex;		//当前播放的动画的编号
 };
 
+//Kiem xem co xin dang nhap tu dong khong; goi moi khung hinh tu UiPaint().
+void KiemDangNhapTuDong();
+
 #endif // __UIINIT_H__

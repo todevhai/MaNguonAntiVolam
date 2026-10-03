@@ -14,7 +14,7 @@
 
 #include <crtdbg.h>
 
-#define EMOTE_INI_FILE "\\Ui\\聊天动作.ini"
+#define EMOTE_INI_FILE "\\Ui\\dong-tac-chat.ini"
 
 //构造在调用ShortcutKey::LuaRegisterFunctionAlias注册SayEmote函数别名时所需参数的定义
 #define SAY_EMOTE_FUNCTION "SayEmote"

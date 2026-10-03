@@ -20,7 +20,7 @@
 #include "../UiBase.h"
 #include "../../../core/src/gamedatadef.h"
 
-#define	SCHEME_INI_NEWPLAYER2 	"新建角色选属性.ini"
+#define	SCHEME_INI_NEWPLAYER2 	"tao-nhan-vat-chon-thuoc-tinh.ini"
 #define countof(array)			(sizeof(array)/sizeof(array[0]))
 
 #define LOGIN_CANCEL_OPER	1

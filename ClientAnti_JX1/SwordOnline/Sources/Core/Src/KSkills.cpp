@@ -91,6 +91,16 @@ KSkill::~KSkill()
 // Comments		:
 // Author		: RomanDou
 *****************************************************************************/
+static int TinhHuongDan(int nLauncher, int nX1, int nY1, int nX2, int nY2)
+{
+	int nDirIndex = g_GetDirIndex(nX1, nY1, nX2, nY2);
+	if (nDirIndex < 0)
+		nDirIndex = g_Dir2DirIndex(Npc[nLauncher].m_Dir, MaxMissleDir);
+	if (nDirIndex < 0 || nDirIndex >= MaxMissleDir)
+		nDirIndex = 0;
+	return nDirIndex;
+}
+
 inline int	KSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , int *npPX, int *npPY, eSkillLauncherType eLauncherType)  const 
 {
 	
@@ -173,7 +183,8 @@ relationisvalid:
 		   (cung luat KSkill::CanCastSkill may chu). */
 		if (IsExpSkill() && Npc[nLauncher].m_Level < (int)m_usReqLevel)
 			return FALSE;
-		if (IsPhysical())
+		extern BOOL LaChieuVuKhi(int nSkillId);
+		if (IsPhysical() && LaChieuVuKhi((int)m_nId))
 		{
 			int nWeapoinSkill = Npc[nLauncher].GetCurActiveWeaponSkill();
 			if ((DWORD)nWeapoinSkill != m_nId)
@@ -662,7 +673,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					
 					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
 					
-					nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					nDir = nDir + MaxMissleDir / 4;
 					if (nDir >= MaxMissleDir) nDir -= MaxMissleDir;
@@ -673,7 +684,17 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					   khong va vao ai. Sua giong ben may chu (Core/KSkills.cpp). */
 					SkillParam.nTargetId = nTargetId;
 					
-					CastWall(&SkillParam , nDir, nDesPX, nDesPY);
+					/* DOI HANH VI: dan BAM MUC TIEU (MoveKind = 5) phai xuat phat tu
+					   NGUOI PHAT, khong phai tu vi tri dich. Hinh TUONG von sinh dan
+					   ngay tai dich - dung cho tuong lua dat xuong dat - nhung chieu
+					   8x Cai Bang lai khai dan bam muc tieu, nen dan de ra ngay tren
+					   dau con quai roi duoi theo chinh no: nhin ra ngoai la "no ngay
+					   tai quai roi bay loan xa". Doi chung ban6 ngay 12/09/2026: dan
+					   bay TU NGUOI TOI QUAI. */
+					if (g_MisslesLib[m_nChildSkillId].m_eMoveKind == MISSLE_MMK_Follow)
+						CastWall(&SkillParam , nDir, nSrcPX, nSrcPY);
+					else
+						CastWall(&SkillParam , nDir, nDesPX, nDesPY);
 				}	break;
 			case SKILL_SLT_Obj:
 				{
@@ -741,7 +762,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					{
 						nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2, &nDesPX, &nDesPY,  SKILL_SLT_Npc);
 						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
-						nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+						nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 						nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 						SkillParam.nLauncher = nLauncher;
 						SkillParam.eLauncherType = eLauncherType;
@@ -834,7 +855,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					{
 						nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2, &nDesPX, &nDesPY, SKILL_SLT_Npc);		
 						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
-						nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+						nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 						nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 						SkillParam.nLauncher = nLauncher;
 						SkillParam.eLauncherType = eLauncherType;
@@ -897,7 +918,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 					nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2,  &nDesPX, &nDesPY, eLauncherType);
 					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
-					nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
 					SkillParam.eLauncherType = eLauncherType;
@@ -956,7 +977,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 			case SKILL_SLT_Npc:
 				{
 					nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2, &nDesPX, &nDesPY);
-					nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
 					SkillParam.eLauncherType = eLauncherType;
@@ -989,8 +1010,9 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 			{
 			case SKILL_SLT_Npc:
 				{
+					nTargetId		= Param2PCoordinate(nLauncher, nParam1, nParam2, &nDesPX, &nDesPY, SKILL_SLT_Npc);
 					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
-					nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
 					SkillParam.eLauncherType = eLauncherType;
@@ -1026,7 +1048,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 					nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2,  &nDesPX, &nDesPY);
 					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
-					nDirIndex		= g_GetDirIndex(nSrcPX, nSrcPY, nDesPX, nDesPY);
+					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
 					SkillParam.eLauncherType = eLauncherType;
@@ -1119,6 +1141,8 @@ int KSkill::CastZone(TOrdinSkillParam * pSkillParam , int nDir, int nRefPX, int 
 					Missle[nMissleIndex].m_nDirIndex		= g_Dir2DirIndex(nDir, MaxMissleDir);
 					CreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);
 					Missle[nMissleIndex].m_nFollowNpcIdx	= pSkillParam->nTargetId;
+			Missle[nMissleIndex].m_dwFollowNpcID	= (pSkillParam->nTargetId > 0)
+				? Npc[pSkillParam->nTargetId].m_dwID : 0;
 					Missle[nMissleIndex].m_dwBornTime		= SubWorld[nSubWorldId].m_dwCurrentTime;
 					Missle[nMissleIndex].m_nSubWorldId		= nSubWorldId;
 					Missle[nMissleIndex].m_nLauncher		= nLauncher;
@@ -1244,6 +1268,8 @@ int		KSkill::CastLine(TOrdinSkillParam *pSkillParam, int nDir, int nRefPX, int n
 			Missle[nMissleIndex].m_nDirIndex		= nDirIndex;
 			CreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);
 			Missle[nMissleIndex].m_nFollowNpcIdx	= pSkillParam->nTargetId;
+			Missle[nMissleIndex].m_dwFollowNpcID	= (pSkillParam->nTargetId > 0)
+				? Npc[pSkillParam->nTargetId].m_dwID : 0;
 			Missle[nMissleIndex].m_dwBornTime		= SubWorld[nSubWorldId].m_dwCurrentTime;
 			Missle[nMissleIndex].m_nSubWorldId		= nSubWorldId;
 			Missle[nMissleIndex].m_nLauncher		= nLauncher;
@@ -1260,11 +1286,8 @@ int		KSkill::CastLine(TOrdinSkillParam *pSkillParam, int nDir, int nRefPX, int n
 			Missle[nMissleIndex].m_nLifeTime		+= Missle[nMissleIndex].m_nStartLifeTime;	
 			Missle[nMissleIndex].m_nRefPX			= nDesSubX;
 			Missle[nMissleIndex].m_nRefPY			= nDesSubY;
-			if (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line || Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)
-			{
-				Missle[nMissleIndex].m_nXFactor = g_DirCos(nDir, MaxMissleDir);
-				Missle[nMissleIndex].m_nYFactor = g_DirSin(nDir, MaxMissleDir);
-			}
+			Missle[nMissleIndex].m_nXFactor = g_DirCos(nDir, MaxMissleDir);
+			Missle[nMissleIndex].m_nYFactor = g_DirSin(nDir, MaxMissleDir);
 			
 			
 #ifdef _SERVER
@@ -1344,6 +1367,8 @@ int		KSkill::CastExtractiveLineMissle(TOrdinSkillParam* pSkillParam,  int nDir,i
 			}
 			
 			Missle[nMissleIndex].m_nFollowNpcIdx	= pSkillParam->nTargetId;
+			Missle[nMissleIndex].m_dwFollowNpcID	= (pSkillParam->nTargetId > 0)
+				? Npc[pSkillParam->nTargetId].m_dwID : 0;
 			Missle[nMissleIndex].m_dwBornTime		= SubWorld[nSubWorldId].m_dwCurrentTime;
 			Missle[nMissleIndex].m_nSubWorldId		= nSubWorldId;
 			Missle[nMissleIndex].m_nLauncher		= nLauncher;
@@ -1491,6 +1516,8 @@ int KSkill::CastWall(TOrdinSkillParam * pSkillParam,  int nDir , int nRefPX , in
 			Missle[nMissleIndex].m_nSubWorldId		= nSubWorldId;
 			CreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);
 			Missle[nMissleIndex].m_nFollowNpcIdx	= pSkillParam->nTargetId;
+			Missle[nMissleIndex].m_dwFollowNpcID	= (pSkillParam->nTargetId > 0)
+				? Npc[pSkillParam->nTargetId].m_dwID : 0;
 			
 			if (pSkillParam->nTargetId)
 				Missle[nMissleIndex].m_dwFollowNpcID	= Npc[pSkillParam->nTargetId].m_dwID;
@@ -1511,11 +1538,15 @@ int KSkill::CastWall(TOrdinSkillParam * pSkillParam,  int nDir , int nRefPX , in
 			Missle[nMissleIndex].m_nRefPX			= nDesSubX;
 			Missle[nMissleIndex].m_nRefPY			= nDesSubY;
 			
-			if (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line|| Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)
-			{
-				Missle[nMissleIndex].m_nXFactor = g_DirCos(Missle[nMissleIndex].m_nDir, MaxMissleDir);
-				Missle[nMissleIndex].m_nYFactor = g_DirSin(Missle[nMissleIndex].m_nDir, MaxMissleDir);
-			}
+			/* DOI HANH VI: dat he so huong cho MOI loai dan, khong rieng bay
+			   thang. Dan BAM MUC TIEU khong nam trong hai loai cu nen hai he so
+			   nay giu nguyen RAC cua lan dung truoc o dan. Co muc tieu thi khong
+			   sao (moi nhip tu tinh huong), nhung danh vao KHOANG TRONG thi
+			   khong co muc tieu -> roi vao nhanh dung he so -> dan bay tu phia
+			   (do 12/09/2026). Cac loai khac khong doc hai he so nay nen dat
+			   thua cung vo hai. */
+			Missle[nMissleIndex].m_nXFactor = g_DirCos(Missle[nMissleIndex].m_nDir, MaxMissleDir);
+			Missle[nMissleIndex].m_nYFactor = g_DirSin(Missle[nMissleIndex].m_nDir, MaxMissleDir);
 			
 #ifdef _SERVER
 			Missle[nMissleIndex].SetMagicAttribsData(pNewMagicAttribsData);
@@ -1607,6 +1638,8 @@ int KSkill::CastNotWall(TOrdinSkillParam * pSkillParam,  int nDir , int nRefPX ,
 			Missle[nMissleIndex].m_nDirIndex		= nDirIndex;
 			CreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);
 			Missle[nMissleIndex].m_nFollowNpcIdx	= pSkillParam->nTargetId;
+			Missle[nMissleIndex].m_dwFollowNpcID	= (pSkillParam->nTargetId > 0)
+				? Npc[pSkillParam->nTargetId].m_dwID : 0;
 			Missle[nMissleIndex].m_dwBornTime		= SubWorld[nSubWorldId].m_dwCurrentTime;
 			Missle[nMissleIndex].m_nSubWorldId		= nSubWorldId;
 			Missle[nMissleIndex].m_nLauncher		= nLauncher;
@@ -1623,11 +1656,8 @@ int KSkill::CastNotWall(TOrdinSkillParam * pSkillParam,  int nDir , int nRefPX ,
 			Missle[nMissleIndex].m_nLifeTime		+= Missle[nMissleIndex].m_nStartLifeTime;	
 			Missle[nMissleIndex].m_nRefPX			= nDesSubX;
 			Missle[nMissleIndex].m_nRefPY			= nDesSubY;
-			if (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line || Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)
-			{
-				Missle[nMissleIndex].m_nXFactor = g_DirCos(nDir, MaxMissleDir);
-				Missle[nMissleIndex].m_nYFactor = g_DirSin(nDir, MaxMissleDir);
-			}
+			Missle[nMissleIndex].m_nXFactor = g_DirCos(nDir, MaxMissleDir);
+			Missle[nMissleIndex].m_nYFactor = g_DirSin(nDir, MaxMissleDir);
 			
 			
 #ifdef _SERVER
@@ -1731,6 +1761,8 @@ int		KSkill::CastCircle(TOrdinSkillParam * pSkillParam, int nDir, int nRefPX, in
 			CreateMissle(nLauncher, m_nChildSkillId, nMissleIndex);
 			
 			Missle[nMissleIndex].m_nFollowNpcIdx	= pSkillParam->nTargetId;
+			Missle[nMissleIndex].m_dwFollowNpcID	= (pSkillParam->nTargetId > 0)
+				? Npc[pSkillParam->nTargetId].m_dwID : 0;
 			Missle[nMissleIndex].m_dwBornTime		= SubWorld[nSubWorldId].m_dwCurrentTime;
 			Missle[nMissleIndex].m_nSubWorldId		= nSubWorldId;
 			Missle[nMissleIndex].m_nLauncher		= nLauncher;
@@ -1748,11 +1780,8 @@ int		KSkill::CastCircle(TOrdinSkillParam * pSkillParam, int nDir, int nRefPX, in
 			Missle[nMissleIndex].m_nRefPX			= nDesSubPX;
 			Missle[nMissleIndex].m_nRefPY			= nDesSubPY;
 			
-			if (Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_Line || Missle[nMissleIndex].m_eMoveKind == MISSLE_MMK_RollBack)
-			{
-				Missle[nMissleIndex].m_nXFactor = g_DirCos(nCurSubDir, MaxMissleDir);
-				Missle[nMissleIndex].m_nYFactor = g_DirSin(nCurSubDir, MaxMissleDir);
-			}
+			Missle[nMissleIndex].m_nXFactor = g_DirCos(nCurSubDir, MaxMissleDir);
+			Missle[nMissleIndex].m_nYFactor = g_DirSin(nCurSubDir, MaxMissleDir);
 			
 			
 #ifdef _SERVER

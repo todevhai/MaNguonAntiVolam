@@ -52,6 +52,7 @@ private:
 	int				m_nLeftLeft, m_nLeftTop;
 	int				m_nRightLeft, m_nRightTop;
 	int				m_nWidthPerSkill, m_nHeightPerSkill;
+	int				m_nMaxPerRow;	/* MaxBtnCountPerRow, mac dinh 5 */
 	static KUiSkillData	ms_ShortcutSkills[SKILLTREE_SHORTCUT_SKILL_COUNT];
 					//KUiSkillData::nLevel在此的含义0表示左手技能，1表示右手技能
 

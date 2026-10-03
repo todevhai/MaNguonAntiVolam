@@ -18,7 +18,9 @@ class KUiStoreBox : protected KWndShowAnimate
 {
 public:
 	static KUiStoreBox* OpenWindow();		//打开窗口，返回唯一的一个类对象实例
-	static KUiStoreBox* GetIfVisible();		//如果窗口正被显示，则返回实例指针
+	static KUiStoreBox* GetIfVisible();
+	BOOL	DepositBagItem(KUiDraggedObject* pBagItem);	// #3 rclick cat vao ruong (public de UiItem goi)
+	BOOL	WithdrawBoxItem(KUiDraggedObject* pBoxItem);	// #3b rclick lay do tu ruong ve tui		//如果窗口正被显示，则返回实例指针
 	static void			CloseWindow();		//关闭窗口
 	static void			LoadScheme(const char* pScheme);//载入界面方案
 	void			UpdateItem(KUiObjAtRegion* pItem, int bAdd);//物品变化更新
@@ -28,6 +30,7 @@ private:
 	void	Initialize();							//初始化
 	int		WndProc(unsigned int uMsg, unsigned int uParam, int nParam);//窗口函数
 	void	UpdateData();
+	void	PaintWindow();	/* nhan nut Khoa theo trang thai that */
 	void	OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos);
 	void	OnGetMoney(int nMoney);
 private:

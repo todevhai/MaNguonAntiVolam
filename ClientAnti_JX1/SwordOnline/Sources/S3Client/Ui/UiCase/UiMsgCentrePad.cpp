@@ -129,6 +129,32 @@ KUiMsgCentrePad* KUiMsgCentrePad::m_pSelf = NULL;
 //--------------------------------------------------------------------------
 //	¹¦ÄÜ£º´ò¿ª´°¿Ú£¬·µ»ØÎ¨Ò»µÄÒ»¸öÀà¶ÔÏóÊµÀý
 //--------------------------------------------------------------------------
+#define defCHAT_KENH_CHO	16
+struct KKenhCho
+{
+	char	szTen[32];
+	DWORD	nId;
+	BYTE	cost;
+};
+static KKenhCho	s_KenhCho[defCHAT_KENH_CHO];
+static int	s_nKenhCho = 0;
+
+/* Goi sau khi cua so chat da san sang: xu ly nhung kenh may chu bao
+   truoc do. */
+void KUiMsgCentrePad::XuLyKenhCho()
+{
+	static int s_bDangChay = 0;
+	if (s_bDangChay)
+		return;
+	s_bDangChay = 1;
+	/* GIU lai danh sach: doi canh thi ReleaseActivateChannelAll xoa
+	   sach kenh dang ky ma may chu khong gui lai, phai tu dang ky lai. */
+	int nSo = s_nKenhCho;
+	for (int i = 0; i < nSo; i++)
+		OpenChannelThat(s_KenhCho[i].szTen, s_KenhCho[i].nId, s_KenhCho[i].cost);
+	s_bDangChay = 0;
+}
+
 KUiMsgCentrePad* KUiMsgCentrePad::OpenWindow()
 {
 	if (m_pSelf == NULL)
@@ -139,6 +165,8 @@ KUiMsgCentrePad* KUiMsgCentrePad::OpenWindow()
 	}
 	if (m_pSelf)
 	{
+		if (s_nKenhCho > 0)
+			m_pSelf->XuLyKenhCho();
 		m_pSelf->m_Sys.Show();
 		m_pSelf->Show();
 	}
@@ -473,9 +501,10 @@ int KUiMsgCentrePad::NewChannelMessageArrival(DWORD nChannelID, char* szSendName
 	if (m_pSelf && pMsgBuff)
 	{
 		int nChannelIndex = m_pSelf->FindActivateChannelIndex(nChannelID);
-		int nID = m_pSelf->m_pActivateChannel[nChannelIndex].ResourceIndex;
+		int nID = -1;
 		if (nChannelIndex >= 0)
 		{
+			nID = m_pSelf->m_pActivateChannel[nChannelIndex].ResourceIndex;
 			m_pSelf->ChannelMessageArrival(nChannelIndex, szSendName, pMsgBuff, nMsgLength, m_pSelf->m_ChatRoom.GetMessageListBox(), true);
 			m_pSelf->m_ChatRoom.GetScrollBar()->SetScrollPos(
 				m_pSelf->m_ChatRoom.GetScrollBar()->GetMaxValue());
@@ -533,6 +562,23 @@ void KUiMsgCentrePad::ShowSomeoneMessage(char* szSourceName, const char* pMsgBuf
 }
 
 void KUiMsgCentrePad::OpenChannel(char* channelName, DWORD nChannelID, BYTE cost)
+{
+	if (m_pSelf == NULL)
+	{
+		if (channelName && s_nKenhCho < defCHAT_KENH_CHO)
+		{
+			strncpy(s_KenhCho[s_nKenhCho].szTen, channelName, sizeof(s_KenhCho[0].szTen) - 1);
+			s_KenhCho[s_nKenhCho].szTen[sizeof(s_KenhCho[0].szTen) - 1] = 0;
+			s_KenhCho[s_nKenhCho].nId = nChannelID;
+			s_KenhCho[s_nKenhCho].cost = cost;
+			s_nKenhCho++;
+		}
+		return;
+	}
+	OpenChannelThat(channelName, nChannelID, cost);
+}
+
+void KUiMsgCentrePad::OpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost)
 {
 	if (nChannelID == -1)
 		return;
@@ -1623,6 +1669,9 @@ int	KUiMsgCentrePad::PtInWindow(int x, int y)
 				m_Khac.PtInWindow(x, y) ||
 				m_BgShadowBtn.PtInWindow(x, y)
 				);
+		/* Hang tab cung la cua so con - thieu no thi tab khong nhan chuot. */
+		for (int i = 0; !nRet && i < m_ChatTabCount && i < MAX_CHAT_TAB; i++)
+			nRet = m_TabButton[i].PtInWindow(x, y);
 	}
 	return nRet;
 }
@@ -2175,9 +2224,10 @@ int KUiMsgCentrePad::CheckChannel(int nChannelIndex, bool b)
 	int n = m_pSelf->m_pActivateChannel[nChannelIndex].ResourceIndex;
 	if (n >= 0)
 	{
-		char Buffer[32];
+		char Buffer[64];
 		strncpy(Buffer, b ? m_pSelf->m_ChannelsResource[n].cMenuText : m_pSelf->m_ChannelsResource[n].cMenuDeactivateText, 32);
-		strcat(Buffer, b ? " Më" : " §ãng");
+		Buffer[32] = 0;
+		strcat(Buffer, b ? " Më " : " §ãng");
 		SystemMessageArrival(Buffer, strlen(Buffer));
 	}
 	return 1;
@@ -2187,6 +2237,14 @@ int	KUiMsgCentrePad::FilterTextColor(char* pMsgBuff, unsigned short nMsgLength, 
 {
 	nMsgLength = TClearSpecialCtrlInEncodedText(pMsgBuff, nMsgLength, KTC_COLOR);
 	nMsgLength = TClearSpecialCtrlInEncodedText(pMsgBuff, nMsgLength, KTC_COLOR_RESTORE);
+	if (memchr(pMsgBuff, KTC_INLINE_PIC, nMsgLength))
+	{
+		/* TFilterEncodedText doi anh chen nam TRUOC cuoi bo dem (nReadPos + 3 < nCount):
+		   tin chi co mot icon, hoac icon o cuoi, bi bo. Them mot byte 0 cuoi de du dieu kien;
+		   byte 0 tu bi loc. Bo dem cua ca hai noi goi (560 byte) con du cho. */
+		pMsgBuff[nMsgLength] = 0;
+		return TFilterEncodedText(pMsgBuff, nMsgLength + 1);
+	}
 	return TEncodeText(pMsgBuff, nMsgLength);
 }
 

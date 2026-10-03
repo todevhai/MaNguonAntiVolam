@@ -226,7 +226,11 @@ bool XPackFile::ExtractRead(void* pBuffer, unsigned int uExtractSize,
 		void*	pReadBuffer = malloc(uSize);
 		if (pReadBuffer)
 		{
-		    if (lCompressType == TYPE_UCL && DirectRead(pReadBuffer, uOffset, uSize))
+		    /* 0x20000000 la nrv2b y het TYPE_UCL, chi khac so hieu - ban Viet
+		       hoa dung no cho toan bo updatejx*.pak. Do 28/08/2026: 237/237
+		       muc thu ngau nhien giai nen dung. */
+		    if ((lCompressType == TYPE_UCL || lCompressType == 0x20000000) &&
+		        DirectRead(pReadBuffer, uOffset, uSize))
 			{
 				unsigned int uDestLength;
 				ucl_nrv2b_decompress_8((BYTE*)pReadBuffer, uSize, (BYTE*)pBuffer, &uDestLength, NULL);

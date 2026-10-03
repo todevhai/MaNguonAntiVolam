@@ -32,7 +32,7 @@ KNpcAttribModify::KNpcAttribModify()
 	ProcessFunc[magic_armordefense_v] = &KNpcAttribModify::ArmorDefenseV;
 	ProcessFunc[magic_lifemax_v] = &KNpcAttribModify::LifeMaxV;
 	ProcessFunc[magic_lifemax_p] = &KNpcAttribModify::LifeMaxP;
-	ProcessFunc[magic_lifemax_yan_v] = &KNpcAttribModify::LifeMaxYanV;
+	ProcessFunc[magic_lifemax_yan_v] = &KNpcAttribModify::LifeMaxYanV; ProcessFunc[magic_physicsres_yan_p] = ProcessFunc[magic_fireres_yan_p] = ProcessFunc[magic_coldres_yan_p] = ProcessFunc[magic_lightingres_yan_p] = ProcessFunc[magic_poisonres_yan_p] = ProcessFunc[magic_allres_yan_p] = &KNpcAttribModify::KhangYanP; ProcessFunc[magic_attackspeed_yan_v] = &KNpcAttribModify::TocDanhYanV; ProcessFunc[magic_castspeed_yan_v] = &KNpcAttribModify::TocPhatYanV; ProcessFunc[magic_fasthitrecover_yan_v] = &KNpcAttribModify::PhucHoiYanV;
 	ProcessFunc[magic_lifemax_yan_p] = &KNpcAttribModify::LifeMaxYanP;
 	ProcessFunc[magic_manamax_yan_v] = &KNpcAttribModify::ManaMaxYanV;
 	ProcessFunc[magic_manamax_yan_p] = &KNpcAttribModify::ManaMaxYanP;
@@ -526,6 +526,30 @@ void KNpcAttribModify::KnockBackP(KNpc* pNpc, void* pData)
    hien tai. Client thieu 4 ham nay thi moi lan tu dung lai thuoc tinh (goi kinh mach, trung sinh)
    ra gioi han thap hon may chu, roi goi dong bo cua may chu keo len lai -> thanh mau nhay. Cung
    cong thuc voi server/linux-server/Core/KNpcAttribModify.cpp. */
+/* Khang Duong: mot ham cho ca 6 ma, chon he theo loai thuoc tinh (may chu tach 6 ham). */
+void KNpcAttribModify::KhangYanP(KNpc* pNpc, void* pData)
+{
+	KMagicAttrib* p = (KMagicAttrib *)pData;
+	int nHe = -1;
+	switch (p->nAttribType)
+	{
+	case magic_physicsres_yan_p:	nHe = KNpc::KHANG_VAT_LY;	break;
+	case magic_fireres_yan_p:		nHe = KNpc::KHANG_HOA;		break;
+	case magic_coldres_yan_p:		nHe = KNpc::KHANG_BANG;		break;
+	case magic_lightingres_yan_p:	nHe = KNpc::KHANG_LOI;		break;
+	case magic_poisonres_yan_p:	nHe = KNpc::KHANG_DOC;		break;
+	case magic_allres_yan_p:
+		for (int i = 0; i < KNpc::KHANG_SO; i++)
+			pNpc->m_nKhangYan[i] += p->nValue[0];
+		return;
+	}
+	if (nHe >= 0)
+		pNpc->m_nKhangYan[nHe] += p->nValue[0];
+}
+void KNpcAttribModify::TocDanhYanV(KNpc* pNpc, void* pData) { pNpc->m_nTocDanhYan += ((KMagicAttrib *)pData)->nValue[0]; }
+void KNpcAttribModify::TocPhatYanV(KNpc* pNpc, void* pData) { pNpc->m_nTocPhatYan += ((KMagicAttrib *)pData)->nValue[0]; }
+void KNpcAttribModify::PhucHoiYanV(KNpc* pNpc, void* pData) { pNpc->m_nPhucHoiYan += ((KMagicAttrib *)pData)->nValue[0]; }
+
 void KNpcAttribModify::LifeMaxYanV(KNpc* pNpc, void* pData)
 {
 	pNpc->m_nTranSinhLucYan += ((KMagicAttrib *)pData)->nValue[0];

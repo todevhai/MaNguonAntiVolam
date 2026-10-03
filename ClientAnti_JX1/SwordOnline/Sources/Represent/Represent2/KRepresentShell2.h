@@ -420,7 +420,7 @@ public:
 	virtual HRESULT UnAdviseRepresent(IInlinePicEngineSink*);
 	
 	virtual bool SaveScreenToFile(const char* pszName, ScreenFileType eType, unsigned int nQuality);
-	virtual void SetGamma(int nGamma){}
+	virtual void SetGamma(int nGamma);	/* cai that o .cpp */
 
 	//设置偏色列表
 	virtual unsigned int SetAdjustColorList(

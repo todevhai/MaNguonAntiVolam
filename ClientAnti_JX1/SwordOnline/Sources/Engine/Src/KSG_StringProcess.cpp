@@ -30,7 +30,7 @@ int KSG_StringGetInt(const char **ppcszString, int nDefaultValue)
     if (!pcszString)
         goto Exit0;
 
-    while (isspace(*pcszString))
+    while (isspace(*pcszString) || *pcszString == '"' || *pcszString == '\'')
         pcszString++;
     
     if ((*pcszString) == '\0')
@@ -58,6 +58,8 @@ int KSG_StringGetInt(const char **ppcszString, int nDefaultValue)
 
         pcszString++;
     }
+    while (isspace(*pcszString) || *pcszString == '"' || *pcszString == '\'')
+        pcszString++;
 
     nResult = true;
 Exit0:

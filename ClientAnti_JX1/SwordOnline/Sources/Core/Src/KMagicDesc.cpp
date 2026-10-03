@@ -545,11 +545,18 @@ const char* KMagicDesc::GetDesc(void *pData)
 				break;
 			case 'l':		// ¼¼ÄÜ
 				{
-					char	szMsg[32];
+					char	szMsg[128];
+					ISkill* pSkill = NULL;
 					if (nValue > 0)
 					{
-						ISkill* pSkill =  g_SkillManager.GetSkill(nValue, 1);
-						sprintf(szMsg, "<color=HGreen>[ %s ]<color>", pSkill->GetSkillName());
+						pSkill = g_SkillManager.GetSkill(nValue, 1);
+						if (!pSkill && nValue > 255)
+							pSkill = g_SkillManager.GetSkill(nValue >> 8, 1);
+					}
+					if (pSkill && pSkill->GetSkillName())
+					{
+						_snprintf(szMsg, sizeof(szMsg), "<color=HGreen>%s <color>", pSkill->GetSkillName());
+						szMsg[sizeof(szMsg) - 1] = 0;
 					}
 					else
 						sprintf(szMsg, "%s", "vâ c«ng vèn cã");

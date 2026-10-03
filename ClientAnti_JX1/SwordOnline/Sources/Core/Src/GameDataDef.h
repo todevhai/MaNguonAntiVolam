@@ -20,7 +20,7 @@
 
 #define		_CHAT_SCRIPT_OPEN
 
-#define		MAX_TEAM_MEMBER						7		// 最大队员数量(不包括队长)
+#define		MAX_TEAM_MEMBER						19		// 最大队员数量(不包括队长)
 #define		MAX_SENTENCE_LENGTH					256		// 聊天每个语句最大长度
 
 #define		FILE_NAME_LENGTH					80
@@ -110,13 +110,14 @@ enum ITEM_POSITION
 #define		EQUIPMENT_ROOM_HEIGHT		10
 #define		MAX_EQUIPMENT_ITEM			(EQUIPMENT_ROOM_WIDTH * EQUIPMENT_ROOM_HEIGHT)
 #define		REPOSITORY_ROOM_WIDTH		6
-#define		REPOSITORY_ROOM_HEIGHT		10
-#define		MAX_REPOSITORY_ITEM			(REPOSITORY_ROOM_WIDTH * REPOSITORY_ROOM_HEIGHT)
+#define		REPOSITORY_ROOM_HEIGHT		10	/* hang MOI TRANG */
+#define		REPOSITORY_ROOM_PAGES		6	/* trang 0 = cua so ruong, 1..5 = Mo rong ruong */
+#define		MAX_REPOSITORY_ITEM			(REPOSITORY_ROOM_WIDTH * REPOSITORY_ROOM_HEIGHT * REPOSITORY_ROOM_PAGES)
 #define		TRADE_ROOM_WIDTH			10
 #define		TRADE_ROOM_HEIGHT			4
 #define		MAX_TRADE_ITEM				(TRADE_ROOM_WIDTH * TRADE_ROOM_HEIGHT)
 #define		MAX_TRADE1_ITEM				MAX_TRADE_ITEM
-#define		IMMEDIACY_ROOM_WIDTH		3
+#define		IMMEDIACY_ROOM_WIDTH		9
 #define		IMMEDIACY_ROOM_HEIGHT		1
 #define		MAX_IMMEDIACY_ITEM			(IMMEDIACY_ROOM_WIDTH * IMMEDIACY_ROOM_HEIGHT)
 #define		MAX_PLAYER_ITEM_RESERVED	32
@@ -588,7 +589,7 @@ struct KUiPlayerAttribute
 //==================================
 struct KUiPlayerImmedItemSkill
 {
-	KUiGameObject	ImmediaItem[3];
+	KUiGameObject	ImmediaItem[9];
 	KUiGameObject	IMmediaSkill[2];
 };
 

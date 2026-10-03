@@ -84,6 +84,9 @@
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\Lib\Release;$(MSBuildThisFileDirectory)..\..\Lib;$(MSBuildThisFileDirectory)..\..\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>odbc32.lib;odbccp32.lib;Winmm.lib;shlwapi.lib;lualibdll.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>Release/Game.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -107,7 +110,8 @@ copy Release\Game.pdb ..\..\..\bin\Client\release\Game.pdb
 copy Release\Game.map ..\..\..\bin\Client\release\Game.map
 copy Release\Game.exe ..\..\..\rebuild\Game.exe
 copy Release\Game.exe ..\..\..\client\Game.exe
-</Command>
+
+exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -150,11 +154,13 @@ copy Release\Game.exe ..\..\..\client\Game.exe
       <Command>md ..\..\..\bin\client\debug\
 copy debug\Game.exe ..\..\..\bin\Client\Game.exe
 copy debug\Game.exe ..\..\..\bin\Client\debug\Game.exe
-</Command>
+
+exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ErrorCode.cpp" />
+    <ClCompile Include="Auto\KAutoControl.cpp" />
     <ClCompile Include="Login\Login.cpp" />
     <ClCompile Include="myui\vongsang.cpp" />
     <ClCompile Include="NetConnect\NetConnectAgent.cpp" />
@@ -300,6 +306,7 @@ copy debug\Game.exe ..\..\..\bin\Client\debug\Game.exe
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorCode.h" />
+    <ClInclude Include="Auto\KAutoControl.h" />
     <ClInclude Include="Login\Login.h" />
     <ClInclude Include="Login\LoginDef.h" />
     <ClInclude Include="myui\vongsang.h" />

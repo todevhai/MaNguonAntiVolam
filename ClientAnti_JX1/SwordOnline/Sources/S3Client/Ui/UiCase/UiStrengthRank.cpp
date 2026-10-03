@@ -18,7 +18,7 @@ Description : 排名窗口的实现部分
 #include "UiStrengthRank.h"
 
 
-#define INDEX_AND_RANK_DATA_INI "排名的临时文件.ini"
+#define INDEX_AND_RANK_DATA_INI "xep-hang-tam.ini"
 #define INDEX_AND_RANK_MAPPING "\\Ui\\XepHang.ini"
 #define STRENGTH_RANK_INI "UiStrengthRank.ini"
 

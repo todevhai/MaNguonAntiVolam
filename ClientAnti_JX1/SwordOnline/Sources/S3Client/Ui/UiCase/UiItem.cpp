@@ -41,6 +41,11 @@ enum WAIT_OTHER_WND_OPER_PARAM
 //--------------------------------------------------------------------------
 //	功能：如果窗口正被显示，则返回实例指针
 //--------------------------------------------------------------------------
+BOOL KUiItem::FindBlankBagCell(int iw, int ih, int* px, int* py)
+{
+	return m_ItemBox.FindBlankCell(iw, ih, px, py);
+}
+
 KUiItem* KUiItem::GetIfVisible()
 {
 	if (m_pSelf && m_pSelf->IsVisible())
@@ -103,7 +108,7 @@ void KUiItem::Initialize()
 	AddChild(&m_MakeAdvBtn);
 	AddChild(&m_MarkPriceBtn);
 	AddChild(&m_MakeStallBtn);
-	strcpy(m_ShopName,"C鯽 h祅g c馻 t玦");
+	m_ShopName[0] = 0;	/* rong: bat buoc dat Loi rao truoc khi Rao ban */
 	char Scheme[256];
 	g_UiBase.GetCurSchemePath(Scheme, 256);
 	LoadScheme(Scheme);
@@ -346,6 +351,9 @@ int KUiItem::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		}
 		break;
 	case WND_N_RIGHT_CLICK_ITEM:
+		if (KUiStoreBox::GetIfVisible() && (GetKeyState(VK_SHIFT) & 0x8000) == 0 &&
+			KUiStoreBox::GetIfVisible()->DepositBagItem((KUiDraggedObject*)uParam))
+			break;	// #3 ruong mo: rclick cat item vao ruong
 		if ((GetKeyState(VK_SHIFT) & 0x8000) == 0)
 			OnClickItem((KUiDraggedObject*)uParam, true);
 		else

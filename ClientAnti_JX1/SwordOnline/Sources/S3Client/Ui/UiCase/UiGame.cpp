@@ -116,7 +116,11 @@ int KUiGameSpace::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 		if (uParam & MK_LBUTTON)
 		{
 			if (g_pCoreShell)
+			{
+				extern int g_nDichSpaceX; extern int g_nDichSpaceY;
+				g_nDichSpaceX = -1; g_nDichSpaceY = -1;	// can thiep huong di -> xoa vector map cu
 				g_pCoreShell->GotoWhere(LOWORD(nParam), HIWORD(nParam), 0);
+			}
 		}
 		else if (uParam & MK_RBUTTON)
 		{
@@ -167,8 +171,8 @@ void KUiGameSpace::OnMouseMoveCursor(int x, int y)
 	{
 		if (nKind == kind_dialoger)
 			Wnd_SwitchCursor(MOUSE_CURSOR_DIALOG);
-		else if (g_pCoreShell->GetNPCBAITAN(SelectPlayer.nIndex)) 
-			Wnd_SwitchCursor(MOUSE_CURSOR_DIALOG);
+		else if ((GetKeyState(VK_CONTROL) & 0x8000) && g_pCoreShell->GetNPCBAITAN(SelectPlayer.uId))
+			Wnd_SwitchCursor(CURSOR_VIEW_STALL);	/* Ctrl + re qua nguoi ban: xem sap */
 		else if (g_pCoreShell->GetNPCRelation(SelectPlayer.nIndex) == relation_enemy)
 			Wnd_SwitchCursor(MOUSE_CURSOR_FIGHT);
 		else

@@ -8,6 +8,8 @@
 #pragma once
 #include "../Elem/WndToolBar.h"
 #include "../Elem/WndButton.h"
+#include "../Elem/WndImagePart.h"
+#include "../Elem/WndText.h"
 
 class KUiHeaderControlBar : public KWndToolBar
 {
@@ -27,4 +29,14 @@ private:
 	static KUiHeaderControlBar*	m_pSelf;
 	KWndText80	m_LevelText;
 	KWndText80	m_RankWorldText;
+	/* Bon thanh: anh ve theo ti le + o chu hien so. Thu tu tren thanh
+	   la the luc, sinh luc, noi luc, kinh nghiem - trai sang phai. */
+	KWndImagePart	m_Stamina;
+	KWndImagePart	m_Life;
+	KWndImagePart	m_Mana;
+	KWndImagePart	m_Exp;
+	KWndText32	m_StaminaText;
+	KWndText32	m_LifeText;
+	KWndText32	m_ManaText;
+	KWndText32	m_ExpText;
 };

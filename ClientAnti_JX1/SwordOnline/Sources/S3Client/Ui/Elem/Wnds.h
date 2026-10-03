@@ -24,6 +24,7 @@ enum CURSOR_INDEX
 	CURSOR_SELL,				//卖东西
 	CURSOR_REPAIR,				//修东西
     CURSOR_USE,                 //看对象的图标
+	CURSOR_VIEW_STALL,			/* 9: xem sap nguoi khac */
 	CURSOR_INDEX_COUNT,
 };
 

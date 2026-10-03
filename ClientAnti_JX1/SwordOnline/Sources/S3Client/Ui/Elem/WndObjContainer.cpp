@@ -294,7 +294,7 @@ void KWndObjectBox::PaintWindow()
 			if (eProp == IIEP_NORMAL)
 				Shadow.Color.Color_dw = l_BgColors[0];
 			else if (eProp == IIEP_NOT_USEABLE)
-				Shadow.Color.Color_dw = l_BgColors[1];
+				Shadow.Color.Color_dw = 0x16FF0000;	/* do khong mac duoc: do, opacity .3 */
 			else if (eProp == IIEP_SPECIAL)
 				Shadow.Color.Color_dw = l_BgColors[2];
 		}
@@ -392,6 +392,16 @@ void KWndObjectBox::EnablePickPut(bool bEnable)
 //--------------------------------------------------------------------------
 //	??:????
 //--------------------------------------------------------------------------
+/* Ve vat dang cam theo con tro. Wnd_RenderWindows goi ham nay moi khung
+   hinh khi co vat duoc nhac len. 32x32 vua mot o phim tat.
+   Tra 1 de con tro chuot van duoc ve len tren. */
+static int VeVatDangCam(int x, int y, const KUiDraggedObject& Obj, int nDropQueryResult)
+{
+	if (g_pCoreShell && Obj.uGenre != CGOG_NOTHING)
+		g_pCoreShell->DrawGameObj(Obj.uGenre, Obj.uId, x - 16, y - 16, 32, 32, 0);
+	return 1;
+}
+
 int KWndObjectBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
 	switch(uMsg)
@@ -403,9 +413,9 @@ int KWndObjectBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			{
 				if (Wnd_GetDragObj(NULL))
 				{
-					DropObject(false);
+					DropObject(false);	Wnd_DragFinished();
 				}
-				else if (m_Object.uGenre != CGOG_NOTHING )
+				else if (m_Object.uGenre != CGOG_NOTHING && Wnd_DragBegin(&m_Object, VeVatDangCam))
 				{
 					ITEM_PICKDROP_PLACE	Pick;
 					Pick.pWnd = this;
@@ -731,11 +741,17 @@ void KWndObjectMatrix::PaintWindow()
 			if (eProp == IIEP_NORMAL)
 				Shadow.Color.Color_dw = l_BgColors[0];
 			else if (eProp == IIEP_NOT_USEABLE)
-				Shadow.Color.Color_dw = l_BgColors[1];
+				Shadow.Color.Color_dw = 0x16FF0000;	/* do khong mac duoc: do, opacity .3 */
 			else if (eProp == IIEP_SPECIAL)
 				Shadow.Color.Color_dw = l_BgColors[2];
 		}
 
+		/* To NEN o vat pham dang bay ban (da dinh gia), neu chua co mau
+		   hover/chon de khong de len. Nen ve truoc icon nen nam duoi. */
+		if ((Shadow.Color.Color_dw == 0 || Shadow.Color.Color_dw == 0x16FF0000) &&
+			(pObj->uGenre == CGOG_ITEM || pObj->uGenre == CGOG_PLAYERSELLITEM) &&	/* ca sap nguoi khac dang xem */
+			g_pCoreShell->GetGameData(GDI_ITEM_SALE_PRICE, pObj->uId, 0) > 0)
+			Shadow.Color.Color_dw = 0x16FFFF00;	/* vang, mau chiem 10/32 ~ opacity .3 - xem ClearAlpha */
 		int width = m_nUnitWidth * pObj->DataW - m_nUnitBorder * 2;
 		int height = m_nUnitHeight * pObj->DataH - m_nUnitBorder * 2;
 		Shadow.oPosition.nX = m_nAbsoluteLeft + m_nUnitWidth * pObj->DataX + m_nUnitBorder;
@@ -922,7 +938,7 @@ int KWndObjectMatrix::WndProc(unsigned int uMsg, unsigned int uParam, int nParam
 		if ((m_Style & OBJCONT_S_DISABLE_PICKPUT)== 0)
 		{
 			if (Wnd_GetDragObj(NULL))
-				DropObject(LOWORD(nParam), HIWORD(nParam), false);
+				{ DropObject(LOWORD(nParam), HIWORD(nParam), false); Wnd_DragFinished(); }
 			else
 				PickUpObjectAt(LOWORD(nParam), HIWORD(nParam));
 		}
@@ -991,6 +1007,29 @@ int KWndObjectMatrix::WndProc(unsigned int uMsg, unsigned int uParam, int nParam
 //--------------------------------------------------------------------------
 //	??:??????????
 //--------------------------------------------------------------------------
+BOOL KWndObjectMatrix::FindBlankCell(int iw, int ih, int* px, int* py)
+{
+	if (iw <= 0) iw = 1;
+	if (ih <= 0) ih = 1;
+	int gx, gy, i;
+	for (gy = 0; gy + ih <= m_nNUmUnitVert; gy++)
+	{
+		for (gx = 0; gx + iw <= m_nNumUnitHori; gx++)
+		{
+			BOOL bFree = TRUE;
+			for (i = 0; i < m_nNumObjects && bFree; i++)
+			{
+				KUiDraggedObject* p = &m_pObjects[i];
+				if (gx < p->DataX + p->DataW && gx + iw > p->DataX &&
+					gy < p->DataY + p->DataH && gy + ih > p->DataY)
+					bFree = FALSE;
+			}
+			if (bFree) { if (px) *px = gx; if (py) *py = gy; return TRUE; }
+		}
+	}
+	return FALSE;
+}
+
 int KWndObjectMatrix::GetObjectAt(int x, int y)
 {
 	x = (x - m_nAbsoluteLeft) / m_nUnitWidth;
@@ -1017,6 +1056,7 @@ int KWndObjectMatrix::PickUpObjectAt(int x, int y)
 	{
 		ITEM_PICKDROP_PLACE	Pick;
 		Pick.pWnd = this;
+		Wnd_DragBegin(&m_pObjects[nPicked], VeVatDangCam);
 		Pick.h = m_pObjects[nPicked].DataX;
 		Pick.v = m_pObjects[nPicked].DataY;
 		m_pParentWnd->WndProc(WND_N_ITEM_PICKDROP, (unsigned int)&Pick, NULL);

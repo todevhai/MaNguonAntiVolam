@@ -289,7 +289,6 @@ enum GAMEDATA_INDEX
 	GDI_PLAYER_GOING_TO_DEST,	// con dang tren duong toi dich vua chon?
 	//Return = 1 khi con duong tu tim HOAC nhan vat con dang di/chay; 0 khi
 	//         da dung han (toi noi, ket, bo cuoc). Ban do dung de tat vector.
-	// Dat o DAY chu khong o cuoi enum: cuoi enum la moc neo cua port-fixes.py.
 	GDI_PLAYER_STATE_SKILLS,	// trang thai dang tac dung: uParam = (KUiStateSkill*) mang, nParam = so o
 	//Return = so trang thai da dien
 	
@@ -302,6 +301,10 @@ enum GAMEDATA_INDEX
 	GDI_PLAYER_TK_NPC,
 	
 	GDI_PLAYER_TK_XEPHANG,
+
+	GDI_GAME_OBJ_IMAGE,	//ten anh icon vat pham (tooltip)
+
+	GDI_ITEM_SALE_PRICE,	//gia rao ban (dau tren icon tui)
 
 };
 
@@ -579,8 +582,6 @@ enum GAMEOPERATION_INDEX
 	// GOI_DANH_QUAI_GAN_NHAT luon phai co mot con quai de tinh toa do khung
 	// nhin, nen khong thu duoc chieu buff (TargetSelf) khi xung quanh sach
 	// quai. Day lay thang toa do cua ban than.
-	// Dat o GIUA enum chu khong phai cuoi: cuoi enum la moc neo cua hai ban
-	// va trong port-fixes.py.
 	GOI_PHAT_CHIEU_LEN_MINH,
 	//uParam = (KUiGameObject*)pSKill, 技能信息
 	//nParam = 立即位置，0表示为左键技能，1表示为右键技能

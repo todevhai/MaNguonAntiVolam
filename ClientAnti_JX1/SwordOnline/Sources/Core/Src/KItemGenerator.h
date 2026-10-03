@@ -27,6 +27,8 @@ public:
 	~KItemGenerator();
 
 // 以下是核心成员变量
+public:
+	const KLibOfBPT* GetBPTLib() const { return &m_BPTLib; }	/* tooltip min-max */
 protected:
 	KLibOfBPT	m_BPTLib;
 

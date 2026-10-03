@@ -49,10 +49,6 @@ jobs:
         shell: cmd
         run: python .github/scripts/kiem-chu-hong.py
 
-      - name: Va nguon cho trinh dich hien dai
-        shell: bash
-        run: python .github/scripts/port-fixes.py .
-
       - name: Dat co tuong thich va duong include
         run: |
           rem MSBuild dung IncludePath cua project de dung moi truong cho cl.exe, nen bien

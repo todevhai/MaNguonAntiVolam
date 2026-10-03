@@ -11,6 +11,7 @@
 #include "../Elem/WndImagePart.h"
 #include "../elem/wndbutton.h"
 #include "../elem/wndtext.h"
+#include "../Elem/WndPureTextBtn.h"
 #include "../elem/WndObjContainer.h"
 #include "../../../core/src/gamedatadef.h"
 
@@ -18,6 +19,16 @@
 #define	FIGHT_SKILL_COUNT			50
 #define FIGHT_SKILL_COUNT_PER_PAGE	25
 #define	FIGHT_SKILL_SUB_PAGE_COUNT	FIGHT_SKILL_COUNT / FIGHT_SKILL_COUNT_PER_PAGE
+
+class KNutCongDiem : public KWndPureTextBtn
+{
+public:
+	KNutCongDiem() { m_bCoChieu = 0; }
+	void	DatCoChieu(int b) { m_bCoChieu = b; }
+	virtual void	PaintWindow();
+private:
+	int	m_bCoChieu;
+};
 
 class KUiFightSkillSubPage : public KWndPage
 {
@@ -35,6 +46,9 @@ private:
 //	int			m_nSubPagIndex;
 	int			m_nRemainSkillPoint;
 	KWndObjectBox	m_FightSkills[FIGHT_SKILL_COUNT_PER_PAGE];
+	// Nut "+" rieng cho tung o chieu: cu click vao O chieu da danh cho viec
+	// nhac chieu ra o phim tat, nen cong diem phai co nut rieng.
+	KNutCongDiem	m_ConDiemBtn[FIGHT_SKILL_COUNT_PER_PAGE];
 //	KWndButton	m_FightSkills[FIGHT_SKILL_COUNT_PER_PAGE];
 //	KUiSkillData	m_Skills[FIGHT_SKILL_COUNT_PER_PAGE];
 	struct

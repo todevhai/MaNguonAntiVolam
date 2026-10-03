@@ -10,6 +10,7 @@
 #include "KWin32Wnd.h"
 #include "../Elem/WndMessage.h"
 #include "Wnds.h"
+#include "KDebug.h"
 #include "WndWindow.h"
 #include "UiCursor.h"
 #include "WndGameSpace.h"
@@ -524,6 +525,7 @@ KWndWindow* Wnd_GetFocusWnd()
 //--------------------------------------------------------------------------
 void Wnd_SetFocusWnd(KWndWindow* pWnd)
 {
+	g_DebugLog("[tieu diem] doi %p -> %p", s_WndStation.pFocusWnd, pWnd);
 	if (s_WndStation.pFocusWnd != pWnd)
 	{
 		if (s_WndStation.pFocusWnd)

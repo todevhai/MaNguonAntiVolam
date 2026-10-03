@@ -13,7 +13,7 @@
 #include "../elem/WndObjContainer.h"
 #include "../Elem/WndShowAnimate.h"
 
-#define CHEST_PW_MAX_VALUE	999999
+#define CHEST_PW_MAX_VALUE	999999999
 
 struct KUiObjAtRegion;
 
@@ -34,7 +34,7 @@ private:
 private:
 	static KUiUnlockBox*		m_pSelf;
 private:
-	KWndEdit6			m_Password;
+	KWndEdit32			m_Password;	/* 6 byte khong chua noi 9 chu so */
 	KWndButton			m_OKBtn;
 	KWndButton			m_CancelBtn;
 	KWndText80			m_Text;

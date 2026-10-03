@@ -1,4 +1,5 @@
 #include "KCore.h"
+#include "KEngine.h"	/* g_DebugLog */
 #include "KNpc.h"
 #include "KNpcSet.h"
 #include "KSubWorld.h"
@@ -643,8 +644,11 @@ void KNpcAI::FollowObject(int nIdx)
 	Npc[m_nIndex].GetMpsPos(&nX1, &nY1);
 	Object[nIdx].GetMpsPos(&nX2, &nY2);
 
-	if ((nX1 - nX2) * (nX1 - nX2) + (nY1 - nY2) * (nY1 - nY2) < PLAYER_PICKUP_CLIENT_DISTANCE * PLAYER_PICKUP_CLIENT_DISTANCE)
+	int nKc2 = (nX1 - nX2) * (nX1 - nX2) + (nY1 - nY2) * (nY1 - nY2);
+	int bDungYenGan = (Npc[m_nIndex].m_Doing == do_stand && nKc2 < 160 * 160);
+	if (nKc2 < PLAYER_PICKUP_CLIENT_DISTANCE * PLAYER_PICKUP_CLIENT_DISTANCE || bDungYenGan)
 	{
+		g_DebugLog("[vat-the] bam %d kind=%d cach2=%d dungyen=%d", nIdx, Object[nIdx].m_nKind, nKc2, bDungYenGan);
 //#ifndef _SERVER
 		Player[CLIENT_PLAYER_INDEX].CheckObject(nIdx);
 //#endif

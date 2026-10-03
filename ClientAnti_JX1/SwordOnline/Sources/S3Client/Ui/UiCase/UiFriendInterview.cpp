@@ -24,7 +24,7 @@ extern iCoreShell*		g_pCoreShell;
 extern iRepresentShell*	g_pRepresentShell;
 
 KUiFriendInterview* KUiFriendInterview::m_pFirstSelf = NULL;
-#define	SCHEME_INI		"你一句我一句聊天.ini"
+#define	SCHEME_INI		"chat-doi-dap.ini"
 #define	SEL_COLOR_MENU	1
 
 char			KUiFriendInterview::m_szSelfName[32] = "";
@@ -250,7 +250,7 @@ void KUiFriendInterview::LoadScheme(const char* pScheme)
 
 	char		Buff[128];
 	KIniFile	Ini;
-	sprintf(Buff, "%s\\"SCHEME_INI, pScheme);
+	sprintf(Buff, "%s\\" SCHEME_INI, pScheme);
 	if (Ini.Load(Buff))
 	{
 		m_pFirstSelf->Init(&Ini, "Main");

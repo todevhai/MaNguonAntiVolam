@@ -2,10 +2,15 @@
 //
 
 #include "KWin32.h"
+#include "KDebug.h"
 #include "KCore.h"
 #include "S3Client.h"
 #include "KWin32Wnd.h"
 #include "../../Represent/iRepresent/iRepresentShell.h"
+/* Ban header duoc include dat ten ham khoi tao la CreateRepresentDirect va bo
+   typedef nay; file nay goi CreateRepresentShell() khong tham so (xem
+   CREATE_REPRESENT_SHELL_FUN ben duoi). Hai ban chi khac o ham khoi tao. */
+typedef struct iRepresentShell* (*fnCreateRepresentShell)();
 #include "Ui/UiShell.h"
 #include "NetConnect/NetConnectAgent.h"
 #include "TextCtrlCmd/TextCtrlCmd.h"
@@ -33,6 +38,9 @@ CChatFilter g_ChatFilter;
 #define REPRESENT_MODULE_3			"Represent3.dll"
 #define CREATE_REPRESENT_SHELL_FUN	"CreateRepresentShell"
 #define	GAME_FPS			18
+
+/* Tran nhip VE, doc tu [Client] FPS trong config.ini. 0 = khong gioi han. */
+int	g_nTranNhipVe = 0;
 //Represent模块接口的指针
 struct iRepresentShell*	g_pRepresentShell = NULL;
 struct IInlinePicEngineSink* g_pIInlinePicSink = NULL;
@@ -52,8 +60,12 @@ char				g_szGameName[32] = "剑侠情缘·网络版";
 
 KClientCallback g_ClientCallback;
 
-#define	SCREEN_WIDTH	800
-#define SCREEN_HEIGHT	600
+/* Khong con la hang so: doc tu [General] Resolution trong config.ini.
+   Dat mac dinh 800x600 de khong doi hanh vi khi thieu khoa. */
+int	g_nBeNgangManHinh = 800;
+int	g_nBeDocManHinh = 600;
+#define	SCREEN_WIDTH	g_nBeNgangManHinh
+#define SCREEN_HEIGHT	g_nBeDocManHinh
 
 /*
  * Add this macro by liupeng on 2003.3.20
@@ -201,6 +213,22 @@ BOOL KMyApp::GameInit()
 #endif
 
 	IniFile.GetInteger("Client", "FullScreen", FALSE, &g_bScreen);
+	{
+		/* Doc ca hai cho: [Client] la muc da chac chan doc duoc (FullScreen
+		   ngay tren dung no), [General] la cho ban 8.x quen dat. */
+		int nDoPhanGiai = 0;
+		IniFile.GetInteger("General", "Resolution", 0, &nDoPhanGiai);
+		if (nDoPhanGiai != 1)
+			IniFile.GetInteger("Client", "Resolution", nDoPhanGiai, &nDoPhanGiai);
+		if (nDoPhanGiai == 1)
+		{
+			g_nBeNgangManHinh = 1024;
+			g_nBeDocManHinh = 768;
+		}
+		g_DebugLog("[man hinh] Resolution=%d -> %dx%d", nDoPhanGiai,
+			g_nBeNgangManHinh, g_nBeDocManHinh);
+	}
+	IniFile.GetInteger("Client", "FPS", 0, &g_nTranNhipVe);
 
 #ifdef DYNAMIC_LINK_REPRESENT_LIBRARY
 	IniFile.GetInteger("Client", "Represent", 2, &g_bRepresent3);
@@ -360,7 +388,21 @@ BOOL KMyApp::GameLoop()
 	}
 	if (m_GameCounter * 1000 >= m_Timer.GetElapse() * GAME_FPS)
 	{
-		UiPaint(nGameFps);
+		if (g_nTranNhipVe <= 0)
+		{
+			UiPaint(nGameFps);
+		}
+		else
+		{
+			/* GetTickCount quay vong sau 49 ngay; hieu hai DWORD van dung. */
+			static DWORD	s_dwVeLanTruoc = 0;
+			DWORD		dwBayGio = GetTickCount();
+			if ((DWORD)(dwBayGio - s_dwVeLanTruoc) >= (DWORD)(1000 / g_nTranNhipVe))
+			{
+				s_dwVeLanTruoc = dwBayGio;
+				UiPaint(nGameFps);
+			}
+		}
 		Sleep(1);
 	}
 	else if ((m_GameCounter % 8) == 0)
@@ -374,6 +416,11 @@ BOOL KMyApp::GameLoop()
 int KMyApp::HandleInput(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	int nRet = 0;
+	{
+		extern unsigned int g_uAutoGiuChuotDen;	/* Auto/KAutoControl.cpp */
+		if ((uMsg == WM_MOUSEMOVE || uMsg == 0x02A1 /* WM_MOUSEHOVER */) && GetTickCount() < g_uAutoGiuChuotDen)
+			return 0;
+	}
 	if (uMsg != WM_CLOSE)
 	{
 		UiProcessInput(uMsg, wParam, lParam);

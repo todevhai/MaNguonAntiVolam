@@ -38,136 +38,136 @@ KProtocolProcess::KProtocolProcess()
 #ifndef _SERVER
 	ProcessFunc[s2c_login] = NULL;
 	ProcessFunc[s2c_logout] = NULL;
-	ProcessFunc[s2c_syncend] = SyncEnd;
-	ProcessFunc[s2c_synccurplayer] = SyncCurPlayer;
-	ProcessFunc[s2c_synccurplayerskill] = s2cSyncAllSkill;
-	ProcessFunc[s2c_synccurplayernormal] = SyncCurNormalData;
+	ProcessFunc[s2c_syncend] = &KProtocolProcess::SyncEnd;
+	ProcessFunc[s2c_synccurplayer] = &KProtocolProcess::SyncCurPlayer;
+	ProcessFunc[s2c_synccurplayerskill] = &KProtocolProcess::s2cSyncAllSkill;
+	ProcessFunc[s2c_synccurplayernormal] = &KProtocolProcess::SyncCurNormalData;
 	ProcessFunc[s2c_newplayer] = NULL;
 	ProcessFunc[s2c_removeplayer] = NULL;
-	ProcessFunc[s2c_syncworld] = SyncWorld;
-	ProcessFunc[s2c_syncplayer] = SyncPlayer;
-	ProcessFunc[s2c_syncplayermin] = SyncPlayerMin;
-	ProcessFunc[s2c_syncnpc] = SyncNpc;
-	ProcessFunc[s2c_syncnpcmin] = SyncNpcMin;
-	ProcessFunc[s2c_syncnpcminplayer] = SyncNpcMinPlayer;
-	ProcessFunc[s2c_objadd] = SyncObjectAdd;
-	ProcessFunc[s2c_syncobjstate] = SyncObjectState;
-	ProcessFunc[s2c_syncobjdir] = SyncObjectDir;
-	ProcessFunc[s2c_objremove] = SyncObjectRemove;
-	ProcessFunc[s2c_objTrapAct] = SyncObjectTrap;
-	ProcessFunc[s2c_npcremove] = NetCommandRemoveNpc;
-	ProcessFunc[s2c_npcwalk] = NetCommandWalk;
-	ProcessFunc[s2c_npcrun] = NetCommandRun;
+	ProcessFunc[s2c_syncworld] = &KProtocolProcess::SyncWorld;
+	ProcessFunc[s2c_syncplayer] = &KProtocolProcess::SyncPlayer;
+	ProcessFunc[s2c_syncplayermin] = &KProtocolProcess::SyncPlayerMin;
+	ProcessFunc[s2c_syncnpc] = &KProtocolProcess::SyncNpc;
+	ProcessFunc[s2c_syncnpcmin] = &KProtocolProcess::SyncNpcMin;
+	ProcessFunc[s2c_syncnpcminplayer] = &KProtocolProcess::SyncNpcMinPlayer;
+	ProcessFunc[s2c_objadd] = &KProtocolProcess::SyncObjectAdd;
+	ProcessFunc[s2c_syncobjstate] = &KProtocolProcess::SyncObjectState;
+	ProcessFunc[s2c_syncobjdir] = &KProtocolProcess::SyncObjectDir;
+	ProcessFunc[s2c_objremove] = &KProtocolProcess::SyncObjectRemove;
+	ProcessFunc[s2c_objTrapAct] = &KProtocolProcess::SyncObjectTrap;
+	ProcessFunc[s2c_npcremove] = &KProtocolProcess::NetCommandRemoveNpc;
+	ProcessFunc[s2c_npcwalk] = &KProtocolProcess::NetCommandWalk;
+	ProcessFunc[s2c_npcrun] = &KProtocolProcess::NetCommandRun;
 	ProcessFunc[s2c_npcattack] = NULL;
 	ProcessFunc[s2c_npcmagic] = NULL;
-	ProcessFunc[s2c_npcjump] = NetCommandJump;
+	ProcessFunc[s2c_npcjump] = &KProtocolProcess::NetCommandJump;
 	ProcessFunc[s2c_npctalk] = NULL;
-	ProcessFunc[s2c_npchurt] = NetCommandHurt;
-	ProcessFunc[s2c_npcdeath] = NetCommandDeath;
-	ProcessFunc[s2c_npcchgcurcamp] = NetCommandChgCurCamp;
-	ProcessFunc[s2c_npcchgcamp] = NetCommandChgCamp;
-	ProcessFunc[s2c_skillcast] = NetCommandSkill;
+	ProcessFunc[s2c_npchurt] = &KProtocolProcess::NetCommandHurt;
+	ProcessFunc[s2c_npcdeath] = &KProtocolProcess::NetCommandDeath;
+	ProcessFunc[s2c_npcchgcurcamp] = &KProtocolProcess::NetCommandChgCurCamp;
+	ProcessFunc[s2c_npcchgcamp] = &KProtocolProcess::NetCommandChgCamp;
+	ProcessFunc[s2c_skillcast] = &KProtocolProcess::NetCommandSkill;
 	ProcessFunc[s2c_playertalk] = NULL;
-	ProcessFunc[s2c_playerexp] = s2cPlayerExp;
-	ProcessFunc[s2c_teaminfo] = s2cShowTeamInfo;
-	ProcessFunc[s2c_teamselfinfo] = s2cUpdataSelfTeamInfo;
-	ProcessFunc[s2c_teamapplyinfofalse] = s2cApplyTeamInfoFalse;
-	ProcessFunc[s2c_teamcreatesuccess] = s2cCreateTeam;
-	ProcessFunc[s2c_teamcreatefalse] = s2cApplyCreateTeamFalse;
-	ProcessFunc[s2c_teamopenclose] = s2cSetTeamState;
-	ProcessFunc[s2c_teamgetapply] = s2cApplyAddTeam;
-	ProcessFunc[s2c_teamaddmember] = s2cTeamAddMember;
-	ProcessFunc[s2c_teamleave] = s2cLeaveTeam;
-	ProcessFunc[s2c_teamchangecaptain] = s2cTeamChangeCaptain;
-	ProcessFunc[s2c_playerfactiondata] = s2cSetFactionData;
-	ProcessFunc[s2c_playerleavefaction] = s2cLeaveFaction;
-	ProcessFunc[s2c_playerfactionskilllevel] = s2cFactionSkillOpen;
-	ProcessFunc[s2c_playersendchat] = s2cGetChat;
-	ProcessFunc[s2c_playersyncleadexp] = s2cGetLeadExp;
-	ProcessFunc[s2c_playerlevelup] = s2cLevelUp;
-	ProcessFunc[s2c_teammatelevel] = s2cGetTeammateLevel;
-	ProcessFunc[s2c_playersyncattribute] = s2cGetCurAttribute;
-	ProcessFunc[s2c_playerskilllevel] = s2cGetSkillLevel;
-	ProcessFunc[s2c_syncitem] = s2cSyncItem;
-	ProcessFunc[s2c_removeitem] = s2cRemoveItem;
-	ProcessFunc[s2c_syncmoney] = s2cSyncMoney;
-	ProcessFunc[s2c_syncxu] = s2cSyncXu;//xu
-	ProcessFunc[s2c_playermoveitem] = s2cMoveItem;
-	ProcessFunc[s2c_scriptaction] = SyncScriptAction;
-	ProcessFunc[s2c_chatapplyaddfriend] = s2cChatGetApplyAddFriend;
-	ProcessFunc[s2c_chataddfriend] = s2cChatAddFriend;
-	ProcessFunc[s2c_chatrefusefriend] = s2cChatBeRefusedAddFriend;
-	ProcessFunc[s2c_chataddfriendfail] = s2cChatAddFriendFail;
-	ProcessFunc[s2c_chatloginfriendnoname] = s2cChatLoginFriendNoName;
-	ProcessFunc[s2c_chatloginfriendname] = s2cChatLoginFriendName;
-	ProcessFunc[s2c_chatonefrienddata] = s2cChatAddOneFriend;
-	ProcessFunc[s2c_chatfriendonline] = s2cChatFriendOnline;
-	ProcessFunc[s2c_chatdeletefriend] = s2cChatDeleteFriend;
-	ProcessFunc[s2c_chatfriendoffline] = s2cChatFriendOffLine;
-	ProcessFunc[s2c_syncrolelist] = s2cSyncRoleList;
-	ProcessFunc[s2c_tradechangestate] = s2cTradeChangeState;
-	ProcessFunc[s2c_npcsetmenustate] = s2cNpcSetMenuState;
-	ProcessFunc[s2c_trademoneysync] = s2cTradeMoneySync;
-	ProcessFunc[s2c_tradedecision] = s2cTradeDecision;
-	ProcessFunc[s2c_chatscreensingleerror] = s2cChatScreenSingleError;
-	ProcessFunc[s2c_syncnpcstate] = s2cUpdateNpcState;
-	ProcessFunc[s2c_teaminviteadd] = s2cTeamInviteAdd;
-	ProcessFunc[s2c_tradepressoksync] = s2cTradePressOkSync;
-	ProcessFunc[s2c_ping] = s2cPing;
-	ProcessFunc[s2c_npcsit] = NetCommandSit;
-	ProcessFunc[s2c_opensalebox] = OpenSaleBox;
-	ProcessFunc[s2c_castskilldirectly] = s2cDirectlyCastSkill;
-	ProcessFunc[s2c_msgshow] = s2cShowMsg;
-	ProcessFunc[s2c_syncstateeffect] = SyncStateEffect;
-	ProcessFunc[s2c_openstorebox] = OpenStoreBox;
-	ProcessFunc[s2c_openresetpass] = OpenResetPass;
-	ProcessFunc[s2c_openstringbox] = OpenStringUI; //string
-	ProcessFunc[s2c_opendataubox] = GiftDT;
-	ProcessFunc[s2c_playerrevive] = PlayerRevive;
-	ProcessFunc[s2c_requestnpcfail] = RequestNpcFail;
-	ProcessFunc[s2c_tradeapplystart] = s2cTradeApplyStart;
+	ProcessFunc[s2c_playerexp] = &KProtocolProcess::s2cPlayerExp;
+	ProcessFunc[s2c_teaminfo] = &KProtocolProcess::s2cShowTeamInfo;
+	ProcessFunc[s2c_teamselfinfo] = &KProtocolProcess::s2cUpdataSelfTeamInfo;
+	ProcessFunc[s2c_teamapplyinfofalse] = &KProtocolProcess::s2cApplyTeamInfoFalse;
+	ProcessFunc[s2c_teamcreatesuccess] = &KProtocolProcess::s2cCreateTeam;
+	ProcessFunc[s2c_teamcreatefalse] = &KProtocolProcess::s2cApplyCreateTeamFalse;
+	ProcessFunc[s2c_teamopenclose] = &KProtocolProcess::s2cSetTeamState;
+	ProcessFunc[s2c_teamgetapply] = &KProtocolProcess::s2cApplyAddTeam;
+	ProcessFunc[s2c_teamaddmember] = &KProtocolProcess::s2cTeamAddMember;
+	ProcessFunc[s2c_teamleave] = &KProtocolProcess::s2cLeaveTeam;
+	ProcessFunc[s2c_teamchangecaptain] = &KProtocolProcess::s2cTeamChangeCaptain;
+	ProcessFunc[s2c_playerfactiondata] = &KProtocolProcess::s2cSetFactionData;
+	ProcessFunc[s2c_playerleavefaction] = &KProtocolProcess::s2cLeaveFaction;
+	ProcessFunc[s2c_playerfactionskilllevel] = &KProtocolProcess::s2cFactionSkillOpen;
+	ProcessFunc[s2c_playersendchat] = &KProtocolProcess::s2cGetChat;
+	ProcessFunc[s2c_playersyncleadexp] = &KProtocolProcess::s2cGetLeadExp;
+	ProcessFunc[s2c_playerlevelup] = &KProtocolProcess::s2cLevelUp;
+	ProcessFunc[s2c_teammatelevel] = &KProtocolProcess::s2cGetTeammateLevel;
+	ProcessFunc[s2c_playersyncattribute] = &KProtocolProcess::s2cGetCurAttribute;
+	ProcessFunc[s2c_playerskilllevel] = &KProtocolProcess::s2cGetSkillLevel;
+	ProcessFunc[s2c_syncitem] = &KProtocolProcess::s2cSyncItem;
+	ProcessFunc[s2c_removeitem] = &KProtocolProcess::s2cRemoveItem;
+	ProcessFunc[s2c_syncmoney] = &KProtocolProcess::s2cSyncMoney;
+	ProcessFunc[s2c_syncxu] = &KProtocolProcess::s2cSyncXu;//xu
+	ProcessFunc[s2c_playermoveitem] = &KProtocolProcess::s2cMoveItem;
+	ProcessFunc[s2c_scriptaction] = &KProtocolProcess::SyncScriptAction;
+	ProcessFunc[s2c_chatapplyaddfriend] = &KProtocolProcess::s2cChatGetApplyAddFriend;
+	ProcessFunc[s2c_chataddfriend] = &KProtocolProcess::s2cChatAddFriend;
+	ProcessFunc[s2c_chatrefusefriend] = &KProtocolProcess::s2cChatBeRefusedAddFriend;
+	ProcessFunc[s2c_chataddfriendfail] = &KProtocolProcess::s2cChatAddFriendFail;
+	ProcessFunc[s2c_chatloginfriendnoname] = &KProtocolProcess::s2cChatLoginFriendNoName;
+	ProcessFunc[s2c_chatloginfriendname] = &KProtocolProcess::s2cChatLoginFriendName;
+	ProcessFunc[s2c_chatonefrienddata] = &KProtocolProcess::s2cChatAddOneFriend;
+	ProcessFunc[s2c_chatfriendonline] = &KProtocolProcess::s2cChatFriendOnline;
+	ProcessFunc[s2c_chatdeletefriend] = &KProtocolProcess::s2cChatDeleteFriend;
+	ProcessFunc[s2c_chatfriendoffline] = &KProtocolProcess::s2cChatFriendOffLine;
+	ProcessFunc[s2c_syncrolelist] = &KProtocolProcess::s2cSyncRoleList;
+	ProcessFunc[s2c_tradechangestate] = &KProtocolProcess::s2cTradeChangeState;
+	ProcessFunc[s2c_npcsetmenustate] = &KProtocolProcess::s2cNpcSetMenuState;
+	ProcessFunc[s2c_trademoneysync] = &KProtocolProcess::s2cTradeMoneySync;
+	ProcessFunc[s2c_tradedecision] = &KProtocolProcess::s2cTradeDecision;
+	ProcessFunc[s2c_chatscreensingleerror] = &KProtocolProcess::s2cChatScreenSingleError;
+	ProcessFunc[s2c_syncnpcstate] = &KProtocolProcess::s2cUpdateNpcState;
+	ProcessFunc[s2c_teaminviteadd] = &KProtocolProcess::s2cTeamInviteAdd;
+	ProcessFunc[s2c_tradepressoksync] = &KProtocolProcess::s2cTradePressOkSync;
+	ProcessFunc[s2c_ping] = &KProtocolProcess::s2cPing;
+	ProcessFunc[s2c_npcsit] = &KProtocolProcess::NetCommandSit;
+	ProcessFunc[s2c_opensalebox] = &KProtocolProcess::OpenSaleBox;
+	ProcessFunc[s2c_castskilldirectly] = &KProtocolProcess::s2cDirectlyCastSkill;
+	ProcessFunc[s2c_msgshow] = &KProtocolProcess::s2cShowMsg;
+	ProcessFunc[s2c_syncstateeffect] = &KProtocolProcess::SyncStateEffect;
+	ProcessFunc[s2c_openstorebox] = &KProtocolProcess::OpenStoreBox;
+	ProcessFunc[s2c_openresetpass] = &KProtocolProcess::OpenResetPass;
+	ProcessFunc[s2c_openstringbox] = &KProtocolProcess::OpenStringUI; //string
+	ProcessFunc[s2c_opendataubox] = &KProtocolProcess::GiftDT;
+	ProcessFunc[s2c_playerrevive] = &KProtocolProcess::PlayerRevive;
+	ProcessFunc[s2c_requestnpcfail] = &KProtocolProcess::RequestNpcFail;
+	ProcessFunc[s2c_tradeapplystart] = &KProtocolProcess::s2cTradeApplyStart;
 	ProcessFunc[s2c_rolenewdelresponse] = NULL;
-	ProcessFunc[s2c_ItemAutoMove] = s2cItemAutoMove;
-	ProcessFunc[s2c_itemexchangefinish] = FinishedItemExchange;
-	ProcessFunc[s2c_changeweather] = s2cChangeWeather;
-	ProcessFunc[s2c_pksyncnormalflag] = s2cPKSyncNormalFlag;
-	ProcessFunc[s2c_pksyncenmitystate] = s2cPKSyncEnmityState;
-	ProcessFunc[s2c_pksyncexercisestate] = s2cPKSyncExerciseState;
-	ProcessFunc[s2c_pksyncpkvalue] = s2cPKValueSync;
-	ProcessFunc[s2c_reputesyncreputevalue] = s2cReputeValueSync;
-	ProcessFunc[s2c_fuyuansyncfuyuanvalue] = s2cFuYuanValueSync;
-	ProcessFunc[s2c_rebornsyncrebornvalue] = s2cReBornValueSync;
-	ProcessFunc[s2c_openmarketbox] = OpenMarketBox;
-	ProcessFunc[s2c_npcsleepmode] = NpcSleepSync;
-	ProcessFunc[s2c_viewequip] = s2cViewEquip;
-	ProcessFunc[s2c_ladderresult] = LadderResult;
-	ProcessFunc[s2c_ladderlist] = LadderList;
-	ProcessFunc[s2c_tongcreate] = s2cTongCreate;
-	ProcessFunc[s2c_replyclientping] = ServerReplyClientPing;
-	ProcessFunc[s2c_npcgoldchange] = s2cNpcGoldChange;
-	ProcessFunc[s2c_itemdurabilitychange] = ItemChangeDurability;
-	ProcessFunc[s2c_setavatar] = SetAvatar;
-	ProcessFunc[s2c_lientram] = LienTram;
-	ProcessFunc[s2c_meridian] = MeridianSync;
-	ProcessFunc[s2c_trungsinh] = TrungSinhSync;
-	ProcessFunc[s2c_kinhnghiemchieu] = KnChieuSync;
-	ProcessFunc[s2c_opentremble] = OpenTremble;
-	ProcessFunc[s2c_rankname] = NetCommandSetRankFF;
+	ProcessFunc[s2c_ItemAutoMove] = &KProtocolProcess::s2cItemAutoMove;
+	ProcessFunc[s2c_itemexchangefinish] = &KProtocolProcess::FinishedItemExchange;
+	ProcessFunc[s2c_changeweather] = &KProtocolProcess::s2cChangeWeather;
+	ProcessFunc[s2c_pksyncnormalflag] = &KProtocolProcess::s2cPKSyncNormalFlag;
+	ProcessFunc[s2c_pksyncenmitystate] = &KProtocolProcess::s2cPKSyncEnmityState;
+	ProcessFunc[s2c_pksyncexercisestate] = &KProtocolProcess::s2cPKSyncExerciseState;
+	ProcessFunc[s2c_pksyncpkvalue] = &KProtocolProcess::s2cPKValueSync;
+	ProcessFunc[s2c_reputesyncreputevalue] = &KProtocolProcess::s2cReputeValueSync;
+	ProcessFunc[s2c_fuyuansyncfuyuanvalue] = &KProtocolProcess::s2cFuYuanValueSync;
+	ProcessFunc[s2c_rebornsyncrebornvalue] = &KProtocolProcess::s2cReBornValueSync;
+	ProcessFunc[s2c_openmarketbox] = &KProtocolProcess::OpenMarketBox;
+	ProcessFunc[s2c_npcsleepmode] = &KProtocolProcess::NpcSleepSync;
+	ProcessFunc[s2c_viewequip] = &KProtocolProcess::s2cViewEquip;
+	ProcessFunc[s2c_ladderresult] = &KProtocolProcess::LadderResult;
+	ProcessFunc[s2c_ladderlist] = &KProtocolProcess::LadderList;
+	ProcessFunc[s2c_tongcreate] = &KProtocolProcess::s2cTongCreate;
+	ProcessFunc[s2c_replyclientping] = &KProtocolProcess::ServerReplyClientPing;
+	ProcessFunc[s2c_npcgoldchange] = &KProtocolProcess::s2cNpcGoldChange;
+	ProcessFunc[s2c_itemdurabilitychange] = &KProtocolProcess::ItemChangeDurability;
+	ProcessFunc[s2c_setavatar] = &KProtocolProcess::SetAvatar;
+	ProcessFunc[s2c_lientram] = &KProtocolProcess::LienTram;
+	ProcessFunc[s2c_meridian] = &KProtocolProcess::MeridianSync;
+	ProcessFunc[s2c_trungsinh] = &KProtocolProcess::TrungSinhSync;
+	ProcessFunc[s2c_kinhnghiemchieu] = &KProtocolProcess::KnChieuSync;
+	ProcessFunc[s2c_opentremble] = &KProtocolProcess::OpenTremble;
+	ProcessFunc[s2c_rankname] = &KProtocolProcess::NetCommandSetRankFF;
 
-	ProcessFunc[s2c_viewsellitem] = s2cViewSellItem;
-	ProcessFunc[s2c_viewupdateitem] = s2cViewUpdateItem;
-	ProcessFunc[s2c_playergetcount] = s2cGetCouunt;
+	ProcessFunc[s2c_viewsellitem] = &KProtocolProcess::s2cViewSellItem;
+	ProcessFunc[s2c_viewupdateitem] = &KProtocolProcess::s2cViewUpdateItem;
+	ProcessFunc[s2c_playergetcount] = &KProtocolProcess::s2cGetCouunt;
 
-	ProcessFunc[s2c_shopname] = s2cShopName;
-	ProcessFunc[s2c_syncmasklock] = SyncMaskLock;	// mat na
+	ProcessFunc[s2c_shopname] = &KProtocolProcess::s2cShopName;
+	ProcessFunc[s2c_syncmasklock] = &KProtocolProcess::SyncMaskLock;	// mat na
 
-	ProcessFunc[s2c_opengive] = SyncGive;
-	ProcessFunc[s2c_npcsecmove] = SyncSecMov;
-	ProcessFunc[s2c_pkvalue] = SyncPKValue;
-	ProcessFunc[s2c_extend] = s2cExtend;
-	ProcessFunc[s2c_extendchat] = s2cExtendChat;
-	ProcessFunc[s2c_extendfriend] = s2cExtendFriend;
-	ProcessFunc[s2c_extendtong] = s2cExtendTong;
+	ProcessFunc[s2c_opengive] = &KProtocolProcess::SyncGive;
+	ProcessFunc[s2c_npcsecmove] = &KProtocolProcess::SyncSecMov;
+	ProcessFunc[s2c_pkvalue] = &KProtocolProcess::SyncPKValue;
+	ProcessFunc[s2c_extend] = &KProtocolProcess::s2cExtend;
+	ProcessFunc[s2c_extendchat] = &KProtocolProcess::s2cExtendChat;
+	ProcessFunc[s2c_extendfriend] = &KProtocolProcess::s2cExtendFriend;
+	ProcessFunc[s2c_extendtong] = &KProtocolProcess::s2cExtendTong;
 
 
 #else
@@ -275,10 +275,10 @@ void KProtocolProcess::ProcessNetMsg(BYTE* pMsg)
 {
 	if (!pMsg || pMsg[0] <= s2c_clientbegin || pMsg[0] >= s2c_end || ProcessFunc[pMsg[0]] == NULL)
 	{
-		g_DebugLog("[error]Net Msg Error");
+		g_DebugLog("[error]Net Msg Error, opcode=%d", pMsg ? (int)pMsg[0] : -1);
 		return;
 	}
-	g_DebugLog("[net]Msg:%c", pMsg[0]);
+	g_DebugLog("[net]Msg:%d", (int)pMsg[0]);
 	if (ProcessFunc[pMsg[0]])
 		(this->*ProcessFunc[pMsg[0]])(pMsg);
 }
@@ -1280,12 +1280,21 @@ void KProtocolProcess::s2cSyncItem(BYTE* pMsg)
 		pItemSync->m_Time.bHour
 		);
 
+	g_DebugLog("[vatpham]goi genre=%d detail=%d part=%d level=%d series=%d gold=%d -> idx=%d",
+		(int)pItemSync->m_Genre, (int)pItemSync->m_Detail, (int)pItemSync->m_Particur,
+		(int)pItemSync->m_Level, (int)pItemSync->m_Series, (int)pItemSync->m_GoldId, nIndex);
 	if (nIndex > 0)
 	{
+		g_DebugLog("[vatpham]tao idx=%d genre=%d detail=%d part=%d level=%d series=%d",
+			nIndex, (int)pItemSync->m_Genre, (int)pItemSync->m_Detail,
+			(int)pItemSync->m_Particur, (int)pItemSync->m_Level, (int)pItemSync->m_Series);
 		Item[nIndex].SetStackNum(pItemSync->m_StackNum);
 		Item[nIndex].SetID(pItemSync->m_ID);
 		Item[nIndex].SetDurability((short)pItemSync->m_Durability);
-		Player[CLIENT_PLAYER_INDEX].m_ItemList.Add(nIndex, pItemSync->m_btPlace, pItemSync->m_btX, pItemSync->m_btY);
+		int nVaoTui = Player[CLIENT_PLAYER_INDEX].m_ItemList.Add(nIndex, pItemSync->m_btPlace, pItemSync->m_btX, pItemSync->m_btY);
+		g_DebugLog("[vatpham]dat place=%d x=%d y=%d cd=%dx%d ket qua=%d",
+			(int)pItemSync->m_btPlace, (int)pItemSync->m_btX, (int)pItemSync->m_btY,
+			Item[nIndex].GetWidth(), Item[nIndex].GetHeight(), nVaoTui);
 	}
 	Player[CLIENT_PLAYER_INDEX].m_ItemList.UnlockOperation();
 }
@@ -2240,6 +2249,15 @@ void	KProtocolProcess::s2cSyncAllSkill(BYTE * pMsg)
 				0,
 				pSync->m_sAllSkill[i].SkillAdd
             );
+			/* Dat TRONG vong lap la co y: moc neo phai la MOT DONG thi moi
+			   song duoc ca LF (ban sao duoi may) lan CRLF (checkout tren CI).
+			   Goi vai lan khong hai gi.
+			   Gan lai chieu cho nut chuot SAU khi da co danh sach vo cong.
+			   SetLeftSkill bo im lang neu chieu chua co trong danh sach, ma
+			   SetDefaultImmedSkill() chay o SyncEnd - som hon goi nay. Khong
+			   goi lai thi m_nLeftSkillID bang 0 mai mai va nhan vat khong bao
+			   gio co dong tac danh. */
+			Player[CLIENT_PLAYER_INDEX].SetDefaultImmedSkill();
 		}
 	}
 

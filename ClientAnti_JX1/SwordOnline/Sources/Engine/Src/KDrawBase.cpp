@@ -157,6 +157,47 @@ void g_DrawPixelAlpha(void* node, void* canvas)
 //			color	ÑÕÉ«Öµ
 // ·µ»Ø:	void
 //---------------------------------------------------------------------------
+// Ve sprite kieu CONG SANG (additive).
+// Hieu ung lua/khoi cua JX1 duoc ve bang phep CONG o ban DirectX. Bo ve phan
+// mem nay chi co phep tron thuong, nen nhung diem TOI cua sprite hieu ung de
+// len nen thanh mot QUANG DEN quanh chieu (do in-game 08/09/2026).
+// Luong sprite (xem DrawSpriteMP.inc): tung cap [do dai][alpha]
+//   alpha == 0  -> doan trong suot, KHONG co byte mau di kem
+//   alpha != 0  -> <do dai> byte chi so, tra mau qua bang mau 16 bit
+//---------------------------------------------------------------------------
+/* 1 = cong (dan dang bay), 2 = alpha (hieu ung bam nguoi), 0 = screen.
+   Noi goi dat truoc khi ve; xem KRepresentShell2. */
+int g_nKieuTronSprite = 1;
+
+#include "KTronSprite.h"
+
+void g_DrawSpriteAdd(void* node, void* canvas)
+{
+	KDrawNode*	pNode = (KDrawNode *)node;
+	KCanvas*	pCanvas = (KCanvas *)canvas;
+
+	KClipper Clipper;
+	if (pCanvas->MakeClip(pNode->m_nX, pNode->m_nY, pNode->m_nWidth, pNode->m_nHeight, &Clipper) == 0)
+		return;
+
+	int nPitch;
+	void* pBuffer = pCanvas->LockCanvas(nPitch);
+	if (pBuffer == NULL)
+		return;
+
+
+	g_TronSpriteVaoDem(
+		(char*)pBuffer + Clipper.y * nPitch, nPitch,
+		pCanvas->m_nMask32 == 0x07e0f81f,
+		(const unsigned char*)pNode->m_pBitmap,
+		(const unsigned short*)pNode->m_pPalette,
+		pNode->m_nWidth, pNode->m_nHeight,
+		Clipper.top, Clipper.top + Clipper.height,
+		Clipper.left, pNode->m_nWidth - Clipper.right, Clipper.x);
+	pCanvas->UnlockCanvas();
+}
+
+//---------------------------------------------------------------------------
 void g_DrawLine(void* node, void* canvas)
 {
 	KDrawNode* pNode = (KDrawNode *)node;

@@ -27,14 +27,14 @@
 #define		PLAYER_INSTANT_SPECIAL_FILE		"\\settings\\npcres\\瞬间特效.txt"
 
 #define		SPR_INFO_NAME					"信息"
-#define		KIND_NAME_SECT					"人物类型"
-#define		KIND_NAME_SPECIAL				"特殊npc"
-#define		KIND_NAME_NORMAL				"普通npc"
-#define		KIND_FILE_SECT1					"部件说明文件名"
-#define		KIND_FILE_SECT2					"武器行为关联表1"
-#define		KIND_FILE_SECT3					"武器行为关联表2"
-#define		KIND_FILE_SECT4					"动作贴图顺序表"
-#define		KIND_FILE_SECT5					"资源文件路经"
+#define		KIND_NAME_SECT					"CharacterType"
+#define		KIND_NAME_SPECIAL				"SpecialNpc"
+#define		KIND_NAME_NORMAL				"NormalNpc"
+#define		KIND_FILE_SECT1					"PartFileName"
+#define		KIND_FILE_SECT2					"WeaponActionTab1"
+#define		KIND_FILE_SECT3					"WeaponActionTab2"
+#define		KIND_FILE_SECT4					"ActionRenderOrderTab"
+#define		KIND_FILE_SECT5					"ResFilePath"
 
 //--------------------------- player 门派相关 ------------------------------
 // 注：下面这个设定文件必须按 金 金 木 木 水 水 火 火 土 土 的顺序排列
@@ -102,7 +102,7 @@
 #define		OBJ_NAME_COLOR_FILE		"\\settings\\obj\\ObjNameColor.ini"
 
 //---------------------------- 小地图相关 -------------------------------
-#define		defLITTLE_MAP_SET_FILE	"\\Ui\\Default\\小地图颜色.ini"
+#define		defLITTLE_MAP_SET_FILE	"\\Ui\\Default\\mau-ban-do-nho.ini"
 
 //----------------------------- 声音相关 --------------------------------
 #define		defINSTANT_SOUND_FILE	"\\settings\\SoundList.txt"
@@ -113,10 +113,10 @@
 #define NPC_LEVELSCRIPT_FILENAME		"\\script\\npclevelscript\\npclevelscript.lua"
 #define NPC_TEMPLATE_BINFILEPATH		"\\settings"
 #define NPC_TEMPLATE_BINFILE			"NpcTemplate.Bin"
-#define WEAPON_PHYSICSSKILLFILE			"\\settings\\武器物理攻击对照表.txt"				
-#define WEAPON_PARTICULARTYPE			"详细类别"
-#define	WEAPON_DETAILTYPE				"具体类别"
-#define	WEAPON_SKILLID					"对应物理技能编号"
+#define WEAPON_PHYSICSSKILLFILE			"\\settings\\vukhi-kynang-vatly.txt"				
+#define WEAPON_PARTICULARTYPE			"ParticularType"
+#define	WEAPON_DETAILTYPE				"DetailType"
+#define	WEAPON_SKILLID					"PhysicsSkillID"
 //-----------------------------------------------------------------------
 #define	WORLD_WAYPOINT_TABFILE			"\\settings\\WayPoint.txt"
 #define WORLD_STATION_TABFILE			"\\settings\\Station.txt"

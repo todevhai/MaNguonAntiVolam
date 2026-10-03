@@ -27,13 +27,23 @@ typedef int	__cdecl g_InternalDirSinCosFunction(int pSinCosTable[], int nDir, in
 
 inline int g_DirSin(int nDir, int nMaxDir)
 {
-    return (*(g_InternalDirSinCosFunction *)(&(g_InternalDirSinCosCode[0])))(g_nSin, nDir, nMaxDir);
+    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault.
+       Chep dung ban C tuong duong dat trong comment o KMath.cpp,
+       ke ca viec tra -1 khi huong ngoai khoang (ma may: 83 C8 FF). */
+    if (nDir < 0 || nDir >= nMaxDir)
+        return -1;
+    return g_nSin[(nDir << 6) / nMaxDir];
 }
 
 
 inline int g_DirCos(int nDir, int nMaxDir)
 {
-    return (*(g_InternalDirSinCosFunction *)(&(g_InternalDirSinCosCode[0])))(g_nCos, nDir, nMaxDir);
+    /* Ban goc goi ma may nhung lam du lieu; Linux co bit NX -> segfault.
+       Chep dung ban C tuong duong dat trong comment o KMath.cpp,
+       ke ca viec tra -1 khi huong ngoai khoang (ma may: 83 C8 FF). */
+    if (nDir < 0 || nDir >= nMaxDir)
+        return -1;
+    return g_nCos[(nDir << 6) / nMaxDir];
 }
 
 //---------------------------------------------------------------------------
@@ -48,12 +58,16 @@ typedef int __cdecl g_InternalIsAccrueConquerFunction(int pAccrueConquerTable[],
 
 inline int g_IsAccrue(int nSrcSeries, int nDesSeries)
 {
-    return (*(g_InternalIsAccrueConquerFunction *)(&(g_InternalIsAccrueConquerCode[0])))(g_nAccrueSeries, nSrcSeries, nDesSeries);
+    if (nSrcSeries < 0 || nSrcSeries >= series_num)
+        return 0;
+    return g_nAccrueSeries[nSrcSeries] == nDesSeries;
 }
 
 inline int g_IsConquer(int nSrcSeries, int nDesSeries)
 {
-    return (*(g_InternalIsAccrueConquerFunction *)(&(g_InternalIsAccrueConquerCode[0])))(g_nConquerSeries, nSrcSeries, nDesSeries);
+    if (nSrcSeries < 0 || nSrcSeries >= series_num)
+        return 0;
+    return g_nConquerSeries[nSrcSeries] == nDesSeries;
 }
 
 

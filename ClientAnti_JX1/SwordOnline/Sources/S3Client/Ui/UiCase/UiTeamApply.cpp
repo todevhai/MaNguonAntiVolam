@@ -16,7 +16,7 @@
 
 extern iCoreShell*		g_pCoreShell;
 
-#define	SCHEME_INI	"加入组队.ini"
+#define	SCHEME_INI	"gia-nhap-doi.ini"
 
 KUiTeamApply* KUiTeamApply::m_pSelf = NULL;
 

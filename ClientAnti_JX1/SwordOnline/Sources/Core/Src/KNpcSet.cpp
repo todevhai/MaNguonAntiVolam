@@ -80,7 +80,7 @@ void KNpcSet::Init()
 	m_RequestFreeIdx.Init(MAX_NPC_REQUEST);
 	m_RequestUseIdx.Init(MAX_NPC_REQUEST);
 
-	for (i = MAX_NPC_REQUEST - 1; i > 0; i--)
+	for (int i = MAX_NPC_REQUEST - 1; i > 0; i--)
 	{
 		m_RequestFreeIdx.Insert(i);
 	}
@@ -1061,7 +1061,13 @@ void KNpcSet::InsertNpcRequest(DWORD dwID)
 	m_RequestNpc[nIndex].dwRequestTime = SubWorld[0].m_dwCurrentTime;
 	m_RequestFreeIdx.Remove(nIndex);
 	m_RequestUseIdx.Insert(nIndex);
-	g_DebugLog("[Request]Insert %d at %d on %d", dwID, nIndex, SubWorld[0].m_dwCurrentTime);
+	{
+		SYSTEMTIME st;
+		GetLocalTime(&st);
+		g_DebugLog("[Request]%02d:%02d:%02d.%03d Insert %d at %d on %d",
+			st.wHour, st.wMinute, st.wSecond, st.wMilliseconds,
+			dwID, nIndex, SubWorld[0].m_dwCurrentTime);
+	}
 }
 
 void KNpcSet::RemoveNpcRequest(DWORD dwID)

@@ -41,6 +41,8 @@ void KUiFightSkillSubPage::Initialize(/*int nSubPageIndex*/)
 		AddChild(&m_FightSkills[i]);
 		m_FightSkills[i].Celar();
 		m_FightSkills[i].SetContainerId((int)UOC_SKILL_LIST);
+		AddChild(&m_ConDiemBtn[i]);
+		m_ConDiemBtn[i].SetText("+");
 	}
 //	m_nSubPagIndex = nSubPageIndex;
 }
@@ -50,7 +52,7 @@ void KUiFightSkillSubPage::LoadScheme(const char* pScheme)
 {
 	char		Buff[128];
 	KIniFile	Ini;
-	sprintf(Buff, "%s\\"SCHEME_INI_FIGHT_SUB_PAGE, pScheme);
+	sprintf(Buff, "%s\\" SCHEME_INI_FIGHT_SUB_PAGE, pScheme);
 	if (Ini.Load(Buff))
 	{
 		KWndPage::Init(&Ini, "Main");
@@ -59,6 +61,20 @@ void KUiFightSkillSubPage::LoadScheme(const char* pScheme)
 			sprintf(Buff, "Skill_%d", i);
 			m_FightSkills[i].Init(&Ini, Buff);
 			m_FightSkills[i].EnablePickPut(false);
+			m_ConDiemBtn[i].Init(&Ini, "ConDiemBtn");
+			m_ConDiemBtn[i].SetText("+");
+			{
+				int nL = 0, nT = 0, nW = 0, nH = 0;
+				m_FightSkills[i].GetPosition(&nL, &nT);
+				m_FightSkills[i].GetSize(&nW, &nH);
+				/* O vuong 13x13 de len GOC DUOI PHAI icon chieu. Ban dau
+				   11x11 khong nen, chi mot dau + vang lot thom: kho thay va
+				   kho bam. Nen do + vien den do KUiFightSkillSubPage::
+				   PaintWindow ve (xem ban va ben duoi) vi KWndPureTextBtn chi
+				   biet ve chu con KWndWindow khong co nen mau. */
+				m_ConDiemBtn[i].SetSize(13, 13);
+				m_ConDiemBtn[i].SetPosition(nL + nW - 13, nT + nH - 13);
+			}
 		}
 
 		Ini.GetInteger("SkillText", "Font", 12, &m_SkillTextParam.nFont);
@@ -91,9 +107,34 @@ void KUiFightSkillSubPage::UpdateData(KUiSkillData* pSkills)
 }
 
 //窗口函数
+/* Ve chieu dang cam theo con tro. Wnd_RenderWindows goi moi khung hinh. */
+static int VeChieuDangCam(int x, int y, const KUiDraggedObject& Obj, int nDropQueryResult)
+{
+	if (g_pCoreShell && Obj.uGenre != CGOG_NOTHING)
+		g_pCoreShell->DrawGameObj(Obj.uGenre, Obj.uId, x - 16, y - 16, 32, 32, 0);
+	return 1;
+}
+
 int	KUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
-	if (uMsg == WND_N_LEFT_CLICK_ITEM && uParam && m_nRemainSkillPoint)
+	/* Nut "+" cua o nao thi cong diem cho chieu dang nam o do. */
+	if (uMsg == WND_N_BUTTON_CLICK && uParam)
+	{
+		for (int nO = 0; nO < FIGHT_SKILL_COUNT_PER_PAGE; nO++)
+		{
+			if ((KWndWindow*)uParam != (KWndWindow*)&m_ConDiemBtn[nO])
+				continue;
+			KUiDraggedObject Obj;
+			m_FightSkills[nO].GetObject(Obj);
+			if (Obj.uGenre == CGOG_NOTHING || m_nRemainSkillPoint <= 0)
+				return 0;
+			m_nRemainSkillPoint--;
+			g_pCoreShell->OperationRequest(GOI_TONE_UP_SKILL, CGOG_SKILL_FIGHT, Obj.uId);
+			return 0;
+		}
+		return 0;
+	}
+	if (0)	/* cong diem chuyen sang nut dau cong rieng, xem ghi chu tren */
 	{
 		KUiDraggedObject* pObj = (KUiDraggedObject*)uParam;
 		if (pObj->uGenre != CGOG_NOTHING)
@@ -104,10 +145,71 @@ int	KUiFightSkillSubPage::WndProc(unsigned int uMsg, unsigned int uParam, int nP
 		return 0;
 	}
 
+	/* Click vao chieu: NHAC len con tro de dat vao o phim tat.
+	   Cong diem la viec cua nut dau cong rieng, khong phai cua cu click nay. */
+	if (uMsg == WND_N_LEFT_CLICK_ITEM && uParam)
+	{
+		KUiDraggedObject* pChieu = (KUiDraggedObject*)uParam;
+		if (pChieu->uGenre != CGOG_NOTHING)
+			Wnd_DragBegin(pChieu, VeChieuDangCam);
+		return 0;
+	}
 	return KWndPage::WndProc(uMsg, uParam, nParam);
 }
 
 //绘制窗口
+/* O vuong DO vien DEN, dau "+" TRANG canh giua, ve o goc duoi phai
+   icon chieu. Ke bang KRULine chu khong dung anh: khong phai them tai
+   nguyen vao pak.
+
+   Tu ve chu chu khong goi KWndPureTextBtn::PaintWindow: ham do dat chu
+   o DINH cua so (param.nY = m_nAbsoluteTop) va tinh be ngang theo
+   nFontSize/2, nen dau + luon lech len tren va sang trai. Do tren anh
+   chup 07/09/2026: glyph "+" font 12 rong 5px cao 7px va co san 1px dem
+   phia tren -> lech 1px moi chieu trong o 13x13. */
+void KNutCongDiem::PaintWindow()
+{
+	if (!m_bCoChieu || g_pRepresentShell == NULL || m_Width <= 4 || m_Height <= 4)
+		return;
+	KRULine To[40];
+	int nSo = 0;
+	/* Nen do: chua tu hang 2 de danh cho vien DAY 2px. */
+	for (int nY = 2; nY < m_Height - 2 && nSo < 36; nY++, nSo++)
+	{
+		To[nSo].Color.Color_dw = 0xffb02020;
+		To[nSo].oPosition.nX = m_nAbsoluteLeft + 2;
+		To[nSo].oEndPos.nX = m_nAbsoluteLeft + m_Width - 2;
+		To[nSo].oPosition.nY = To[nSo].oEndPos.nY = m_nAbsoluteTop + nY;
+	}
+	if (nSo > 0)
+		g_pRepresentShell->DrawPrimitives(nSo, To, RU_T_LINE, true);
+	/* Vien den DAY 2px: hai khung long nhau. */
+	nSo = 0;
+	for (int nV = 0; nV < 2; nV++)
+	{
+		int nL = m_nAbsoluteLeft + nV, nT = m_nAbsoluteTop + nV;
+		int nR = m_nAbsoluteLeft + m_Width - 1 - nV;
+		int nB = m_nAbsoluteTop + m_Height - 1 - nV;
+		To[nSo].oPosition.nX = To[nSo].oEndPos.nX = nL;
+		To[nSo].oPosition.nY = nT; To[nSo].oEndPos.nY = nB + 1; nSo++;
+		To[nSo].oPosition.nX = To[nSo].oEndPos.nX = nR;
+		To[nSo].oPosition.nY = nT; To[nSo].oEndPos.nY = nB + 1; nSo++;
+		To[nSo].oPosition.nY = To[nSo].oEndPos.nY = nT;
+		To[nSo].oPosition.nX = nL; To[nSo].oEndPos.nX = nR + 1; nSo++;
+		To[nSo].oPosition.nY = To[nSo].oEndPos.nY = nB;
+		To[nSo].oPosition.nX = nL; To[nSo].oEndPos.nX = nR + 1; nSo++;
+	}
+	for (int nK = 0; nK < nSo; nK++)
+		To[nK].Color.Color_dw = 0xff100808;
+	g_pRepresentShell->DrawPrimitives(nSo, To, RU_T_LINE, true);
+	/* Dau "+": lay dung be rong/cao THAT cua glyph (5x7 o font 12) roi
+	   canh giua, tru 1px dem san phia tren. */
+	g_pRepresentShell->OutputText(12, "+", 1,
+		m_nAbsoluteLeft + (m_Width - 5) / 2,
+		m_nAbsoluteTop + (m_Height - 7) / 2 - 1,
+		0xffffffff, 0xff000000);
+}
+
 void KUiFightSkillSubPage::PaintWindow()
 {
 	KWndPage::PaintWindow();
@@ -140,6 +242,25 @@ void KUiFightSkillSubPage::PaintWindow()
 			}
 		}
 	}
+	/* Nen cho nut "+": o vuong DO, vien DEN, o goc duoi phai moi o chieu.
+	   Ve o day chu khong trong nut vi KWndPureTextBtn chi ve duoc CHU va
+	   KWndWindow khong co nen mau. Trang duoc ve TRUOC cac cua so con nen
+	   dau "+" trang cua nut nam de len nen nay. Ke bang KRULine ngang chu
+	   khong dung anh: khong phai them tai nguyen vao pak. */
+	/* O chieu TRONG thi giau han nut: khong dau "+" thua, va bam vao
+	   cung khong cong duoc gi. Dat moi khung ve chu khong trong
+	   UpdateData - khoi phai bat het cac duong lam doi noi dung o. */
+	for (int nN = 0; nN < FIGHT_SKILL_COUNT_PER_PAGE; nN++)
+	{
+		KUiDraggedObject ObjN;
+		m_FightSkills[nN].GetObject(ObjN);
+		/* O DON DANH THUONG khong co nut "+": no la don co ban cua vu khi
+		   (settings/vukhi-kynang-vatly.txt tra ve 53 cho moi loai), khong
+		   phai chieu de nuoi diem ky nang. */
+		int bCo = (ObjN.uGenre != CGOG_NOTHING) && ((int)ObjN.uId != 53);
+		m_ConDiemBtn[nN].DatCoChieu(bCo);
+		m_ConDiemBtn[nN].SetText(bCo ? "+" : "");
+	}
 }
 
 //初始化
@@ -157,7 +278,7 @@ void KUiFightSkillSub::LoadScheme(const char* pScheme)
 {
 	char		Buff[128];
 	KIniFile	Ini;
-	sprintf(Buff, "%s\\"SCHEME_INI_FIGHT, pScheme);
+	sprintf(Buff, "%s\\" SCHEME_INI_FIGHT, pScheme);
 	if (Ini.Load(Buff))
 	{
 		KWndPageSet::Init(&Ini, "Main");
@@ -217,7 +338,7 @@ void KUiFightSkill::LoadScheme(const char* pScheme)
 {
 	char		Buff[128];
 	KIniFile	Ini;
-	sprintf(Buff, "%s\\"SCHEME_INI_FIGHT, pScheme);
+	sprintf(Buff, "%s\\" SCHEME_INI_FIGHT, pScheme);
 	if (Ini.Load(Buff))
 	{
 		KWndPage::Init(&Ini, "Main");
@@ -308,7 +429,7 @@ void KUiLiveSkill::LoadScheme(const char* pScheme)
 //--------------------------------------------------------------------------
 int KUiLiveSkill::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
-	if (uMsg == WND_N_LEFT_CLICK_ITEM && uParam && m_nRemainSkillPoint)
+	if (0)	/* cong diem chuyen sang nut dau cong rieng, xem ghi chu tren */
 	{
 		KUiDraggedObject* pObj = (KUiDraggedObject*)uParam;
 		if (pObj->uGenre != CGOG_NOTHING)
@@ -316,6 +437,15 @@ int KUiLiveSkill::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			m_nRemainSkillPoint--;	// 使用技能点数
 			g_pCoreShell->OperationRequest(GOI_TONE_UP_SKILL, CGOG_SKILL_LIVE, pObj->uId);
 		}
+		return 0;
+	}
+	/* Click vao chieu: NHAC len con tro de dat vao o phim tat.
+	   Cong diem la viec cua nut dau cong rieng, khong phai cua cu click nay. */
+	if (uMsg == WND_N_LEFT_CLICK_ITEM && uParam)
+	{
+		KUiDraggedObject* pChieu = (KUiDraggedObject*)uParam;
+		if (pChieu->uGenre != CGOG_NOTHING)
+			Wnd_DragBegin(pChieu, VeChieuDangCam);
 		return 0;
 	}
 	return KWndPage::WndProc(uMsg, uParam, nParam);

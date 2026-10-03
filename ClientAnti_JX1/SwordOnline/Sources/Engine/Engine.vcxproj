@@ -123,6 +123,9 @@
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\Lib\Release;$(MSBuildThisFileDirectory)..\..\Lib;$(MSBuildThisFileDirectory)..\..\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>ddraw.lib;dsound.lib;dxguid.lib;winmm.lib;wsock32.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Engine___Win32_OutRead_Debug/Engine.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -144,7 +147,8 @@ copy Engine___Win32_OutRead_Debug\Engine.dll ..\..\..\bin\client\debug\engine.dl
 md ..\..\..\bin\server\debug\
 copy Engine___Win32_OutRead_Debug\Engine.dll ..\..\..\bin\server\engine.dll
 copy Engine___Win32_OutRead_Debug\Engine.dll ..\..\..\bin\server\debug\engine.dll
-</Command>
+
+exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='OuRead Release|Win32'">
@@ -177,6 +181,9 @@ copy Engine___Win32_OutRead_Debug\Engine.dll ..\..\..\bin\server\debug\engine.dl
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\Lib\Release;$(MSBuildThisFileDirectory)..\..\Lib;$(MSBuildThisFileDirectory)..\..\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>ddraw.lib;dsound.lib;dxguid.lib;winmm.lib;wsock32.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Engine___Win32_OuRead_Release/Engine.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -204,7 +211,8 @@ copy Engine___Win32_OuRead_Release\Engine.dll ..\..\..\bin\server\engine.dll
 copy Engine___Win32_OuRead_Release\Engine.dll ..\..\..\bin\server\release\engine.dll
 copy Engine___Win32_OuRead_Release\Engine.pdb ..\..\..\bin\server\release\engine.pdb
 copy Engine___Win32_OuRead_Release\Engine.map ..\..\..\bin\server\release\engine.map
-</Command>
+
+exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -238,6 +246,9 @@ copy Engine___Win32_OuRead_Release\Engine.map ..\..\..\bin\server\release\engine
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\Lib\Release;$(MSBuildThisFileDirectory)..\..\Lib;$(MSBuildThisFileDirectory)..\..\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>ddraw.lib;dsound.lib;dxguid.lib;winmm.lib;wsock32.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Debug/Engine.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -261,7 +272,8 @@ copy debug\engine.dll ..\..\..\bin\client\debug\engine.dll
 md ..\..\..\bin\server\debug\
 copy debug\engine.dll ..\..\..\bin\server\engine.dll
 copy debug\engine.dll ..\..\..\bin\server\debug\engine.dll
-</Command>
+
+exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -294,6 +306,9 @@ copy debug\engine.dll ..\..\..\bin\server\debug\engine.dll
       <Culture>0x0804</Culture>
     </ResourceCompile>
     <Link>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <AdditionalLibraryDirectories>$(SolutionDir)..\Lib;$(SolutionDir)..\Lib\Release;$(MSBuildThisFileDirectory)..\..\Lib;$(MSBuildThisFileDirectory)..\..\Lib\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>LIBC.lib;LIBCD.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>ddraw.lib;dsound.lib;dxguid.lib;winmm.lib;wsock32.lib;dinput8.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>.\Release/Engine.dll</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -321,7 +336,8 @@ copy release\engine.dll ..\..\..\bin\server\engine.dll
 copy release\engine.dll ..\..\..\bin\server\release\engine.dll
 copy release\engine.pdb ..\..\..\bin\server\release\engine.pdb
 copy release\engine.map ..\..\..\bin\server\release\engine.map
-</Command>
+
+exit /b 0</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

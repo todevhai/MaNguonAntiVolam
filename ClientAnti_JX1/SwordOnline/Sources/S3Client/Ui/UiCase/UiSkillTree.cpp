@@ -262,8 +262,17 @@ void KUiSkillTree::UpdateWndRect()
 // -------------------------------------------------------------------------
 void KUiSkillTree::UpdateData()
 {
+	/* Gan lai chi so hang theo so cot cua cau hinh. KSkillList chia TAM
+	   chieu mot hang bang hang so; ca ba cho ngat hang deu doc nLevel nen
+	   sua o day la du. */
+	if (m_nMaxPerRow < 1)
+		m_nMaxPerRow = 5;
 	m_nNumSkills = g_pCoreShell->GetGameData(
 		m_bLeft ? GDI_LEFT_ENABLE_SKILLS : GDI_RIGHT_ENABLE_SKILLS, (unsigned int)&m_Skills, 0);
+	{
+		for (int nHang = 0; nHang < m_nNumSkills; nHang++)
+			m_Skills[nHang].nLevel = nHang / m_nMaxPerRow;
+	}
 
 	for (int i = 0; i < SKILLTREE_SHORTCUT_SKILL_COUNT; i++)
 	{
@@ -339,6 +348,9 @@ void KUiSkillTree::LoadScheme(const char* pScheme)
 			m_pSelf->m_nWidthPerSkill = 1;
 		if (m_pSelf->m_nHeightPerSkill <= 0)
 			m_pSelf->m_nHeightPerSkill = 1;
+		Ini.GetInteger("Main", "MaxBtnCountPerRow", 5, &m_pSelf->m_nMaxPerRow);
+		if (m_pSelf->m_nMaxPerRow < 1)
+			m_pSelf->m_nMaxPerRow = 1;
 		Ini.GetInteger("Main", "KeyFont", 12, &m_pSelf->m_nFont);
 		Ini.GetString("Main", "KeyColor", "", Buff, sizeof(Buff));
 		m_pSelf->m_uColor = GetColor(Buff);
@@ -483,10 +495,22 @@ void KUiSkillTree::PaintWindow()
 		return;
 	KWndWindow::PaintWindow();
 	int	nCurRowIndex = -1;
-	int	nLeft, nTop = m_nAbsoluteTop - m_nHeightPerSkill;
-	int nDX = -m_nWidthPerSkill; //m_bLeft ? m_nWidthPerSkill : (-m_nWidthPerSkill);
-	
-	for (int i = 0; i < m_nNumSkills; i++)
+	int	nLeft = 0, nTop = m_nAbsoluteTop - m_nHeightPerSkill;
+	int nDX = -m_nWidthPerSkill;
+
+	/* DOI HANH VI: gom chu phim tat lai, ve HET icon roi moi ve chu.
+	   Icon di duong g_pCoreShell->DrawGameObj (lop Represent) con chu di
+	   duong g_pRepresentShell->OutputText - hai kenh khong do len mat ve
+	   cung mot luc, nen ve xen ke thi chu bi icon phu kin: nguoi choi gan
+	   phim xong khong thay chu nao (do 12/09/2026, log cho thay ham ve chu
+	   CO chay va tim ra dung ten phim). */
+	int nSoChu = 0;
+	int anChuX[SKILLTREE_MAX_SKILL_COUNT];
+	int anChuY[SKILLTREE_MAX_SKILL_COUNT];
+	char aszChu[SKILLTREE_MAX_SKILL_COUNT][16];
+	int i = 0, j = 0;
+
+	for (i = 0; i < m_nNumSkills; i++)
 	{
 		if (m_Skills[i].nLevel == nCurRowIndex)
 		{
@@ -495,17 +519,13 @@ void KUiSkillTree::PaintWindow()
 		else
 		{
 			nTop += m_nHeightPerSkill;
-//			if (m_bLeft)
-//				nLeft = m_nAbsoluteLeft;
-//			else
-				nLeft = m_nAbsoluteLeft + m_Width - m_nWidthPerSkill;
+			nLeft = m_nAbsoluteLeft + m_Width - m_nWidthPerSkill;
 			nCurRowIndex = m_Skills[i].nLevel;
 		}
 		g_pCoreShell->DrawGameObj(m_Skills[i].uGenre, m_Skills[i].uId,
 			nLeft, nTop, m_nWidthPerSkill, m_nHeightPerSkill, 0);
 
-
-		for (int j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)
+		for (j = 0; j < SKILLTREE_SHORTCUT_SKILL_COUNT; j++)
 		{
 			if (m_bLeft == (unsigned)ms_ShortcutSkills[j].IS_LEFT_SKILL &&
 				m_Skills[i].uGenre == ms_ShortcutSkills[j].uGenre &&
@@ -514,28 +534,41 @@ void KUiSkillTree::PaintWindow()
 				char szScript[64];
 				sprintf(szScript, SCK_SHORTCUTSKILL_FORMAT, j);
 				int nIndexC = KShortcutKeyCentre::FindCommandByScript(szScript);
-				char* pszKey = NULL;
+				const char* pszKey = NULL;
 				if (nIndexC >= 0)
 				{
-					pszKey = (char*)KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));
+					pszKey = KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));
 				}
 				else
 				{
 					sprintf(szScript, SCK_DIRECTSHORTCUTSKILL_FORMAT, j);
 					nIndexC = KShortcutKeyCentre::FindCommandByScript(szScript);
 					if (nIndexC >= 0)
-					{
-						pszKey = (char*)KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));
-					}
+						pszKey = KShortcutKeyCentre::GetKeyName(KShortcutKeyCentre::GetCommandKey(nIndexC));
 				}
 
-				if (pszKey)
+				if (pszKey && pszKey[0] && nSoChu < SKILLTREE_MAX_SKILL_COUNT)
 				{
-					g_pRepresentShell->OutputText(m_nFont, pszKey, KRF_ZERO_END,
-						nLeft + m_nWidthPerSkill - m_nFont, nTop + m_nHeightPerSkill - m_nFont - 1, m_uColor);
+					/* GetKeyName tra con tro toi mot chuoi TINH dung chung -
+					   lan goi sau ghi de len no, nen phai chep ra ngay. */
+					strncpy(aszChu[nSoChu], pszKey, 15);
+					aszChu[nSoChu][15] = 0;
+					anChuX[nSoChu] = nLeft + m_nWidthPerSkill - m_nFont;
+					anChuY[nSoChu] = nTop + m_nHeightPerSkill - m_nFont - 1;
+					nSoChu++;
 					break;
 				}
 			}
 		}
+	}
+
+	/* Vien den truoc, chu mau sau: nen icon sang toi lan lon, chu mot mau
+	   de chim vao hoa tiet. */
+	for (i = 0; i < nSoChu; i++)
+	{
+		g_pRepresentShell->OutputText(m_nFont, aszChu[i], KRF_ZERO_END,
+			anChuX[i] + 1, anChuY[i] + 1, 0xFF000000);
+		g_pRepresentShell->OutputText(m_nFont, aszChu[i], KRF_ZERO_END,
+			anChuX[i], anChuY[i], m_uColor);
 	}
 }

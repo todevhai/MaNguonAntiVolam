@@ -20,7 +20,7 @@
 //---------------------------------------------------------------------------
 KLuaScript::KLuaScript(void)
 {
-	m_LuaState					= lua_open(100);
+	m_LuaState					= lua_open(200);	/* 100 tran voi bang chieu tangmen/cuiyan/kunlun/tianwang */
 
 	if (m_LuaState == NULL)
 	{

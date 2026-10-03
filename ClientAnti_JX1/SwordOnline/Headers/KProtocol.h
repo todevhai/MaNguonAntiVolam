@@ -2357,7 +2357,7 @@ typedef struct
 typedef struct
 {
 	BYTE			ProtocolType;		// 协议类型
-	BYTE			m_Idx;			// 买第几个东西
+	int				m_Idx;		/* chi so Item[] may chu - BYTE cu cat mat chi so > 255 */			// 买第几个东西
 	DWORD				m_PlayerId;
 	BYTE			m_Place;			// 放在身上哪个地方
 	BYTE			m_X;				// 坐标X

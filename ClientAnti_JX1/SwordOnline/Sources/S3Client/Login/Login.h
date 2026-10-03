@@ -108,6 +108,8 @@ public:
 	void ReturnToIdle();
 	//全程自动连接
 	void AutoLogin();
+	//Dang nhap tu dong tu tai khoan cho san, khong qua UserData\<id>\UiConfig.ini
+	int	DangNhapTuDongTheoCauHinh(const char* pszAccount, const KSG_PASSWORD& crPassword);
 	//判断是否可以执行全程自动连接
 	int	IsAutoLoginEnable();
 	//设置纪录标记

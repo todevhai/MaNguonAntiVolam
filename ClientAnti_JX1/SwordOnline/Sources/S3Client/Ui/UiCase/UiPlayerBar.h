@@ -136,6 +136,7 @@ private:
 private:
 	static KUiPlayerBar* m_pSelf;
 private:
+	KWndImage		m_InputBack;	/* anh nen o nhap chat */
 	KWndButton		m_Face;		//表情
 	KWndButton		m_Friend;	//好友	
 	KWndButton		m_EscDlg;	//系统选项
@@ -150,7 +151,7 @@ private:
 	KWndButton		m_TuongTacNhom;
 	GameWorld_DateTime		m_DateTime;		//时间
 
-#define	UPB_IMMEDIA_ITEM_COUNT	3
+#define	UPB_IMMEDIA_ITEM_COUNT	9
 	KImmediaItem	m_ImmediaItem[UPB_IMMEDIA_ITEM_COUNT];
 	KWndObjectBox	m_ImmediaSkill[2];
 	

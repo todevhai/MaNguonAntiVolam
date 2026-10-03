@@ -25,7 +25,7 @@ KFont2::KFont2()
 	m_pDevice		= 0;
 	m_bLoaded		= false;
 	m_nRefCount		= 1;
-//	m_nDrawBorderWithDeffColor = true;
+	m_nDrawBorderWithDeffColor = true;	/* vien den, khop ban hoan thien */
 	m_nBorderColor = 0;
 	m_nOutputWidth = m_nFontWidth;
 	m_nOutputHeight= m_nFontHeight;
@@ -80,6 +80,26 @@ bool KFont2::Load(const char* pszFontFile)
 		if (m_Resources.Load(pszFontFile))
 		{
 			m_Resources.GetInfo(m_nFontWidth, m_nFontHeight);
+			/* Font chu Viet: CUNG TEN, nam trong thu muc con "vn". Thieu no thi
+			   chu Viet khong ve duoc nhung font chinh van chay - khong chet. */
+			{
+				const char* pszTen = strrchr(pszFontFile, 0x5C);
+				if (pszTen == NULL)
+					pszTen = strrchr(pszFontFile, 0x2F);
+				if (pszTen)
+				{
+					char szViet[260];
+					int nThuMuc = (int)(pszTen - pszFontFile) + 1;
+					if (nThuMuc + 3 + (int)strlen(pszTen + 1) < (int)sizeof(szViet))
+					{
+						memcpy(szViet, pszFontFile, nThuMuc);
+						memcpy(szViet + nThuMuc, "vn", 2);
+						szViet[nThuMuc + 2] = 0x5C;
+						strcpy(szViet + nThuMuc + 3, pszTen + 1);
+						m_ResourcesVn.Load(szViet);
+					}
+				}
+			}
 			m_bLoaded = true;
 			return true;
 		}
@@ -132,7 +152,16 @@ void KFont2::OutputText(const char* pszText, int nCount/*= KF_ZERO_END*/,
 	while (nPos < nCount)
 	{
 		//*********字符的判断与处理*********
-		if (lpByte[nPos] > 0x80 && nPos + 1 < nCount)
+		/* Chu Viet TCVN3 di TRUOC: mot byte, ve nua o nhu chu Latin. Chi cac
+		   ma co glyph trong font Viet moi vao day, con lai van la GBK. */
+		if (lpByte[nPos] > 0x80 && m_ResourcesVn.GetVietCharacterData(lpByte[nPos]))
+		{
+			DrawVietCharacter(nX + h, nY, lpByte[nPos], sColor);
+			nPos++;
+			h += m_nFontHalfWidth[nHalfIndex];
+			nHalfIndex ^= 1;
+		}
+		else if (lpByte[nPos] > 0x80 && nPos + 1 < nCount)
 		{
 			DrawCharacter(nX + h, nY, lpByte[nPos], lpByte[nPos + 1], sColor);
 			nPos += 2;
@@ -187,17 +216,11 @@ void KFont2::OutputText(const char* pszText, int nCount/*= KF_ZERO_END*/,
 //设置绘制时字符边缘的颜色，如alpha为0表示字符边缘不单独处理
 void KFont2::SetBorderColor(unsigned int uColor)
 {
-	if (uColor & 0xff000000)
-	{		
-		KRColor		c;
-		c.Color_dw = uColor;
-		m_nBorderColor = g_RGB(c.Color_b.r, c.Color_b.g, c.Color_b.b);
-		m_nDrawBorderWithDeffColor = true;
-	}
-	else
-	{
-		m_nDrawBorderWithDeffColor = false;
-	}
+	/* Khop ban hoan thien: alpha khong tat vien, mau vien luon lay tu RGB. */
+	KRColor		c;
+	c.Color_dw = uColor;
+	m_nBorderColor = g_RGB(c.Color_b.r, c.Color_b.g, c.Color_b.b);
+	m_nDrawBorderWithDeffColor = true;
 }
 
 /*!*****************************************************************************
@@ -212,6 +235,21 @@ void KFont2::DrawCharacter(int x, int y, unsigned char cFirst, unsigned char cNe
 	{
 		//取得字符在字库里的数据区指针
 		unsigned char* pCharacterData = m_Resources.GetCharacterData(cFirst, cNext);		
+		if (pCharacterData)
+		{
+			if (m_nDrawBorderWithDeffColor == false)
+				((KCanvas*)m_pDevice)->DrawFont(x, y, m_nFontWidth, m_nFontHeight, nColor, 31, pCharacterData);
+			else
+				((KCanvas*)m_pDevice)->DrawFontWithBorder(x, y, m_nFontWidth, m_nFontHeight, nColor, 31, pCharacterData, m_nBorderColor);
+		}
+	}
+}
+
+void KFont2::DrawVietCharacter(int x, int y, unsigned char cCode, int nColor) const
+{
+	if (m_pDevice && m_bLoaded)
+	{
+		unsigned char* pCharacterData = m_ResourcesVn.GetVietCharacterData(cCode);
 		if (pCharacterData)
 		{
 			if (m_nDrawBorderWithDeffColor == false)

@@ -97,6 +97,7 @@ ISkill*	KSkillManager::InstanceSkill( unsigned long ulSkillID, unsigned long ulS
 	case SKILL_SS_Missles:			        //	子弹类		本技能用于发送子弹类
 	case SKILL_SS_Melee:
 	case SKILL_SS_InitiativeNpcState:	    //	主动类		本技能用于改变当前Npc的主动状态
+	case SKILL_SS_InstantMissle:	/* kieu 14 dung nhu KSkill thuong (ban6) */
 	case SKILL_SS_PassivityNpcState:		//	被动类		本技能用于改变Npc的被动状态
 		{
             KSkill * pNewOrdinSkill = NULL;

@@ -10,6 +10,7 @@
 #include "Elem/UiImage.h"
 #include "UiShell.h"
 #include "UiBase.h"
+#include "../Auto/KAutoControl.h"
 //#include "../../../core/src/gamedatadef.h"
 #include "../../core/src/coreshell.h"
 
@@ -34,6 +35,7 @@
 #include "UiCase/UiNewPlayer.h"
 #include "UiCase/UiSelNativePlace.h"
 #include "UiCase/UiChatCentre.h"
+#include "UiCase/UiToolsControlBar.h"
 #include "UiCase/UiChatStatus.h"
 #include "UiCase/UiSysMsgCentre.h"
 #include "UiCase/UiHeaderControlBar.h"
@@ -272,6 +274,7 @@ int UiStart()
 //--------------------------------------------------------------------------
 void UiPaint(int nGameLoop)
 {
+	KiemDangNhapTuDong();
 	if (g_pRepresentShell == NULL || 
 		g_pRepresentShell->RepresentBegin(false, 0) == false)
 	{
@@ -322,6 +325,7 @@ int UiHeartBeat()
 		{
 			IR_UpdateTime();
 			Wnd_Heartbeat();
+			if (s_UiLiveSeed == UI_LIVING_S_INGAME) KAutoControl::Tick();
 		}
 		else
 		{

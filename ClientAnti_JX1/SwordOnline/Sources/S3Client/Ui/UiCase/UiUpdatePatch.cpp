@@ -14,7 +14,7 @@
 #include "UiLoginBg.h"
 #include "UiUpdatePatch.h"
 
-#define	SCHEME_INI_UPDATAPATCH			"œ¬‘ÿ≤π∂§.ini"
+#define	SCHEME_INI_UPDATAPATCH			"tai-ban-va.ini"
 //define for PatchSehll Dll Name;
 #define PATCHSHELL_LIB					"SUpdate.DLL"
 //define for PatchSehll function Name;

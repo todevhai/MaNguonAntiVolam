@@ -5,7 +5,7 @@
 #define MAX_SKILLLEVEL 64
 #define MaxMissleDir	64
 #define MAXSKILLLEVELSETTINGNUM	20  //供填写技能升级时最大的相关数据种类
-#define MAX_MISSLESTYLE  500
+#define MAX_MISSLESTYLE  1000	// missles.txt khai id toi 882
 #define MISSLE_MIN_COLLISION_ZHEIGHT 0	  //子弹落地碰撞的高度。
 #define MISSLE_MAX_COLLISION_ZHEIGHT 20   //子弹高于该高度时,不计算碰撞	
 
@@ -107,7 +107,7 @@ enum eSKillStyle
 		SKILL_SS_Mining,				//	采矿类		本技能用于采矿随机生成矿石
 		SKILL_SS_RepairWeapon,			//	修复类		本技能用于修复装备
 		SKILL_SS_Capture,				//	捕捉类		本技能用于捕捉动物Npc
-		SKILL_SS_Thief,					//	偷窃类
+		SKILL_SS_Thief, SKILL_SS_InstantMissle,	/* 14 (8.x): dan no tuc thi - may chu CastInstantMissle */					//	偷窃类
 };
 
 

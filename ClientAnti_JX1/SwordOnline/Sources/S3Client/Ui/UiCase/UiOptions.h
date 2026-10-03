@@ -98,5 +98,8 @@ private:
 	KToggleOptionItem	m_ToggleItemList[OPTION_INDEX_COUNT];
 	int					m_nFirstControlableIndex;
 	int					m_nToggleBtnValidCount;
+	/* Muc thu i tren man hinh la muc nao trong m_ToggleItemList.
+	   Muc may nay khong lam duoc thi khong chiem cho. */
+	int					m_ToggleIndexMap[MAX_TOGGLE_BTN_COUNT];
 	int					m_nToggleItemCount;
 };

@@ -7,6 +7,8 @@
 // -------------------------------------------------------------------------
 #include "KWin32.h"
 #include "KIniFile.h"
+#include "KDebug.h"
+#include "KSG_MD5_String.h"
 #include "KFilePath.h"
 #include "KMusic.h"
 #include "../Elem/WndMessage.h"
@@ -211,6 +213,58 @@ void KUiInit::Initialize()
 //--------------------------------------------------------------------------
 //	功能：窗口消息函数
 //--------------------------------------------------------------------------
+/* Dang nhap tu dong theo cau hinh cua ta. Dat o day chu khong o ShowCompleted
+   vi ShowCompleted chay ngay trong OpenWindow: dong cua so o do se lam
+   UiStart() thay NULL. */
+bool g_bXinDangNhapTuDong = false;
+
+static bool DangNhapTuDongTheoCauHinh()
+{
+    char szTepCauHinh[] = "\\Ui\\Setting.ini";
+    KIniFile Ini;
+    if (!Ini.Load(szTepCauHinh))
+        return false;
+
+    int nBat = 0;
+    Ini.GetInteger("AutoLogin", "Enable", 0, &nBat);
+    if (!nBat)
+        return false;
+
+    char szTaiKhoan[32];
+    KSG_PASSWORD MatKhau;
+    szTaiKhoan[0] = 0;
+    memset(&MatKhau, 0, sizeof(MatKhau));
+    Ini.GetString("AutoLogin", "Account", "", szTaiKhoan, sizeof(szTaiKhoan));
+    char szMatKhauTho[KSG_PASSWORD_MAX_SIZE];
+    szMatKhauTho[0] = 0;
+    Ini.GetString("AutoLogin", "Password", "", szMatKhauTho, sizeof(szMatKhauTho));
+    /* Phai di DUNG duong ma giao dien di (UiLogin.cpp:316), khong thi
+       tu dang nhap gui mat khau THO con go tay gui MD5 -> cung mot tai
+       khoan ma hai bi mat khac nhau, duong nao dang ky truoc thi duong
+       kia bi khoa ngoai. Chi lo ra khi may chu bat kiem mat khau. */
+#ifdef SWORDONLINE_USE_MD5_PASSWORD
+    KSG_StringToMD5String(MatKhau.szPassword, szMatKhauTho);
+#else
+    strncpy(MatKhau.szPassword, szMatKhauTho, sizeof(MatKhau.szPassword) - 1);
+#endif
+    memset(szMatKhauTho, 0, sizeof(szMatKhauTho));
+    g_DebugLog("[TuDong] Setting.ini Enable=%d Account=\"%s\"", nBat, szTaiKhoan);
+    if (!szTaiKhoan[0])
+        return false;
+
+    KUiInit::CloseWindow();
+    KUiConnectInfo::OpenWindow(CI_MI_CONNECTING, LL_S_IN_GAME);
+    return g_LoginLogic.DangNhapTuDongTheoCauHinh(szTaiKhoan, MatKhau) != 0;
+}
+
+void KiemDangNhapTuDong()
+{
+    if (!g_bXinDangNhapTuDong)
+        return;
+    g_bXinDangNhapTuDong = false;
+    DangNhapTuDongTheoCauHinh();
+}
+
 int KUiInit::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
 	int nRet = 0;
@@ -343,4 +397,5 @@ KWndButton*	KUiInit::GetActiveBtn()
 void KUiInit::ShowCompleted()
 {
     m_EnterGame.SetCursorAbove();
+    g_bXinDangNhapTuDong = true;
 }

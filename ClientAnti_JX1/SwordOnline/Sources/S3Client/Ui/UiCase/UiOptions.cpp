@@ -205,7 +205,14 @@ void KUiOptions::LoadScheme(KIniFile* pIni)
 	}
 
 	m_nFirstControlableIndex = 0;
-	m_nToggleBtnValidCount = (OPTION_INDEX_COUNT <= MAX_TOGGLE_BTN_COUNT) ? OPTION_INDEX_COUNT : MAX_TOGGLE_BTN_COUNT;
+	m_nToggleBtnValidCount = 0;
+	for (i = 0; i < OPTION_INDEX_COUNT && m_nToggleBtnValidCount < MAX_TOGGLE_BTN_COUNT; i++)
+	{
+		if (m_ToggleItemList[i].bInvalid)
+			continue;	/* may nay khong lam duoc - khong chiem cho */
+		m_ToggleIndexMap[m_nToggleBtnValidCount] = i;
+		m_nToggleBtnValidCount++;
+	}
 	UpdateAllToggleBtn();
 	UpdateAllStatusImg();
 }
@@ -242,7 +249,7 @@ int	 KUiOptions::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			{
 				if (uParam == (unsigned int)(KWndWindow*)&m_ToggleBtn[i])
 				{
-					ToggleOption(m_nFirstControlableIndex + i);
+					ToggleOption(m_ToggleIndexMap[i]);
 				}
 			}
 		}
@@ -426,7 +433,7 @@ void KUiOptions::UpdateAllToggleBtn()
 	{
 		m_ToggleBtn[i].Show();
 		m_StatusImage[i].Show();
-		int nIndex = m_nFirstControlableIndex + i;
+		int nIndex = m_ToggleIndexMap[i];
 		m_ToggleBtn[i].SetLabel(m_ToggleItemList[nIndex].szName);
 		if (m_ToggleItemList[nIndex].bInvalid == false)
 		{
@@ -452,9 +459,9 @@ void KUiOptions::UpdateAllStatusImg()
 	int nFrame;
 	for (int i = 0; i < m_nToggleBtnValidCount; i++)
 	{
-		if (m_ToggleItemList[m_nFirstControlableIndex + i].bInvalid == false)
+		if (m_ToggleItemList[m_ToggleIndexMap[i]].bInvalid == false)
 		{
-			nFrame = m_ToggleItemList[m_nFirstControlableIndex + i].bEnable ?
+			nFrame = m_ToggleItemList[m_ToggleIndexMap[i]].bEnable ?
 				m_nStatusEnableFrame : m_nStatusDisableFrame;
 		}
 		else
@@ -478,7 +485,7 @@ void KUiOptions::LoadSetting(bool bReload, bool bUpdateOption)
 
 	int bOptionsEnable[OPTION_INDEX_COUNT] =
 	{
-		true, true, true
+		false, false, false	/* dung khi khong mo duoc tep cai dat */
 	};
 
 	if (bReload == false && m_pSelf)
@@ -497,11 +504,11 @@ void KUiOptions::LoadSetting(bool bReload, bool bUpdateOption)
 		if (pSetting)
 		{
 			pSetting->GetInteger(OPTIONS_SAVE_SECTION, "Brightness", 50, &nBrightness);			
-			pSetting->GetInteger(OPTIONS_SAVE_SECTION, "MusicValue", 100, &nMusicValue);
-			pSetting->GetInteger(OPTIONS_SAVE_SECTION, "SoundValue", 100, &nSoundValue);
+			pSetting->GetInteger(OPTIONS_SAVE_SECTION, "MusicValue", 0, &nMusicValue);
+			pSetting->GetInteger(OPTIONS_SAVE_SECTION, "SoundValue", 0, &nSoundValue);
 			pSetting->GetInteger(OPTIONS_SAVE_SECTION, "ShortcutSet", 0, &nSettingSet);
 			for (i = 0; i < OPTION_INDEX_COUNT; i++)
-				pSetting->GetInteger(OPTIONS_SAVE_SECTION, ls_ToggleOptionName[i], true, &bOptionsEnable[i]);
+				pSetting->GetInteger(OPTIONS_SAVE_SECTION, ls_ToggleOptionName[i], false, &bOptionsEnable[i]);
 			g_UiBase.CloseCommSettingFile(false);
 		}		
 	}
@@ -517,8 +524,10 @@ void KUiOptions::LoadSetting(bool bReload, bool bUpdateOption)
 		{
 			g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_PERSPECTIVE, bOptionsEnable[OPTION_I_PERSPECTIVE]);
 			g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_DYNALIGHT, bOptionsEnable[OPTION_I_DYNALIGHT]);
-			g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, nBrightness);
 		}
+		/* Do sang gui cho CA HAI bo ve: truoc day nam trong nhanh
+		   g_bRepresent3 nen bo ve phan mem khong bao gio nhan duoc. */
+		g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, nBrightness);
 
 		g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_MUSIC_VALUE, nMusicValue);
 		g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_SOUND_VALUE, nSoundValue);
@@ -531,9 +540,9 @@ void KUiOptions::LoadSetting(bool bReload, bool bUpdateOption)
 		{
 			for (i = 0; i < OPTION_INDEX_COUNT; i++)
 				m_pSelf->m_ToggleItemList[i].bEnable = bOptionsEnable[i];
-			//m_pSelf->m_nBrightness = nBrightness;
-			//m_pSelf->m_nSoundValue = nSoundValue;
-			//m_pSelf->m_nMusicValue = nMusicValue;
+			m_pSelf->m_nBrightness = nBrightness;
+			m_pSelf->m_nSoundValue = nSoundValue;
+			m_pSelf->m_nMusicValue = nMusicValue;
 			m_pSelf->m_nShortcutSet = nSettingSet;
 			m_pSelf->m_BrightnessScroll.SetScrollPos(nBrightness);
 			m_pSelf->m_BGMValue.SetScrollPos(nMusicValue);
@@ -543,7 +552,8 @@ void KUiOptions::LoadSetting(bool bReload, bool bUpdateOption)
 			m_pSelf->UpdateAllStatusImg();
 		}
 
-		m_pSelf->m_BrightnessScroll.Enable(g_bRepresent3 && g_bScreen);
+		/* Luon bat thanh keo do sang - bo ve phan mem ap thang vao canvas */
+		m_pSelf->m_BrightnessScroll.Enable(true);
 	}
 }
 
@@ -613,12 +623,10 @@ void KUiOptions::SetSoundValue(int n)
 
 void KUiOptions::SetBrightness(int n)
 {
-	if (g_bRepresent3)
+	/* Keo thanh do sang: gui ve CoreShell cho ca hai bo ve */
+	if (m_nBrightness != n)
 	{
-		if (m_nBrightness != n)
-		{
-			m_nBrightness = n;
-			g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, m_nBrightness);
-		}
+		m_nBrightness = n;
+		g_pCoreShell->OperationRequest(GOI_OPTION_SETTING, OPTION_BRIGHTNESS, m_nBrightness);
 	}
 }

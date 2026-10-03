@@ -23,6 +23,7 @@
 #else
 #include "../../Headers/IClient.h"
 #include "CoreShell.h"
+#include "KAutoPath.h"
 #include "Scene/KScenePlaceC.h"
 #include "KIme.h"
 #include "../../Represent/iRepresent/iRepresentshell.h"
@@ -153,6 +154,17 @@ void KNpc::Init()
 	m_ActiveSkillID = 0;
 	m_SkillParam1 = 0;
 	m_SkillParam2 = 0;
+	m_nAutoPathCnt = 0;	// auto-path (A*) chua co
+	m_nAutoPathIdx = 0;
+	m_nAutoPathRecalc = 0;
+	m_nAutoPathNoProg = 0;
+	m_nAutoPathLastDist = 0x7fffffff;
+	m_nAutoFarX = 0;
+	m_nAutoFarY = 0;
+	m_bAutoFar = 0;
+	m_nAutoLastX = 0;
+	m_nAutoLastY = 0;
+	m_nAutoStall = 0;
 
 #ifndef _SERVER
     m_bIsHideNpc                = FALSE;
@@ -190,7 +202,7 @@ void KNpc::Init()
 	m_CurrentJumpSpeed = 12;	// Npc的当前跳跃速度
 	m_CurrentJumpFrame = 40;	// Npc的当前跳跃时间
 	m_CurrentAttackSpeed = 0;	// Npc的当前攻击速度
-	m_CurrentCastSpeed = 0;		// Npc的当前施法速度
+	m_CurrentCastSpeed = 0; memset(m_nKhangYan, 0, sizeof(m_nKhangYan)); m_nTocDanhYan = m_nTocPhatYan = m_nPhucHoiYan = 0;		// Npc的当前施法速度
 	m_CurrentVisionRadius = 40;	// Npc的当前视野范围
 	m_CurrentAttackRadius = 30;	// Npc的当前攻击范围
 	m_CurrentHitRecover = 0;	// Npc的当前受击回复速度
@@ -470,6 +482,114 @@ void KNpc::Activate()
 
 	ProcCommand(m_ProcessAI);
 	ProcStatus();
+	if (IsPlayer())
+		AutoPathObsTick(16);	// nap DAN lop vat can subworld -> khong dung hinh khi doi map
+	// DANH NHAU = DA TOI NOI: bo duong tu tim. Neu con, khoi duoi van ban
+	// lenh chay len server moi 4 khung trong luc client dang danh -> server
+	// keo nhan vat ve buoc di do: moi cu keo la mot nac GIAT LUI. Chinh cu
+	// keo do lai reset m_nAutoStall nen bo dem chong-ket khong bao gio tu dung.
+	if (IsPlayer() && m_nAutoPathCnt > 0 && (m_Doing == do_attack ||
+		m_Doing == do_magic || m_Doing == do_special1 || m_Doing == do_manyattack))
+	{
+		m_nAutoPathCnt = 0; m_nAutoPathIdx = 0; m_nAutoStall = 0; m_bAutoFar = 0;
+		g_DebugLog("[AUTOPATH] danh nhau -> huy duong tu tim");
+	}
+	// DI GIUA HANH LANG + LIEN TUC (y tuong user): moi ~4 khung, gui mot buoc
+	// ngan ve phia waypoint nhung DON VAO GIUA hai tuong. Server luon co dich
+	// gan phia truoc -> di MUOT khong dung o nga re; luon giua duong -> khong
+	// nem than vao goc nha. Chay ca khi dang di. Vi tri that do server sync.
+	if (IsPlayer() && m_nAutoPathCnt > 0 && (m_LoopFrames & 3) == 0)
+	{
+		int nGx = 0, nGy = 0;
+		SubWorld[m_SubWorldIndex].Map2Mps(m_RegionIndex, m_MapX, m_MapY, 0, 0, &nGx, &nGy);
+		nGx = ((nGx << 10) + m_OffX) >> 10;
+		nGy = ((nGy << 10) + m_OffY) >> 10;
+		// CHONG GIAT: theo doi vi tri THAT. Neu KHONG nhich (>8 Mps) qua ~48 khung
+		// (12 lan check) -> KET that -> DUNG HAN thay vi gui lien tuc (nhan vat
+		// dung yen ma cu ban lenh -> giat giat). Con nhich thi reset dem.
+		int nMvx = nGx - m_nAutoLastX; if (nMvx < 0) nMvx = -nMvx;
+		int nMvy = nGy - m_nAutoLastY; if (nMvy < 0) nMvy = -nMvy;
+		if (nMvx + nMvy > 8)
+		{
+			m_nAutoLastX = nGx; m_nAutoLastY = nGy; m_nAutoStall = 0;
+		}
+		else if (++m_nAutoStall >= 12)
+		{
+			m_nAutoPathCnt = 0; m_nAutoPathIdx = 0; m_nAutoStall = 0; m_bAutoFar = 0;
+			g_DebugLog("[AUTOPATH] stall-stop cur=%d,%d des=%d,%d", nGx, nGy, m_DesX, m_DesY);
+		}
+		if (m_nAutoPathCnt > 0)
+		{
+			// BI CHAN DUNG GIUA DUONG (ro nhat luc qua cong thanh: server dat lai
+			// trang thai chien dau -> nhan vat ve do_stand). Duong tu tim van con
+			// nen khoi duoi VAN ban lenh buoc len server: server di tiep, client
+			// dung yen -> moi lan dong bo la mot cu TELE, va chinh cu tele do lai
+			// lam bo dem m_nAutoStall reset (coi nhu "co nhich") nen khong bao gio
+			// dung -> tele lien tuc toi tan dich.
+			// Cho nhan vat chay lai NGAY tai day (RunTo = cuc bo, khong gui goi),
+			// khong cho 45 khung cua nhanh kick-stand ben duoi. Hai ben cung di
+			// thi dong bo chi con la chinh li nho.
+			if (m_Doing == do_stand)
+				SendCommand(do_run, m_DesX, m_DesY);
+			int nGsx = 0, nGsy = 0;
+			AutoPathCenteredStep(nGx, nGy, m_DesX, m_DesY, &nGsx, &nGsy);
+			extern void SendClientCmdRun(int nX, int nY);
+			SendClientCmdRun(nGsx, nGsy);
+		}
+	}
+	if (IsPlayer() && m_nAutoPathCnt > 0 && m_Doing == do_stand)
+	{
+		int nKx = 0, nKy = 0;
+		SubWorld[m_SubWorldIndex].Map2Mps(m_RegionIndex, m_MapX, m_MapY, 0, 0, &nKx, &nKy);
+		nKx = ((nKx << 10) + m_OffX) >> 10;
+		nKy = ((nKy << 10) + m_OffY) >> 10;
+		int nKdx = nKx - m_DesX; if (nKdx < 0) nKdx = -nKdx;
+		int nKdy = nKy - m_DesY; if (nKdy < 0) nKdy = -nKdy;
+		if (nKdx <= 48 && nKdy <= 48 && m_nAutoPathIdx + 1 < m_nAutoPathCnt)
+		{
+			// DA dung han o waypoint (nga re) ma con waypoint -> di tiep NGAY,
+			// khong cho 45 khung (backup cho look-ahead o ServeMove).
+			m_nAutoPathIdx++;
+			m_DesX = m_AutoPathX[m_nAutoPathIdx]; m_DesY = m_AutoPathY[m_nAutoPathIdx];
+			m_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;
+			extern void SendClientCmdRun(int nX, int nY);
+			SendClientCmdRun(m_DesX, m_DesY);
+		}
+		else if (++m_nAutoPathNoProg >= 45)
+		{
+			m_nAutoPathNoProg = 0;
+			// m_nAutoFarX/Y LUON la dich that (GotoWhere set vo dieu kien), du dich
+			// gan (m_bAutoFar=0, A* toi-dich) hay xa. Kick toi no BAT KE m_bAutoFar:
+			// dich gan ma ket giua duong cung phai re-path vong qua, khong bo cuoc.
+			int nKfx = nKx - m_nAutoFarX; if (nKfx < 0) nKfx = -nKfx;
+			int nKfy = nKy - m_nAutoFarY; if (nKfy < 0) nKfy = -nKfy;
+			if (m_nAutoPathRecalc >= 40 || (nKfx <= 48 && nKfy <= 48))
+			{
+				m_nAutoPathCnt = 0; m_nAutoPathIdx = 0;
+				g_DebugLog("[AUTOPATH] stand-het cur=%d,%d far=%d,%d recalc=%d", nKx, nKy, m_nAutoFarX, m_nAutoFarY, m_nAutoPathRecalc);
+			}
+			else
+			{
+				int nSdx = m_DesX - nKx, nSdy = m_DesY - nKy;
+				int nSad = (nSdx < 0 ? -nSdx : nSdx) + (nSdy < 0 ? -nSdy : nSdy);
+				if (nSad > 0)
+					AutoPathMarkStuckMps(nKx + nSdx * 48 / nSad, nKy + nSdy * 48 / nSad);
+				int bKfin = 1;
+				int nKwp = AutoPathFindStep(nKx, nKy, m_nAutoFarX, m_nAutoFarY, m_AutoPathX, m_AutoPathY, AUTOPATH_MAX_WP, &bKfin);
+				if (nKwp > 0)
+				{
+					m_nAutoPathCnt = nKwp; m_nAutoPathIdx = 0; m_nAutoPathRecalc++;
+					m_bAutoFar = bKfin ? 0 : 1;
+					m_DesX = m_AutoPathX[0]; m_DesY = m_AutoPathY[0];
+					m_nAutoPathLastDist = 0x7fffffff;
+					extern void SendClientCmdRun(int nX, int nY);
+					SendClientCmdRun(m_DesX, m_DesY);
+					g_DebugLog("[AUTOPATH] kick-stand %d wp=%d cur=%d,%d des=%d,%d", m_nAutoPathRecalc, nKwp, nKx, nKy, m_DesX, m_DesY);
+				}
+				else { m_nAutoPathCnt = 0; m_nAutoPathIdx = 0; }
+			}
+		}
+	}
 
 		if (m_MaskType > 0 && m_MaskMark != 0 && m_MaskMark != m_MaskType)// mat na
 		{
@@ -1912,6 +2032,45 @@ void KNpc::OnSit()
 	}
 }
 
+/* CanCastSkill + bao ly do cho nguoi choi (cuoi ngua / sai vu khi). */
+static BOOL ThuThiTrienChieu(KNpc* pNpc, ISkill* pSkill, int& nX, int& nY)
+{
+	if (pSkill->CanCastSkill(pNpc->m_Index, nX, nY))
+		return TRUE;
+	if (!pNpc->IsPlayer() || pNpc->m_Index != Player[CLIENT_PLAYER_INDEX].m_nIndex)
+		return FALSE;
+	KSkill* pK = (KSkill*)pSkill;
+	const char* szBao = NULL;
+	if (pK->GetHorseLimited() == 1 && pNpc->m_bRideHorse)
+		szBao = "V\xe2 c\xabng n\xb5y kh\xabng th\xd3 s\xf6 d\xf4ng l\xf3""c c\xad\xeci ng\xf9""a.";
+	else if (pK->GetHorseLimited() == 2 && !pNpc->m_bRideHorse)
+		szBao = "V\xe2 c\xabng n\xb5y ch\xd8 thi tri\xd3n \xae\xad\xee""c khi c\xad\xeci ng\xf9""a.";
+	else if (pK->GetEquiptLimited() != -2)
+	{
+		int nLoai = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponType();
+		int nRieng = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetWeaponParticular();
+		if (nLoai == 1)
+			nRieng += MAX_MELEEWEAPON_PARTICULARTYPE_NUM;
+		else if (nLoai == -1)
+			nRieng = -1;
+		if (nRieng != pK->GetEquiptLimited())
+			szBao = "V\xe2 c\xabng kh\xabng th\xd3 thi tri\xd3n v\xedi v\xf2 kh\xdd n\xb5y.";
+	}
+	static DWORD s_dwBaoLanTruoc = 0;
+	if (szBao && GetTickCount() - s_dwBaoLanTruoc >= 2000)
+	{
+		s_dwBaoLanTruoc = GetTickCount();
+		KSystemMessage Msg;
+		Msg.eType = SMT_NORMAL;
+		Msg.byConfirmType = SMCT_NONE;
+		Msg.byPriority = 0;
+		Msg.byParamSize = 0;
+		strcpy(Msg.szMessage, szBao);
+		CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, 0);
+	}
+	return FALSE;
+}
+
 void KNpc::DoSkill(int nX, int nY)
 {
 	_ASSERT(m_RegionIndex >= 0);
@@ -1924,7 +2083,7 @@ void KNpc::DoSkill(int nX, int nY)
 	if (IsPlayer())
 	{
 		if (!m_FightMode)
-			return;
+			SetFightMode(TRUE);	/* tu rut vu khi thay vi bo lenh */
 #ifdef _SERVER
 		if (m_nPlayerIdx > 0)
 			Player[m_nPlayerIdx].m_ItemList.Abrade(enumAbradeAttack);
@@ -1938,7 +2097,7 @@ void KNpc::DoSkill(int nX, int nY)
 		eSkillStyle eStyle = (eSkillStyle)pSkill->GetSkillStyle();
 
 		if (m_SkillList.CanCast(m_ActiveSkillID, SubWorld[m_SubWorldIndex].m_dwCurrentTime)
-			&& pSkill->CanCastSkill(m_Index, nX, nY) 
+			&& ThuThiTrienChieu(this, pSkill, nX, nY) 
 			&& 
 			( m_Kind != kind_player 
 			|| Cost(pSkill->GetSkillCostType(), pSkill->GetSkillCost(this))
@@ -2114,7 +2273,7 @@ int KNpc::DoOrdinSkill(KSkill * pSkill, int nX, int nY)
 		if (ClientDoing == cdo_none) 
 			m_Frames.nTotalFrame = 0;
 		else
-			m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + m_CurrentAttackSpeed);
+			m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + TocDanhHieuLuc());
 		
 #ifndef _SERVER
 		/* Nhip ve mot don danh cua CHINH MINH. Day la cho duy nhat thay duoc
@@ -2163,7 +2322,7 @@ void KNpc::DoAttack()
 #endif
 
 	m_ProcessAI = 0;
-	m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + m_CurrentAttackSpeed);
+	m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + TocDanhHieuLuc());
 	m_Frames.nCurrentFrame = 0;
 	m_Doing = do_attack;
 }
@@ -2254,7 +2413,7 @@ BOOL KNpc::DoBlurAttack()// DoSpecail1
 		m_DataRes.SetBlur(TRUE);
 #endif
 
-	m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + m_CurrentAttackSpeed);
+	m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + TocDanhHieuLuc());
 	m_Frames.nCurrentFrame = 0;
 	m_Doing = do_special1;
 	return TRUE;
@@ -3312,16 +3471,132 @@ void KNpc::ServeMove(int MoveSpeed)
 	x = (x << 10) + m_OffX;
 	y = (y << 10) + m_OffY;
 
+#ifndef _SERVER
+	if (IsPlayer() && m_nAutoPathCnt > 0)
+	{
+		extern void SendClientCmdWalk(int nX, int nY);
+		extern void SendClientCmdRun(int nX, int nY);
+		int nApTien = 0;
+		while (m_nAutoPathIdx + 1 < m_nAutoPathCnt)
+		{
+			int nApWx = (x >> 10) - m_DesX; if (nApWx < 0) nApWx = -nApWx;
+			int nApWy = (y >> 10) - m_DesY; if (nApWy < 0) nApWy = -nApWy;
+			if (nApWx > 40 || nApWy > 40)
+				break;
+			m_nAutoPathIdx++;
+			m_DesX = m_AutoPathX[m_nAutoPathIdx];
+			m_DesY = m_AutoPathY[m_nAutoPathIdx];
+			nApTien++;
+		}
+		if (nApTien > 0)
+		{
+			m_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;
+			if (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);
+		}
+	}
+#endif
+
 	int nRet = m_PathFinder.GetDir(x, y, m_Dir, m_DesX, m_DesY, MoveSpeed, &m_Dir);
 
 #ifndef _SERVER
-	if(nRet == 1)
+	BOOL bApStuck = FALSE;
+	if (IsPlayer() && m_nAutoPathCnt > 0)
+	{
+		int nApMx = x >> 10, nApMy = y >> 10;
+		int nApAx = nApMx - m_DesX; if (nApAx < 0) nApAx = -nApAx;
+		int nApAy = nApMy - m_DesY; if (nApAy < 0) nApAy = -nApAy;
+		int nApDist = nApAx + nApAy;
+		// KET = KHONG gan them des sau nhieu khung LIEN TUC. Chi reset dem khi
+		// that su TIEN GAN des (nApDist < ky luc - 4). Phep cu "cua so 30 khung"
+		// bi qua khi nhan vat rung lac quanh khe hep (moi 30 khung lai nhich
+		// mot ti -> reset -> ket vo han khong bao gio bao). Nay dung ky luc min:
+		// rung lac khong gan them -> dem tang deu -> 45 khung (~1.5s) bao ket.
+		if (nApDist + 4 < m_nAutoPathLastDist)
+		{
+			m_nAutoPathLastDist = nApDist;	// ky luc moi -> con tien
+			m_nAutoPathNoProg = 0;
+		}
+		else if (++m_nAutoPathNoProg >= 45)
+		{
+			bApStuck = TRUE;	// 45 khung khong gan them des -> ket that (khe hep)
+		}
+	}
+	if(nRet == 1 && !bApStuck)
 	{
 		x = g_DirCos(m_Dir, 64) * MoveSpeed;
 		y = g_DirSin(m_Dir, 64) * MoveSpeed;
 	}
-	else if (nRet == 0)
+	else if (nRet == 0 || bApStuck)
 	{
+		if (IsPlayer() && m_nAutoPathCnt > 0)
+		{
+			int nApCurMx = x >> 10, nApCurMy = y >> 10;
+			int nApDx = nApCurMx - m_DesX; if (nApDx < 0) nApDx = -nApDx;
+			int nApDy = nApCurMy - m_DesY; if (nApDy < 0) nApDy = -nApDy;
+			extern void SendClientCmdWalk(int nX, int nY);
+			extern void SendClientCmdRun(int nX, int nY);
+			if (nApDx <= 48 && nApDy <= 48 && m_nAutoPathIdx + 1 < m_nAutoPathCnt)
+			{
+				m_nAutoPathIdx++;
+				m_DesX = m_AutoPathX[m_nAutoPathIdx];
+				m_DesY = m_AutoPathY[m_nAutoPathIdx];
+				m_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;
+				if (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);
+				return;
+			}
+			// KET THAT (khe hep / va cham): danh dau o phia truoc la tuong roi
+			// tinh lai -> A* vong qua thay vi lao vao lai. Chi khi bApStuck de
+			// khong blacklist nham o tot luc den dich binh thuong (nRet==0).
+			if (bApStuck)
+			{
+				int nSdx = m_DesX - nApCurMx, nSdy = m_DesY - nApCurMy;
+				int nSad = (nSdx < 0 ? -nSdx : nSdx) + (nSdy < 0 ? -nSdy : nSdy);
+				if (nSad > 0)
+					AutoPathMarkStuckMps(nApCurMx + nSdx * 48 / nSad, nApCurMy + nSdy * 48 / nSad);
+			}
+			if (!(nApDx <= 48 && nApDy <= 48) && m_nAutoPathRecalc < 40)
+			{
+				int nApGx = m_AutoPathX[m_nAutoPathCnt - 1];
+				int nApGy = m_AutoPathY[m_nAutoPathCnt - 1];
+				int nApWp = AutoPathFind(nApCurMx, nApCurMy, nApGx, nApGy, m_AutoPathX, m_AutoPathY, AUTOPATH_MAX_WP);
+				if (nApWp > 0)
+				{
+					m_nAutoPathCnt = nApWp;
+					m_nAutoPathIdx = 0;
+					m_nAutoPathRecalc++;
+					m_DesX = m_AutoPathX[0];
+					m_DesY = m_AutoPathY[0];
+					m_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;
+					if (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);
+					g_DebugLog("[AUTOPATH] recalc %d wp=%d cur=%d,%d stuck=%d", m_nAutoPathRecalc, nApWp, nApCurMx, nApCurMy, (int)bApStuck);
+					return;
+				}
+			}
+			// Toi het waypoint (nac) ma dich XA that van con -> di tiep tung nac.
+			if (m_bAutoFar && m_nAutoPathRecalc < 40)
+			{
+				int nFdx = nApCurMx - m_nAutoFarX; if (nFdx < 0) nFdx = -nFdx;
+				int nFdy = nApCurMy - m_nAutoFarY; if (nFdy < 0) nFdy = -nFdy;
+				if (nFdx > 48 || nFdy > 48)
+				{
+					int bApFin2 = 1;
+					int nApWp2 = AutoPathFindStep(nApCurMx, nApCurMy, m_nAutoFarX, m_nAutoFarY, m_AutoPathX, m_AutoPathY, AUTOPATH_MAX_WP, &bApFin2);
+					if (nApWp2 > 0)
+					{
+						m_nAutoPathCnt = nApWp2; m_nAutoPathIdx = 0; m_nAutoPathRecalc++;
+						m_bAutoFar = bApFin2 ? 0 : 1;
+						m_DesX = m_AutoPathX[0]; m_DesY = m_AutoPathY[0];
+						m_nAutoPathNoProg = 0; m_nAutoPathLastDist = 0x7fffffff;
+						if (m_Doing == do_run) SendClientCmdRun(m_DesX, m_DesY); else SendClientCmdWalk(m_DesX, m_DesY);
+						g_DebugLog("[AUTOPATH] nac %d wp=%d cur=%d,%d far=%d,%d fin=%d", m_nAutoPathRecalc, nApWp2, nApCurMx, nApCurMy, m_nAutoFarX, m_nAutoFarY, bApFin2);
+						return;
+					}
+				}
+				m_bAutoFar = 0;
+			}
+			m_nAutoPathCnt = 0;
+			m_nAutoPathIdx = 0;
+		}
 		DoStand();
 		return;
 	}
@@ -3817,6 +4092,8 @@ void KNpc::Load(int nNpcSettingIdx, int nLevel, int nSeries)
 		if (nNpcSettingIdx == PLAYER_MALE_NPCTEMPLATEID)
 		{
 			strcpy(szNpcTypeName, "男主角");
+			/* dong 2 cua bang loai nhan vat = MainMan */
+			g_NpcKindFile.GetString(2, "", "", szNpcTypeName, sizeof(szNpcTypeName));
 			m_StandFrame = NpcSet.GetPlayerStandFrame(TRUE);
 			m_WalkFrame = NpcSet.GetPlayerWalkFrame(TRUE);
 			m_RunFrame = NpcSet.GetPlayerRunFrame(TRUE);
@@ -3824,6 +4101,8 @@ void KNpc::Load(int nNpcSettingIdx, int nLevel, int nSeries)
 		else
 		{
 			strcpy(szNpcTypeName, "女主角");
+			/* dong 3 cua bang loai nhan vat = MainLady */
+			g_NpcKindFile.GetString(3, "", "", szNpcTypeName, sizeof(szNpcTypeName));
 			m_StandFrame = NpcSet.GetPlayerStandFrame(FALSE);
 			m_WalkFrame = NpcSet.GetPlayerWalkFrame(FALSE);
 			m_RunFrame = NpcSet.GetPlayerRunFrame(FALSE);
@@ -4872,6 +5151,42 @@ int	KNpc::PaintMana(int nHeightOffset)
 
 void KNpc::Paint()
 {
+	if (m_Index == Player[CLIENT_PLAYER_INDEX].m_nIndex && g_pRepresent
+		&& m_ActiveSkillID > 0 && (m_Doing == do_magic || m_Doing == do_attack
+		|| m_Doing == do_special1 || m_Doing == do_manyattack))
+	{
+		ISkill* pChieuVong = g_SkillManager.GetSkill(m_ActiveSkillID, 1);
+		int nBanKinh = pChieuVong ? pChieuVong->GetAttackRadius() : 0;
+		if (nBanKinh > 0)
+		{
+			int nGocX = 0, nGocY = 0;
+			GetMpsPos(&nGocX, &nGocY);
+			int nO_X = 0, nO_Y = 0;
+			g_pRepresent->ViewPortCoordToSpaceCoord(nO_X, nO_Y, m_Height);
+			KRULine Vong[16];
+			int nSo = 0;
+			for (int nK = 0; nK < 32; nK += 2)
+			{
+				int nD1 = nK * 2;
+				int nD2 = nD1 + 2;
+				if (nD2 >= 64)
+					nD2 -= 64;
+				int nX1 = nGocX + ((g_DirCos(nD1, 64) * nBanKinh) >> 10);
+				int nY1 = nGocY + ((g_DirSin(nD1, 64) * nBanKinh) >> 10);
+				int nX2 = nGocX + ((g_DirCos(nD2, 64) * nBanKinh) >> 10);
+				int nY2 = nGocY + ((g_DirSin(nD2, 64) * nBanKinh) >> 10);
+				Vong[nSo].oPosition.nX = nX1 - nO_X;
+				Vong[nSo].oPosition.nY = (nY1 - nO_Y) / 2;
+				Vong[nSo].oPosition.nZ = 0;
+				Vong[nSo].oEndPos.nX = nX2 - nO_X;
+				Vong[nSo].oEndPos.nY = (nY2 - nO_Y) / 2;
+				Vong[nSo].oEndPos.nZ = 0;
+				Vong[nSo].Color.Color_dw = 0xffffd040;
+				nSo++;
+			}
+			g_pRepresent->DrawPrimitives(nSo, Vong, RU_T_LINE, 1);
+		}
+	}
 	if (relation_enemy == NpcSet.GetRelation(m_Index, Player[CLIENT_PLAYER_INDEX].m_nIndex) &&
 		(m_Kind == kind_player ||
 		 m_Kind == kind_partner) && m_Hide.nTime > 0
@@ -5398,7 +5713,7 @@ BOOL	KNpc::DoRunAttack()
 		}
 		m_Dir = g_GetDirIndex(x, y, tx, ty);
 #endif
-		m_Frames.nTotalFrame = 0;//m_AttackFrame * 100 / (100 + m_CurrentAttackSpeed);
+		m_Frames.nTotalFrame = 0;//m_AttackFrame * 100 / (100 + TocDanhHieuLuc());
 		m_Frames.nCurrentFrame = 0;
 		m_Doing = do_runattack;
 		break;
@@ -5524,7 +5839,7 @@ BOOL KNpc::DoJumpAttack()
 		}
 		m_Dir = g_GetDirIndex(x, y, tx, ty);
 #endif
-		m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + m_CurrentAttackSpeed);
+		m_Frames.nTotalFrame = m_AttackFrame * 100 / (100 + TocDanhHieuLuc());
 		m_Frames.nCurrentFrame = 0;
 		m_Doing = do_jumpattack;
 		break;
@@ -7116,8 +7431,8 @@ void	KNpc::SetBlood(int nNo)
 				  n_mMin = j;
 				 }
 			 }
-			 m_nBloodNo[j][0] = nNo;
-			 m_nBloodNo[j][1] = defMAX_SHOW_BLOOD_TIME;
+			 m_nBloodNo[n_mMin][0] = nNo;
+			 m_nBloodNo[n_mMin][1] = defMAX_SHOW_BLOOD_TIME;
 		}
 				
 	
@@ -7230,7 +7545,7 @@ int	KNpc::PaintBlood(int nHeightOffset)
 		return nHeightOffset;
 	}
 	int nFontSize = 16;
-	DWORD dwColor = SHOW_BLOOD_COLOR | (m_nBloodAlpha << 24);
+	DWORD dwColor = SHOW_BLOOD_COLOR | 0xff000000;	/* alpha day, khong thi vo hinh */
 	 int  nMpsX, nMpsY;
 	GetMpsPos(&nMpsX, &nMpsY);
 	int nHeightOff = nHeightOffset;

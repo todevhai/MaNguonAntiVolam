@@ -152,7 +152,7 @@ BOOL KLibOfBPT::Init()
 		}
 
 		if (FALSE == paryBPT[i]->Load())
-			{ _ASSERT(FALSE); return FALSE; }
+			{ g_DebugLog("[bang vat pham] bang thu %d nap HONG - bo qua, nap tiep", i); continue; }
 	}
 
 	// 构造魔法属性表

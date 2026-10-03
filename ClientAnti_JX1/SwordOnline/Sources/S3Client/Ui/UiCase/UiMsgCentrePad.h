@@ -104,7 +104,9 @@ public:
 	//用于新聊天协议到达的处理
 	static int				NewChannelMessageArrival(DWORD nChannelID, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);
 	static void				NewMSNMessageArrival(char* szSourceName, char* szSendName, const char* pMsgBuff, unsigned short nMsgLength);
-	static void				OpenChannel(char* channelName, DWORD nChannelID, BYTE cost);	//同时订阅
+	static void				OpenChannel(char* channelName, DWORD nChannelID, BYTE cost);
+	static void				OpenChannelThat(char* channelName, DWORD nChannelID, BYTE cost);
+	static void				XuLyKenhCho();	//同时订阅
 	//用于外挂的聊天
 	static void				ShowSomeoneMessage(char* szSourceName, const char* pMsgBuff, unsigned short nMsgLength);
 	enum  SelfChannel

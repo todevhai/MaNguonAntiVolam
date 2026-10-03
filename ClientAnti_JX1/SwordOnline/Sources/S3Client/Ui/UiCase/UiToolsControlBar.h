@@ -34,5 +34,17 @@ private:
 	KWndButton	m_Friend;
 	KWndButton	m_ChatRoom;
 	KWndButton	m_Options;
+	/* Muoi nut them 28/08/2026. Ba nut cuoi la CONG TAC (bat/tat) chu
+	   khong mo cua so: chay, ngoi, cuoi ngua, giao dich, PK. */
+	KWndButton	m_Status;
+	KWndButton	m_Items;
+	KWndButton	m_Skills;
+	KWndButton	m_Team;
+	KWndButton	m_Faction;
+	KWndButton	m_Run;
+	KWndButton	m_Sit;
+	KWndButton	m_Horse;
+	KWndButton	m_Exchange;
+	KWndButton	m_PK;
 };
 #endif // __UITOOLSCONTROLBAR_H__

@@ -348,7 +348,8 @@ int KMissle::Activate()
 // 		{
 // 			m_nFollowNpcIdx = 0;
 // 		}
-		if (Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId)
+		if (!Npc[m_nFollowNpcIdx].IsMatch(m_dwFollowNpcID)
+			|| Npc[m_nFollowNpcIdx].m_SubWorldIndex != m_nSubWorldId)
 		{
 			m_nFollowNpcIdx = 0;
 		}
@@ -523,6 +524,12 @@ int KMissle::CheckCollision()
 			nNpcIdx = SubWorld[m_nSubWorldId].m_Region[nColRegion].FindNpc(nColMapX, nColMapY, m_nLauncher, m_eRelation);
 		}
 
+		/* DOI HANH VI: bo qua NPC DA CHET. Bon vien dan cua mot chieu bay sat
+		   nhau: vien dau giet con quai, cac vien sau van "va" vao xac trong
+		   cung nhip va no ngay do - nguoi choi thay quai chet TRUOC khi chieu
+		   bay toi. Cho dan bay xuyen qua xac de con quet trung con dang song. */
+		if (nNpcIdx > 0 && (Npc[nNpcIdx].m_Doing == do_death || Npc[nNpcIdx].m_CurrentLife <= 0))
+			nNpcIdx = 0;
 		if (nNpcIdx > 0)
 		{ 
 			if (m_nDamageRange == 1)//在目标Npc处碰撞
@@ -631,10 +638,17 @@ void KMissle::OnFly()
 					{
 						int nXFactor = ((nDesMpsX - nSrcMpsX) << 10)/nDistance;
 						int nYFactor = ((nDesMpsY - nSrcMpsY) << 10)/nDistance;
-						int dx = nXFactor * m_nSpeed / 1.3;
-						int dy = nYFactor * m_nSpeed / 1.3;
+						/* *10/13 thay cho /1.3, cho khop so nguyen ben may chu. */
+						int dx = nXFactor * m_nSpeed * 10 / 13;
+						int dy = nYFactor * m_nSpeed * 10 / 13;
 						nDOffsetX = dx;
 						nDOffsetY = dy;
+						/* Ghi lai he so huong: khi muc tieu chet, nhanh duoi bay
+						   tiep bang hai he so nay. De nguyen he so LUC BAN thi dan
+						   re nguoc ve huong cu trong khi hinh van quay theo m_nDir
+						   moi - nhin ra ngoai la con rong nam ngang. */
+						m_nXFactor = nXFactor;
+						m_nYFactor = nYFactor;
 						m_nDir = g_GetDirIndex(nSrcMpsX,nSrcMpsY,nDesMpsX,nDesMpsY);
 					}
 					else
@@ -837,10 +851,18 @@ void KMissle::OnFly()
 					{
 						int nXFactor = ((nDesMpsX - nSrcMpsX) << 10)/nDistance;
 						int nYFactor = ((nDesMpsY - nSrcMpsY) << 10)/nDistance;
-						int dx = nXFactor * m_nSpeed / 1.3;
-						int dy = nYFactor * m_nSpeed / 1.3;
+						/* *10/13 thay cho /1.3: may chu tinh bang so nguyen, hai
+						   nua phai ra CUNG mot buoc thi duong bay moi trung. */
+						int dx = nXFactor * m_nSpeed * 10 / 13;
+						int dy = nYFactor * m_nSpeed * 10 / 13;
 						nDOffsetX = dx;
 						nDOffsetY = dy;
+						/* Ghi lai he so huong: khi muc tieu chet, nhanh duoi bay
+						   tiep bang hai he so nay. De nguyen he so LUC BAN thi dan
+						   re nguoc ve huong cu trong khi hinh van quay theo m_nDir
+						   moi - nhin ra ngoai la con rong nam ngang. */
+						m_nXFactor = nXFactor;
+						m_nYFactor = nYFactor;
 						m_nDir = g_GetDirIndex(nSrcMpsX,nSrcMpsY,nDesMpsX,nDesMpsY);
 					}
 					else
@@ -889,27 +911,52 @@ void KMissle::OnFly()
 	}
 	
 	//
-	if (CheckBeyondRegion(nDOffsetX, nDOffsetY))
+	/* DOI HANH VI: dan di nhanh hon MOT O moi nhip bi CheckBeyondRegion tra
+	   FALSE va tu huy ngay tai chan nguoi phat. Buoc moi nhip = toc do x he so
+	   huong (he so toi 1024), ma nguong la CellWidth = 32 << 10; nen moi chieu
+	   co toc do > 32 deu hong - va hong THEO HUONG, vi he so nho khi ban cheo.
+	   Do 11/09/2026: chieu 150 Cai Bang toc do 40 -> buoc 38280 > 32768.
+	   Chia buoc lon thanh nhieu buoc con khong qua mot o, kiem va cham sau
+	   tung buoc de dan khong xuyen qua muc tieu. */
 	{
-		if (CheckCollision() == -1) 
+		int nSoPhan = 1;
+		int nPhan = 0;
+		int nDaDiX = 0;
+		int nDaDiY = 0;
+		while ((abs(nDOffsetX) / nSoPhan) >= CellWidth || (abs(nDOffsetY) / nSoPhan) >= CellHeight)
+			nSoPhan++;
+		for (nPhan = 1; nPhan <= nSoPhan; nPhan++)
 		{
-			if (m_bAutoExplode)
+			int nToiX = (int)((__int64)nDOffsetX * nPhan / nSoPhan);
+			int nToiY = (int)((__int64)nDOffsetY * nPhan / nSoPhan);
+			int nBuocX = nToiX - nDaDiX;
+			int nBuocY = nToiY - nDaDiY;
+			nDaDiX = nToiX;
+			nDaDiY = nToiY;
+			if (CheckBeyondRegion(nBuocX, nBuocY))
 			{
-				ProcessCollision();//处理碰撞
-			}
+				if (CheckCollision() == -1) 
+				{
+					if (m_bAutoExplode)
+					{
+						ProcessCollision();//处理碰撞
+					}
 #ifndef _SERVER 
-			int nSrcX4 = 0 ;
-			int nSrcY4 = 0 ;
-			SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY,m_nXOffset, m_nYOffset, &nSrcX4, &nSrcY4);
-			CreateSpecialEffect(MS_DoVanish, nSrcX4, nSrcY4, m_nCurrentMapZ);
+					int nSrcX4 = 0 ;
+					int nSrcY4 = 0 ;
+					SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY,m_nXOffset, m_nYOffset, &nSrcX4, &nSrcY4);
+					CreateSpecialEffect(MS_DoVanish, nSrcX4, nSrcY4, m_nCurrentMapZ);
 #endif
-			DoVanish();
-			return;
+					DoVanish();
+					return;
+				}
+			}
+			else//如果子弹飞行过程中进入了一个无效的Region则子弹自动消亡
+			{
+				DoVanish();
+				return;
+			}
 		}
-	}
-	else//如果子弹飞行过程中进入了一个无效的Region则子弹自动消亡
-	{
-		DoVanish();
 	}
 }
 /*!*****************************************************************************

@@ -10,6 +10,7 @@
 #include "../Elem/WndMessage.h"
 #include <crtdbg.h>
 #include "UiPlayerBar.h"
+#include "../../../Engine/src/KDebug.h"
 #include "UiStatus.h"
 #include "UiSkillTree.h"
 #include "UiEscDlg.h"
@@ -273,7 +274,7 @@ void KImmediaItem::PaintWindow()
 			g_pRepresentShell->OutputText(12, szO, KRF_ZERO_END,
 				m_nAbsoluteLeft + 2, m_nAbsoluteTop + 1, m_TextColor);
 		}
-		if (nNum > 1 && nNum < 1000)
+		if (nNum >= 1 && nNum < 1000)
 		{
 			int nFontSize = 12;
 			char szNum[4];
@@ -442,6 +443,7 @@ void KUiPlayerBar::LoadScheme(KIniFile* pIni)
 	Init(pIni, $Main);
 
 	m_EscDlg  .Init(pIni, "Options");
+	m_InputBack.Init(pIni, "InputBack");
 	m_Face    .Init(pIni, "Face");
 	m_Friend  .Init(pIni, "Friend");
 	m_ChatBar  .Init(pIni, "ChatBar");
@@ -502,6 +504,7 @@ void KUiPlayerBar::LoadScheme(KIniFile* pIni)
 //--------------------------------------------------------------------------
 void KUiPlayerBar::Initialize()
 {
+	AddChild(&m_InputBack);
 	AddChild(&m_ChatBar);
 	AddChild(&m_DateTime);
 	AddChild(&m_Face);
@@ -517,7 +520,7 @@ void KUiPlayerBar::Initialize()
 
 	for (int i = 0; i < UPB_IMMEDIA_ITEM_COUNT; i++)
 	{
-		m_ImmediaItem[i].SetObjectGenre(CGOG_ITEM);
+		m_ImmediaItem[i].SetObjectGenre(CGOG_NOTHING);	/* nhan ca vo cong lan vat pham */
 		m_ImmediaItem[i].HoldObject(CGOG_NOTHING, 0, 0, 0);
 		AddChild(&m_ImmediaItem[i]);
 		m_ImmediaItem[i].SetContainerId((int)UOC_IMMEDIA_ITEM);
@@ -742,6 +745,16 @@ void KUiPlayerBar::PaintWindow()
 	KWndImage::PaintWindow();
 
 	int nChannelDataCount = KUiMsgCentrePad::GetChannelCount() + m_nRecentPlayerName;
+	/* Doi canh xoa sach kenh dang ky ma may chu khong gui lai; dang ky
+	   lai tu danh sach da giu. Gioi han so lan de khong thu mai. */
+	static int s_nThuLai = 0;
+	if (KUiMsgCentrePad::GetChannelCount() > 0)
+		s_nThuLai = 0;
+	else if (s_nThuLai < 30)
+	{
+		s_nThuLai++;
+		KUiMsgCentrePad::XuLyKenhCho();
+	}
 	if (m_nCurChannel < 0 || m_nCurChannel >= nChannelDataCount)
 	{
 		SetCurrentChannel(0);
@@ -843,6 +856,8 @@ void KUiPlayerBar::PopupChannelMenu(int x, int y)
 	pMenuData->nX = x;
 	pMenuData->nY = y;
 	pMenuData->nSelectedItem = m_nCurChannel;
+	if (pMenuData->nItemHeight < 16)
+		pMenuData->nItemHeight = 16;	/* du cho chu 12 diem */
 	KPopupMenu::Popup(pMenuData, (KWndWindow*)this, SEL_CHANNEL_MENU);
 }
 
@@ -1143,6 +1158,11 @@ void KUiPlayerBar::InputRecentMsg(bool bPrior)
 //--------------------------------------------------------------------------
 //	功能：响应界面操作取起\放下东西
 //--------------------------------------------------------------------------
+/* Chieu dang nam trong tung o phim tat. 0 = o do khong giu chieu
+   (dang trong, hoac dang giu vat pham - vat pham do may chu quan ly). */
+static unsigned int s_uChieuTrongO[UPB_IMMEDIA_ITEM_COUNT] = {0};
+static unsigned int s_uLoaiChieuTrongO[UPB_IMMEDIA_ITEM_COUNT] = {0};
+
 void KUiPlayerBar::OnObjPickedDropped(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)
 {
 	KUiObjAtContRegion	Pick, Drop;
@@ -1190,6 +1210,27 @@ void KUiPlayerBar::OnObjPickedDropped(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDR
 	}
 	
 	
+	g_DebugLog("[o]pick=%d drop=%d gpick=%u gdrop=%u o=%d",
+		pPickPos ? 1 : 0, pDropPos ? 1 : 0,
+		pPickPos ? Pick.Obj.uGenre : 0, pDropPos ? Drop.Obj.uGenre : 0,
+		pDropPos ? Drop.Region.h : (pPickPos ? Pick.Region.h : -1));
+	if ((pPickPos && (Pick.Obj.uGenre & 0xFFFF) == CGOG_SKILL) ||
+		(pDropPos && (Drop.Obj.uGenre & 0xFFFF) == CGOG_SKILL))
+	{
+		if (pPickPos && Pick.Region.h >= 0 && Pick.Region.h < UPB_IMMEDIA_ITEM_COUNT)
+		{
+			s_uChieuTrongO[Pick.Region.h] = 0;
+			s_uLoaiChieuTrongO[Pick.Region.h] = 0;
+			m_ImmediaItem[Pick.Region.h].HoldObject(CGOG_NOTHING, 0, 0, 0);
+		}
+		if (pDropPos && Drop.Region.h >= 0 && Drop.Region.h < UPB_IMMEDIA_ITEM_COUNT)
+		{
+			s_uChieuTrongO[Drop.Region.h] = Drop.Obj.uId;
+			s_uLoaiChieuTrongO[Drop.Region.h] = Drop.Obj.uGenre;
+			m_ImmediaItem[Drop.Region.h].HoldObject(Drop.Obj.uGenre, Drop.Obj.uId, 0, 0);
+		}
+		return;
+	}
 	g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, 
 		pPickPos ? (unsigned int)&Pick : 0,
 		pDropPos ? (int)&Drop : 0);
@@ -1204,6 +1245,17 @@ void KUiPlayerBar::OnUseItem(int nIndex)
 	{
 
 		KUiDraggedObject Obj;
+		if (s_uChieuTrongO[nIndex])
+		{
+			/* Thi trien NGAY ve phia con tro. Khong dung
+			   KShortcutKeyCentre::ms_MouseX: bien do chi duoc gan trong
+			   HandleMouseInput, tuc luc BAM chuot - bam phim so khong di qua
+			   do nen no giu toa do cu va chieu ra theo huong nhan vat. */
+			int nChuotX = 0, nChuotY = 0;
+			Wnd_GetCursorPos(&nChuotX, &nChuotY);
+			g_pCoreShell->UseSkill(nChuotX, nChuotY, s_uChieuTrongO[nIndex]);
+			return;
+		}
 		m_pSelf->m_ImmediaItem[nIndex].GetObject(Obj);
 		KUiObjAtRegion Info;
 		{
@@ -1262,7 +1314,17 @@ void KUiPlayerBar::SetCurrentChannel(int nIndex)
 			char buffer[3];
 			buffer[0] = KTC_INLINE_PIC;
 			*((WORD*)(buffer + 1)) = nPicIndex;
-			m_pSelf->m_ChannelSwitchBtn.SetText(buffer, 3);
+			char szTenKenh[64];
+			szTenKenh[0] = 0;
+			WORD nCaoAnh = 0;
+			KRColor uMau1, uMau2;
+			short nCheck = -1;
+			KUiMsgCentrePad::GetChannelMenuinfo(m_pSelf->m_nCurChannel,
+				NULL, &nCaoAnh, &uMau1, &uMau2, szTenKenh, &nCheck);
+			if (nPicIndex == (WORD)-1 && szTenKenh[0])
+				m_pSelf->m_ChannelSwitchBtn.SetText(szTenKenh);	/* anh hong -> ve chu */
+			else
+				m_pSelf->m_ChannelSwitchBtn.SetText(buffer, 3);
 		}
 	}
 	else if (nIndex < nChannelDataCount + m_pSelf->m_nRecentPlayerName)

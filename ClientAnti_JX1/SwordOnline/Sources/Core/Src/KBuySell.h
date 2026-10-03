@@ -1,7 +1,7 @@
 #ifndef	KBuySellH
 #define	KBuySellH
 
-#define	BUY_SELL_SCALE		4
+#define	BUY_SELL_SCALE		1
 
 class KItem;
 

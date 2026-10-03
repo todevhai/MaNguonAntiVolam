@@ -16,7 +16,7 @@ extern iCoreShell*		g_pCoreShell;
 
 #define	TEAM_NAME_LEN_MAX	20
 #define	TEAM_NAME_LEN_MIN	4
-#define	SCHEME_INI	"ÐÂ½¨¶ÓÎé.ini"
+#define	SCHEME_INI	"tao-doi-moi.ini"
 
 KUiTeamNew* KUiTeamNew::m_pSelf = NULL;
 

@@ -57,6 +57,13 @@ void KDirectDraw::Mode(BOOL bFullScreen, int nWidth, int nHeight)
 	m_dwScreenMode   = bFullScreen? FULLSCREEN : WINDOWMODE;
 	m_dwScreenWidth  = nWidth;
 	m_dwScreenHeight = nHeight;
+	/* Cua so that duoc dung bang hang so WND_INIT_WIDTH tu truoc khi biet
+	   do phan giai. Keo lai cho khop, neu khong thi khung game van 800
+	   du be ngang ve da doi. Vien +6/+25 lay dung cong thuc cua
+	   KWin32App::InitWindow. */
+	if (!bFullScreen && g_GetMainHWnd())
+		SetWindowPos(g_GetMainHWnd(), NULL, 0, 0, nWidth + 6, nHeight + 25,
+			SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 //---------------------------------------------------------------------------
@@ -697,7 +704,8 @@ void KDirectDraw::UpdateScreenZoom(LPRECT lpRect)
 //---------------------------------------------------------------------------
 void KDirectDraw::SetWindowStyle()
 {
-	exit(1);
+	/* Da bo exit(1) o day: rac go loi de quen, giet tien trinh ngay khi khoi
+	   tao do hoa. Xem docs/chay-thu-client-tu-build-lan-dau.md. */
 	RECT	rc = {0, 0, m_dwScreenWidth, m_dwScreenHeight};
 	HWND	hWnd = g_GetMainHWnd();
 	DWORD	dwStyle = 0;

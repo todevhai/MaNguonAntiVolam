@@ -11,8 +11,8 @@
 //  phan la mot thanh + he dong cua no; thanh<->thanh phai di Xa phu.
 //
 //  File nguon cua ta (khong phai Kingsoft goc). Comment ASCII.
-//  Luu y: tep nay chi duoc them vao build boi port-fixes.py, tuc luon bien dich
-//  tren cay DA VA -- nen goi duoc helper AutoRouteGotoSpace ma ban va them vao.
+//  Goi helper AutoRouteGotoSpace trong CoreShell.cpp (truoc 03/10/2026 do
+//  port-fixes.py chen luc build; nay da nuong thang vao nguon).
 // -------------------------------------------------------------------------
 #include "KWin32.h"
 #include "KCore.h"				// keo theo KDebug.h (g_DebugLog) + KTabFile.h
@@ -263,7 +263,7 @@ static const KRouteEdge* ArFindEdge(int nFrom, int nTo)
 //  KHONG tu viet lai phan di lai: GotoWhere da co san nhanh mode >= 10 nghia la
 //  "toa do truyen vao DA LA toa do khong gian", va nhanh do da chay A* + luu
 //  waypoint + bao server tung waypoint. Ta chi can goi lai qua helper
-//  AutoRouteGotoSpace (port-fixes them vao CoreShell.cpp, noi thay g_CoreShell).
+//  AutoRouteGotoSpace (o CoreShell.cpp, noi thay g_CoreShell).
 //  Helper cung go throttle m_nSendMoveFrames -- neu khong, lenh dau chang co the
 //  bi throttle nuot IM LANG va tuyen dung yen cho toi luc dem treo kick vao.
 // -------------------------------------------------------------------------

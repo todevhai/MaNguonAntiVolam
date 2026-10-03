@@ -49,6 +49,7 @@ KUiUnlockBox* KUiUnlockBox::OpenWindow()
 		m_pSelf->BringToTop();
 		m_pSelf->Show();
 		Wnd_GameSpaceHandleInput(false);
+		Wnd_SetFocusWnd(&m_pSelf->m_Password);	/* go ngay, khong phai bam vao o */
 	}
 	return m_pSelf;
 }
@@ -71,7 +72,7 @@ void KUiUnlockBox::CloseWindow()
 // -------------------------------------------------------------------------
 void KUiUnlockBox::Initialize()
 {
-//	AddChild(&m_Text);
+	AddChild(&m_Text);
 	AddChild(&m_Password);
 	AddChild(&m_OKBtn);
 	AddChild(&m_CancelBtn);
@@ -168,6 +169,6 @@ void KUiUnlockBox::OnCheckInput()
 	char	szBuff1[16], szBuff2[16];
 	itoa(nPass, szBuff1, 10);
 	m_Password.GetText(szBuff2, sizeof(szBuff2), true);
-	if (strcmp(szBuff1, szBuff2))
+	if (szBuff2[0] && strcmp(szBuff1, szBuff2))	/* o trong: de trong, dung ep thanh 0 */
 		m_Password.SetIntText(nPass);
 }

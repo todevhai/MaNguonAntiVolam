@@ -86,10 +86,13 @@ private:
 	~KFont2();
 	//绘制字符
 	void	DrawCharacter(int x, int y, unsigned char cFirst, unsigned char cNext, int nColor) const;
+	/* Ve mot chu Viet TCVN3 (mot byte) tu font phu. */
+	void	DrawVietCharacter(int x, int y, unsigned char cCode, int nColor) const;
 
 private:
 	bool				m_bLoaded;			//是否已经载入字库
 	unsigned short		m_nRefCount;		//引用计数
+	KFontData			m_ResourcesVn;		/* font chu Viet TCVN3 mot byte */
 	KFontData			m_Resources;		//字体资源
 	int					m_nFontWidth;		//字体的宽
 	int					m_nFontHeight;		//字体的高

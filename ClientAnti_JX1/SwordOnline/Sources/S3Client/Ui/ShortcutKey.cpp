@@ -6,6 +6,7 @@
 *****************************************************************************************/
 #include "KWin32.h"
 #include "KIniFile.h"
+#include "KDebug.h"
 #include "ShortcutKey.h"
 #include "UiBase.h"
 #include "UiCase/UiTeamManage.h"
@@ -503,7 +504,7 @@ int LuaSwitchStatus(Lua_State * L)
 			{
 			if (g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0))
 			{		
-				if (KUiPK::GetIfVisible())
+				if (false)	/* xem ghi chu: khong bat-tat nua, luon mo */
 				KUiPK::CloseWindow();
 				else
 				KUiPK::OpenWindow();				
@@ -919,6 +920,13 @@ int LuaAddCommand(Lua_State * L)
 	strncpy(cs.szDo, strDo, 127);
 	cs.szDo[127] = 0;
 	KShortcutKeyCentre::AddCommand(&cs);
+	{
+		static int nDemLenh = 0;
+		nDemLenh++;
+		if (nDemLenh <= 3 || (nDemLenh % 40) == 0)
+			g_DebugLog("[phim] lenh thu %d: phim=%u lam=\"%s\"",
+				nDemLenh, (unsigned)cs.uKey, cs.szDo);
+	}
 
 	return 0;
 }
@@ -1397,7 +1405,7 @@ int LuaExit(Lua_State * L)
 	return 0;
 }
 
-#define GAME_CONFIG_STRING_INI "\\Ui\\тс╩Б.ini"
+#define GAME_CONFIG_STRING_INI "\\Ui\\tap-hop.ini"
 int LuaSet3D(Lua_State * L)
 {
 	if (Lua_GetTopIndex(L) != 1)
@@ -2266,7 +2274,11 @@ BOOL KShortcutKeyCentre::LoadScript(char* pFileName)
 {
 	ClearScript();
 
-	return ms_Script.Load(pFileName);
+	{
+		BOOL bXong = ms_Script.Load(pFileName);
+		g_DebugLog("[phim] nap \"%s\" -> %d", pFileName, (int)bXong);
+		return bXong;
+	}
 }
 
 BOOL KShortcutKeyCentre::UninitScript()
@@ -2659,6 +2671,9 @@ BOOL KShortcutKeyCentre::TranslateExcuteScript(const char * ScriptCommand)
 
 BOOL KShortcutKeyCentre::ExcuteScript(const char * ScriptCommand)
 {
+	g_DebugLog("[phim] chay \"%s\" trang-thai=%d bat=%d",
+		ScriptCommand ? ScriptCommand : "(rong)",
+		(int)g_UiBase.GetStatus(), (int)ms_Enable);
 	if (g_UiBase.GetStatus() != UIS_S_IDLE || !ms_Enable)
 		return FALSE;
 
@@ -2748,6 +2763,7 @@ void KShortcutKeyCentre::RemoveCommandAll()
 
 int	KShortcutKeyCentre::FindCommand(DWORD uKey)
 {
+	g_DebugLog("[phim] tra ma=%u trong %d lenh", (unsigned)uKey, ms_nCommands);
 	if (uKey == 0)
 		return -1;
 	for (int i = 0; i < ms_nCommands; i++)

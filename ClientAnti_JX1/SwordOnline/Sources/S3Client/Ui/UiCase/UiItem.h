@@ -18,7 +18,8 @@ class KUiItem : public KWndShowAnimate
 {
 public:
 	static KUiItem* OpenWindow();				//打开窗口，返回唯一的一个类对象实例
-	static KUiItem* GetIfVisible();				//如果窗口正被显示，则返回实例指针
+	static KUiItem* GetIfVisible();
+	BOOL	FindBlankBagCell(int iw, int ih, int* px, int* py);	// #3b tim o trong tui (public de UiStoreBox lay do)				//如果窗口正被显示，则返回实例指针
 	static void		CloseWindow(bool bDestroy);	//关闭窗口，同时可以选则是否删除对象实例
 	static void		LoadScheme(const char* pScheme);//载入界面方案
 	static void		OnNpcTradeMode(bool bTrue);

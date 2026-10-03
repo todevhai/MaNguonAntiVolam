@@ -15,9 +15,9 @@
 
 extern iCoreShell*		g_pCoreShell;
 
-#define MANAGE_INI_SHEET			"管理主窗口.ini"
-#define MANAGE_INI_CLIQUE			"帮派管理.ini"
-#define MANAGE_INI_CONFRATERNITY	"帮会管理.ini"
+#define MANAGE_INI_SHEET			"quan-ly-cua-so-chinh.ini"
+#define MANAGE_INI_CLIQUE			"quan-ly-bang-phai.ini"
+#define MANAGE_INI_CONFRATERNITY	"quan-ly-bang-hoi.ini"
 
 //KUiManage	g_UiManage;
 KUiManage* KUiManage::m_pSelf = NULL;

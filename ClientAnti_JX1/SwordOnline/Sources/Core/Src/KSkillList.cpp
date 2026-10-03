@@ -353,7 +353,7 @@ void KSkillList::ReEnChance()
 		m_Skills[i].EnChance = 0;
 	}
 
-	for(i = 0;i < MAX_NPCSKILL;i++)
+	for(int i = 0;i < MAX_NPCSKILL;i++)
 	{
 		if (m_Skills[i].SkillId <= 0)
 			continue;
@@ -404,7 +404,9 @@ int	KSkillList::GetSkillSortList(KUiSkillData * pSkillList)
 			case SKILL_SS_PassivityNpcState:		//	被动类		本技能用于改变Npc的被动状态
 				{
 					pOrdinSkill = (KSkill * ) pSkill;
-					if (pOrdinSkill->IsPhysical())
+					(void)pOrdinSkill;	/* khong con loc IsPhysical */
+					extern BOOL LaChieuNgoaiBangVoCong(int nSkillId);
+					if (LaChieuNgoaiBangVoCong(m_Skills[i].SkillId))
 						continue;
 
 				}break;
@@ -462,9 +464,11 @@ int KSkillList::GetLeftSkillSortList(KUiSkillData* pSkillList)
 			case SKILL_SS_PassivityNpcState:		//	被动类		本技能用于改变Npc的被动状态
 				{
 					pOrdinSkill = (KSkill * ) pISkill;
-					if ((!pOrdinSkill->IsPhysical()) &&	
-						(pOrdinSkill->GetSkillLRInfo() == BothSkill) || 
-						(pOrdinSkill->GetSkillLRInfo() == leftOnlySkill)
+					extern BOOL LaChieuVuKhi(int nSkillId);
+					if (
+						!LaChieuVuKhi(m_Skills[i].SkillId) &&
+						((pOrdinSkill->GetSkillLRInfo() == BothSkill) || 
+						(pOrdinSkill->GetSkillLRInfo() == leftOnlySkill))
 						)
 					{
 						
@@ -528,10 +532,11 @@ int KSkillList::GetRightSkillSortList(KUiSkillData* pSkillList)
 			case SKILL_SS_PassivityNpcState:		//	被动类		本技能用于改变Npc的被动状态
 				{
 					pOrdinSkill = (KSkill * ) pISkill;
+					extern BOOL LaChieuVuKhi(int nSkillId);
 					if (
-						(!pOrdinSkill->IsPhysical()) && 
-						(pOrdinSkill->GetSkillLRInfo() == BothSkill) || 
-						(pOrdinSkill->GetSkillLRInfo() == RightOnlySkill)
+						!LaChieuVuKhi(m_Skills[i].SkillId) &&
+						((pOrdinSkill->GetSkillLRInfo() == BothSkill) || 
+						(pOrdinSkill->GetSkillLRInfo() == RightOnlySkill))
 						)
 					{
 						
@@ -599,9 +604,10 @@ int KSkillList::GetSkillPosition(int nSkillId)//获得技能在技能界面的位置
 		case SKILL_SS_PassivityNpcState:		//	被动类		本技能用于改变Npc的被动状态
 			{
 				pOrdinSkill = (KSkill * ) pISkill;
+				extern BOOL LaChieuNgoaiBangVoCong(int nSkillId);
 				if (
-					(!m_Skills[i].SkillId) || 
-					(pOrdinSkill->IsPhysical())
+					(!m_Skills[i].SkillId) ||
+					LaChieuNgoaiBangVoCong(m_Skills[i].SkillId)
 					)
 				{
 					continue;

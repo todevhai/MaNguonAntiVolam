@@ -103,6 +103,32 @@ KTabFile		g_NpcKindFile; //记录Npc人物类型文件
 int				g_nMeleeWeaponSkill[MAX_MELEEWEAPON_PARTICULARTYPE_NUM];
 int				g_nRangeWeaponSkill[MAX_RANGEWEAPON_PARTICULARTYPE_NUM];	
 int				g_nHandSkill;
+
+/* Chieu nay co phai don danh thuong cua mot loai vu khi khong? */
+BOOL LaChieuVuKhi(int nSkillId)
+{
+	if (nSkillId <= 0)
+		return FALSE;
+	if (nSkillId == g_nHandSkill)
+		return TRUE;
+	for (int i = 0; i < MAX_MELEEWEAPON_PARTICULARTYPE_NUM; i++)
+		if (g_nMeleeWeaponSkill[i] == nSkillId)
+			return TRUE;
+	for (int j = 0; j < MAX_RANGEWEAPON_PARTICULARTYPE_NUM; j++)
+		if (g_nRangeWeaponSkill[j] == nSkillId)
+			return TRUE;
+	return FALSE;
+}
+
+/* Chieu khong bao gio cong diem duoc, nen bang vo cong (F5) giau di:
+   53 la don danh thuong cua vu khi - client tu gan vao o tay trai,
+   210 la khinh cong - chi co MOT cap. De chung trong bang thi nguoi
+   choi thay o co nut "+" bam vao khong an gi. Ca hai VAN nam trong
+   danh sach chon chieu tay trai/tay phai va thanh phim tat. */
+BOOL LaChieuNgoaiBangVoCong(int nSkillId)
+{
+	return (nSkillId == 53 || nSkillId == 210);
+}
 #ifndef	_SERVER
 KSoundCache		g_SoundCache;
 KMusic			*g_pMusic = NULL;
@@ -112,7 +138,7 @@ KMusic			*g_pMusic = NULL;
 //CORE_API BOOL			g_bDebugScript;//When True , Testing Debug, Script Will be ReLoaded EveryTime When to be Executed, Not Using ScriptCach.
 //#endif
 
-//KLuaScript	*	g_pNpcLevelScript = NULL;
+KLuaScript	*	g_pNpcLevelScript = NULL;
 //KLuaScript g_WorldScript;
 
 void g_InitProtocol();
@@ -441,7 +467,7 @@ BOOL	InitMissleSetting()
 		int nMissleId = 0;
 		g_MisslesSetting.GetInteger(i + 2, "MissleId", -1, &nMissleId);
 		
-		if (nMissleId > 0)
+		if (nMissleId > 0 && nMissleId < MAX_MISSLESTYLE)	// id vuot tran thi bo qua, dung ghi ra ngoai g_MisslesLib
 		{
 			g_MisslesLib[nMissleId].GetInfoFromTabFile(i + 2);
 			g_MisslesLib[nMissleId].m_nMissleId = nMissleId;

@@ -153,6 +153,7 @@ class KItem
 public:
 	KItem();
 	~KItem();
+	const char* GetImageName() { return m_CommonAttrib.szImageName; }
 
 // 以下是核心成员变量
 private:
@@ -244,6 +245,7 @@ public:
 	int		GetSetPrice() {return m_CommonAttrib.uPrice;};
 
 	void	Paint(int nX, int nY,BOOL bStack = TRUE);
+	BOOL	GetIconFrameBox(int* pOffX, int* pOffY, int* pW, int* pH);	// khung THAT cua icon SPR
 	void	GetDesc(char* pszMsg, bool bShowPrice = false, int nPriceScale = 1, int nActiveAttrib = 0);
 #endif
 

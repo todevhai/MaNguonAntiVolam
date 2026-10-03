@@ -80,6 +80,7 @@ public:
 	void			EnablePickPut(bool bEnable);
 	int				GetObjectNum();
 	void			GetObjectById(KUiDraggedObject& Obj, int id);
+	BOOL	FindBlankCell(int iw, int ih, int* px, int* py);	// #3 tim o trong fit iw*ih (public)
 protected:
 	void			Clone(KWndObjectMatrix* pCopy);
 private:

@@ -223,6 +223,24 @@ void KAutoControl::RunLine(const char* szLine)
 			g_DebugLog("[AUTO] chieu %d len chinh minh", nChieu);
 		}
 	}
+	else if (!strcmp(szCmd, "route"))
+	{
+		// route <mapId> = di bo toi map do theo bang autopathfindroutes.txt
+		// (mapId nhu khoa trong settings/maplist.ini). route stop = huy.
+		int nMap = 0;
+		if (!strncmp(szArg, "stop", 4))
+		{
+			if (g_pCoreShell) g_pCoreShell->OperationRequest(GOI_FINDPOS, 0, 0);
+			g_DebugLog("[AUTO] route stop");
+		}
+		else if (sscanf(szArg, "%d", &nMap) == 1 && nMap > 0 && g_pCoreShell)
+		{
+			int nHop = g_pCoreShell->OperationRequest(GOI_FINDPOS, (unsigned int)nMap, 0);
+			g_DebugLog("[AUTO] route %d -> %d chang", nMap, nHop);
+		}
+		else
+			g_DebugLog("[AUTO] route: thieu hoac sai mapId (%s)", szArg);
+	}
 	else if (!strcmp(szCmd, "ride"))
 	{
 		// Dung hanh dong cua phim M: Switch([[horse]]) -> PA_RIDE. Server quyet
@@ -246,6 +264,11 @@ void KAutoControl::RunLine(const char* szLine)
 //---------------------------------------------------------------------------
 void KAutoControl::Tick()
 {
+	// Nhip tu-tim-duong lien ban do. PHAI dat TRUOC fopen: ngay duoi la
+	// duong thoat "khong co file lenh" -> de sau thi tuyen khong bao gio chay.
+	if (g_pCoreShell)
+		g_pCoreShell->OperationRequest(GOI_FINDPOS, 0xFFFFFFFF, 0);
+
 	FILE* fp = fopen(AUTO_CMD_FILE, "rb");
 	if (!fp) return;
 

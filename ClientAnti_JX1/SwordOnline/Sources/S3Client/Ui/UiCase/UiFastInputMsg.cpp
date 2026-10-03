@@ -25,7 +25,7 @@ extern iRepresentShell*	g_pRepresentShell;
 
 extern iCoreShell*		g_pCoreShell;
 
-#define	SCHEME_INI		"快速输入消息界面.ini"
+#define	SCHEME_INI		"nhap-nhanh-tin-nhan.ini"
 
 #define		SWITCH_OPEN_CLOSE		1
 #define		SEL_COLOR_MENU			1

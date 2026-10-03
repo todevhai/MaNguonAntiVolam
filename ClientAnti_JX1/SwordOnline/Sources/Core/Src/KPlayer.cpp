@@ -464,7 +464,30 @@ void KPlayer::ProcessMouse(int x, int y, int Key, MOUSE_BUTTON nButton)
 		return;
 	}
 	
-	if ((Key & MK_SHIFT) || (nButton == button_right))
+	BOOL bChieuTayTrai = FALSE;
+	if (nButton == button_left && !(Key & MK_SHIFT)
+		&& m_nLeftSkillID > 0 && m_nLeftSkillID != g_nHandSkill)
+	{
+		/* FindSelectNpc XOA m_nPeapleIdx khi bam truot, nen phai cat giu roi
+		   tra lai - khong thi moi cu bam xuong dat trong deu lam mat muc tieu
+		   dang chon va nhanh di-roi-danh ben duoi hong theo. */
+		int nMucTieuCu = m_nPeapleIdx;
+		FindSelectNpc(x, y, relation_enemy);
+		if (m_nPeapleIdx)
+		{
+			/* CHI phat khi da TRONG TAM. Ngoai tam thi giu duong cu (di toi
+			   roi danh): phat tu xa thi client tien len con may chu giu vi tri
+			   cu roi keo ve - nhin ra ngoai la nhan vat giat lui tung nac
+			   giong luc tim duong bi ket. */
+			ISkill* pChieuTrai = g_SkillManager.GetSkill(m_nLeftSkillID, 1);
+			int nTamDanh = pChieuTrai ? pChieuTrai->GetAttackRadius() : 0;
+			if (nTamDanh > 0 && NpcSet.GetDistance(m_nIndex, m_nPeapleIdx) <= nTamDanh)
+				bChieuTayTrai = TRUE;
+		}
+		else
+			m_nPeapleIdx = nMucTieuCu;
+	}
+	if ((Key & MK_SHIFT) || (nButton == button_right) || bChieuTayTrai)
 	{
 		if (Npc[m_nIndex].m_ActiveSkillID > 0)
 		{
@@ -2614,7 +2637,7 @@ void	KPlayer::UpdataCurData()
 	Npc[m_nIndex].m_CurrentAttackRating	= Npc[m_nIndex].m_AttackRating;
 	Npc[m_nIndex].m_CurrentAttackSpeed	= Npc[m_nIndex].m_AttackSpeed;
 //	Npc[m_nIndex].m_CurrentCamp			= Npc[m_nIndex].m_Camp;
-	Npc[m_nIndex].m_CurrentCastSpeed	= Npc[m_nIndex].m_CastSpeed;
+	Npc[m_nIndex].m_CurrentCastSpeed	= Npc[m_nIndex].m_CastSpeed; memset(Npc[m_nIndex].m_nKhangYan, 0, sizeof(Npc[m_nIndex].m_nKhangYan)); Npc[m_nIndex].m_nTocDanhYan = Npc[m_nIndex].m_nTocPhatYan = Npc[m_nIndex].m_nPhucHoiYan = 0;
 	ZeroMemory(&Npc[m_nIndex].m_CurrentMagicColdDamage, sizeof(KMagicAttrib));
 	ZeroMemory(&Npc[m_nIndex].m_CurrentColdDamage, sizeof(KMagicAttrib));
 	Npc[m_nIndex].m_CurrentColdEnhance	= 0;
@@ -3113,6 +3136,18 @@ BOOL	KPlayer::ApplyUseItem(int nItemID, ItemPos SrcPos)
 	
 	if (nRet == REQUEST_EQUIP_ITEM)
 	{
+		// Mac do = MOT lenh move CHEO tu o tui sang o trang bi.
+		// Truoc day dung 3 MoveItem (pick/equip/putback) NHUNG SendClientCmdMoveItem
+		// return ngay khi IsLockOperation() -> sau goi DAU (pick) item-list bi khoa
+		// -> goi 2 (equip) + 3 KHONG bao gio gui -> item chi len tay, khong mac.
+		// Nay gui MOT goi cheo (giong cat/lay ruong): server ServerMoveItem tach
+		// thanh pick(tui->tay) + put(tay->o trang bi=Equip). 1 goi -> khong dinh lock.
+		ItemPos EquipPos;
+		EquipPos.nPlace = pos_equip;
+		EquipPos.nX = m_ItemList.GetEquipPlace(Item[nItemID].GetDetailType());
+		EquipPos.nY = 0;
+		g_DebugLog("[EQUIP] item=%d detail=%d slot=%d pos_equip=%d src=%d,%d,%d hand=%d", nItemID, Item[nItemID].GetDetailType(), EquipPos.nX, pos_equip, SrcPos.nPlace, SrcPos.nX, SrcPos.nY, m_ItemList.Hand());
+		MoveItem(SrcPos, EquipPos);
 	}
 	else if (nRet == REQUEST_EAT_MEDICINE)
 	{
@@ -3707,6 +3742,7 @@ void	KPlayer::SetRightSkill(int nSkillID)
 	CoreDataChanged(GDCNI_PLAYER_IMMED_ITEMSKILL, (unsigned int)&Info, -2);
 }
 
+extern BOOL LaChieuVuKhi(int nSkillId);	/* KCore.cpp: don danh thuong cua mot loai vu khi */
 void KPlayer::UpdateWeaponSkill()
 {
 	if (m_nLeftSkillID > 0)
@@ -3715,7 +3751,7 @@ void KPlayer::UpdateWeaponSkill()
 		if (!pISkill) 
             return;
 		
-		if (pISkill->IsPhysical())
+		if (LaChieuVuKhi(m_nLeftSkillID))	/* giu chieu mon phai khi doi vu khi */
 		{
 			SetLeftSkill(Npc[m_nIndex].GetCurActiveWeaponSkill());
 		}
@@ -3727,7 +3763,7 @@ void KPlayer::UpdateWeaponSkill()
 		if (!pISkill) 
             return;
 		
-		if (pISkill->IsPhysical())
+		if (LaChieuVuKhi(m_nRightSkillID))	/* giu chieu mon phai khi doi vu khi */
 		{
 			SetRightSkill(Npc[m_nIndex].GetCurActiveWeaponSkill());
 		}
@@ -5379,7 +5415,8 @@ void	KPlayer::OnScriptAction(PLAYER_SCRIPTACTION_SYNC * pMsg)
 					g_bUISelIntelActiveWithServer = pScriptAction->m_bParam2;
 					g_bUISelLastSelCount = pQuest->AnswerCount;
                     /*******************************************Code by thienthanden2*******************************************************/ 
-                    if (m_nImageNpcID) 
+                    if (m_nImageNpcID && Npc[m_nImageNpcID].GetNpcRes() &&
+                        Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode) 
                     { 
                     char szBuffer[128]; 
                     for (int i = 0; i < 16; i++) 
@@ -5387,8 +5424,12 @@ void	KPlayer::OnScriptAction(PLAYER_SCRIPTACTION_SYNC * pMsg)
                         if (szBuffer[0]) 
                             { 
                             strcpy(pImage->ImageFile, szBuffer); 
-                            pImage->MaxFrame = (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(i, 3, 0, 16))/ 
-                            (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(i, 3, 0, 16)); goto Next; 
+                            { 
+                            int nHuong = Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(i, 3, 0, 16); 
+                            pImage->MaxFrame = nHuong > 0 ? 
+                                (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(i, 3, 0, 16)) / nHuong : 1; 
+                            } 
+                            goto Next; 
                             } 
                         } 
                     for (int j = 0; j < 16; j++) 
@@ -5397,8 +5438,12 @@ void	KPlayer::OnScriptAction(PLAYER_SCRIPTACTION_SYNC * pMsg)
                         if (szBuffer[0]) 
                             { 
                             strcpy(pImage->ImageFile, szBuffer); 
-                            pImage->MaxFrame = (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(j, 0, 0, 16))/ 
-                            (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(j, 0, 0, 16)); goto Next; 
+                            { 
+                            int nHuong = Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalDirs(j, 0, 0, 16); 
+                            pImage->MaxFrame = nHuong > 0 ? 
+                                (Npc[m_nImageNpcID].GetNpcRes()->m_pcResNode->GetTotalFrames(j, 0, 0, 16)) / nHuong : 1; 
+                            } 
+                            goto Next; 
                             } 
                         } 
                      
@@ -6563,7 +6608,7 @@ void KPlayer::GetEchoDamage(int* nMin, int* nMax, int nType)
 		}
 	}
 	pMagicData++;
-	// Calc cold damage
+	if (!bIsPhysical && magic_colddamage_v == pMagicData->nAttribType && pMagicData->nValue[0] > 0) { *nMin += m_nCurEngergy; *nMax += m_nCurEngergy; }	// Calc cold damage
 	if (magic_colddamage_v == pMagicData->nAttribType)
 	{
 		*nMin += pMagicData->nValue[0];
@@ -6581,7 +6626,7 @@ void KPlayer::GetEchoDamage(int* nMin, int* nMax, int nType)
 		*nMax += Npc[m_nIndex].m_CurrentColdDamage.nValue[2];
 	}
 	pMagicData++;
-	// Calc fire damage
+	if (!bIsPhysical && magic_firedamage_v == pMagicData->nAttribType && pMagicData->nValue[0] > 0) { *nMin += m_nCurEngergy; *nMax += m_nCurEngergy; }	// Calc fire damage
 	if (magic_firedamage_v == pMagicData->nAttribType)
 	{
 		*nMin += pMagicData->nValue[0];
@@ -6599,7 +6644,7 @@ void KPlayer::GetEchoDamage(int* nMin, int* nMax, int nType)
 		*nMax += Npc[m_nIndex].m_CurrentFireDamage.nValue[2];
 	}
 	pMagicData++;
-	// Calc lighting damage
+	if (!bIsPhysical && magic_lightingdamage_v == pMagicData->nAttribType && pMagicData->nValue[0] > 0) { *nMin += m_nCurEngergy; *nMax += m_nCurEngergy; }	// Calc lighting damage
 	if (magic_lightingdamage_v == pMagicData->nAttribType)
 	{
 		*nMin += pMagicData->nValue[0];
@@ -6617,7 +6662,7 @@ void KPlayer::GetEchoDamage(int* nMin, int* nMax, int nType)
 		*nMax += Npc[m_nIndex].m_CurrentLightDamage.nValue[2];
 	}
 	pMagicData++;
-	// Calc poison damage
+	if (!bIsPhysical && magic_poisondamage_v == pMagicData->nAttribType && pMagicData->nValue[0] > 0) { *nMin += m_nCurEngergy; *nMax += m_nCurEngergy; }	// Calc poison damage
 	if (magic_poisondamage_v == pMagicData->nAttribType)
 	{
 			*nMin += pMagicData->nValue[0];

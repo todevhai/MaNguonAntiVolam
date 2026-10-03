@@ -253,7 +253,7 @@ void KScenePlaceC::ClosePlace()
 
 	EnterCriticalSection(&m_ProcessCritical);
 	ClearPreprocess(true);
-	for (i = 0; i < SPWP_MAX_NUM_REGIONS; i++)
+	for (int i = 0; i < SPWP_MAX_NUM_REGIONS; i++)
 		m_RegionObjs[i].Clear();
 	LeaveCriticalSection(&m_ProcessCritical);
 
@@ -401,7 +401,7 @@ bool KScenePlaceC::OpenPlace(int nPlaceIndex)
 	g_nMapIndex = nPlaceIndex;		//场景索引数值
 #endif
 
-	m_FocusRegion.x = m_FocusRegion.y = -SPWP_LOAD_EXTEND_RANGE;
+	m_FocusRegion.x = m_FocusRegion.y = -SPWP_LOAD_EXTEND_RANGE; m_FocusPosition.x = m_FocusPosition.y = SPWP_FARAWAY_COORD;
 	m_FocusMoveOffset.cx = m_FocusMoveOffset.cy = 0;
 	int	nImageIndex = 0;
 	for (int i = 0; i < SPWP_MAX_NUM_REGIONS; i++)
@@ -1009,7 +1009,18 @@ void KScenePlaceC::Breathe()
 
 	if (m_bLoading)
 	{
-		WaitForSingleObject(m_hSwitchLoadFinishedEvent, SPWP_SWITCH_SCENE_TIMEOUT);
+		if (WaitForSingleObject(m_hSwitchLoadFinishedEvent, 200) == WAIT_TIMEOUT)
+		{
+			static DWORD s_dwLanLogChoNap = 0;
+			if (GetTickCount() - s_dwLanLogChoNap > 1000)
+			{
+				s_dwLanLogChoNap = GetTickCount();
+				g_DebugLog("[Scene]cho nap canh qua 200ms: tiep=%d vung=(%d,%d) tieu-diem=(%d,%d)",
+					m_nFirstToLoadIndex, m_FocusRegion.x, m_FocusRegion.y, m_FocusPosition.x, m_FocusPosition.y);
+			}
+			if (m_nFirstToLoadIndex < 0)
+				SetLoadingStatus(false);
+		}
 		m_bRenderGround = true;
 	}
 
@@ -1149,7 +1160,7 @@ void KScenePlaceC::ChangeProcessArea()
 		nNum = SPWP_MAX_NUM_REGIONS;
 	else
 		nNum = m_nFirstToLoadIndex;
-	for (i = 0; i < nNum; i++)
+	for (int i = 0; i < nNum; i++)
 	{
 		m_pRegions[i]->GetRegionIndex(h, v);
 		if (INSIDE_AREA(h, v, 1))
@@ -1397,7 +1408,7 @@ void KScenePlaceC::Preprocess()
 					dy = pObj->oEndPos.y - pObj->oPosition.y;
 					int nLength2 = dx * dx + dy * dy;
 
-					for (unsigned int k = 0; k < nTotalLineObj; k++)
+					unsigned int k; for (k = 0; k < nTotalLineObj; k++)
 					{
 						if (nLength2 > pNodeList[k].nLength2)
 						{

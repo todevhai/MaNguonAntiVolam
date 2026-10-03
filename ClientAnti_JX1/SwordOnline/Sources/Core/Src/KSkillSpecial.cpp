@@ -26,7 +26,7 @@ KSkillSpecial::KSkillSpecial()
 	m_RUImage.uImage = 0;
 	m_RUImage.nType = ISI_T_SPR;
 	m_RUImage.Color.Color_b.a = 255;
-	m_RUImage.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA;
+	m_RUImage.bRenderStyle = IMAGE_RENDER_STYLE_ALPHA_NOT_BE_LIT;
 	m_RUImage.nISPosition = IMAGE_IS_POSITION_INIT;
 	m_RUImage.bRenderFlag = RUIMAGE_RENDER_FLAG_REF_SPOT;
 	m_eStatus = 0;

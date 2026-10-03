@@ -28,6 +28,8 @@
 #include "MsgGenreDef.h"
 #include "KOption.h"
 #include "KSubWorld.h"
+#include "KAutoRoute.h"
+#include "KAutoPath.h"
 #include "KViewItem.h"
 #include "KTongProtocol.h"
 #include "malloc.h"
@@ -342,6 +344,27 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 			}
 		}
 		break;
+	case GDI_ITEM_SALE_PRICE:
+		if (uParam > 0 && uParam < MAX_ITEM)
+			nRet = Item[uParam].GetSetPrice();	/* gia NIEM YET (uPrice), khong phai gia goc (nPrice) */
+		break;
+
+	case GDI_GAME_OBJ_IMAGE:
+		if (nParam && uParam)
+		{
+			KUiObjAtContRegion* pObjImg = (KUiObjAtContRegion *)uParam;
+			char* pszImg = (char *)nParam;
+			pszImg[0] = 0;
+			if (pObjImg->Obj.uGenre == CGOG_ITEM && pObjImg->Obj.uId)
+			{
+				const char* pNm = Item[pObjImg->Obj.uId].GetImageName();
+				int iNm = 0;
+				for (; pNm[iNm] && iNm < 79; iNm++) pszImg[iNm] = pNm[iNm];
+				pszImg[iNm] = 0;
+			}
+		}
+		break;
+
 	case GDI_GAME_OBJ_DESC:
 		if (nParam && uParam)
 		{
@@ -550,31 +573,31 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 			pInfo->nAttack = pNpc->m_CurrentAttackRating;				//¹¥»÷Á¦
 			pInfo->nDefence = pNpc->m_CurrentDefend;					//·ÀÓùÁ¦
 			pInfo->nMoveSpeed = pNpc->m_CurrentRunSpeed;				//ÒÆ¶¯ËÙ¶È
-			pInfo->nAttackSpeed = pNpc->m_CurrentAttackSpeed;			//¹¥»÷ËÙ¶È
-			pInfo->nCastSpeed = pNpc->m_CurrentCastSpeed;
+			pInfo->nAttackSpeed = pNpc->TocDanhHieuLuc();			//¹¥»÷ËÙ¶È
+			pInfo->nCastSpeed = pNpc->TocPhatHieuLuc();
 			//ÎïÀí·ÀÓù
 			if (pNpc->m_CurrentPhysicsResistMax >= pNpc->m_CurrentPhysicsResist)
-				pInfo->nPhyDef = pNpc->m_CurrentPhysicsResist;
+				pInfo->nPhyDef = pNpc->KhangHienThi(pNpc->m_CurrentPhysicsResist, pNpc->m_CurrentPhysicsResistMax, KNpc::KHANG_VAT_LY);
 			else
 				pInfo->nPhyDef = pNpc->m_CurrentPhysicsResistMax;
 			//±ù¶³·ÀÓù
 			if (pNpc->m_CurrentColdResistMax >= pNpc->m_CurrentColdResist)
-				pInfo->nCoolDef = pNpc->m_CurrentColdResist;
+				pInfo->nCoolDef = pNpc->KhangHienThi(pNpc->m_CurrentColdResist, pNpc->m_CurrentColdResistMax, KNpc::KHANG_BANG);
 			else
 				pInfo->nCoolDef = pNpc->m_CurrentColdResistMax;
 			//ÉÁµç·ÀÓù
 			if (pNpc->m_CurrentLightResistMax >= pNpc->m_CurrentLightResist)
-				pInfo->nLightDef = pNpc->m_CurrentLightResist;
+				pInfo->nLightDef = pNpc->KhangHienThi(pNpc->m_CurrentLightResist, pNpc->m_CurrentLightResistMax, KNpc::KHANG_LOI);
 			else
 				pInfo->nLightDef = pNpc->m_CurrentLightResistMax;
 			//»ðÑæ·ÀÓù
 			if (pNpc->m_CurrentFireResistMax >= pNpc->m_CurrentFireResist)
-				pInfo->nFireDef = pNpc->m_CurrentFireResist;
+				pInfo->nFireDef = pNpc->KhangHienThi(pNpc->m_CurrentFireResist, pNpc->m_CurrentFireResistMax, KNpc::KHANG_HOA);
 			else
 				pInfo->nFireDef = pNpc->m_CurrentFireResistMax;
 			//¶¾ËØ·ÀÓù
 			if (pNpc->m_CurrentPoisonResistMax >= pNpc->m_CurrentPoisonResist)
-				pInfo->nPoisonDef = pNpc->m_CurrentPoisonResist;
+				pInfo->nPoisonDef = pNpc->KhangHienThi(pNpc->m_CurrentPoisonResist, pNpc->m_CurrentPoisonResistMax, KNpc::KHANG_DOC);
 			else
 				pInfo->nPoisonDef = pNpc->m_CurrentPoisonResistMax;
 			
@@ -1120,7 +1143,7 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 		}
 		break;
 	case GDI_IMMEDIATEITEM_NUM:
-		if (uParam >= 0 && uParam < 3)
+		if (uParam >= 0 && uParam < MAX_IMMEDIACY_ITEM)
 			nRet = Player[CLIENT_PLAYER_INDEX].m_ItemList.GetSameDetailItemNum(uParam);
 		break;
 	//ÓëNPCµÄÂòÂô
@@ -1720,6 +1743,17 @@ int	KCoreShell::OperationRequest(unsigned int uOper, unsigned int uParam, int nP
 		{
 			char* sShopName = (char *)uParam;
 			
+			if (sShopName == 0 || sShopName[0] == 0)
+			{
+				KSystemMessage	sMsg;
+				sprintf(sMsg.szMessage, "H\267y \256\306t L\352i rao tr\255\355c khi b\265y b\270n!");	/* TCVN3 */
+				sMsg.eType = SMT_SYSTEM;	/* SMT_SYSTEM: popup noi, khong chim vao chat */
+				sMsg.byConfirmType = SMCT_NONE;
+				sMsg.byPriority = 0;
+				sMsg.byParamSize = 0;
+				CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, 0);
+				return 0;
+			}
 			if (Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_bRideHorse)
 			{
 				KSystemMessage	sMsg;
@@ -2709,6 +2743,12 @@ case GOI_AUTO_COMMAND:
 
 	case GOI_FINDPOS: 
 		{
+			if (uParam == 0)
+				AutoRouteCancel("lenh dung");
+			else if (uParam == 0xFFFFFFFF)
+				AutoRouteTick();
+			else
+				nRet = AutoRouteStart((int)uParam);
 		} 
         break; 
 
@@ -2744,7 +2784,19 @@ case GOI_AUTO_COMMAND:
 				break;
 			int nX, nY;
 			Npc[nMinh].GetMpsPos(&nX, &nY);
-			int nGan = 0, nGanNhat = 0;
+			/* Phep doi khong gian -> khung nhin, lay TRUOC vong lap de loc
+			   theo man hinh. Tuyen tinh nen hai mau la du. */
+			int nLocAx = 0, nLocAy = 0, nLocAz = 0;
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nLocAx, nLocAy, nLocAz);
+			int nLocBx = 100, nLocBy = 100, nLocBz = 0;
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nLocBx, nLocBy, nLocBz);
+			int nLocHsX = nLocBx - nLocAx, nLocHsY = nLocBy - nLocAy;
+			/* Do phan giai client: config.ini [Client] Resolution = 1 la
+			   1024x768. Chua bien 80 diem moi ria de hieu ung no con nam
+			   tron trong khung, khong bi cat mat nua. */
+			const int nRongKhung = 1024, nCaoKhung = 768, nBien = 80;
+			int nGan = 0, nGanNhat = 0;		/* gan nhat, khong ke khung nhin */
+			int nTrong = 0, nTrongNhat = 0;	/* gan nhat TRONG khung nhin */
 			for (int i = 1; i < MAX_NPC; i++)
 			{
 				if (i == nMinh || Npc[i].m_Index <= 0)
@@ -2760,7 +2812,24 @@ case GOI_AUTO_COMMAND:
 					nGan = i;
 					nGanNhat = nKc;
 				}
+				if (nLocHsX && nLocHsY)
+				{
+					int nVx = (nQx - nLocAx) * 100 / nLocHsX;
+					int nVy = (nQy - nLocAy) * 100 / nLocHsY;
+					if (nVx >= nBien && nVx <= nRongKhung - nBien &&
+						nVy >= nBien && nVy <= nCaoKhung - nBien &&
+						(nTrong == 0 || nKc < nTrongNhat))
+					{
+						nTrong = i;
+						nTrongNhat = nKc;
+					}
+				}
 			}
+			if (nTrong)
+				nGan = nTrong;				/* uu tien con nhin thay duoc */
+			else if (nGan)
+				g_DebugLog("[danh-quai] khong con nao trong khung nhin, "
+					"danh con gan nhat o ngoai");
 			if (nGan == 0)
 			{
 				g_DebugLog("[danh-quai] khong thay quai thu dich nao");
@@ -3339,7 +3408,7 @@ case GOI_AUTO_COMMAND:
 						Msg.eType = SMT_NORMAL;
 						Msg.byPriority = 1;
 						Msg.byParamSize = 0;
-						strcpy(Msg.szMessage, "MËt khÈu ph¶i dµi ®ñ 6 ch÷ sè");
+						strcpy(Msg.szMessage, "MËt khÈu ph¶i lµ sè, tõ 1 ®Õn 9 ch÷ sè");
 						CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, 0);
 					}
 				break;
@@ -3869,15 +3938,340 @@ int KCoreShell::LockObjectAction(int nTargetIndex)
 	if (nTargetIndex <= 0)	//È¡ÏûLock
 		Npc[nIndex].m_nObjectIdx = 0;
 	else
+	{
 		Npc[nIndex].m_nObjectIdx = nTargetIndex;
+		g_DebugLog("[vat-the] khoa dich %d kind=%d", nTargetIndex, Object[nTargetIndex].m_nKind);
+	}
 
 	return 1;
 }
 
+/* ---- Tim duong cho lenh bam ban do (ghi chu cu nam trong port-fixes.py - xem lich su git truoc 03/10/2026) ---- */
+#define defTD_O          32     /* mot o luoi = 32 diem ban do */
+#define defTD_CANH       64     /* hop tim duong 64x64 o */
+#define defTD_SO_O       (defTD_CANH * defTD_CANH)
+#define defTD_MAX_CHANG  96
+#define defTD_TOI_NOI    48     /* coi nhu toi chang khi con cach duoi 48 diem */
+#define defTD_MAX_XET    4096   /* het luoi 64x64; 1500 cu qua thap cho duong chu Z */
+#define defTD_NHIP_KET   60      /* bao nhieu nhip khong ngan duoc khoang cach thi coi la ket */
+#define defTD_MAX_KET    6      /* tinh lai qua nhieu lan thi thoi, tranh lap vo han */
+
+static int   s_nTDGocX = 0, s_nTDGocY = 0;
+static short s_nTDG[defTD_SO_O];
+static short s_nTDCha[defTD_SO_O];
+static unsigned char s_bTDDaXet[defTD_SO_O];
+static unsigned char s_bTDNpc[defTD_SO_O];	/* o co NPC/quai dung chan */
+static short s_nTDLan[defTD_SO_O];
+
+static int s_nChangX[defTD_MAX_CHANG];
+static int s_nChangY[defTD_MAX_CHANG];
+static int s_nSoChang  = 0;
+static int s_nChangDang = 0;
+static int  s_bDoDang = 0;      /* duong chi toi duoc mot phan */
+static int  s_nKcTruoc = 0x7fffffff;  /* khoang cach toi chang o nhip truoc */
+static int  s_nDemKet = 0;      /* so nhip lien tiep dung yen */
+static int  s_nSoLanKet = 0;    /* da tinh lai bao nhieu lan cho mot lenh */
+static int  s_bTinhLai = 0;     /* lenh nay do chinh ta phat lai sau khi ket */
+static int  s_nDichCuoiX = 0;   /* diem nguoi choi bam, de tinh tiep */
+static int  s_nDichCuoiY = 0;
+static int s_nChangMode = 0;
+
+/* Vi tri nhan vat theo diem ban do (mps). */
+static void TD_ViTriNguoi(int* pnX, int* pnY)
+{
+	int nIdx = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+	*pnX = 0;
+	*pnY = 0;
+	if (nIdx > 0 && Npc[nIdx].m_RegionIndex >= 0)
+		Npc[nIdx].GetMpsPos(pnX, pnY);
+}
+
+static int TD_DiDuoc(int nX, int nY)
+{
+	return SubWorld[0].GetBarrier(nX, nY) == 0;
+}
+
+/* Tra ve so chang tim duoc, 0 neu khong co duong. */
+static int TD_TimDuong(int nTuX, int nTuY, int nDenX, int nDenY)
+{
+	int i;
+	static const int nDX8[8] = { 1, -1, 0, 0, 1, 1, -1, -1 };
+	static const int nDY8[8] = { 0, 0, 1, -1, 1, -1, 1, -1 };
+
+	s_nSoChang = 0;
+	s_nChangDang = 0;
+	/* Luoi phai bao NHAN VAT, khong phai trung diem giua nguoi va dich:
+	   dat theo trung diem thi dich cang xa luoi cang troi ve phia dich va
+	   chinh nguoi choi roi ra ngoai (do duoc o_bat(35,-17)), A* bo cuoc
+	   ngay. Dich nam ngoai luoi thi da co duong di do dang lo. */
+	s_nTDGocX = nTuX - (defTD_CANH / 2) * defTD_O;
+	s_nTDGocY = nTuY - (defTD_CANH / 2) * defTD_O;
+
+	int nBatX = (nTuX - s_nTDGocX) / defTD_O;
+	int nBatY = (nTuY - s_nTDGocY) / defTD_O;
+	int nDichX = (nDenX - s_nTDGocX) / defTD_O;
+	int nDichY = (nDenY - s_nTDGocY) / defTD_O;
+	if (nBatX < 0 || nBatY < 0 || nBatX >= defTD_CANH || nBatY >= defTD_CANH)
+	{
+		/* Ra khoi luoi: xay ra khi TD_ViTriNguoi khong lay duoc vi tri
+		   nhan vat (tra 0,0). Bo cuoc, GotoWhere se di thang. */
+		return 0;
+	}
+	if (nDichX < 0) nDichX = 0;
+	if (nDichY < 0) nDichY = 0;
+	if (nDichX >= defTD_CANH) nDichX = defTD_CANH - 1;
+	if (nDichY >= defTD_CANH) nDichY = defTD_CANH - 1;
+
+	for (i = 0; i < defTD_SO_O; i++)
+	{
+		s_nTDG[i] = -1;
+		s_nTDCha[i] = -1;
+		s_bTDDaXet[i] = 0;
+		s_bTDNpc[i] = 0;
+	}
+	int nBatDau  = nBatY * defTD_CANH + nBatX;
+	int nKetThuc = nDichY * defTD_CANH + nDichX;
+	s_nTDG[nBatDau] = 0;
+
+	/* Quai va NPC KHONG nam trong du lieu chuong ngai cua ban do nen A*
+	   khong biet ne. Nhung client giu san danh sach NPC quanh nguoi choi -
+	   danh dau o cua chung lai, coi nhu tuong. */
+	int nNpcIdx = 0;
+	int nMinh = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+	while ((nNpcIdx = NpcSet.GetNextIdx(nNpcIdx)) != 0)
+	{
+		if (nNpcIdx == nMinh || Npc[nNpcIdx].m_RegionIndex < 0)
+			continue;
+		int nNx = 0, nNy = 0;
+		Npc[nNpcIdx].GetMpsPos(&nNx, &nNy);
+		nNx -= s_nTDGocX;
+		nNy -= s_nTDGocY;
+		if (nNx < 0 || nNy < 0)	/* chia so am trong C lam tron ve 0 */
+			continue;
+		int nOx = nNx / defTD_O;
+		int nOy = nNy / defTD_O;
+		if (nOx < defTD_CANH && nOy < defTD_CANH)
+			s_bTDNpc[nOy * defTD_CANH + nOx] = 1;
+	}
+	/* O dang dung va o dich thi khong duoc coi la tuong. */
+	s_bTDNpc[nBatDau] = 0;
+	s_bTDNpc[nKetThuc] = 0;
+
+	int nSoXet = 0;
+	while (nSoXet < defTD_MAX_XET)
+	{
+		int nTot = -1, nFTot = 0;
+		for (i = 0; i < defTD_SO_O; i++)
+		{
+			if (s_nTDG[i] < 0 || s_bTDDaXet[i])
+				continue;
+			int nCx = i % defTD_CANH;
+			int nCy = i / defTD_CANH;
+			int nAx = nCx - nDichX; if (nAx < 0) nAx = -nAx;
+			int nAy = nCy - nDichY; if (nAy < 0) nAy = -nAy;
+			int nF = s_nTDG[i] + nAx + nAy;
+			if (nTot < 0 || nF < nFTot)
+			{
+				nTot = i;
+				nFTot = nF;
+			}
+		}
+		if (nTot < 0 || nTot == nKetThuc)
+			break;
+		s_bTDDaXet[nTot] = 1;
+		nSoXet++;
+
+		int nCx = nTot % defTD_CANH;
+		int nCy = nTot / defTD_CANH;
+		for (i = 0; i < 8; i++)
+		{
+			int nNx = nCx + nDX8[i];
+			int nNy = nCy + nDY8[i];
+			if (nNx < 0 || nNy < 0 || nNx >= defTD_CANH || nNy >= defTD_CANH)
+				continue;
+			int nJ = nNy * defTD_CANH + nNx;
+			if (s_bTDDaXet[nJ])
+				continue;
+			if (s_bTDNpc[nJ])
+				continue;
+			/* Khong duoc CAT GOC: di cheo ma mot trong hai o ke bi chan
+			   thi that ra nhan vat khong lach qua khe do duoc. Day la cho
+			   lam duong hinh chu Z dut giua chung. */
+			if (i >= 4)
+			{
+				int nKe1 = nCy * defTD_CANH + nNx;
+				int nKe2 = nNy * defTD_CANH + nCx;
+				if (s_bTDNpc[nKe1] || s_bTDNpc[nKe2])
+					continue;
+				if (!TD_DiDuoc(s_nTDGocX + nNx * defTD_O + defTD_O / 2,
+						s_nTDGocY + nCy * defTD_O + defTD_O / 2))
+					continue;
+				if (!TD_DiDuoc(s_nTDGocX + nCx * defTD_O + defTD_O / 2,
+						s_nTDGocY + nNy * defTD_O + defTD_O / 2))
+					continue;
+			}
+			if (!TD_DiDuoc(s_nTDGocX + nNx * defTD_O + defTD_O / 2,
+					s_nTDGocY + nNy * defTD_O + defTD_O / 2))
+				continue;
+			short nGMoi = (short)(s_nTDG[nTot] + 1);
+			if (s_nTDG[nJ] < 0 || nGMoi < s_nTDG[nJ])
+			{
+				s_nTDG[nJ] = nGMoi;
+				s_nTDCha[nJ] = (short)nTot;
+			}
+		}
+	}
+
+	/* Client chi giu du lieu vung quanh nhan vat: dich o xa gan nhu
+	   luon nam ngoai vung da nap va khong bao gio toi duoc trong mot
+	   lan tinh. Khi do di toi o DA MO gan dich nhat; toi noi thi vung
+	   moi duoc nap va nhip sau tinh tiep. */
+	s_bDoDang = 0;
+	if (s_nTDG[nKetThuc] < 0)
+	{
+		int nGanNhat = -1, nKcGan = 0;
+		for (i = 0; i < defTD_SO_O; i++)
+		{
+			if (s_nTDG[i] < 0)
+				continue;
+			int nAx = (i % defTD_CANH) - nDichX; if (nAx < 0) nAx = -nAx;
+			int nAy = (i / defTD_CANH) - nDichY; if (nAy < 0) nAy = -nAy;
+			if (nGanNhat < 0 || nAx + nAy < nKcGan)
+			{
+				nGanNhat = i;
+				nKcGan = nAx + nAy;
+			}
+		}
+		if (nGanNhat < 0 || nGanNhat == nBatDau)
+			return 0;
+		nKetThuc = nGanNhat;
+		s_bDoDang = 1;
+	}
+
+	/* Lan nguoc tu dich ve dau. */
+	int nSo = 0;
+	int nO = nKetThuc;
+	while (nO >= 0 && nSo < defTD_SO_O)
+	{
+		s_nTDLan[nSo++] = (short)nO;
+		if (nO == nBatDau)
+			break;
+		nO = s_nTDCha[nO];
+	}
+	if (nSo <= 0)
+		return 0;
+
+	/* Dao lai va CHI GIU diem doi huong, cho so chang it di. */
+	int nHTruocX = 999, nHTruocY = 999;
+	int nOTruoc = 0;
+	for (i = nSo - 1; i >= 0 && s_nSoChang < defTD_MAX_CHANG; i--)
+	{
+		int nCx = s_nTDLan[i] % defTD_CANH;
+		int nCy = s_nTDLan[i] / defTD_CANH;
+		int nHx = 0, nHy = 0;
+		if (i < nSo - 1)
+		{
+			nHx = nCx - (s_nTDLan[i + 1] % defTD_CANH);
+			nHy = nCy - (s_nTDLan[i + 1] / defTD_CANH);
+		}
+		int nDaDi = i < nSo - 1 ? (nSo - 1 - i) : 0;
+		if (nHx != nHTruocX || nHy != nHTruocY || nDaDi - nOTruoc >= 4)
+		{
+			s_nChangX[s_nSoChang] = s_nTDGocX + nCx * defTD_O + defTD_O / 2;
+			s_nChangY[s_nSoChang] = s_nTDGocY + nCy * defTD_O + defTD_O / 2;
+			s_nSoChang++;
+			nHTruocX = nHx;
+			nHTruocY = nHy;
+			nOTruoc = nDaDi;
+		}
+	}
+	if (s_nSoChang <= 0)
+		return 0;
+	/* Chang cuoi lay dung diem nguoi choi bam -- chi khi duong di
+	   that su cham dich, khong phai duong do dang. */
+	/* Chang dau thuong chinh la o dang dung - di toi do thi nhan vat
+	   dung yen. Bo di, bat dau tu chang thu hai. */
+	if (s_nSoChang > 1)
+	{
+		int nBoX = s_nChangX[0] - nTuX; if (nBoX < 0) nBoX = -nBoX;
+		int nBoY = s_nChangY[0] - nTuY; if (nBoY < 0) nBoY = -nBoY;
+		if (nBoX < defTD_O && nBoY < defTD_O)
+		{
+			int nK;
+			for (nK = 1; nK < s_nSoChang; nK++)
+			{
+				s_nChangX[nK - 1] = s_nChangX[nK];
+				s_nChangY[nK - 1] = s_nChangY[nK];
+			}
+			s_nSoChang--;
+		}
+	}
+	if (!s_bDoDang)
+	{
+		s_nChangX[s_nSoChang - 1] = nDenX;
+		s_nChangY[s_nSoChang - 1] = nDenY;
+	}
+	return s_nSoChang;
+}
+
 void KCoreShell::GotoWhere(int x, int y, int mode)
 {
+	/* mode >= 10: toa do truyen vao DA LA toa do khong gian (ban do nho
+	   bam de chay toi). Tru 10 ra che do di lai nhu cu. */
+	/* mode >= 20: toa do khong gian VA phai tim duong tranh vat can. */
+	if (mode >= 20)
+	{
+		int nTuX = 0, nTuY = 0;
+		TD_ViTriNguoi(&nTuX, &nTuY);
+		s_nChangMode = mode - 20;
+		s_nDichCuoiX = x;
+		s_nDichCuoiY = y;
+		/* Lenh MOI cua nguoi choi thi xoa so lan ket; con lan tu tinh
+		   lai sau khi ket thi giu nguyen, neu khong se lap vo han. */
+		s_nDemKet = 0;
+		s_nKcTruoc = 0x7fffffff;
+		if (s_bTinhLai)
+			s_bTinhLai = 0;
+		else
+			s_nSoLanKet = 0;
+		if (TD_TimDuong(nTuX, nTuY, x, y) > 0)
+			GotoWhere(s_nChangX[0], s_nChangY[0], 10 + s_nChangMode);
+		else
+			GotoWhere(x, y, 10 + s_nChangMode);
+		return;
+	}
+	bool bDaLaKhongGian = (mode >= 10);
+	if (bDaLaKhongGian)
+		mode -= 10;
+	else
+	{
+		/* Lenh di TAY cua nguoi choi (click khung game -> Mouse_Action ->
+		   GotoWhere mode 0/1/2) trong luc dang chay duong tu tim: HUY duong.
+		   Phai huy O DAY, TRUOC throttle m_nSendMoveFrames ben duoi: auto-path
+		   moi nhip reset m_nSendMoveFrames ve 0 nen lenh click thuong bi
+		   throttle nuot, khong toi SendCommand - huy o SendCommand vo hieu.
+		   Lenh noi bo cua duong tu tim luon mode >= 10 nen khong vao nhanh nay. */
+		s_nSoChang = 0;
+		s_nChangDang = 0;
+		s_nSoLanKet = 0;
+		s_bTinhLai = 0;
+		/* He A* moi: huy auto-path tren player. Vector chi huong (g_nDichSpaceX)
+		   nam ben S3Client (Game.exe) -> KHONG tham chieu duoc tu Core; xoa vector
+		   o phia S3Client (Mouse_Action + UiMiniMap PaintWindow tu tat khi het path). */
+		int nApMe = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+		if (nApMe > 0)
+		{
+			Npc[nApMe].m_nAutoPathCnt = 0;
+			Npc[nApMe].m_nAutoPathIdx = 0;
+			Npc[nApMe].m_bAutoFar = 0;
+			Npc[nApMe].m_nAutoStall = 0;
+		}
+	}
 	if (mode < 0 || mode > 2)
 		return;
+
+	if (!bDaLaKhongGian)
+		AutoRouteCancel("nguoi choi tu click di cho khac");
 
 	if (Player[CLIENT_PLAYER_INDEX].m_nSendMoveFrames >= defMAX_PLAYER_SEND_MOVE_FRAME)
 	{
@@ -3890,8 +4284,41 @@ void KCoreShell::GotoWhere(int x, int y, int mode)
 		int nX = x;
 		int nY = y;
 		int nZ = 0;
-		g_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);
+		if (!bDaLaKhongGian)
+			g_ScenePlace.ViewPortCoordToSpaceCoord(nX, nY, nZ);
 		int nIndex = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+
+		// A* toan cuc: neu giua vi tri va dich co can chan thi tim tuyen vong qua cong.
+		// AutoPathFind tra 0 khi di thang duoc / khong co duong -> giu hanh vi cu.
+		{
+			KNpc* pApMe = &Npc[nIndex];
+			int nApSx, nApSy;
+			SubWorld[pApMe->m_SubWorldIndex].Map2Mps(pApMe->m_RegionIndex, pApMe->m_MapX, pApMe->m_MapY, 0, 0, &nApSx, &nApSy);
+			nApSx = ((nApSx << 10) + pApMe->m_OffX) >> 10;
+			nApSy = ((nApSy << 10) + pApMe->m_OffY) >> 10;
+			AutoPathClearStuck();	// lenh di MOI -> xoa blacklist o ket cu
+			int bApFin = 1;
+			int nApWp = AutoPathFindStep(nApSx, nApSy, nX, nY, pApMe->m_AutoPathX, pApMe->m_AutoPathY, AUTOPATH_MAX_WP, &bApFin);
+			pApMe->m_nAutoFarX = nX; pApMe->m_nAutoFarY = nY;	// dich XA that (co the ngoai vung nap)
+			pApMe->m_bAutoFar = (nApWp > 0 && !bApFin) ? 1 : 0;	// wp moi toi mot nac -> con phai di tiep
+			/* In LOAI VAT CAN (o=obstacle kind), khong in TestBarrier: TestBarrier tra
+			   DO CAO dia hinh khi khong co vat can canh, doc ra tuong nham. */
+			if (nApWp > 0)
+			{
+				pApMe->m_nAutoPathCnt = nApWp;
+				pApMe->m_nAutoPathIdx = 0;
+				pApMe->m_nAutoPathRecalc = 0;
+				pApMe->m_nAutoPathNoProg = 0;
+				pApMe->m_nAutoPathLastDist = 0x7fffffff;
+				nX = pApMe->m_AutoPathX[0];
+				nY = pApMe->m_AutoPathY[0];
+			}
+			else
+			{
+				pApMe->m_nAutoPathCnt = 0;
+				pApMe->m_nAutoPathIdx = 0;
+			}
+		}
 
 		if (!bRun)
 		{
@@ -3907,6 +4334,33 @@ void KCoreShell::GotoWhere(int x, int y, int mode)
 		}
 		Player[CLIENT_PLAYER_INDEX].m_nSendMoveFrames = 0;
 	}
+}
+
+void AutoRouteGotoSpace(int nMpsX, int nMpsY)
+{
+	Player[CLIENT_PLAYER_INDEX].m_nSendMoveFrames = defMAX_PLAYER_SEND_MOVE_FRAME;
+	g_CoreShell.GotoWhere(nMpsX, nMpsY, 10);	// 10 = toa do da la khong gian
+}
+
+void AutoRouteSay(const char* szMsg)
+{
+	KSystemMessage	Msg;
+	Msg.byConfirmType = SMCT_NONE;
+	Msg.eType = SMT_NORMAL;
+	Msg.byPriority = 1;
+	Msg.byParamSize = 0;
+	strncpy(Msg.szMessage, szMsg, sizeof(Msg.szMessage) - 1);
+	Msg.szMessage[sizeof(Msg.szMessage) - 1] = 0;
+	CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&Msg, 0);
+}
+
+void AutoRouteGetPlayerMps(int* pnX, int* pnY)
+{
+	KNpc* pMe = &Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex];
+	int nX = 0, nY = 0;
+	SubWorld[pMe->m_SubWorldIndex].Map2Mps(pMe->m_RegionIndex, pMe->m_MapX, pMe->m_MapY, 0, 0, &nX, &nY);
+	*pnX = ((nX << 10) + pMe->m_OffX) >> 10;
+	*pnY = ((nY << 10) + pMe->m_OffY) >> 10;
 }
 
 void KCoreShell::Goto(int nDir, int mode)
@@ -4005,6 +4459,64 @@ int KCoreShell::Breathe()
 	g_SubWorldSet.MessageLoop();
 	g_SubWorldSet.MainLoop();
 	g_ScenePlace.Breathe();
+	/* Nhip di theo duong da tim. Viet thang o day chu khong tach ra ham
+	   rieng: ham tu do trong Core khong co g_pCoreShell (bien do thuoc
+	   S3Client), con o day GotoWhere goi duoc vi cung lop. */
+	if (s_nSoChang > 0)
+	{
+		int nHX = 0, nHY = 0;
+		TD_ViTriNguoi(&nHX, &nHY);
+		int nHDx = nHX - s_nChangX[s_nChangDang]; if (nHDx < 0) nHDx = -nHDx;
+		int nHDy = nHY - s_nChangY[s_nChangDang]; if (nHDy < 0) nHDy = -nHDy;
+		if (nHDx < defTD_TOI_NOI && nHDy < defTD_TOI_NOI)
+		{
+			s_nChangDang++;
+			s_nKcTruoc = 0x7fffffff;
+			s_nDemKet = 0;
+			if (s_nChangDang >= s_nSoChang)
+			{
+				s_nSoChang = 0;
+				s_nSoLanKet = 0;
+				/* Duong moi di duoc mot phan: gio da dung gan hon, vung
+				   quanh do da nap, tinh tiep den dich that. */
+				if (s_bDoDang)
+				{
+					s_bTinhLai = 1;
+					GotoWhere(s_nDichCuoiX, s_nDichCuoiY, 20 + s_nChangMode);
+				}
+			}
+		}
+		else
+		{
+			/* Gui LAI lenh di moi nhip, y het nguoi choi giu chuot trai:
+			   Mouse_Action cung chi goi GotoWhere, va chinh GotoWhere tu
+			   han che tan suat bang m_nSendMoveFrames roi BO QUA IM LANG
+			   khi goi qua day. Truoc day chi gui mot lan luc doi chang nen
+			   lenh de bi bo mat, nhan vat dung giua duong. */
+			GotoWhere(s_nChangX[s_nChangDang], s_nChangY[s_nChangDang], 10 + s_nChangMode);
+
+			/* Coi la ket khi KHOANG CACH toi chang khong ngan lai, chu khong
+			   phai khi nhan vat nhich it: mot nhip di bo chi duoc vai diem,
+			   nguong cu (<4 diem) lam ca luc dang di cung bi tinh la ket. */
+			int nKc = nHDx + nHDy;
+			if (nKc + 8 < s_nKcTruoc)
+			{
+				s_nKcTruoc = nKc;
+				s_nDemKet = 0;
+			}
+			else if (++s_nDemKet > defTD_NHIP_KET)
+			{
+				s_nDemKet = 0;
+				s_nSoLanKet++;
+				s_nSoChang = 0;
+				if (s_nSoLanKet <= defTD_MAX_KET)
+				{
+					s_bTinhLai = 1;
+					GotoWhere(s_nDichCuoiX, s_nDichCuoiY, 20 + s_nChangMode);
+				}
+			}
+		}
+	}
 	return true;
 }
 

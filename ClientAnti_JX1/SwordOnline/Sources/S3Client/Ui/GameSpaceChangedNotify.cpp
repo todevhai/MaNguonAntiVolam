@@ -894,7 +894,7 @@ void KClientCallback::AddPeople(char* unitName, char* roleName)
 	}
 }
 
-#define LEVEL_TIPS_INI "\\Ui\\杂烩.ini"
+#define LEVEL_TIPS_INI "\\Ui\\tap-hop.ini"
 //--------------------------------------------------------------------------
 //	功能：等级的贴士
 //--------------------------------------------------------------------------

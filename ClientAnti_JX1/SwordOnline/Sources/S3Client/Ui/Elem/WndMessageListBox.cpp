@@ -421,6 +421,7 @@ void KWndMessageListBox::UpdateData()
 		{
 			m_pScrollbar->Enable(true);
 			m_pScrollbar->SetValueRange(0, nTotalLine - m_nNumMaxShowLine);
+			m_pScrollbar->Show();	// noi dung tran -> hien thanh cuon
 		}
 
 		m_nNumVisibleTextLine = m_nNumMaxShowLine;
@@ -431,6 +432,8 @@ void KWndMessageListBox::UpdateData()
 		{
 			m_pScrollbar->Enable(false);
 			m_pScrollbar->SetValueRange(0, 0);
+			// noi dung vua khung -> AN han thanh cuon (nut truot la con, an theo)
+			m_pScrollbar->SetStyle(m_pScrollbar->GetStyle() & ~WND_S_VISIBLE);
 		}
 
 		m_nNumVisibleTextLine = nTotalLine;

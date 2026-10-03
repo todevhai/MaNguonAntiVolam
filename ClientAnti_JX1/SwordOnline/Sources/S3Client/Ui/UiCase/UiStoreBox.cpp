@@ -74,6 +74,7 @@ KUiStoreBox* KUiStoreBox::OpenWindow()
 //--------------------------------------------------------------------------
 void KUiStoreBox::CloseWindow()
 {
+	KUiExBox1::CloseWindow();	/* roi ruong (di xa, UiShell) cung dong trang mo rong */
 	if (m_pSelf)
 	{
 		Wnd_GameSpaceHandleInput(true);
@@ -122,7 +123,8 @@ void KUiStoreBox::UpdateData()
 	{
 		g_pCoreShell->GetGameData(GDI_ITEM_IN_STORE_BOX, (unsigned int)pObjs, nCount);//单线程执行，nCount值不变
 		for (int i = 0; i < nCount; i++)
-			UpdateItem(&pObjs[i], true);
+			if (pObjs[i].Obj.uGenre == CGOG_MONEY || pObjs[i].Region.v < REPOSITORY_ROOM_HEIGHT)	/* chi trang 0 */
+				UpdateItem(&pObjs[i], true);
 		free(pObjs);
 		pObjs = NULL;
 	}
@@ -133,6 +135,14 @@ void KUiStoreBox::UpdateData()
 // -------------------------------------------------------------------------
 void KUiStoreBox::UpdateItem(KUiObjAtRegion* pItem, int bAdd)
 {
+	if (pItem && pItem->Obj.uGenre != CGOG_MONEY && pItem->Region.v >= REPOSITORY_ROOM_HEIGHT)
+	{	/* mon o trang mo rong */
+		if (KUiExBox1::GetIfVisible())
+			KUiExBox1::GetIfVisible()->UpdateItem(pItem, bAdd);
+		return;
+	}
+	if (pItem == NULL && KUiExBox1::GetIfVisible())
+		KUiExBox1::GetIfVisible()->UpdateItem(NULL, bAdd);
 	if (pItem)
 	{
 		UiSoundPlay(UI_SI_PICKPUT_ITEM);
@@ -185,10 +195,20 @@ void KUiStoreBox::LoadScheme(const char* pScheme)
 // -------------------------------------------------------------------------
 // 功能	: 窗口函数
 // -------------------------------------------------------------------------
+void KUiStoreBox::PaintWindow()
+{
+	if (g_pCoreShell)
+		m_UnlockBtn.CheckButton(!g_pCoreShell->GetGameData(GDI_IS_CHEST_UNLOCKED, 0, 0));
+	KWndShowAnimate::PaintWindow();
+}
+
 int KUiStoreBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 {
 	switch(uMsg)
 	{
+	case WND_N_RIGHT_CLICK_ITEM:
+		WithdrawBoxItem((KUiDraggedObject*)uParam);	// #3b rclick trong ruong -> lay ve tui
+		break;
 	case WND_N_ITEM_PICKDROP:
 		OnItemPickDrop((ITEM_PICKDROP_PLACE*)uParam, (ITEM_PICKDROP_PLACE*)nParam);
 		break;
@@ -204,9 +224,11 @@ int KUiStoreBox::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			KUiGetMoney::OpenWindow(0, m_nMoney, this, UISTOREBOX_WAIT_GETMONEY, &m_Money);
 		}
 		else if (uParam == (unsigned int)(KWndWindow*)&m_BtnBox)
-		{	
-			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, EX_BOX, 0);
-				
+		{	/* bat/tat cua so Mo rong ruong - moi trang deu mo san */
+			if (KUiExBox1::GetIfVisible())
+				KUiExBox1::CloseWindow();
+			else
+				KUiExBox1::OpenWindow();
 		}
 		else if (uParam == (unsigned int)(KWndWindow*)&m_UnlockBtn)
 		{
@@ -250,6 +272,66 @@ void KUiStoreBox::OnGetMoney(int nMoney)
 		g_pCoreShell->OperationRequest(GOI_MONEY_INOUT_STORE_BOX,
 			false, nMoney);
 	}
+}
+
+BOOL KUiStoreBox::DepositBagItem(KUiDraggedObject* pBagItem)
+{
+	if (KUiExBox1::GetIfVisible())	/* dang xem trang mo rong: cat vao trang do */
+		return KUiExBox1::GetIfVisible()->DepositBagItem(pBagItem);
+	if (pBagItem == NULL || pBagItem->uGenre == CGOG_NOTHING || g_pCoreShell == NULL)
+		return FALSE;
+	int iw = pBagItem->DataW > 0 ? pBagItem->DataW : 1;
+	int ih = pBagItem->DataH > 0 ? pBagItem->DataH : 1;
+	int fx = -1, fy = -1;
+	if (!m_ItemBox.FindBlankCell(iw, ih, &fx, &fy))
+		return FALSE;	// ruong het cho
+	KUiObjAtContRegion Pick, Drop;
+	Pick.Obj.uGenre = pBagItem->uGenre;
+	Pick.Obj.uId = pBagItem->uId;
+	Pick.Region.Width = pBagItem->DataW;
+	Pick.Region.Height = pBagItem->DataH;
+	Pick.Region.h = pBagItem->DataX;
+	Pick.Region.v = pBagItem->DataY;
+	Pick.eContainer = UOC_ITEM_TAKE_WITH;
+	Drop.Obj.uGenre = pBagItem->uGenre;
+	Drop.Obj.uId = pBagItem->uId;
+	Drop.Region.Width = pBagItem->DataW;
+	Drop.Region.Height = pBagItem->DataH;
+	Drop.Region.h = fx;
+	Drop.Region.v = fy;
+	Drop.eContainer = UOC_STORE_BOX;
+	g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, (unsigned int)&Pick, (int)&Drop);
+	return TRUE;
+}
+
+BOOL KUiStoreBox::WithdrawBoxItem(KUiDraggedObject* pBoxItem)
+{
+	if (pBoxItem == NULL || pBoxItem->uGenre == CGOG_NOTHING || g_pCoreShell == NULL)
+		return FALSE;
+	KUiItem* pBag = KUiItem::GetIfVisible();
+	if (pBag == NULL) return FALSE;	// tui phai dang mo
+	int iw = pBoxItem->DataW > 0 ? pBoxItem->DataW : 1;
+	int ih = pBoxItem->DataH > 0 ? pBoxItem->DataH : 1;
+	int fx = -1, fy = -1;
+	if (!pBag->FindBlankBagCell(iw, ih, &fx, &fy))
+		return FALSE;	// tui het cho
+	KUiObjAtContRegion Pick, Drop;
+	Pick.Obj.uGenre = pBoxItem->uGenre;
+	Pick.Obj.uId = pBoxItem->uId;
+	Pick.Region.Width = pBoxItem->DataW;
+	Pick.Region.Height = pBoxItem->DataH;
+	Pick.Region.h = pBoxItem->DataX;
+	Pick.Region.v = pBoxItem->DataY;
+	Pick.eContainer = UOC_STORE_BOX;
+	Drop.Obj.uGenre = pBoxItem->uGenre;
+	Drop.Obj.uId = pBoxItem->uId;
+	Drop.Region.Width = pBoxItem->DataW;
+	Drop.Region.Height = pBoxItem->DataH;
+	Drop.Region.h = fx;
+	Drop.Region.v = fy;
+	Drop.eContainer = UOC_ITEM_TAKE_WITH;
+	g_pCoreShell->OperationRequest(GOI_SWITCH_OBJECT, (unsigned int)&Pick, (int)&Drop);
+	return TRUE;
 }
 
 void KUiStoreBox::OnItemPickDrop(ITEM_PICKDROP_PLACE* pPickPos, ITEM_PICKDROP_PLACE* pDropPos)

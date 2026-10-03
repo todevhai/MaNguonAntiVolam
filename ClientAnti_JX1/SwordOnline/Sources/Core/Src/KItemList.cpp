@@ -680,7 +680,7 @@ BOOL KItemList::Init(int nPlayerIdx)
 //	m_Room[room_trade].Init(nWidth, nHeight);
 //	m_Room[room_tradeback].Init(nWidth, nHeight);
 	m_Room[room_equipment].Init(EQUIPMENT_ROOM_WIDTH, EQUIPMENT_ROOM_HEIGHT);
-	m_Room[room_repository].Init(REPOSITORY_ROOM_WIDTH, REPOSITORY_ROOM_HEIGHT);
+	m_Room[room_repository].Init(REPOSITORY_ROOM_WIDTH, REPOSITORY_ROOM_HEIGHT * REPOSITORY_ROOM_PAGES);
 	m_Room[room_trade].Init(TRADE_ROOM_WIDTH, TRADE_ROOM_HEIGHT);
 	m_Room[room_exbox1].Init(REPOSITORY_ROOM_WIDTH, REPOSITORY_ROOM_HEIGHT); // ruong mo rong 1
 	m_Room[room_exbox2].Init(REPOSITORY_ROOM_WIDTH, REPOSITORY_ROOM_HEIGHT); // ruong mo rong 2
@@ -1397,9 +1397,7 @@ int KItemList::UseItem(int nIdx)
 	switch(Item[nIdx].GetGenre())
 	{
 	case item_equip:
-		break;
-/*		if (Equip(nNpcIdx, nIdx))
-			nRet = REQUEST_EQUIP_ITEM;*/
+		nRet = REQUEST_EQUIP_ITEM;	// mac do: de ApplyUseItem gui move len o trang bi
 		break;
 	case item_townportal:
 	case item_medicine:
@@ -3632,7 +3630,7 @@ int KItemList::GetGoldColor(int nSet,int nId )
 		}
 	}
 
-	for (i = 0;i < MAX_PLAYER_ITEM;i++)
+	for (int i = 0;i < MAX_PLAYER_ITEM;i++)
 	{
 		if (Item[m_Items[i].nIdx].GetSet() == nSet && Item[m_Items[i].nIdx].GetSetId() == nId)
 		{

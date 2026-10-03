@@ -2643,6 +2643,7 @@ extern IClientCallback* l_pDataChangedNotifyFunc;
 void KProtocolProcess::s2cExtend(BYTE* pMsg)
 {
 	EXTEND_HEADER* pHeader = (EXTEND_HEADER*)(pMsg + sizeof(tagExtendProtoHeader));
+	g_DebugLog("[goi mo rong] family=%d id=%d", (int)pHeader->ProtocolFamily, (int)pHeader->ProtocolID);
 
 	if (pHeader->ProtocolFamily == pf_playercommunity)
 	{
@@ -2650,6 +2651,7 @@ void KProtocolProcess::s2cExtend(BYTE* pMsg)
 		{
 			PLAYERCOMM_NOTIFYCHANNELID* pNChann = (PLAYERCOMM_NOTIFYCHANNELID*)pHeader;
 
+			g_DebugLog("[goi mo kenh] ten=\"%s\" id=%d gia=%d", pNChann->channel, (int)pNChann->channelid, (int)pNChann->cost);
 			l_pDataChangedNotifyFunc->NotifyChannelID(pNChann->channel, pNChann->channelid, pNChann->cost);
 		}
 	}

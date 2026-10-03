@@ -15,6 +15,61 @@
 #include "KPlayer.h"
 #include "../../Represent/iRepresent/iRepresentshell.h"
 #include "KMagicDesc.h"
+#include "KItemGenerator.h"
+
+#ifndef _SERVER
+/* Min/max of parameter 1 over every magicattrib row of this property kind, all tiers.
+   Built once. -1 in the table means "unused" so negatives are skipped. */
+static BOOL MagicAttribRange(int nPropKind, int* pnMin, int* pnMax)
+{
+	enum { MAX_KIND = 1024 };
+	static int s_bDaLap = 0;
+	static int s_nMin[MAX_KIND], s_nMax[MAX_KIND];
+	if (!s_bDaLap)
+	{
+		s_bDaLap = 1;
+		for (int k = 0; k < MAX_KIND; k++) { s_nMin[k] = 0x7fffffff; s_nMax[k] = -1; }
+		const KLibOfBPT* pLib = ItemGen.GetBPTLib();
+		int n = pLib->GetMARecordNumber();
+		for (int r = 0; r < n; r++)
+		{
+			const KMAGICATTRIB_TABFILE* pRec = pLib->GetMARecord(r);
+			if (!pRec) continue;
+			int k = pRec->m_MagicAttrib.nPropKind;
+			int a = pRec->m_MagicAttrib.aryRange[0].nMin, b = pRec->m_MagicAttrib.aryRange[0].nMax;
+			if (k <= 0 || k >= MAX_KIND || a < 0 || b < a) continue;
+			if (a < s_nMin[k]) s_nMin[k] = a;
+			if (b > s_nMax[k]) s_nMax[k] = b;
+		}
+	}
+	if (nPropKind <= 0 || nPropKind >= MAX_KIND || s_nMax[nPropKind] <= s_nMin[nPropKind])
+		return FALSE;	/* not in the table, or a single fixed value */
+	*pnMin = s_nMin[nPropKind];
+	*pnMax = s_nMax[nPropKind];
+	return TRUE;
+}
+
+/* Hoang Kim: each magic slot has its own range in magicattrib_ge.txt (goldequip columns 47..52 give the
+   1-based row). The blue magicattrib.txt range does not apply - gold values go past it. */
+static BOOL GoldMagicRange(int nGoldId, int nSlot, int* pnMin, int* pnMax)
+{
+	const KLibOfBPT* pLib = ItemGen.GetBPTLib();
+	if (nGoldId <= 0 || nGoldId > pLib->GetGoldItemNumber() || nSlot < 0 || nSlot >= 6)
+		return FALSE;
+	const KBASICPROP_EQUIPMENT_GOLD* pRec = pLib->GetGoldItemRecord(nGoldId - 1);
+	if (!pRec)
+		return FALSE;
+	int nIdx = pRec->m_aryMagicIdx[nSlot];
+	if (nIdx <= 0 || nIdx > pLib->GetGoldMagicNumber())
+		return FALSE;
+	const KBASICPROP_GOLDMAGIC* pMA = pLib->GetGoldMagicRecord(nIdx - 1);
+	if (!pMA || pMA->m_aryRange[0].nMax <= pMA->m_aryRange[0].nMin)
+		return FALSE;	/* fixed value, nothing to show */
+	*pnMin = pMA->m_aryRange[0].nMin;
+	*pnMax = pMA->m_aryRange[0].nMax;
+	return TRUE;
+}
+#endif
 #include <time.h>
 #endif
 
@@ -805,6 +860,28 @@ int KItem::Abrade(IN const int nRandRange)
 }
 
 #ifndef _SERVER
+// Khung THAT cua icon: offset va kich thuoc frame trong tep SPR. Khac han
+// GetWidth()/GetHeight() - hai cai do la so O CHIEM trong tui (du lieu
+// settings/item), khong lien quan gi den anh to hay nho.
+BOOL KItem::GetIconFrameBox(int* pOffX, int* pOffY, int* pW, int* pH)
+{
+	if (!g_pRepresent || m_Image.szImage[0] == 0)
+		return FALSE;
+	KRPosition2 oOffset, oSize;
+	oOffset.nX = oOffset.nY = 0;
+	oSize.nX = oSize.nY = 0;
+	if (!g_pRepresent->GetImageFrameParam(m_Image.szImage, m_Image.nFrame,
+										  &oOffset, &oSize, m_Image.nType))
+		return FALSE;
+	if (oSize.nX <= 0 || oSize.nY <= 0)
+		return FALSE;
+	if (pOffX) *pOffX = oOffset.nX;
+	if (pOffY) *pOffY = oOffset.nY;
+	if (pW) *pW = oSize.nX;
+	if (pH) *pH = oSize.nY;
+	return TRUE;
+}
+
 void KItem::Paint(int nX, int nY,BOOL bStack/* = TRUE*/)
 {
 	m_Image.oPosition.nX = nX;
@@ -864,12 +941,12 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 	}
 	if (m_CommonAttrib.nEnChance)
 	{
-		char sItemName[64];
+		char sItemName[160];	/* ten dai 80 byte, cong hau to - xem ghi chu */
 		sprintf(sItemName,"%s + %d",m_CommonAttrib.szItemName,m_CommonAttrib.nEnChance);
 		strcpy(pszMsg, szColor[m_CommonAttrib.nItemGenre]);
 		if (m_CommonAttrib.nItemGenre == 0)
 		{
-			char    TextLevel[10];
+			char    TextLevel[160];	/* phai chua ca TEN 80 byte, khong chi con so */
 			int        LevelItem = m_CommonAttrib.nLevel;
 
 			if(LevelItem > 10)
@@ -913,7 +990,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		strcpy(pszMsg, szColor[m_CommonAttrib.nItemGenre]);
 		if (m_CommonAttrib.nItemGenre == 0)
 		{
-			char    TextLevel[10];
+			char    TextLevel[160];	/* phai chua ca TEN 80 byte, khong chi con so */
 			int        LevelItem = m_CommonAttrib.nLevel;
 
 			if(LevelItem > 10)
@@ -1108,7 +1185,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		}
 		strcat(pszMsg, "\n");
 	}
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		if (!m_aryRequireAttrib[i].nAttribType)
 		{
@@ -1129,7 +1206,7 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 		strcat(pszMsg, "\n");
 	}
 
-	for (i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 	{
 		if (!m_aryMagicAttrib[i].nAttribType)
 		{
@@ -1172,6 +1249,20 @@ void KItem::GetDesc(char* pszMsg, bool bShowPrice, int nPriceScale, int nActiveA
 			}
 		}
 		strcat(pszMsg, pszInfo);
+		{
+			int nMin, nMax;
+			BOOL bCoKhoang = (m_CommonAttrib.nGoldId > 0)
+				? GoldMagicRange(m_CommonAttrib.nGoldId, i, &nMin, &nMax)
+				: MagicAttribRange(m_aryMagicAttrib[i].nAttribType, &nMin, &nMax);
+			if (strlen(pszMsg) < 12000 && bCoKhoang)
+			{
+				char szKhoang[48];
+				sprintf(szKhoang, " <color=Cyan>[%d-%d]", nMin, nMax);
+				strcat(pszMsg, szKhoang);
+				if (abs(m_aryMagicAttrib[i].nValue[0]) >= nMax)
+					strcat(pszMsg, "<color=Fire>[MAX]");
+			}
+		}
 		strcat(pszMsg, "\n");
 	}
 

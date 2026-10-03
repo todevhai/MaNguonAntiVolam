@@ -37,6 +37,8 @@ public:
 	void			GetInfo(int& nWidth, int& nHeight) const;
 	//取得单个字符的数据区
 	unsigned char*	GetCharacterData(unsigned char cFirst, unsigned char cNext) const;
+	/* Font Viet mot byte: chi so danh thang bang ma byte. */
+	unsigned char*	GetVietCharacterData(unsigned char cCode) const;
 	
 	KFontData();
 	~KFontData();

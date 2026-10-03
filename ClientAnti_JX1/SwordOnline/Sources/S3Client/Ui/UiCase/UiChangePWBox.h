@@ -13,8 +13,8 @@
 #include "../elem/WndObjContainer.h"
 #include "../Elem/WndShowAnimate.h"
 
-#define CHEST_PW_MAX_VALUE	999999
-#define CHEST_PW_MIN_VALUE	100000
+#define CHEST_PW_MAX_VALUE	999999999
+#define CHEST_PW_MIN_VALUE	1
 // Ma ruong phai bao gom 6 chu so
 
 #define NOTICE_NEW_PW_NOT_THE_SAME "MËt khÈu míi nhËp vµo kh«ng gièng nhau"

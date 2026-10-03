@@ -27,7 +27,7 @@ private:
 	void	ArmorDefenseV(KNpc* pNpc, void* pData);
 	void	LifeMaxV(KNpc* pNpc, void* pData);
 	void	LifeMaxP(KNpc* pNpc, void* pData);
-	void	LifeMaxYanV(KNpc* pNpc, void* pData);
+	void	LifeMaxYanV(KNpc* pNpc, void* pData); void KhangYanP(KNpc* pNpc, void* pData); void TocDanhYanV(KNpc* pNpc, void* pData); void TocPhatYanV(KNpc* pNpc, void* pData); void PhucHoiYanV(KNpc* pNpc, void* pData);
 	void	LifeMaxYanP(KNpc* pNpc, void* pData);
 	void	ManaMaxYanV(KNpc* pNpc, void* pData);
 	void	ManaMaxYanP(KNpc* pNpc, void* pData);

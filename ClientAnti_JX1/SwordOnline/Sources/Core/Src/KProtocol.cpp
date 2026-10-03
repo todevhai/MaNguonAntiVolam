@@ -1,6 +1,7 @@
 #include "KCore.h"
 
 #include "KEngine.h"
+#include "KDebug.h"
 #include "KProtocol.h"
 #include "KPlayer.h"
 #include "KItemList.h"
@@ -263,6 +264,7 @@ void SendClientCmdRun(int nX, int nY)
 	NPC_RUN_COMMAND	NetCommand;
 	
 	NetCommand.ProtocolType = (BYTE)c2s_npcrun;
+	g_DebugLog("[MOVE] run %d,%d", nX, nY);
 	NetCommand.nMpsX = nX;
 	NetCommand.nMpsY = nY;
 	if (g_pClient)
@@ -274,6 +276,7 @@ void SendClientCmdWalk(int nX, int nY)
 	NPC_WALK_COMMAND	NetCommand;
 	
 	NetCommand.ProtocolType = (BYTE)c2s_npcwalk;
+	g_DebugLog("[MOVE] walk %d,%d", nX, nY);
 	NetCommand.nMpsX = nX;
 	NetCommand.nMpsY = nY;
 	if (g_pClient)
@@ -652,7 +655,7 @@ void SendClientCmdPlayerBuy(int nIdx, DWORD nPlayerId, int nPlace, int nX, int n
 		return;
 	PLAYER_TRADE_BUY_ITEM_COMMAND PlayerBuy;
 	PlayerBuy.ProtocolType = c2s_playertradebuyitem;
-	PlayerBuy.m_Idx = (BYTE)nIdx;
+	PlayerBuy.m_Idx = nIdx;
 	PlayerBuy.m_PlayerId = nPlayerId;
 	PlayerBuy.m_Place = (BYTE)nPlace;
 	PlayerBuy.m_X = (BYTE)nX;
