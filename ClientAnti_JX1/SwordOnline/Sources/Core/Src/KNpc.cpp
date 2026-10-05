@@ -3232,8 +3232,8 @@ void KNpc::AppendSkillEffect(int nIsMaigc ,BOOL bIsPhysical, BOOL bIsMelee, void
 		{
 			if (Player[m_nPlayerIdx].m_ItemList.GetWeaponType() == equip_meleeweapon)
 			{
-				pDes->nValue[0] += nMinDamage * m_CurrentMeleeEnhance[Player[m_nPlayerIdx].m_ItemList.GetWeaponParticular()] / 100;
-				pDes->nValue[2] += nMaxDamage * m_CurrentMeleeEnhance[Player[m_nPlayerIdx].m_ItemList.GetWeaponParticular()] / 100;
+				pDes->nValue[0] += nMinDamage * LayTangCanChien(Player[m_nPlayerIdx].m_ItemList.GetWeaponParticular()) / 100;
+				pDes->nValue[2] += nMaxDamage * LayTangCanChien(Player[m_nPlayerIdx].m_ItemList.GetWeaponParticular()) / 100;
 			}
 			else if (Player[m_nPlayerIdx].m_ItemList.GetWeaponType() == equip_rangeweapon)
 			{

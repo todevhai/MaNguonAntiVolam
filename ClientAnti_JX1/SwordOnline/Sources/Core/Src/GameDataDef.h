@@ -128,6 +128,10 @@ enum ITEM_POSITION
 #define		LOCAL_REVIVE_TYPE			1
 
 #define		MAX_MELEE_WEAPON			6
+/* So loai vu khi can chien THAT (particular 0..8: 6 Trien Thu, 7 Dao Thuan, 8 Thuan Dao).
+   MAX_MELEE_WEAPON phai giu 6: 6..9 la MA trong du lieu thuoc tinh (WEAPON_ALL... o
+   KNpcAttribModify::AddPhysicsDamageP). Mang tang sat thuong theo loai dung hang nay. */
+#define		MAX_MELEE_PARTICULAR		9
 #define		MAX_RANGE_WEAPON			3
 #define		MAX_ARMOR					14
 #define		MAX_HELM					14

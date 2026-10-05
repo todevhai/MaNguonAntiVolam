@@ -6583,7 +6583,7 @@ void KPlayer::GetEchoDamage(int* nMin, int* nMax, int nType)
 		int nEnhance;
 		if (equip_meleeweapon == m_ItemList.GetWeaponType())
 		{
-			nEnhance = Npc[m_nIndex].m_CurrentMeleeEnhance[m_ItemList.GetWeaponParticular()];
+			nEnhance = Npc[m_nIndex].LayTangCanChien(m_ItemList.GetWeaponParticular());
 		}
 		else if (equip_rangeweapon == m_ItemList.GetWeaponType())
 		{

@@ -208,7 +208,7 @@ void KNpcAttribModify::AddPhysicsDamageP(KNpc* pNpc, void* pData)
 
 	if (nType == WEAPON_ALL)
 	{
-		for (int i = 0; i < MAX_MELEE_WEAPON; i++)
+		for (int i = 0; i < MAX_MELEE_PARTICULAR; i++)
 		{
 			pNpc->m_CurrentMeleeEnhance[i] += pMagic->nValue[0];
 		}
@@ -228,7 +228,7 @@ void KNpcAttribModify::AddPhysicsDamageP(KNpc* pNpc, void* pData)
 	}
 	else if (nType == WEAPON_MELEE_ALL)
 	{
-		for (int i = 0; i < MAX_MELEE_WEAPON; i++)
+		for (int i = 0; i < MAX_MELEE_PARTICULAR; i++)
 		{
 			pNpc->m_CurrentMeleeEnhance[i] += pMagic->nValue[0];
 		}

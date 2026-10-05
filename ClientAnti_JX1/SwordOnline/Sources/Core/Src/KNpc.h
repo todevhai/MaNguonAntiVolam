@@ -347,7 +347,10 @@ public:
 	int					m_CurrentPoisonEnhance;			// 毒加强
 	int					m_CurrentLightEnhance;			// 电加强
 	int					m_CurrentAddPhysicsDamage;		// 直接的物理伤害加强点数
-	int					m_CurrentMeleeEnhance[MAX_MELEE_WEAPON];	// 近程物理加强
+	int					m_CurrentMeleeEnhance[MAX_MELEE_PARTICULAR];	// 近程物理加强
+	/* Doc tang sat thuong can chien theo loai vu khi - chan ngoai mang (truoc day loai 6/7/8
+	   doc lan sang m_CurrentRangeEnhance / m_CurrentHandEnhance / m_Dir). */
+	int					LayTangCanChien(int nLoai) const { return (nLoai >= 0 && nLoai < MAX_MELEE_PARTICULAR) ? m_CurrentMeleeEnhance[nLoai] : 0; }
 	int					m_CurrentRangeEnhance;			// 远程物理加强
 	int					m_CurrentHandEnhance;			// 空手物理加强
 	int					m_CurrentSerisesEnhance;
