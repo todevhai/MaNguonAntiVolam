@@ -4846,6 +4846,24 @@ int KCoreShell::TeamOperation(unsigned int uOper, unsigned int uParam, int nPara
 			}
 		}
 		break;
+	case TEAM_OI_SUMMON:		// chu to trieu hoi thanh vien (0 = ca to)
+		{
+			TRIEU_HOI_COMMAND	g;
+			g.ProtocolType = c2s_trieuhoi;
+			g.m_dwNpcID = uParam ? ((KUiPlayerItem*)uParam)->uId : 0;
+			g_pClient->SendPackToServer((BYTE*)&g, sizeof(g));
+		}
+		break;
+	case TEAM_OI_SUMMON_RESPONSE:	// tra loi loi trieu hoi cua chu to
+		if (uParam)
+		{
+			TRIEU_HOI_TRA_LOI	g;
+			g.ProtocolType = c2s_trieuhoitraloi;
+			g.m_dwDoiTruong = ((KUiPlayerItem*)uParam)->uId;
+			g.m_btDongY = nParam ? 1 : 0;
+			g_pClient->SendPackToServer((BYTE*)&g, sizeof(g));
+		}
+		break;
 	case TEAM_OI_INVITE_RESPONSE://对组队邀请的回复
 		if (uParam)
 			Player[CLIENT_PLAYER_INDEX].m_cTeam.ReplyInvite(((KUiPlayerItem*)uParam)->nIndex, nParam);

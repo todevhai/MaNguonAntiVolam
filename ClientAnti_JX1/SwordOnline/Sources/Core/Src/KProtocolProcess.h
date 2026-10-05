@@ -130,6 +130,7 @@ public:
 	void	MeridianSync(BYTE* pMsg);
 	void	TrungSinhSync(BYTE* pMsg);
 	void	KnChieuSync(BYTE* pMsg);
+	void	TrieuHoiSync(BYTE* pMsg);	// chu to trieu hoi minh -> hop dong y / tu choi
 	void	OpenTremble(BYTE* pMsg);
 	void	NetCommandSetRankFF(BYTE* pMsg);
 

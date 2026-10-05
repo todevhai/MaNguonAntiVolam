@@ -2278,6 +2278,28 @@ typedef struct
 	BYTE	btLoai;		// PHIM_TAT_*
 } PHIM_TAT_COMMAND;
 
+// Trieu hoi dong doi (user 05/10): chu to goi thanh vien toi cho minh, thanh vien dong y / tu choi.
+typedef struct
+{
+	BYTE	ProtocolType;		// c2s_trieuhoi
+	DWORD	m_dwNpcID;			// npc id thanh vien; 0 = ca to
+} TRIEU_HOI_COMMAND;
+
+typedef struct
+{
+	BYTE	ProtocolType;		// c2s_trieuhoitraloi
+	DWORD	m_dwDoiTruong;		// npc id chu to (tu s2c_trieuhoi)
+	BYTE	m_btDongY;			// 1 dong y, 0 tu choi
+} TRIEU_HOI_TRA_LOI;
+
+typedef struct
+{
+	BYTE	ProtocolType;		// s2c_trieuhoi
+	DWORD	m_dwDoiTruong;		// npc id chu to
+	int		m_nSubWorldID;		// map chu to dang dung
+	char	m_szTen[32];		// ten chu to
+} TRIEU_HOI_SYNC;
+
 enum MERIDIAN_RESULT
 {
 	meridian_sync = 0,		// plain refresh, nothing was tried

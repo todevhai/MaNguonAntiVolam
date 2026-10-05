@@ -10,6 +10,7 @@
 #include "../Elem/WndShowAnimate.h"
 #include "../Elem/WndText.h"
 #include "../elem/wndbutton.h"
+#include "../Elem/WndLabeledButton.h"
 #include "../elem/WndList.h"
 #include "../Elem/WndScrollBar.h"
 #include "../../../core/src/gamedatadef.h"
@@ -63,6 +64,7 @@ private:
 	KWndButton		m_btnCloseTeam;			// 关闭组队
 	KWndButton		m_btnRefresh;			// 刷新
 	KWndButton		m_btnCancel;			// cancel button
+	KWndLabeledButton	m_btnSummon;		// trieu hoi ca to toi cho minh (chi doi truong)
 
 	KUiPlayerTeam	m_Info;
 	KUiPlayerItem*	m_pPlayersList;

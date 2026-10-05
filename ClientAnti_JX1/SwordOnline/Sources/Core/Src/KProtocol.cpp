@@ -141,6 +141,7 @@ int	g_nProtocolSize[MAX_PROTOCOL_NUM] =
 	sizeof(MERIDIAN_SYNC),					//s2c_meridian
 	sizeof(TRUNG_SINH_SYNC),				//s2c_trungsinh
 	sizeof(KN_CHIEU_SYNC),					//s2c_kinhnghiemchieu
+	sizeof(TRIEU_HOI_SYNC),					// s2c_trieuhoi
 #else
 	sizeof(LOGIN_COMMAND),		//	c2s_login,
 	sizeof(tagLogicLogin),		//	c2s_logicLogin,
@@ -236,6 +237,8 @@ int	g_nProtocolSize[MAX_PROTOCOL_NUM] =
 	sizeof(SET_AVATAR),							// c2s_setavatar
 	sizeof(MERIDIAN_COMMAND),					// c2s_meridian
 	sizeof(PHIM_TAT_COMMAND),					// c2s_phimtat
+	sizeof(TRIEU_HOI_COMMAND),				// c2s_trieuhoi
+	sizeof(TRIEU_HOI_TRA_LOI),				// c2s_trieuhoitraloi
 #endif
 };
 

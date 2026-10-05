@@ -292,6 +292,13 @@ void KUiSysMsgCentre::OnConfirmOperFinished(unsigned int uParam, int nSelAction)
 				(unsigned int)pPlayer, (nSelAction == 0));	//nSelAction=0£º´ðÓ¦, nSelAction=1£º¾Ü¾ø
 		}
 		break;
+	case SMCT_UI_TEAM_SUMMON:	// chu to trieu hoi: dong y thi may chu dua toi cho chu to
+		if (m_pHandlingMsg)
+		{
+			pPlayer = (KUiPlayerItem*)(&m_pHandlingMsg[1]);
+			g_pCoreShell->TeamOperation(TEAM_OI_SUMMON_RESPONSE, (unsigned int)pPlayer, (nSelAction == 0));
+		}
+		break;
 	case SMCT_UI_TONG_JOIN_APPLY:
 		if (m_pHandlingMsg)
 		{
@@ -610,6 +617,16 @@ void KUiSysMsgCentre::ConfirmMsg(KSystemMessage* pMsg, bool bImmedDel)
 		sprintf(szBuf, "%s mêi giao dÞch.", pPlayer->Name);
 		pFirstBtnText = "§ång ý";
 		pSecBtnText = "Tõ chèi";
+		_ASSERT(m_pHandlingMsg == NULL);
+		m_pHandlingMsg = pMsg;
+		pMsg = NULL;
+		break;
+	case SMCT_UI_TEAM_SUMMON:
+		_ASSERT (pMsg->byParamSize >= sizeof(KUiPlayerItem));
+		pPlayer = (KUiPlayerItem*)(&pMsg[1]);
+		sprintf(szBuf, "%s tri\326u h\345i b\271n t\355i b\252n c\271nh.", pPlayer->Name);
+		pFirstBtnText = "\247\345ng \375";
+		pSecBtnText = "T\365 ch\350i";
 		_ASSERT(m_pHandlingMsg == NULL);
 		m_pHandlingMsg = pMsg;
 		pMsg = NULL;

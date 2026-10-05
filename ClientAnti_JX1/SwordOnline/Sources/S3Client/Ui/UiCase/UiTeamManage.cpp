@@ -99,6 +99,7 @@ void KUiTeamManage::Initialize()
 	AddChild(&m_btnRefresh);
 	AddChild(&m_btnCloseTeam);
 	AddChild(&m_btnCancel);
+	AddChild(&m_btnSummon);
 	
 	m_TeamMember.SetScrollbar(&m_MemberScroll);
 	m_NearbyList.SetScrollbar(&m_NearbyScroll);
@@ -140,6 +141,7 @@ void KUiTeamManage::LoadScheme(class KIniFile* pSetting)
 	m_btnRefresh	.Init(pSetting, "Refresh");
 	m_btnCloseTeam	.Init(pSetting, "CloseTeam");
 	m_btnCancel		.Init(pSetting, "Cancel");
+	m_btnSummon		.Init(pSetting, "Summon");
 }
 
 //载入界面方案
@@ -184,6 +186,8 @@ int KUiTeamManage::WndProc(unsigned int uMsg, unsigned int uParam, int nParam)
 			g_pCoreShell->TeamOperation(TEAM_OI_CLOSE, 0, nParam);
 		else if (uParam == (unsigned int)(KWndWindow*)&m_btnCancel)
 			CloseWindow();
+		else if (uParam == (unsigned int)(KWndWindow*)&m_btnSummon)
+			g_pCoreShell->TeamOperation(TEAM_OI_SUMMON, 0, 0);
 		break;
 	case WND_N_LIST_ITEM_SEL:
 		if (uParam == (unsigned int)(KWndWindow*)&m_TeamMember)
@@ -247,6 +251,7 @@ void KUiTeamManage::Clear()
 	m_btnAppoint.Enable(false);
 	m_btnLeave.Enable(false);
 	m_btnDismiss.Enable(false);
+	m_btnSummon.Enable(false);
 	m_btnCloseTeam.CheckButton(false);
 
 	memset(&m_Info, 0, sizeof(KUiPlayerTeam));
@@ -294,12 +299,15 @@ void KUiTeamManage::UpdateData(KUiPlayerTeam* pInfo)
 		m_btnDismiss.Show();
 		m_btnDismiss.Enable(true);
 		m_btnLeave.Hide();
+		m_btnSummon.Show();
+		m_btnSummon.Enable(m_Info.cNumMember > 1);
 	}
 	else
 	{
 		m_btnLeave.Show();
 		m_btnLeave.Enable(m_Info.cNumMember > 0);
 		m_btnDismiss.Hide();
+		m_btnSummon.Hide();
 	}
 
 	if (m_Info.cNumMember > 0)

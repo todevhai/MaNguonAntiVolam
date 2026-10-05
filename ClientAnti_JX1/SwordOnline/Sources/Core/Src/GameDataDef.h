@@ -441,6 +441,7 @@ enum SYS_MESSAGE_CONFIRM_TYPE
 	//						pParamBuf 指向一个KUiPlayerItem结构的数据，表示发出交易邀请的人
 	SMCT_DISCONNECT,		//断线
 	SMCT_UI_TONG_JOIN_APPLY,//答应或拒绝加入帮会的申请
+	SMCT_UI_TEAM_SUMMON,	// chu to trieu hoi: pParamBuf = KUiPlayerItem (Name chu to, uId npc id chu to)
 };
 
 //==================================

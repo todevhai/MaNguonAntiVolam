@@ -193,6 +193,7 @@ enum s2c_PROTOCOL
 	s2c_meridian,	// kinh mach: 8 cap + vat lieu + ket qua (server -> client)
 	s2c_trungsinh,	// so lan trung sinh + khang toi da cong them (server -> client)
 	s2c_kinhnghiemchieu,	// tien do luyen chieu IsExpSkill, phan nghin (server -> client)
+	s2c_trieuhoi,	// chu to trieu hoi minh: hop dong y / tu choi (server -> client)
 //	s2c_gmgateway2relaysvr,		//GM登陆后网关通知中转服务器有合法连接的协议
 
 	s2c_extend = 250,
@@ -335,6 +336,8 @@ enum c2s_PROTOCOL
 	c2s_setavatar,	// chon chan dung (client -> server)
 	c2s_meridian,	// kinh mach: xin dong bo / goi y / xung huyet (client -> server)
 	c2s_phimtat,	// phim tat yeu cau may chu: 1 mo ruong, 2 mo tiem tai cho (client -> server)
+	c2s_trieuhoi,	// chu to trieu hoi thanh vien (client -> server)
+	c2s_trieuhoitraloi,	// thanh vien dong y / tu choi loi trieu hoi (client -> server)
 	_c2s_begin_relay = 250,
 	c2s_extend = _c2s_begin_relay,
 	c2s_extendchat,

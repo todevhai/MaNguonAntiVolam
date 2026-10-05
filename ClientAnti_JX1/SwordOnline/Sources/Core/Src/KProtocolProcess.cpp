@@ -151,6 +151,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_meridian] = &KProtocolProcess::MeridianSync;
 	ProcessFunc[s2c_trungsinh] = &KProtocolProcess::TrungSinhSync;
 	ProcessFunc[s2c_kinhnghiemchieu] = &KProtocolProcess::KnChieuSync;
+	ProcessFunc[s2c_trieuhoi] = &KProtocolProcess::TrieuHoiSync;
 	ProcessFunc[s2c_opentremble] = &KProtocolProcess::OpenTremble;
 	ProcessFunc[s2c_rankname] = &KProtocolProcess::NetCommandSetRankFF;
 
@@ -3631,6 +3632,25 @@ void	KProtocolProcess::MeridianSync(BYTE* pMsg)
 }
 
 // Tien do luyen chieu: chi cat vao bang, tooltip doc luc ve.
+// Chu to trieu hoi minh (may chu KPlayerTrieuHoi.cpp): hop dong y / tu choi nhu loi moi vao to (SMCT_UI_TEAM_SUMMON).
+// uId = npc id chu to (gui lai trong c2s_trieuhoitraloi), nIndex = map chu to.
+void	KProtocolProcess::TrieuHoiSync(BYTE* pMsg)
+{
+	TRIEU_HOI_SYNC*	p = (TRIEU_HOI_SYNC*)pMsg;
+	KUiPlayerItem	sPlayer;
+	KSystemMessage	sMsg;
+	memset(&sPlayer, 0, sizeof(sPlayer));
+	strncpy(sPlayer.Name, p->m_szTen, sizeof(sPlayer.Name) - 1);
+	sPlayer.uId = p->m_dwDoiTruong;
+	sPlayer.nIndex = p->m_nSubWorldID;
+	sprintf(sMsg.szMessage, "%s tri\326u h\345i b\271n t\355i b\252n c\271nh.", sPlayer.Name);
+	sMsg.eType = SMT_TEAM;
+	sMsg.byConfirmType = SMCT_UI_TEAM_SUMMON;
+	sMsg.byPriority = 3;
+	sMsg.byParamSize = sizeof(KUiPlayerItem);
+	CoreDataChanged(GDCNI_SYSTEM_MESSAGE, (unsigned int)&sMsg, (int)&sPlayer);
+}
+
 void	KProtocolProcess::KnChieuSync(BYTE* pMsg)
 {
 	KN_CHIEU_SYNC* pSync = (KN_CHIEU_SYNC*)pMsg;

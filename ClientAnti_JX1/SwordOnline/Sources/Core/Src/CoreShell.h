@@ -923,6 +923,8 @@ enum GAME_TEAM_OPERATION_INDEX
 	//			KUiPlayerItem::nData = 0
 	//nParam = (int)(bool)bApprove -> 是否批准了
 
+	TEAM_OI_SUMMON,		// chu to trieu hoi: uParam = (KUiPlayerItem*) thanh vien, 0 = ca to
+	TEAM_OI_SUMMON_RESPONSE,	// tra loi trieu hoi: uParam = (KUiPlayerItem*) chu to, nParam = dong y
 	TEAM_OI_INVITE_RESPONSE,	//对组队邀请的回复
 	//uParam = (KUiPlayerItem*)pTeamLeader 发出组队邀请的队长
 	//nParam = (int)(bool)bAccept 是否接受邀请
