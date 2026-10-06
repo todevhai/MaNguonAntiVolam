@@ -1379,7 +1379,9 @@ int KMissle::ProcessCollision(int nLauncherIdx, int nRegionId, int nMapX, int nM
 	if (nLauncherIdx <= 0 ) return 0;
 	if (nRange <= 0) return 0;
 	
-	int nRangeX = nRange / 2;
+	/* Ban kinh = DmgRange o, quet TRON - nhu ban 8.x (ban6: GetNpcSearcher(DmgRange) + GetNextNpcRound, khong chia 2)
+	   va nhu may chu cua ta; nguon 2003 lay DmgRange/2 nen hieu ung no ve thieu muc tieu so voi sat thuong may chu. */
+	int nRangeX = nRange;
 	int	nRangeY = nRangeX;
 	int	nSubWorld = Npc[nLauncherIdx].m_SubWorldIndex;
 	
@@ -1396,8 +1398,8 @@ int KMissle::ProcessCollision(int nLauncherIdx, int nRegionId, int nMapX, int nM
 		for (int j = -nRangeY; j <= nRangeY; j++)
 		{
 			// 去掉边角几个格子，保证视野是椭圆形
-			//if ((i * i + j * j ) > nRangeX * nRangeX)
-			//continue;
+			if ((i * i + j * j ) > nRangeX * nRangeX)		/* tron nhu GetNextNpcRound cua ban 8.x */
+				continue;
 
 			if (!GetOffsetAxis(nSubWorld, nRegionId, nMapX, nMapY, i , j , nSearchRegion, nRMx, nRMy))
 				continue;
