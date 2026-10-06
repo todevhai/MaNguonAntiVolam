@@ -691,7 +691,11 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					   dau con quai roi duoi theo chinh no: nhin ra ngoai la "no ngay
 					   tai quai roi bay loan xa". Doi chung ban6 ngay 12/09/2026: dan
 					   bay TU NGUOI TOI QUAI. */
-					if (g_MisslesLib[m_nChildSkillId].m_eMoveKind == MISSLE_MMK_Follow)
+					/* ban6 KSkill::CastMissles (hinh tuong, nguoi phat): word CAO cua Param2 (m_nValue2 >> 16) bat thi
+					   dung tuong TAI NGUOI PHAT, khong thi tai dich (word thap la xoay huong, xem CastWall). 14 chieu
+					   khai Param2 = 65537 (Tam Nga Te Tuyet 328, Kiem Hoa Van Tinh 1061, Thuong Tung Nghenh Khach
+					   1360...): thieu luat nay thi chum dan hien o muc tieu roi bay tiep 512 ra sau, tach khoi nguoi danh. */
+					if ((m_nValue2 >> 16) != 0 || g_MisslesLib[m_nChildSkillId].m_eMoveKind == MISSLE_MMK_Follow)
 						CastWall(&SkillParam , nDir, nSrcPX, nSrcPY);
 					else
 						CastWall(&SkillParam , nDir, nDesPX, nDesPY);
@@ -1499,7 +1503,7 @@ int KSkill::CastWall(TOrdinSkillParam * pSkillParam,  int nDir , int nRefPX , in
 				continue;
 			}
 
-			if (m_nValue2)
+			if (m_nValue2 & 0xFFFF)	/* ban6 CastWall: chi word THAP (cmp word [+0x54]) - word cao la "tai nguoi phat" */
 			{
 				int nDirTemp = nDir - MaxMissleDir / 4;
 				if (nDirTemp < 0) nDirTemp += MaxMissleDir;
