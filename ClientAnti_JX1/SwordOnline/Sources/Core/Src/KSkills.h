@@ -215,6 +215,7 @@ private:
 	void				CreateMissle(int nLauncher, int ChildSkillId,  int nMissleIndex) const ;
 	
 	BOOL				ParseString2MagicAttrib(unsigned long ulLevel, char * szMagicAttribName, char * szValue) ;
+	void				DatSuKienTuLua(int nLoai, int nBat, int nMaCon);
 	inline const char *		MagicAttrib2String(int MagicAttrib) const ;
 
 #ifndef _SERVER

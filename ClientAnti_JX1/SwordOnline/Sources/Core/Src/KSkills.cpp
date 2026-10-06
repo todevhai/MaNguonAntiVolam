@@ -2539,6 +2539,19 @@ void KSkill::EnChanceSkill(int nLauncher)
 
 }
 
+void KSkill::DatSuKienTuLua(int nLoai, int nBat, int nMaCon)
+{
+	BOOL bBat = (nBat > 0 && nMaCon > 0 && (DWORD)nMaCon != m_nId);
+	int nMa = bBat ? nMaCon : 0;
+	switch (nLoai)
+	{
+	case magic_skill_startevent:		m_bStartEvent = bBat;		m_nStartSkillId = nMa;		break;
+	case magic_skill_flyevent:		m_bFlyingEvent = bBat;		m_nFlySkillId = nMa;		break;
+	case magic_skill_collideevent:	m_bCollideEvent = bBat;		m_nCollideSkillId = nMa;	break;
+	case magic_skill_vanishedevent:	m_bVanishedEvent = bBat;	m_nVanishedSkillId = nMa;	break;
+	}
+}
+
 /*!*****************************************************************************
 // Function		: KSkill::ParseString2MagicAttrib
 // Purpose		: 解析通过脚本运算获得的技能数据
@@ -2571,6 +2584,14 @@ BOOL	KSkill::ParseString2MagicAttrib(unsigned long ulLevel, char * szMagicAttrib
 			//sscanf(szValue, "%d,%d,%d", &nValue1, &nValue2, &nValue3);
 
 
+			/* Su kien chieu con khai trong Lua (skill_startevent/flyevent/collideevent/vanishedevent):
+			   [1] bat/tat theo tang cap, [3] ma chieu con. Truoc day chi vao m_ImmediateAttribs de viet
+			   mo ta nen engine KHONG phat - 9 chieu mon phai (1073, 1079, 1080...) mat chieu con. Chi ten co
+			   trong LvlSetting moi toi day (giong jx9tn); Lua de len cot skills.txt cho cap nay. Bo qua khi ma con trung
+			   chinh no: 1085/1086/1201 dung chung khoa Lua voi chieu me nen tu goi lai minh. Khong return
+			   - nhanh duoi van dua vao m_ImmediateAttribs de mo ta. */
+			if (i >= magic_skill_startevent && i <= magic_skill_vanishedevent)
+				DatSuKienTuLua(i, nValue1, nValue3);
 			if (i > magic_missle_begin && i < magic_missle_end)
 			{
 				m_MissleAttribs[m_nMissleAttribsNum].nAttribType = i;
