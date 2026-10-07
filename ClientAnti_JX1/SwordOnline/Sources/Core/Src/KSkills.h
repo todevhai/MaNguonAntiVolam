@@ -187,6 +187,7 @@ public:
 	BOOL				IsPhysical() const {return m_bIsPhysical;};
 	int					IsMagic() const {return m_nIsMagic;};
 	int					GetMeleeType() const { return m_eMisslesForm;};
+	int					GetParam2() const { return m_nValue2; };
 	int					GetStateSpecailId() const {return m_nStateSpecialId;		};
 	BOOL				CanCastSkill  (int nLauncher, int &nParam1, int &nParam2)  const ;
 	void				PlayPreCastSound  (BOOL bIsFeMale , int nX, int nY) const ;

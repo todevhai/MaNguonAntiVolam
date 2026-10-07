@@ -132,6 +132,7 @@ enum eMeleeForm
 	Melee_JumpAndAttack,
 	Melee_RunAndAttack,
 	Melee_ManyAttack,
+	Melee_MovePos,			// 13: luot toi diem (710 Me Anh Tung, 1918 Tap Dap Luu Tinh)
 	Melee_Move,
 };
 

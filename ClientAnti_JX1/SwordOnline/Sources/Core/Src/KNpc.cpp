@@ -721,6 +721,9 @@ void KNpc::ProcStatus()
 	case do_jumpattack:
 		OnJumpAttack();
 		break;
+	case do_movepos:
+		OnMovePos();
+		break;
 	case do_idle:
 		OnIdle();
 	default:
@@ -2384,6 +2387,10 @@ BOOL	KNpc::CastMeleeSkill(KSkill * pSkill)
 		{
 			bSuceess = DoManyAttack();
 		}break;
+	case Melee_MovePos:
+		{
+			bSuceess = DoMovePos();
+		}break;
 	case Melee_Move:
 		{
 			if (NewJump(m_DesX, m_DesY))
@@ -3845,6 +3852,116 @@ BOOL KNpc::NewPath(int nMpsX, int nMpsY)
 	m_DesX = nMpsX;
 	m_DesY = nMpsY;
 	return TRUE;
+}
+
+
+/* CHIEU LUOT (MisslesForm 13 = Melee_MovePos: 710 Me Anh Tung, 1918 Tap Dap Luu Tinh). Engine 2003 khong co;
+   dung lai theo ban6 (jx_linux_y con symbol: KNpc::DoMovePos / TestMovePos / OnMovePos, KNpc::CastMeleeSkill
+   bang nhay hinh 8..13). Tam luot = Param1 cua chieu (skill_param1_v), cho Param2 khung (it nhat 1) roi dat
+   nhan vat o dich. Hai nua chay cung ma: may chu phat s2c_skillcast, client tu chay CastMeleeSkill cua no.
+
+   TestMovePos: do tung buoc dai m_CurrentJumpSpeed (1..32) tu cho dung ve phia (nX, nY), toi da
+   min(khoang cach, nDist). O trong -> buoc nay dung duoc; o vat can thuong / bay -> dung; o nhay qua duoc
+   (Jump, JumpFly - ca o dang co NPC) -> bVuot thi luot qua ma khong dap len; gap bay -> dung TREN bay.
+   Ra: (nX, nY) = diem dap, nDist = quang duong that. */
+BOOL KNpc::TestMovePos(int &nX, int &nY, int &nDist, BOOL bVuot)
+{
+	int nBuoc = m_CurrentJumpSpeed;
+	if (nBuoc < 1 || nBuoc > 32 || nDist <= 0 || m_SubWorldIndex < 0 || m_RegionIndex < 0)
+		return FALSE;
+	int nCx, nCy;
+	GetMpsPos(&nCx, &nCy);
+	int nDx = nX - nCx;
+	int nDy = nY - nCy;
+	int nDai = g_GetDistance(nCx, nCy, nX, nY);
+	if (nDai <= 0)
+		return FALSE;
+	int nBx = ((nDx * nBuoc) << 10) / nDai;
+	int nBy = ((nDy * nBuoc) << 10) / nDai;
+	int nSo = (nDai < nDist ? nDai : nDist) / nBuoc;
+	int nDuoc = 0;
+	int nPx = nCx << 10;
+	int nPy = nCy << 10;
+	for (int k = 1; k <= nSo; k++)
+	{
+		nPx += nBx;
+		nPy += nBy;
+		if (SubWorld[m_SubWorldIndex].GetTrap(nPx >> 10, nPy >> 10))
+		{
+			nDuoc = k;
+			break;
+		}
+		int nCan = SubWorld[m_SubWorldIndex].GetBarrier(nPx >> 10, nPy >> 10);
+		if (nCan == Obstacle_NULL)
+		{
+			nDuoc = k;
+			continue;
+		}
+		if ((nCan == Obstacle_Jump || nCan == Obstacle_JumpFly) && bVuot)
+			continue;
+		if (nCan >= Obstacle_Kind_Num)
+			return FALSE;
+		break;
+	}
+	nDist = nDuoc * nBuoc;
+	nX = nCx + ((nDuoc * nBx) >> 10);
+	nY = nCy + ((nDuoc * nBy) >> 10);
+	return TRUE;
+}
+
+BOOL KNpc::DoMovePos()
+{
+	KSkill * pSkill = (KSkill *)GetActiveSkill();
+	if (!pSkill)
+		return FALSE;
+	/* Nham NPC (m_DesX = -1, m_DesY = chi so NPC): luot toi cho NPC dung. 710/1918 khong khai co muc tieu nen
+	   nguoi choi chi phat vao diem, nhanh nay giu cho chieu luot sau nay co nham muc tieu. */
+	if (m_DesX < 0)
+	{
+		if (m_DesX != -1 || m_DesY <= 0 || m_DesY >= MAX_NPC || Npc[m_DesY].m_RegionIndex < 0)
+			return FALSE;
+		int nNx, nNy;
+		Npc[m_DesY].GetMpsPos(&nNx, &nNy);
+		m_DesX = nNx;
+		m_DesY = nNy;
+	}
+	int nTam = pSkill->GetParam1();
+	if (!TestMovePos(m_DesX, m_DesY, nTam, TRUE) || nTam <= 20)
+		return FALSE;
+	if (m_Doing == do_runattack)
+		m_ProcessAI = 1;
+	m_Doing = do_movepos;
+	m_ProcessAI = 0;
+	m_Frames.nTotalFrame = pSkill->GetParam2() > 0 ? pSkill->GetParam2() : 1;
+	m_Frames.nCurrentFrame = 0;
+	return TRUE;
+}
+
+void KNpc::OnMovePos()
+{
+	if (!WaitForFrame())
+		return;
+	/* Client khong co KNpc::SetPos (chi may chu): dat lai o/vung nhu doan cuoi ServeJump. */
+	int nRegion, nMapX, nMapY, nOffX, nOffY;
+	SubWorld[m_SubWorldIndex].Mps2Map(m_DesX, m_DesY, &nRegion, &nMapX, &nMapY, &nOffX, &nOffY);
+	if (nRegion >= 0 && m_RegionIndex >= 0)
+	{
+		int nCu = m_RegionIndex;
+		CURREGION.DecRef(m_MapX, m_MapY, obj_npc);
+		m_RegionIndex = nRegion;
+		m_MapX = nMapX;
+		m_MapY = nMapY;
+		m_OffX = nOffX;
+		m_OffY = nOffY;
+		CURREGION.AddRef(m_MapX, m_MapY, obj_npc);
+		if (nCu != m_RegionIndex)
+		{
+			SubWorld[0].NpcChangeRegion(SubWorld[0].m_Region[nCu].m_RegionID, SubWorld[0].m_Region[m_RegionIndex].m_RegionID, m_Index);
+			m_dwRegionID = SubWorld[0].m_Region[m_RegionIndex].m_RegionID;
+		}
+	}
+	DoStand();
+	m_ProcessAI = 1;
 }
 
 BOOL KNpc::NewJump(int nMpsX, int nMpsY)

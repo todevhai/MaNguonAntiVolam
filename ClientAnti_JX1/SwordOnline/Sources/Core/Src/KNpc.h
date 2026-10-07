@@ -72,6 +72,7 @@ enum NPCCMD
 	do_manyattack,
 	do_jumpattack,
 	do_revive,
+	do_movepos,		// chieu luot (MisslesForm 13) - ban6 do_movepos = 23 sau mot trang thai ta khong co
 };
 
 enum CLIENTACTION
@@ -561,6 +562,9 @@ private:
 	BOOL				DoBlurAttack();
 
 	BOOL				DoJumpAttack();
+	BOOL				TestMovePos(int &nX, int &nY, int &nDist, BOOL bVuot);
+	BOOL				DoMovePos();
+	void				OnMovePos();
 	BOOL				OnJumpAttack();
 
 	BOOL				DoRunAttack();
