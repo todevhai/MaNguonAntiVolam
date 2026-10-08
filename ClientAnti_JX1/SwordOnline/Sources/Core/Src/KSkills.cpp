@@ -101,6 +101,12 @@ static int TinhHuongDan(int nLauncher, int nX1, int nY1, int nX2, int nY2)
 	return nDirIndex;
 }
 
+/* Vi tri NGUOI PHAT, DAN PHAT DAN va MUC TIEU khi ra chieu lay o TAM O (do lech 16 << 10), muc tieu la diem thi dua ve tam o:
+   ban6 KSkill::CastMissles goi Map2Mps(..., 0x4000, 0x4000) ca 22 lan va (x & ~31) + 16 cho diem. Duong dan khi do di qua
+   tam o dich, buoc dan < 1 o nen luon cham o dich (va cham CollidRange 1 so dung mot o). Lay vi tri le trong o thi dan di
+   sat mep o, cat goc o ngan hon mot buoc - Vo Tuong Tram 321 do 08/10: co sat thuong (may chu) ma client khong no. */
+#define TAM_O	(16 << 10)
+
 inline int	KSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , int *npPX, int *npPY, eSkillLauncherType eLauncherType)  const 
 {
 	
@@ -117,9 +123,9 @@ inline int	KSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , i
 		nDesMapY		= Npc[nParam2].m_MapY;
 		
 		if (eLauncherType == SKILL_SLT_Npc)
-			SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(nRegionId, nDesMapX , nDesMapY, Npc[nParam2].m_OffX , Npc[nParam2].m_OffY, npPX, npPY);
+			SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(nRegionId, nDesMapX , nDesMapY, TAM_O, TAM_O, npPX, npPY);
 		else if(eLauncherType == SKILL_SLT_Obj)
-			SubWorld[Object[nLauncher].m_nSubWorldID].Map2Mps(nRegionId, nDesMapX, nDesMapY, Object[nParam2].m_nOffX , Object[nParam2].m_nOffY, npPX, npPY);
+			SubWorld[Object[nLauncher].m_nSubWorldID].Map2Mps(nRegionId, nDesMapX, nDesMapY, TAM_O, TAM_O, npPX, npPY);
 		else;
 		break;
 		
@@ -127,8 +133,8 @@ inline int	KSkill::Param2PCoordinate(int nLauncher, int nParam1, int nParam2 , i
 		
 		break;
 	default://默认时, nParam1 与nParam2 为实际点坐标
-		*npPX = nParam1;
-		*npPY = nParam2;
+		*npPX = (nParam1 / 32) * 32 + 16;
+		*npPY = (nParam2 / 32) * 32 + 16;
 		break;
 	}
 	
@@ -671,7 +677,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 						return FALSE;
 					}
 					
-					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 					
 					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
@@ -708,7 +714,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					KMissle * pMissle = &Missle[nLauncher];
 					if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
 					
-					SubWorld[Missle[nLauncher].m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+					SubWorld[Missle[nLauncher].m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 					int nDir = pMissle->m_nDir + MaxMissleDir / 4;
 					if (nDir >= MaxMissleDir) nDir -= MaxMissleDir;
 					SkillParam.nLauncher = pMissle->m_nLauncher;
@@ -730,7 +736,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 				case SKILL_SLT_Npc:
 					{
-						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 						if (nParam2 > MaxMissleDir || nParam2 < 0) return FALSE;
 						nDir = nParam2;
 						SkillParam.nLauncher = nLauncher;
@@ -749,7 +755,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 						if (nParam2 > MaxMissleDir || nParam2 < 0) return FALSE;
 						if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
 						nDir = nParam2;
-						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 						SkillParam.nLauncher = pMissle->m_nLauncher;
 						SkillParam.nParent = nLauncher;
 						SkillParam.nTargetId = pMissle->m_nFollowNpcIdx;
@@ -765,7 +771,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				case SKILL_SLT_Npc:
 					{
 						nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2, &nDesPX, &nDesPY,  SKILL_SLT_Npc);
-						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 						nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 						nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 						SkillParam.nLauncher = nLauncher;
@@ -801,7 +807,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					{
 						KMissle * pMissle = &Missle[nLauncher];
 						if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
-						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 						SkillParam.nLauncher = pMissle->m_nLauncher;
 						SkillParam.nParent = nLauncher;
 						SkillParam.eParentType = eLauncherType;
@@ -825,7 +831,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 				case SKILL_SLT_Npc:
 					{
-						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 						if (nParam2 > MaxMissleDir || nParam2 < 0) return FALSE;
 						nDir = nParam2;
 						SkillParam.nLauncher = nLauncher;
@@ -842,7 +848,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 						if (nParam2 > MaxMissleDir || nParam2 < 0) return FALSE;
 						if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
 						nDir = nParam2;
-						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 						SkillParam.nLauncher = pMissle->m_nLauncher;
 						SkillParam.nParent = nLauncher;
 						SkillParam.eParentType = eLauncherType;
@@ -858,7 +864,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				case SKILL_SLT_Npc:
 					{
 						nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2, &nDesPX, &nDesPY, SKILL_SLT_Npc);		
-						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+						SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 						nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 						nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 						SkillParam.nLauncher = nLauncher;
@@ -895,7 +901,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 					{
 						KMissle * pMissle = &Missle[nLauncher];
 						if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
-						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+						SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 						SkillParam.nLauncher = pMissle->m_nLauncher;
 						SkillParam.nParent = nLauncher;
 						SkillParam.eParentType = eLauncherType;
@@ -921,7 +927,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 			case SKILL_SLT_Npc:
 				{
 					nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2,  &nDesPX, &nDesPY, eLauncherType);
-					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
@@ -941,7 +947,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 					KMissle * pMissle = &Missle[nLauncher];
 					if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
-					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 					SkillParam.nLauncher = pMissle->m_nLauncher;
 					SkillParam.nParent = nLauncher;
 					SkillParam.eParentType = eLauncherType;
@@ -996,7 +1002,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 					KMissle * pMissle = &Missle[nLauncher];
 					if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
-					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 					SkillParam.nLauncher = pMissle->m_nLauncher;
 					SkillParam.nParent = nLauncher;
 					SkillParam.eParentType = eLauncherType;
@@ -1015,7 +1021,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 			case SKILL_SLT_Npc:
 				{
 					nTargetId		= Param2PCoordinate(nLauncher, nParam1, nParam2, &nDesPX, &nDesPY, SKILL_SLT_Npc);
-					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
@@ -1031,7 +1037,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 					KMissle * pMissle = &Missle[nLauncher];
 					if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
-					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 					SkillParam.nLauncher = pMissle->m_nLauncher;
 					SkillParam.nParent = nLauncher;
 					SkillParam.eParentType = eLauncherType;
@@ -1051,7 +1057,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 			case SKILL_SLT_Npc:
 				{
 					nTargetId		= Param2PCoordinate(nLauncher,nParam1, nParam2,  &nDesPX, &nDesPY);
-					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, Npc[nLauncher].m_OffX, Npc[nLauncher].m_OffY, &nSrcPX, &nSrcPY);
+					SubWorld[Npc[nLauncher].m_SubWorldIndex].Map2Mps(Npc[nLauncher].m_RegionIndex, Npc[nLauncher].m_MapX, Npc[nLauncher].m_MapY, TAM_O, TAM_O, &nSrcPX, &nSrcPY);
 					nDirIndex		= TinhHuongDan(nLauncher, nSrcPX, nSrcPY, nDesPX, nDesPY);
 					nDir			= g_DirIndex2Dir(nDirIndex, MaxMissleDir);
 					SkillParam.nLauncher = nLauncher;
@@ -1067,7 +1073,7 @@ BOOL	KSkill::CastMissles(int nLauncher, int nParam1, int nParam2, int nWaitTime 
 				{
 					KMissle * pMissle = &Missle[nLauncher];
 					if (!Npc[pMissle->m_nLauncher].IsMatch(pMissle->m_dwLauncherId)) return FALSE;
-					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , pMissle->m_nXOffset, pMissle->m_nYOffset, &nRefPX, &nRefPY);
+					SubWorld[pMissle->m_nSubWorldId].Map2Mps(pMissle->m_nRegionId, pMissle->m_nCurrentMapX, pMissle->m_nCurrentMapY , TAM_O, TAM_O, &nRefPX, &nRefPY);
 					SkillParam.nLauncher = pMissle->m_nLauncher;
 					SkillParam.nParent = nLauncher;
 					SkillParam.eParentType = eLauncherType;
