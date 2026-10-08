@@ -3932,18 +3932,33 @@ BOOL KNpc::DoMovePos()
 		m_ProcessAI = 1;
 	m_Doing = do_movepos;
 	m_ProcessAI = 0;
-	m_Frames.nTotalFrame = pSkill->GetParam2() > 0 ? pSkill->GetParam2() : 1;
+	/* So khung luot: Param2 (ban6), nhung it nhat quang luot / (2 x toc do nhay) - VNG 1918 TRUOT toi dich
+	   chu khong bien toi (1918/710 khong khai Param2 nen ban6 dat thang sau 1 khung). Hai nua cung cong thuc:
+	   may chu dat vi tri o khung cuoi, client ve truot dan trong cac khung do. */
+	int nKhungLuot = pSkill->GetParam2() > 0 ? pSkill->GetParam2() : 1;
+	if (m_CurrentJumpSpeed > 0 && nTam / (2 * m_CurrentJumpSpeed) > nKhungLuot)
+		nKhungLuot = nTam / (2 * m_CurrentJumpSpeed);
+	m_Frames.nTotalFrame = nKhungLuot;
+	GetMpsPos(&m_nLuotTuX, &m_nLuotTuY);
+#ifndef _SERVER
+	m_DataRes.SetBlur(TRUE);	// hang bong mo doc duong luot, cung co che voi DoRunAttack
+#endif
 	m_Frames.nCurrentFrame = 0;
 	return TRUE;
 }
 
 void KNpc::OnMovePos()
 {
-	if (!WaitForFrame())
-		return;
+	/* Ve TRUOT tu diem dau toi dich theo khung (may chu chi dat vi tri o khung cuoi). WaitForFrame tang khung
+	   truoc khi so nen khung k/tong la ty le quang duong da di. */
+	int nTong = m_Frames.nTotalFrame > 0 ? m_Frames.nTotalFrame : 1;
+	BOOL bXong = WaitForFrame();
+	int nKhung = bXong ? nTong : m_Frames.nCurrentFrame;
+	int nToiX = m_nLuotTuX + (m_DesX - m_nLuotTuX) * nKhung / nTong;
+	int nToiY = m_nLuotTuY + (m_DesY - m_nLuotTuY) * nKhung / nTong;
 	/* Client khong co KNpc::SetPos (chi may chu): dat lai o/vung nhu doan cuoi ServeJump. */
 	int nRegion, nMapX, nMapY, nOffX, nOffY;
-	SubWorld[m_SubWorldIndex].Mps2Map(m_DesX, m_DesY, &nRegion, &nMapX, &nMapY, &nOffX, &nOffY);
+	SubWorld[m_SubWorldIndex].Mps2Map(nToiX, nToiY, &nRegion, &nMapX, &nMapY, &nOffX, &nOffY);
 	if (nRegion >= 0 && m_RegionIndex >= 0)
 	{
 		int nCu = m_RegionIndex;
@@ -3960,6 +3975,11 @@ void KNpc::OnMovePos()
 			m_dwRegionID = SubWorld[0].m_Region[m_RegionIndex].m_RegionID;
 		}
 	}
+	if (!bXong)
+		return;
+#ifndef _SERVER
+	m_DataRes.SetBlur(FALSE);
+#endif
 	DoStand();
 	m_ProcessAI = 1;
 }

@@ -545,6 +545,11 @@ int KMissle::CheckCollision()
 		for (int i = -m_nCollideRange; i <= m_nCollideRange; i ++)
 			for (int j = -m_nCollideRange; j <= m_nCollideRange; j ++)
 			{
+				/* Do va cham theo VONG TRON nhu vung sat thuong (ProcessCollision, GetNextNpcRound). Do vuong thi dan bay
+				   CHEO cham goc o (2,2) cach ~75 ma vong sat thuong ban kinh 2 o chi toi 64: no o day, khong trung ai,
+				   roi tan - 1936/1940/1941 Tieu Dao (CollidRange = DmgRange = 2) truot 100% theo 4 huong cheo, do 08/10. */
+				if (i * i + j * j > m_nCollideRange * m_nCollideRange)
+					continue;
 				if (!GetOffsetAxis(m_nSubWorldId, m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, i , j , nSearchRegion, nRMx, nRMy))
 					continue;
 				
@@ -702,32 +707,13 @@ void KMissle::OnFly()
 			if (nPreAngle < 0) nPreAngle = MaxMissleDir - 1;
 			m_nDir = m_nAngle + (MaxMissleDir / 4);
 			if (m_nDir >= MaxMissleDir) m_nDir = m_nDir - MaxMissleDir;
-			int dx = (m_nSpeed + 250)  * (g_DirCos(m_nAngle,MaxMissleDir) - g_DirCos(nPreAngle,MaxMissleDir)) ;
+			int dx = (m_nSpeed + 50)  * (g_DirCos(m_nAngle,MaxMissleDir) - g_DirCos(nPreAngle,MaxMissleDir)) ;
 			int dy = (m_nSpeed + 50)  * (g_DirSin(m_nAngle,MaxMissleDir) - g_DirSin(nPreAngle, MaxMissleDir)) ; 
-			
-			if (m_nParam2) //原地转
-			{
-				nDOffsetX = dx;
-				nDOffsetY = dy;
-			}
-			else			// 围绕着发送者转
-			{
-				int nOldRegion = m_nRegionId;
-				CurRegion.DecRef(m_nCurrentMapX, m_nCurrentMapY, obj_missle);
-				m_nRegionId		= Npc[m_nLauncher].m_RegionIndex;
-				m_nCurrentMapX	= Npc[m_nLauncher].m_MapX;
-				m_nCurrentMapY	= Npc[m_nLauncher].m_MapY;
-				m_nXOffset		= Npc[m_nLauncher].m_OffX;
-				m_nYOffset		= Npc[m_nLauncher].m_OffY;
-				CurRegion.AddRef(m_nCurrentMapX, m_nCurrentMapY, obj_missle);
-				
-				if (nOldRegion != m_nRegionId)
-				{
-					SubWorld[m_nSubWorldId].m_WorldMessage.Send(GWM_MISSLE_CHANGE_REGION, nOldRegion, m_nRegionId, m_nMissleId);
-				}  
-				nDOffsetX = dx;
-				nDOffsetY = dy;
-			}
+			/* Ban 8.x (ban6, VNG) cong don buoc vong; diem khoi dau dat MOT lan o PrePareFly.
+			   Ban 2003 keo dan ve giua nguoi phat MOI nhip (Param2 = 0) nen dan dung yen tren
+			   nguoi - chieu 384 Bach Doc Xuyen Tam mat duong bay. */
+			nDOffsetX = dx;
+			nDOffsetY = dy;
 			
 			//顺时针还是逆时针
 			if (m_nParam1)
@@ -1571,6 +1557,31 @@ BOOL	KMissle::PrePareFly()
 {
 	if (m_eMoveKind == MISSLE_MMK_RollBack)
 		m_nTempParam2 =  m_nStartLifeTime + (m_nLifeTime - m_nStartLifeTime ) / 2;
+
+	/* Dan vong quanh nguoi phat (Circle, Param2 = 0): ban6/VNG dat dan o dinh vong tron, cach
+	   nguoi phat speed+50 ve phia Y am, roi OnFly cong don buoc vong ban kinh speed+50. */
+	if (m_eMoveKind == MISSLE_MMK_Circle && !m_nParam2 && m_nLauncher > 0)
+	{
+		int nPX, nPY;
+		Npc[m_nLauncher].GetMpsPos(&nPX, &nPY);
+		nPY -= 50 + m_nSpeed;
+		if (nPY < 0) nPY = 0;
+		int nRegion = -1, nMapX = 0, nMapY = 0, nOffX = 0, nOffY = 0;
+		SubWorld[m_nSubWorldId].Mps2Map(nPX, nPY, &nRegion, &nMapX, &nMapY, &nOffX, &nOffY);
+		if (nRegion >= 0)
+		{
+			int nOldRegion = m_nRegionId;
+			CurRegion.DecRef(m_nCurrentMapX, m_nCurrentMapY, obj_missle);
+			m_nRegionId = nRegion;
+			m_nCurrentMapX = nMapX;
+			m_nCurrentMapY = nMapY;
+			m_nXOffset = nOffX;
+			m_nYOffset = nOffY;
+			CurRegion.AddRef(m_nCurrentMapX, m_nCurrentMapY, obj_missle);
+			if (nOldRegion != m_nRegionId)
+				SubWorld[m_nSubWorldId].m_WorldMessage.Send(GWM_MISSLE_CHANGE_REGION, nOldRegion, m_nRegionId, m_nMissleId);
+		}
+	}
 
 	//是否会随发送者的移动而中断，类式魔兽3中大型法术
 	if (m_nInteruptTypeWhenMove)

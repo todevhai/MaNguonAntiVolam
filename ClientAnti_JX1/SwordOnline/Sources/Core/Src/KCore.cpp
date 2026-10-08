@@ -127,7 +127,8 @@ BOOL LaChieuVuKhi(int nSkillId)
    danh sach chon chieu tay trai/tay phai va thanh phim tat. */
 BOOL LaChieuNgoaiBangVoCong(int nSkillId)
 {
-	return (nSkillId == 53 || nSkillId == 210);
+	/* Moi don vu khi (bang vukhi-kynang-vatly: 53, 1, 2, 1935...), khong rieng 53: may chu bu du cap 1 luc nap nhan vat. */
+	return (LaChieuVuKhi(nSkillId) || nSkillId == 210);
 }
 #ifndef	_SERVER
 KSoundCache		g_SoundCache;

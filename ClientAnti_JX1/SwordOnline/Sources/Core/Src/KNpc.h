@@ -363,6 +363,7 @@ public:
 	int					m_MapX, m_MapY, m_MapZ;			// Npc的地图坐标
 	int					m_OffX, m_OffY;					// Npc在格子中的偏移坐标（放大了1024倍）
 	int					m_DesX, m_DesY;					// Npc的目标坐标
+	int					m_nLuotTuX, m_nLuotTuY;		// diem bat dau chieu luot (MisslesForm 13), client ve truot
 	int					m_AutoPathX[64], m_AutoPathY[64];	// A* waypoint (Mps) player auto-di
 	int					m_nAutoPathCnt, m_nAutoPathIdx, m_nAutoPathRecalc;	// so wp + wp dang di + so lan tinh lai
 	int					m_nAutoPathNoProg, m_nAutoPathLastDist;	// dem frame khong tien + khoang cach frame truoc (bat ket khi GetDir==1 ma va cham)
