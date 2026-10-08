@@ -241,6 +241,16 @@ void KAutoControl::RunLine(const char* szLine)
 		else
 			g_DebugLog("[AUTO] route: thieu hoac sai mapId (%s)", szArg);
 	}
+	else if (!strcmp(szCmd, "ngoi"))
+	{
+		// Hanh dong cua phim V: PA_SIT bat/tat ngoi (dang cuoi ngua thi game tu bao loi). De do hinh nhan vat
+		// khi ngoi ma khong bam phim that (khong cuop focus).
+		if (g_pCoreShell)
+		{
+			g_pCoreShell->OperationRequest(GOI_PLAYER_ACTION, PA_SIT, 0);
+			g_DebugLog("[AUTO] ngoi (PA_SIT)");
+		}
+	}
 	else if (!strcmp(szCmd, "ride"))
 	{
 		// Dung hanh dong cua phim M: Switch([[horse]]) -> PA_RIDE. Server quyet
