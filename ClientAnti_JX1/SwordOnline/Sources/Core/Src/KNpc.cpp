@@ -3329,6 +3329,18 @@ void KNpc::AppendSkillEffect(int nIsMaigc ,BOOL bIsPhysical, BOOL bIsMelee, void
 			pDes->nValue[2] += m_CurrentMagicLightDamage.nValue[2];
 	   }
 	}
+	/* lightingdamage_p (o 76, VNG - Cam Tieu Dao): nhu may chu - goc = 5 x noi cong + loi noi cong, min x (p+4)% x
+	   (100+lightingenhance)%, max x (p+4)% (client VNG game_y.exe 0x6347d8). */
+	if (pTemp->nAttribType == magic_lightingdamage_p)
+	{
+		int nNoi = IsPlayer() ? Player[m_nPlayerIdx].m_nCurEngergy : 0;
+		int nGocMin = 5 * nNoi + m_CurrentMagicLightDamage.nValue[0];
+		int nGocMax = 5 * nNoi + m_CurrentMagicLightDamage.nValue[2];
+		pDes->nAttribType = magic_lightingdamage_v;
+		pDes->nValue[0] = nGocMin * (pTemp->nValue[0] + 4) / 100 * (100 + m_CurrentLightEnhance) / 100;
+		pDes->nValue[1] = 0;
+		pDes->nValue[2] = nGocMax * (pTemp->nValue[0] + 4) / 100;
+	}
 	if (bIsPhysical)
 	{
 		pDes->nValue[0] += m_CurrentLightDamage.nValue[0];

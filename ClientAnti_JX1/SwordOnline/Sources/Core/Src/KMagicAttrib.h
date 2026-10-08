@@ -84,7 +84,7 @@ enum MAGIC_ATTRIB
 	magic_addskillexp1,						// 73
 	magic_addskillexp2,						// 74
 	magic_seriesdamage_p,						// 75
-	magic_damage_reserve4,					// 76
+	magic_lightingdamage_p,	/* VNG dung o damage_reserve4 cho sat thuong Loi theo noi cong (Cam Tieu Dao) */					// 76
 	magic_damage_reserve5,					// 77
 	magic_damage_reserve6,					// 78
 	magic_damage_reserve7,					// 79

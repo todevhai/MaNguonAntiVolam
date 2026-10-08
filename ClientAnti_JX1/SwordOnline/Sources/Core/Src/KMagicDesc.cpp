@@ -87,7 +87,7 @@ const char MAGIC_ATTRIB_STRING[magic_end + 1][100] =
 	"addskillexp1",	// 73
 	"addskillexp2",	// 74
 	"seriesdamage_p",	// 75
-	"damage_reserve4",	// 76
+	"lightingdamage_p",	// 76
 	"damage_reserve5",	// 77
 	"damage_reserve6",	// 78
 	"damage_reserve7",	// 79

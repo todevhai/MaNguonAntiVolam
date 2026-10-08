@@ -2702,6 +2702,7 @@ BOOL	KSkill::ParseString2MagicAttrib(unsigned long ulLevel, char * szMagicAttrib
 					break;
 				case magic_lightingdamage_v:
 				case magic_lightingenhance_p:
+				case magic_lightingdamage_p:
 					m_DamageAttribs[5].nAttribType = i;
 					m_DamageAttribs[5].nValue[0] = nValue1;
 					m_DamageAttribs[5].nValue[1] = nValue2;
