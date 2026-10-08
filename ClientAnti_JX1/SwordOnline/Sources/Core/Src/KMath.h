@@ -101,10 +101,17 @@ inline int	g_GetDirIndex(int nX1, int nY1, int nX2, int nY2)
 			break;
 		nRet = i;
 	}
+	/* Lay huong GAN NHAT nhu ban6 (KSkill::CastMissles 0x8104bfb: so khoang cach toi hai moc sin ke nhau, gan moc sau
+	   hon thi +1). Ban 2003 dung o moc cuoi chua vuot = lam tron XUONG, dan lech toi gan mot buoc (5.6 do) ve mot phia
+	   - Vo Tuong Tram 321 do 08/10 lech 1-5.4 do, bay ne bao cat 4-21 diem nen khong cham (CollidRange 1). */
+	if (nRet >= 0 && nRet < 32 && g_nSin[nRet] != nSin && (g_nSin[nRet] - nSin) > (nSin - g_nSin[nRet + 1]))
+		nRet++;
 
-	if ((nX2 - nX1) > 0)
+	/* Nua phai doi xung qua truc doc: 64 - nRet nhu ban6 (0x8104c34), nRet 0 (thang xuong) giu 0. Ban 2003 lay
+	   63 - nRet nen moi huong ben phai lech them mot buoc. */
+	if ((nX2 - nX1) >= 0 && nRet > 0)
 	{
-		nRet = 63 - nRet;
+		nRet = 64 - nRet;
 	}
 	return nRet;
 }
