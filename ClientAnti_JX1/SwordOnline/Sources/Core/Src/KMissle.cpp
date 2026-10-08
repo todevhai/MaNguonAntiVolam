@@ -473,6 +473,12 @@ void KMissle::OnCollision()
 }
 
 // 1表示正常碰撞到物体，0表示未碰撞到任何物体, -1表示落地
+#ifndef _SERVER
+/* Nhat ky [dan-no] (engine-debug.log): vong doi dan CUA CHINH nguoi choi o client - sinh / cham NPC / ve no / tan -
+   de tim huong danh co sat thuong (may chu tinh) ma khong hien no (client ve). Chi ghi dan cua nhan vat minh. */
+#define DAN_CUA_TOI()	(m_nLauncher > 0 && m_nLauncher == Player[CLIENT_PLAYER_INDEX].m_nIndex)
+#endif
+
 int KMissle::CheckCollision()
 {
 #ifdef TOOLVERSION
@@ -532,6 +538,9 @@ int KMissle::CheckCollision()
 			nNpcIdx = 0;
 		if (nNpcIdx > 0)
 		{ 
+			#ifndef _SERVER
+			if (DAN_CUA_TOI()) { int nLX = 0, nLY = 0; SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nLX, &nLY); g_DebugLog("[dan-no] cham dan=%d chieu=%d npc=%d vi-tri=%d,%d nhip=%d", m_nMissleId, m_nSkillId, nNpcIdx, nLX, nLY, m_nCurrentLife); }
+#endif
 			if (m_nDamageRange == 1)//在目标Npc处碰撞
 				ProcessCollision(m_nLauncher, Npc[nNpcIdx].m_RegionIndex , Npc[nNpcIdx].m_MapX, Npc[nNpcIdx].m_MapY, m_nDamageRange , m_eRelation);
 			else
@@ -557,6 +566,9 @@ int KMissle::CheckCollision()
 				nNpcIdx = SubWorld[m_nSubWorldId].m_Region[nSearchRegion].FindNpc(nRMx, nRMy, m_nLauncher, m_eRelation);
 				if (nNpcIdx > 0)
 				{
+					#ifndef _SERVER
+					if (DAN_CUA_TOI()) { int nLX = 0, nLY = 0; SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nLX, &nLY); g_DebugLog("[dan-no] cham dan=%d chieu=%d npc=%d vi-tri=%d,%d nhip=%d", m_nMissleId, m_nSkillId, nNpcIdx, nLX, nLY, m_nCurrentLife); }
+#endif
 					ProcessCollision();//处理碰撞
 					DoCollision();//子弹作碰撞后的效果
 					return 1;
@@ -1202,6 +1214,9 @@ BOOL KMissle::ProcessDamage(int nNpcId)
 void KMissle::DoVanish()
 {
 	if (m_eMissleStatus == MS_DoVanish) return ;
+#ifndef _SERVER
+	if (DAN_CUA_TOI()) { int nLX = 0, nLY = 0; SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nLX, &nLY); g_DebugLog("[dan-no] tan dan=%d chieu=%d trang-thai=%d vi-tri=%d,%d nhip=%d/%d", m_nMissleId, m_nSkillId, (int)m_eMissleStatus, nLX, nLY, m_nCurrentLife, m_nLifeTime); }
+#endif
 	
 #ifndef _SERVER
 	m_MissleRes.m_bHaveEnd = TRUE;
@@ -1235,6 +1250,9 @@ void KMissle::DoVanish()
 void KMissle::DoCollision()
 {
 	if (m_eMissleStatus == MS_DoCollision) return;
+#ifndef _SERVER
+	if (DAN_CUA_TOI()) g_DebugLog("[dan-no] xu-ly-cham dan=%d chieu=%d tan-khi-cham=%d su-kien-cham=%d phim-no-truoc-xong=%d co-anh-no=%d", m_nMissleId, m_nSkillId, m_bCollideVanish, m_bCollideEvent, m_MissleRes.SpecialMovieIsAllEnd(), m_MissleRes.m_MissleRes[MS_DoCollision].AnimFileName[0] != 0);
+#endif
 	
 #ifndef _SERVER
 	int nSrcX = 0 ;
@@ -1402,10 +1420,10 @@ int KMissle::ProcessCollision(int nLauncherIdx, int nRegionId, int nMapX, int nM
 				int nSrcY = 0;
 				SubWorld[0].Map2Mps(nSearchRegion, Npc[nNpcIdx].m_MapX,Npc[nNpcIdx].m_MapY, Npc[nNpcIdx].m_OffX, Npc[nNpcIdx].m_OffY,  &nSrcX, &nSrcY);
 				
-				if (m_bFollowNpcWhenCollid)
-					CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ, nNpcIdx);
-				else 
-					CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ);
+				BOOL bVe = m_bFollowNpcWhenCollid
+					? CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ, nNpcIdx)
+					: CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ);
+				if (DAN_CUA_TOI()) g_DebugLog("[dan-no] ve-no dan=%d chieu=%d npc=%d tai=%d,%d ve=%d", m_nMissleId, m_nSkillId, nNpcIdx, nSrcX, nSrcY, bVe);
 #else
 				ProcessDamage(nNpcIdx);						
 #endif
@@ -1421,7 +1439,13 @@ int KMissle::ProcessCollision()
 #ifdef TOOLVERSION
 	return 0;
 #endif
-	if (m_bClientSend) return 0;
+	if (m_bClientSend)
+	{
+#ifndef _SERVER
+		if (DAN_CUA_TOI()) g_DebugLog("[dan-no] bo-ve-no dan=%d chieu=%d: client-gui", m_nMissleId, m_nSkillId);
+#endif
+		return 0;
+	}
 	return ProcessCollision(m_nLauncher, m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nDamageRange , m_eRelation);
 }
 
@@ -1642,6 +1666,14 @@ BOOL	KMissle::PrePareFly()
 		
 	}
 	
+#ifndef _SERVER
+	if (DAN_CUA_TOI())
+	{
+		int nLX = 0, nLY = 0; SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nLX, &nLY); 
+		int nNX = 0, nNY = 0; Npc[m_nLauncher].GetMpsPos(&nNX, &nNY);
+		g_DebugLog("[dan-no] sinh dan=%d chieu=%d cap=%d huong=%d nguoi=%d,%d vi-tri=%d,%d va-cham=%d sat-thuong=%d tan-khi-cham=%d client-gui=%d doi=%d", m_nMissleId, m_nSkillId, m_nLevel, m_nDirIndex, nNX, nNY, nLX, nLY, m_nCollideRange, m_nDamageRange, m_bCollideVanish, m_bClientSend, m_nLifeTime);
+	}
+#endif
 	return true;
 	
 }
