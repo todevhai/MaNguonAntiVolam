@@ -30,6 +30,13 @@
 #include "KSG_StringProcess.h"
 #else
 #include "../../Engine/Src/KSG_StringProcess.h"
+
+#ifndef _SERVER
+/* Nhat ky [dan-no] (engine-debug.log): vong doi dan CUA CHINH nguoi choi o client - sinh / cham NPC / ve no / tan -
+   de tim huong danh co sat thuong (may chu tinh) ma khong hien no (client ve). Chi ghi dan cua nhan vat minh. */
+#define DAN_CUA_TOI()	(m_nLauncher > 0 && m_nLauncher == Player[CLIENT_PLAYER_INDEX].m_nIndex)
+#endif
+
 #endif
 
 TCollisionMatrix g_CollisionMatrix[64] =
@@ -377,7 +384,17 @@ int KMissle::Activate()
 	
 	if (m_nCurrentLife == m_nStartLifeTime && m_eMissleStatus != MS_DoVanish)	
 	{
-		if (PrePareFly())
+		BOOL bBay = PrePareFly();
+#ifndef _SERVER
+		if (DAN_CUA_TOI())
+		{
+			int nLX = 0, nLY = 0; SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nLX, &nLY);
+			int nNX = 0, nNY = 0; Npc[m_nLauncher].GetMpsPos(&nNX, &nNY);
+			g_DebugLog("[dan-no] sinh dan=%d chieu=%d cap=%d bay=%d huong=%d nguoi=%d,%d vi-tri=%d,%d va-cham=%d sat-thuong=%d tan-khi-cham=%d tu-no=%d client-gui=%d doi=%d",
+				m_nMissleId, m_nSkillId, m_nLevel, bBay, m_nDirIndex, nNX, nNY, nLX, nLY, m_nCollideRange, m_nDamageRange, m_bCollideVanish, m_bAutoExplode, m_bClientSend, m_nLifeTime);
+		}
+#endif
+		if (bBay)
 		{
 #ifndef _SERVER
 			int nSrcX2 = 0 ;
@@ -473,12 +490,6 @@ void KMissle::OnCollision()
 }
 
 // 1表示正常碰撞到物体，0表示未碰撞到任何物体, -1表示落地
-#ifndef _SERVER
-/* Nhat ky [dan-no] (engine-debug.log): vong doi dan CUA CHINH nguoi choi o client - sinh / cham NPC / ve no / tan -
-   de tim huong danh co sat thuong (may chu tinh) ma khong hien no (client ve). Chi ghi dan cua nhan vat minh. */
-#define DAN_CUA_TOI()	(m_nLauncher > 0 && m_nLauncher == Player[CLIENT_PLAYER_INDEX].m_nIndex)
-#endif
-
 int KMissle::CheckCollision()
 {
 #ifdef TOOLVERSION
@@ -1420,10 +1431,10 @@ int KMissle::ProcessCollision(int nLauncherIdx, int nRegionId, int nMapX, int nM
 				int nSrcY = 0;
 				SubWorld[0].Map2Mps(nSearchRegion, Npc[nNpcIdx].m_MapX,Npc[nNpcIdx].m_MapY, Npc[nNpcIdx].m_OffX, Npc[nNpcIdx].m_OffY,  &nSrcX, &nSrcY);
 				
-				BOOL bVe = m_bFollowNpcWhenCollid
-					? CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ, nNpcIdx)
-					: CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ);
-				if (DAN_CUA_TOI()) g_DebugLog("[dan-no] ve-no dan=%d chieu=%d npc=%d tai=%d,%d ve=%d", m_nMissleId, m_nSkillId, nNpcIdx, nSrcX, nSrcY, bVe);
+				if (m_bFollowNpcWhenCollid)
+					CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ, nNpcIdx);
+				else 
+					CreateSpecialEffect(MS_DoCollision, nSrcX, nSrcY, m_nCurrentMapZ);
 #else
 				ProcessDamage(nNpcIdx);						
 #endif
@@ -1462,11 +1473,16 @@ BOOL KMissle::CreateSpecialEffect(eMissleStatus eStatus, int nPX, int nPY, int n
 		pNode = (KSkillSpecialNode*)m_MissleRes.m_SkillSpecialList.GetHead();
 		while(pNode)
 		{
-			if (pNode->m_pSkillSpecial->m_dwMatchID == Npc[nNpcIndex].m_dwID) return FALSE;
+			if (pNode->m_pSkillSpecial->m_dwMatchID == Npc[nNpcIndex].m_dwID)
+			{
+				if (DAN_CUA_TOI()) g_DebugLog("[dan-no] ve dan=%d chieu=%d loai=%d npc=%d tai=%d,%d ve=0: npc da co hieu ung", m_nMissleId, m_nSkillId, (int)eStatus, nNpcIndex, nPX, nPY);
+				return FALSE;
+			}
 			pNode = (KSkillSpecialNode*)pNode->GetNext();
 		}
 	}
 	m_MissleRes.PlaySound(eStatus, nPX, nPY, 0);
+	if (DAN_CUA_TOI()) g_DebugLog("[dan-no] ve dan=%d chieu=%d loai=%d npc=%d tai=%d,%d ve=%d", m_nMissleId, m_nSkillId, (int)eStatus, nNpcIndex, nPX, nPY, m_MissleRes.m_MissleRes[eStatus].AnimFileName[0] != 0);
 	if (!m_MissleRes.m_MissleRes[eStatus].AnimFileName[0]) return FALSE; 
 	pNode = new KSkillSpecialNode;
 	KSkillSpecial * pSkillSpecial = new KSkillSpecial;
@@ -1666,14 +1682,6 @@ BOOL	KMissle::PrePareFly()
 		
 	}
 	
-#ifndef _SERVER
-	if (DAN_CUA_TOI())
-	{
-		int nLX = 0, nLY = 0; SubWorld[0].Map2Mps(m_nRegionId, m_nCurrentMapX, m_nCurrentMapY, m_nXOffset, m_nYOffset, &nLX, &nLY); 
-		int nNX = 0, nNY = 0; Npc[m_nLauncher].GetMpsPos(&nNX, &nNY);
-		g_DebugLog("[dan-no] sinh dan=%d chieu=%d cap=%d huong=%d nguoi=%d,%d vi-tri=%d,%d va-cham=%d sat-thuong=%d tan-khi-cham=%d client-gui=%d doi=%d", m_nMissleId, m_nSkillId, m_nLevel, m_nDirIndex, nNX, nNY, nLX, nLY, m_nCollideRange, m_nDamageRange, m_bCollideVanish, m_bClientSend, m_nLifeTime);
-	}
-#endif
 	return true;
 	
 }
