@@ -5185,12 +5185,10 @@ int	KNpc::PaintLife(int nHeightOffset, bool bSelect)
 	if (m_Hide.nTime > 0 && relation_enemy == NpcSet.GetRelation(m_Index, Player[CLIENT_PLAYER_INDEX].m_nIndex))
 		return nHeightOffset;
 
-	if (relation_enemy == NpcSet.GetRelation(m_Index, Player[CLIENT_PLAYER_INDEX].m_nIndex) &&
-		(m_Kind == kind_player ||
-		 m_Kind == kind_partner)
-		 && m_nPKFlag != 2
-		)
-		return nHeightOffset;		//有敌对关系的玩家不显示生命
+	/* ban6 PaintLife (0x578860): VAN ve mau nguoi choi phe dich, to cam (230,190,0); do sat (PK 2) to tim. Ban cu
+	   return o day khi PK != 2: Tong Kim dat phe 1/2 + SetPKFlag(1) nen ca phe kia mat thanh mau. */
+	BOOL bNguoiDich = relation_enemy == NpcSet.GetRelation(m_Index, Player[CLIENT_PLAYER_INDEX].m_nIndex) &&
+		(m_Kind == kind_player || m_Kind == kind_partner) && m_nPKFlag != 2;
 
 	int	nMpsX, nMpsY;
 	GetMpsPos(&nMpsX, &nMpsY);
@@ -5217,6 +5215,12 @@ int	KNpc::PaintLife(int nHeightOffset, bool bSelect)
 		Blood.Color.Color_b.b = 0;
 	}
 
+	if (bNguoiDich)
+	{
+		Blood.Color.Color_b.r = 230;
+		Blood.Color.Color_b.g = 190;
+		Blood.Color.Color_b.b = 0;
+	}
 	if (m_nPKFlag == 2)
 	{
 		Blood.Color.Color_b.r = 255;
@@ -7789,9 +7793,8 @@ int	KNpc::GetNpcPatePeopleInfo()
 		if (m_Kind == kind_player ||
 			m_Kind == kind_partner)
 		{
-			if (m_CurrentLifeMax > 0 &&
-				(relation_enemy == NpcSet.GetRelation(m_Index, Player[CLIENT_PLAYER_INDEX].m_nIndex))
-				)
+			/* PaintLife ve mau MOI nguoi choi (ke ca phe dich, ban6) - chieu cao chua cho thanh mau tinh cho moi nguoi. */
+			if (m_CurrentLifeMax > 0)
 				nHeight += SHOW_LIFE_HEIGHT;
 		}
 	}
