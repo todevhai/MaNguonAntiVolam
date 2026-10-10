@@ -10,6 +10,7 @@
 #include "../Ui/UiCase/UiMiniMap.h"		// mo ban do lon (WORLD_MAP) de verify tim duong xa
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../Ui/UiBase.h"				// nap-giao-dien: g_UiBase.ReloadCurScheme
+#include "../Ui/ShortcutKey.h"			// phimtat: chay lenh cua phim tat (vd Open([[battlereport]]) cua phim `)
 #include "../../core/src/coreshell.h"
 #include "../../core/src/gamedatadef.h"	// PA_RIDE
 /* Wine day WM_MOUSEMOVE cua con tro THAT vao ngay sau lenh hover, xoa vi tri vua dat - thu
@@ -58,6 +59,12 @@ void KAutoControl::RunLine(const char* szLine)
 	if (!strcmp(szCmd, "open"))
 	{
 		OpenByName(szArg);
+	}
+	else if (!strcmp(szCmd, "phimtat"))
+	{
+		// Chay dung lenh phim tat gan trong autoexec.lua (bat / tat nhu bam phim that), khong can phim that.
+		KShortcutKeyCentre::ExcuteScript(szArg);
+		g_DebugLog("[AUTO] phim tat: %s", szArg);
 	}
 	else if (!strcmp(szCmd, "goto"))
 	{
