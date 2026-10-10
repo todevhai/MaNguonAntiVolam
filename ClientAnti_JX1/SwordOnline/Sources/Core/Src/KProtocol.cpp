@@ -143,6 +143,7 @@ int	g_nProtocolSize[MAX_PROTOCOL_NUM] =
 	sizeof(KN_CHIEU_SYNC),					//s2c_kinhnghiemchieu
 	sizeof(TRIEU_HOI_SYNC),					// s2c_trieuhoi
 	sizeof(CHIEN_TRUONG_SYNC),				// s2c_chientruong
+	-1,										// s2c_chientruongbao (do dai thay doi)
 #else
 	sizeof(LOGIN_COMMAND),		//	c2s_login,
 	sizeof(tagLogicLogin),		//	c2s_logicLogin,

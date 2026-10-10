@@ -437,6 +437,7 @@ exit /b 0</Command>
     <ClCompile Include="Src\KPlayerTrade.cpp" />
     <ClCompile Include="Src\KProtocol.cpp" />
     <ClCompile Include="Src\KProtocolProcess.cpp" />
+    <ClCompile Include="Src\KChienBao.cpp" />
     <ClCompile Include="Src\KRegion.cpp" />
     <ClCompile Include="Src\KScriptValueSet.cpp" />
     <ClCompile Include="Src\KSellItem.cpp" />

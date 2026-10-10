@@ -306,6 +306,8 @@ enum GAMEDATA_INDEX
 
 	GDI_ITEM_SALE_PRICE,	//gia rao ban (dau tren icon tui)
 
+	GDI_CHIEN_BAO,		// chien bao Tong Kim: Return = (KChienBaoDuLieu*) du lieu tran client (KChienBao.cpp)
+
 };
 
 //=========================================================
@@ -509,6 +511,7 @@ enum GAMEDATA_CHANGED_NOTIFY_INDEX
 	GDCNI_GIVE,
 
 	GDCNI_PKVALUE,
+	GDCNI_CHIEN_BAO,	// chien bao Tong Kim vua nhan goi: uParam = loai (CHIEN_BAO_LOAI)
 	
 };
 

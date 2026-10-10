@@ -42,6 +42,7 @@
 #include "uicase/UiQuestDT1.h"
 #include "../Login/Login.h"
 #include "UiCase/UiParadeItem.h"
+#include "UiCase/UiBattleReport.h"
 #include "KTongProtocol.h"
 
 #include "../S3Client.h"
@@ -422,6 +423,9 @@ void CoreDataChangedCallback(unsigned int uDataId, unsigned int uParam, int nPar
 		{
 			KUiComItem::OpenWindow();
 		}
+		break;
+	case GDCNI_CHIEN_BAO:	// chien bao Tong Kim: cua so tu doc du lieu khi ve, roi tran thi dong
+		KUiBattleReport::OnCoreData(uParam);
 		break;
 	case GDCNI_GIVE:
 		{

@@ -289,6 +289,7 @@ exit /b 0</Command>
     </ClCompile>
     <ClCompile Include="Ui\UiCase\UiTongGetString.cpp" />
     <ClCompile Include="Ui\UiCase\UiTongKim.cpp" />
+    <ClCompile Include="Ui\UiCase\UiBattleReport.cpp" />
     <ClCompile Include="Ui\UiCase\UiTongKimPhongVan.cpp" />
     <ClCompile Include="ui\uicase\UiTongManager.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -429,6 +430,7 @@ exit /b 0</Command>
     <ClInclude Include="ui\uicase\UiTongCreateSheet.h" />
     <ClInclude Include="Ui\UiCase\UiTongGetString.h" />
     <ClInclude Include="Ui\UiCase\UiTongKim.h" />
+    <ClInclude Include="Ui\UiCase\UiBattleReport.h" />
     <ClInclude Include="Ui\UiCase\UiTongKimPhongVan.h" />
     <ClInclude Include="ui\uicase\UiTongManager.h" />
     <ClInclude Include="Ui\UiCase\UiToolsControlBar.h" />

@@ -75,6 +75,7 @@
 #include "UiCase/UiQuestDT.h"
 #include "UiCase/UiGive.h"
 #include "UiCase/UiTongKim.h"
+#include "UiCase/UiBattleReport.h"
 #include "UiCase/UiTongKimPhongVan.h"
 #include "UiCase/UiPK.h"
 #include "UiCase/UiChangeAvatar.h"
@@ -386,6 +387,7 @@ void UiCloseWndsOutGame(bool bAll)
 	g_UiInformation2.Close();
 	KUiAutoPlay::CloseWindow(true);
 	KUiTongKim::CloseWindow(true);
+	KUiBattleReport::CloseWindow(true);
 	KUiTongKimPhongVan::CloseWindow(true);
 	KUiPK::CloseWindow();
 	KUiChangeAvatar::CloseWindow(true);
@@ -480,6 +482,7 @@ bool UiCloseWndsInGame(bool bAll)
 			KUiAutoPlay::GetIfVisible() == NULL &&
 			KUiTongCreateSheet::GetIfVisible() == NULL &&
 			KUiTongKim::GetIfVisible() == NULL &&
+			KUiBattleReport::GetIfVisible() == NULL &&
 			KUiTongKimPhongVan::GetIfVisible() == NULL &&
 			KUiPK::GetIfVisible() == NULL &&
 			KUiChangeAvatar::GetIfVisible() == NULL
@@ -534,6 +537,7 @@ bool UiCloseWndsInGame(bool bAll)
 	KUiTongCreateSheet::CloseWindow();
 	KUiAutoPlay::CloseWindow(bAll);
 	KUiTongKim::CloseWindow(bAll);
+	KUiBattleReport::CloseWindow(bAll);
 	KUiTongKimPhongVan::CloseWindow(bAll);
 	KUiGive::CloseWindow(bAll);
 	KUiPK::CloseWindow();

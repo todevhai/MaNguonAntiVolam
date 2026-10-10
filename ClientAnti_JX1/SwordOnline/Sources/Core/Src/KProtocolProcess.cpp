@@ -153,6 +153,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_kinhnghiemchieu] = &KProtocolProcess::KnChieuSync;
 	ProcessFunc[s2c_trieuhoi] = &KProtocolProcess::TrieuHoiSync;
 	ProcessFunc[s2c_chientruong] = &KProtocolProcess::ChienTruongSync;
+	ProcessFunc[s2c_chientruongbao] = &KProtocolProcess::ChienTruongBaoSync;
 	ProcessFunc[s2c_opentremble] = &KProtocolProcess::OpenTremble;
 	ProcessFunc[s2c_rankname] = &KProtocolProcess::NetCommandSetRankFF;
 
@@ -3640,6 +3641,16 @@ extern BOOL g_bMinimapTheoPhe;
 void	KProtocolProcess::ChienTruongSync(BYTE* pMsg)
 {
 	g_bMinimapTheoPhe = ((CHIEN_TRUONG_SYNC*)pMsg)->m_btPhe != 0;
+}
+
+// Chien bao Tong Kim (KChienBao.cpp): cua so UiBattleReport tu doc du lieu khi ve; chi bao UI loai goi vua nhan
+// (roi tran -> dong cua so).
+extern int ChienBaoNhan(const BYTE * pMsg);
+void	KProtocolProcess::ChienTruongBaoSync(BYTE* pMsg)
+{
+	int nLoai = ChienBaoNhan(pMsg);
+	if (nLoai >= 0)
+		CoreDataChanged(GDCNI_CHIEN_BAO, (unsigned int)nLoai, 0);
 }
 
 void	KProtocolProcess::TrieuHoiSync(BYTE* pMsg)

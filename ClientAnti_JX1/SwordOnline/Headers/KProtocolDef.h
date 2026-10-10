@@ -195,6 +195,7 @@ enum s2c_PROTOCOL
 	s2c_kinhnghiemchieu,	// tien do luyen chieu IsExpSkill, phan nghin (server -> client)
 	s2c_trieuhoi,	// chu to trieu hoi minh: hop dong y / tu choi (server -> client)
 	s2c_chientruong,	// ban do dang co tran (GAME_BATTLEID != 0): minimap to cham theo phe nhu ban6 (server -> client)
+	s2c_chientruongbao,	// chien bao Tong Kim (phim `): than goi giong goi 0xb0 cua ban6 tu byte 1, do dai thay doi
 //	s2c_gmgateway2relaysvr,		//GM登陆后网关通知中转服务器有合法连接的协议
 
 	s2c_extend = 250,

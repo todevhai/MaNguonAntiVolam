@@ -2307,6 +2307,28 @@ typedef struct
 	BYTE	m_btPhe;			// 1 = to theo phe, 0 = to thuong
 } CHIEN_TRUONG_SYNC;
 
+// Chien bao Tong Kim (server -> client, phim `). Than giong goi 0xb0 cua ban6 tu byte 1 (ban6 KBattle::BroadCast*,
+// client 0x5f08e0); ta doi byte 0 vi 0xb0 cua ta la s2c_rankname. Do dai thay doi: tong = 1 + m_wLength.
+enum CHIEN_BAO_LOAI
+{
+	chienbao_xem = 0,		// m_btSoMuc id loai co hien (BYTE moi id)
+	chienbao_dong = 1,		// mot dong: m_btHang 1..10 bang muoi nguoi, 0 = ban than; ten KHONG NUL roi SoMuc x {BYTE id, int}
+	chienbao_tran = 2,		// game data: SoMuc x {BYTE id = chi so + 51, int}
+	chienbao_roi = 5,		// roi tran: xoa du lieu tran o client
+	chienbao_mota = 6,		// 4 chuoi co NUL: ten tran, mo ta cap, ten phuong thuc, mo ta
+	chienbao_quanso = 10,	// int so nguoi phe 1, int so nguoi phe 2
+};
+#define CHIEN_BAO_SO_LOAI	50
+typedef struct
+{
+	BYTE	ProtocolType;		// s2c_chientruongbao
+	WORD	m_wLength;
+	BYTE	m_btLoai;			// CHIEN_BAO_LOAI
+	BYTE	m_btHang;
+	BYTE	m_btPhe;
+	BYTE	m_btSoMuc;
+} CHIEN_TRUONG_BAO_HEAD;
+
 enum MERIDIAN_RESULT
 {
 	meridian_sync = 0,		// plain refresh, nothing was tried

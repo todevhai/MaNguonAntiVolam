@@ -1028,4 +1028,27 @@ struct KUiGameObjectWithName
 
 //-------------------------- ∞Ôª·œ‡πÿ end ----------------------
 
+// Chien bao Tong Kim (phim `): du lieu tran client nhan qua s2c_chientruongbao (KChienBao.cpp), cua so
+// UiBattleReport doc qua GetGameData(GDI_CHIEN_BAO). Bo cuc theo ban6 KBattleReport.
+#define CHIEN_BAO_LOAI	50
+#define CHIEN_BAO_DONG	10
+struct KChienBaoDong
+{
+	int		v[CHIEN_BAO_LOAI];
+	char	szTen[32];
+	unsigned char btPhe;
+};
+struct KChienBaoDuLieu
+{
+	unsigned char	Xem[CHIEN_BAO_LOAI];	// loai co hien o bang muoi nguoi (BT_SetView)
+	KChienBaoDong	Bang[CHIEN_BAO_DONG];
+	int				nSoDong;
+	KChienBaoDong	BanThan;
+	int				bCoBanThan;
+	int				nTran[16];				// GAME_1..13 (BT_GetGameData)
+	unsigned int	uNhanGio;				// GetTickCount luc nhan GAME_RESTTIME (giay)
+	int				nPhe1, nPhe2;			// so nguoi hai phe
+	char			szTenTran[32], szMoTaCap[32], szPhuongThuc[32], szMoTa[500];
+};
+
 #endif

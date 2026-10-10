@@ -1600,6 +1600,12 @@ int	KCoreShell::GetGameData(unsigned int uDataId, unsigned int uParam, int nPara
 	case GDI_PLAYER_TK_XEPHANG:	
 		nRet = Player[CLIENT_PLAYER_INDEX].m_cTask.GetSaveVal(TASKVALUE_XEPHANG);
 		break;	
+	case GDI_CHIEN_BAO:
+		{
+			extern KChienBaoDuLieu g_ChienBao;
+			nRet = (int)&g_ChienBao;
+		}
+		break;
 	}
 	return nRet;
 }

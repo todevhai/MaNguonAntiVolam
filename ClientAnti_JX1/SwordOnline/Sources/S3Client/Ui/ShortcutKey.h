@@ -21,7 +21,7 @@
 #define SCK_SHORTCUT_OPTIONS "Open([[options]])"
 #define SCK_SHORTCUT_AUTO "Open([[auto]])"
 #define SCK_SHORTCUT_MARKET "Open([[market]])"
-#define SCK_SHORTCUT_TONGKIM "Open([[tongkim]])"
+#define SCK_SHORTCUT_TONGKIM "Open([[battlereport]])"	// nut Tong Kim mo chien bao (phim `) nhu ban6
 
 #define SCK_SHORTCUT_SIT	"Switch([[sit]])"
 #define SCK_SHORTCUT_RUN	"Switch([[run]])"

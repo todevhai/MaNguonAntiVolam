@@ -37,6 +37,7 @@
 #include "UiCase/UiAutoPlay.h"
 #include "UiCase/UiMarket.h"
 #include "UiCase/UiTongKim.h"
+#include "UiCase/UiBattleReport.h"
 #include "UiCase/UiPK.h"
 
 #include "Elem/SpecialFuncs.h"
@@ -156,6 +157,7 @@ char* l_WindowList[] =
 	"auto",			//18
 	"market",		//19
 	"tongkim",		//20
+	"battlereport",	//21 chien bao Tong Kim (phim `, ban6 KBattleReport)
 };
 
 int FindWindow(const char* szname)
@@ -302,6 +304,12 @@ int LuaOpenWindow(Lua_State * L)
 			{
 				KUiTongKim::OpenWindow();
 			}
+			break;
+		case 21:
+			if (KUiBattleReport::GetIfVisible())
+				KUiBattleReport::CloseWindow(false);
+			else
+				KUiBattleReport::OpenWindow();
 			break;
 		}
 	}
