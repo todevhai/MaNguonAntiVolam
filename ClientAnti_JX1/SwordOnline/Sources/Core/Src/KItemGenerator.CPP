@@ -429,7 +429,17 @@ BOOL KItemGenerator::Gen_MagicAttrib(
         // 取出相应的项放在SelectedMagicTable中
         int nCMITItemCount = pCMITItem->GetCount();
         int j = 0;
-        int nDecide = GetRandomNumber(0, 100 - 1) / (1 + nLucky * 20 / 100);
+        /* Nguong theo phien ban mon nhu ban6 (KItemGenerator::Gen_MagicAttrib): cot ti le cua
+           magicattrib.txt tinh tren thang 1.000.000, nen ban >3 quay g_Random(1000000) - o nao quay
+           vuot moi ti le con lai thi dut dong, dong hiem (ti le nho) it ra. Ban 1 giu thang 100 cu
+           de do da luu (iequipversion = 1) dung lai y nguyen dong. */
+        int nDecide;
+        if (nGameVersion > 3)
+            nDecide = GetRandomNumber(0, 1000000 - 1) * 100 / (100 + nLucky * 10);
+        else if (nGameVersion > 1)
+            nDecide = GetRandomNumber(0, 1000000 - 1) / (1 + nLucky / 5);
+        else
+            nDecide = GetRandomNumber(0, 100 - 1) / (1 + nLucky * 20 / 100);
 
         for (j = 0; j < nCMITItemCount; j++)
         {

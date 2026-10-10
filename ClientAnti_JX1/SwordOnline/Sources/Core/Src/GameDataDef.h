@@ -16,7 +16,7 @@
 #include "CoreObjGenreDef.h"
 #include "CoreUseNameDef.h"
 
-#define		ITEM_VERSION						1
+#define		ITEM_VERSION						4	// 4: nguong dong option thang 1.000.000 nhu ban6 (do cu ban 1 giu luat cu)
 
 #define		_CHAT_SCRIPT_OPEN
 
