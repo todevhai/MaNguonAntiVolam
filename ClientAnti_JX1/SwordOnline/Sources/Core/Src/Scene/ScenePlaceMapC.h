@@ -111,4 +111,9 @@ private:
 	unsigned int	m_uPlayerColor;			// 其他玩家颜色
 	unsigned int	m_uFightNpcColor;		// 战斗npc颜色
 	unsigned int	m_uNormalNpcColor;		// 普通npc颜色
+	// Minimap theo phe (ban6 Setting.ini [Map]): bat khi may chu bao ban do co tran (s2c_chientruong, g_bMinimapTheoPhe).
+	unsigned int	m_uSelfPlayerColor;		// nguoi choi cung phe
+	unsigned int	m_uOtherPlayerColor;	// nguoi choi phe dich
+	unsigned int	m_uSelfNpcColor;		// NPC chien dau cung phe
+	unsigned int	m_uOtherNpcColor;		// NPC chien dau phe dich
 };

@@ -2300,6 +2300,13 @@ typedef struct
 	char	m_szTen[32];		// ten chu to
 } TRIEU_HOI_SYNC;
 
+// Che do phe cua minimap (server -> client, may chu ScriptFuns8xChienTruong.cpp GuiCheDoPheMinimap).
+typedef struct
+{
+	BYTE	ProtocolType;		// s2c_chientruong
+	BYTE	m_btPhe;			// 1 = to theo phe, 0 = to thuong
+} CHIEN_TRUONG_SYNC;
+
 enum MERIDIAN_RESULT
 {
 	meridian_sync = 0,		// plain refresh, nothing was tried

@@ -152,6 +152,7 @@ KProtocolProcess::KProtocolProcess()
 	ProcessFunc[s2c_trungsinh] = &KProtocolProcess::TrungSinhSync;
 	ProcessFunc[s2c_kinhnghiemchieu] = &KProtocolProcess::KnChieuSync;
 	ProcessFunc[s2c_trieuhoi] = &KProtocolProcess::TrieuHoiSync;
+	ProcessFunc[s2c_chientruong] = &KProtocolProcess::ChienTruongSync;
 	ProcessFunc[s2c_opentremble] = &KProtocolProcess::OpenTremble;
 	ProcessFunc[s2c_rankname] = &KProtocolProcess::NetCommandSetRankFF;
 
@@ -3634,6 +3635,13 @@ void	KProtocolProcess::MeridianSync(BYTE* pMsg)
 // Tien do luyen chieu: chi cat vao bang, tooltip doc luc ve.
 // Chu to trieu hoi minh (may chu KPlayerTrieuHoi.cpp): hop dong y / tu choi nhu loi moi vao to (SMCT_UI_TEAM_SUMMON).
 // uId = npc id chu to (gui lai trong c2s_trieuhoitraloi), nIndex = map chu to.
+// Ban do co tran (may chu GuiCheDoPheMinimap): minimap to cham theo phe (Scene/ScenePlaceMapC.cpp) nhu ban6.
+extern BOOL g_bMinimapTheoPhe;
+void	KProtocolProcess::ChienTruongSync(BYTE* pMsg)
+{
+	g_bMinimapTheoPhe = ((CHIEN_TRUONG_SYNC*)pMsg)->m_btPhe != 0;
+}
+
 void	KProtocolProcess::TrieuHoiSync(BYTE* pMsg)
 {
 	TRIEU_HOI_SYNC*	p = (TRIEU_HOI_SYNC*)pMsg;

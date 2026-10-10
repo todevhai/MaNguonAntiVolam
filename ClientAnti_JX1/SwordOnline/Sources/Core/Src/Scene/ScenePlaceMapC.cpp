@@ -21,6 +21,9 @@
 
 #define	RIGHT_BOTTOM_NO_LIMIT			0x7fffffff
 
+// May chu bao ban do dang co tran (s2c_chientruong, KProtocolProcess::ChienTruongSync): minimap to theo phe.
+BOOL g_bMinimapTheoPhe = FALSE;
+
 KScenePlaceMapC::KScenePlaceMapC()
 {
 	m_bHavePicMap = false;
@@ -121,6 +124,22 @@ bool KScenePlaceMapC::Initialize()
             KSG_StringSkipSymbol(&pcszTemp, ',');
 			Color.Color_b.b = KSG_StringGetInt(&pcszTemp, 255);
 			m_uNormalNpcColor = Color.Color_dw;
+
+			// Mau theo phe (ban6: hang mac dinh duoi day la gia tri trong Setting.ini cua ban6).
+			struct { const char* szKhoa; const char* szMacDinh; unsigned int* pMau; } aPhe[4] = {
+				{ "SelfPlayerColor", "0,255,0", &m_uSelfPlayerColor }, { "OtherPlayerColor", "255,0,0", &m_uOtherPlayerColor },
+				{ "SelfNpcColor", "155,255,155", &m_uSelfNpcColor }, { "OtherNpcColor", "255,155,155", &m_uOtherNpcColor } };
+			for (int k = 0; k < 4; k++)
+			{
+				ColorSetting.GetString("Map", aPhe[k].szKhoa, aPhe[k].szMacDinh, szBuffer, sizeof(szBuffer));
+				pcszTemp = szBuffer;
+				Color.Color_b.r = KSG_StringGetInt(&pcszTemp, 255);
+				KSG_StringSkipSymbol(&pcszTemp, ',');
+				Color.Color_b.g = KSG_StringGetInt(&pcszTemp, 255);
+				KSG_StringSkipSymbol(&pcszTemp, ',');
+				Color.Color_b.b = KSG_StringGetInt(&pcszTemp, 255);
+				*aPhe[k].pMau = Color.Color_dw;
+			}
 		}
 	}
 
@@ -471,10 +490,13 @@ void KScenePlaceMapC::PaintCharacters(int nX, int nY)
 		bool			bValidNpc = false;
 		unsigned int	uColor;
 
+		int nPheMinh = Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp;
 		if (Npc[nNpcIdx].m_Kind == kind_normal && bCharacters)
 		{
 			bValidNpc = true;
 			uColor = m_uFightNpcColor;
+			if (g_bMinimapTheoPhe)		// ban6 0x5f7d49: so m_CurrentCamp voi minh
+				uColor = Npc[nNpcIdx].m_CurrentCamp == nPheMinh ? m_uSelfNpcColor : m_uOtherNpcColor;
 		}
 		else if (Npc[nNpcIdx].m_Kind == kind_dialoger && bCharacters)
 		{
@@ -483,7 +505,12 @@ void KScenePlaceMapC::PaintCharacters(int nX, int nY)
 		}
 		else if (Npc[nNpcIdx].m_Kind == kind_player && nNpcIdx != Player[CLIENT_PLAYER_INDEX].m_nIndex)
 		{
-			if (bPartners && //要显示队友
+			if (g_bMinimapTheoPhe && bCharacters)	// che do phe: khong tach dong doi (ban6), to theo phe
+			{
+				bValidNpc = true;
+				uColor = Npc[nNpcIdx].m_CurrentCamp == nPheMinh ? m_uSelfPlayerColor : m_uOtherPlayerColor;
+			}
+			else if (bPartners && //要显示队友
 				nIsInTeam && //主角是组队状态
 				((DWORD)g_Team[0].m_nCaptain == Npc[nNpcIdx].m_dwID ||	//是主角所在队伍的队长
 					g_Team[0].FindMemberID(Npc[nNpcIdx].m_dwID) >= 0) &&	//是主角所在队伍的队员
