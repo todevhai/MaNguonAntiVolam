@@ -2309,7 +2309,7 @@ typedef struct
 
 // Chien bao Tong Kim (server -> client, phim `). Than giong goi 0xb0 cua ban6 tu byte 1 (ban6 KBattle::BroadCast*,
 // client 0x5f08e0); ta doi byte 0 vi 0xb0 cua ta la s2c_rankname. Do dai thay doi: tong = 1 + m_wLength.
-enum CHIEN_BAO_LOAI
+enum CHIEN_BAO_KIEU
 {
 	chienbao_xem = 0,		// m_btSoMuc id loai co hien (BYTE moi id)
 	chienbao_dong = 1,		// mot dong: m_btHang 1..10 bang muoi nguoi, 0 = ban than; ten KHONG NUL roi SoMuc x {BYTE id, int}
@@ -2323,7 +2323,7 @@ typedef struct
 {
 	BYTE	ProtocolType;		// s2c_chientruongbao
 	WORD	m_wLength;
-	BYTE	m_btLoai;			// CHIEN_BAO_LOAI
+	BYTE	m_btLoai;			// CHIEN_BAO_KIEU
 	BYTE	m_btHang;
 	BYTE	m_btPhe;
 	BYTE	m_btSoMuc;
