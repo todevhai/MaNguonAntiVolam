@@ -20,6 +20,7 @@ private:
 	void	Initialize();
 	void	PaintWindow();
 	void	Chu(const char* sz, int nCot, int y, unsigned int uMau);	// nCot tinh theo so chu nua o
+	void	ChuCot(const char* sz, int nCot, int nRong, int y, unsigned int uMau);	// cat theo do rong cot
 	void	Vach(int y);
 	static KUiBattleReport*	m_pSelf;
 

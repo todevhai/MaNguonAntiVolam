@@ -135,6 +135,22 @@ void KUiBattleReport::Chu(const char* sz, int nCot, int y, unsigned int uMau)
 		m_nAbsoluteTop + y, uMau, 0, TEXT_IN_SINGLE_PLANE_COORD, 0xff000000);
 }
 
+// Chu trong mot cot rong nRong chu nua o: cat bot de khong de len cot ke (TCVN3 mot byte mot chu).
+void KUiBattleReport::ChuCot(const char* sz, int nCot, int nRong, int y, unsigned int uMau)
+{
+	char szCat[256];
+	int n = (int)strlen(sz);
+	if (n > nRong - 1)
+		n = nRong - 1;
+	if (n < 0)
+		n = 0;
+	if (n > (int)sizeof(szCat) - 1)
+		n = sizeof(szCat) - 1;
+	memcpy(szCat, sz, n);
+	szCat[n] = 0;
+	Chu(szCat, nCot, y, uMau);
+}
+
 void KUiBattleReport::Vach(int y)
 {
 	KRULine Line;
@@ -158,16 +174,16 @@ void KUiBattleReport::PaintWindow()
 
 	// Dong dau: ten tran | cap | phuong thuc | Tong N : Kim M | con X phut.
 	int x = 0;
-	Chu(c->szTenTran, x, m_nYDau, m_uMauDau);
+	ChuCot(c->szTenTran, x, m_nCotDau[0], m_nYDau, m_uMauDau);
 	x += m_nCotDau[0];
 	const char* aCap[4] = { "", "S\254 c\312p", "Trung c\312p", "Cao c\312p" };
 	int nCap = c->nTran[9];
-	Chu((nCap >= 1 && nCap <= 3) ? aCap[nCap] : "", x, m_nYDau, m_uMauDau);
+	ChuCot((nCap >= 1 && nCap <= 3) ? aCap[nCap] : "", x, m_nCotDau[1], m_nYDau, m_uMauDau);
 	x += m_nCotDau[1];
-	Chu(c->szPhuongThuc, x, m_nYDau, m_uMauDau);
+	ChuCot(c->szPhuongThuc, x, m_nCotDau[2], m_nYDau, m_uMauDau);
 	x += m_nCotDau[2];
 	sprintf(sz, "T\350ng %d : Kim %d", c->nPhe1, c->nPhe2);
-	Chu(sz, x, m_nYDau, m_uMauDau);
+	ChuCot(sz, x, m_nCotDau[3], m_nYDau, m_uMauDau);
 	x += m_nCotDau[3];
 	int nCon = c->nTran[8] - (int)((GetTickCount() - c->uNhanGio) / 1000);
 	sprintf(sz, "C\337n %d ph\363t", (c->uNhanGio && nCon > 0) ? nCon / 60 + 1 : 0);
@@ -177,7 +193,8 @@ void KUiBattleReport::PaintWindow()
 	// Thanh tich ca nhan (ban6: Tong PK, NPC, lien tram hien tai, thang don dau, bao vat, doat co).
 	const int* v = c->BanThan.v;
 	Chu("Th\265nh t\335ch c\270 nh\251n", 0, m_nYBan, m_uMauTieuDeBan);
-	Chu("T\346ng", m_nCotBan[0], m_nYBan, m_uMauTieuDeBan);
+	int xGiaTri = m_nCotBan[0] + 2;		// ban6 noi cot bang '|': chua khoang cach sau nhan dai nhat (18 chu)
+	Chu("T\346ng", xGiaTri, m_nYBan, m_uMauTieuDeBan);
 	const char* aMuc[6] = { "T\346ng PK", "NPC", "Li\252n tr\266m hi\326n t\271i", "Th\276ng \256\254n \256\312u", "B\270u v\313t", "\247o\271t c\352" };
 	const int aId[6] = { 2, 3, 14, 16, 17, 5 };
 	for (int i = 0; i < 6; ++i)
@@ -185,7 +202,7 @@ void KUiBattleReport::PaintWindow()
 		int y = m_nYBan + (i + 1) * CB_CAO_DONG + 4;
 		Chu(aMuc[i], 0, y, m_uMauBan);
 		sprintf(sz, "%d", v[aId[i]]);
-		Chu(sz, m_nCotBan[0], y, m_uMauBan);
+		Chu(sz, xGiaTri, y, m_uMauBan);
 	}
 	sprintf(sz, "\247i\323m t\335ch l\362y: %d    T\366 vong: %d    Li\252n tr\266m cao nh\312t: %d    (\312n ph\335m ~ \256\323 b\313t/t\276t)", v[1], v[4], v[13]);
 	Chu(sz, 0, m_nYChan, m_uMauTieuDeBan);
@@ -197,8 +214,19 @@ void KUiBattleReport::PaintWindow()
 		if (c->Xem[id])
 			aCot[nCot++] = id;
 	int nYTieuDe = m_nYMuoi + 2;
-	Chu("Th\313p \256\271i cao th\361", 0, nYTieuDe, m_uMauTieuDeMuoi);
-	x = m_nCotTen + 6;
+	// Cot ten rong theo ten dai nhat ("10. " + ten), it nhat bang tieu de va PlayerName cua ini.
+	int nRongTen = m_nCotTen;
+	for (int i = 0; i < c->nSoDong && i < CHIEN_BAO_DONG; ++i)
+	{
+		int n = (int)strlen(c->Bang[i].szTen) + 6;
+		if (n > nRongTen)
+			nRongTen = n;
+	}
+	const char* szTieuDeMuoi = "Th\313p \256\271i cao th\361";
+	if ((int)strlen(szTieuDeMuoi) + 2 > nRongTen)
+		nRongTen = (int)strlen(szTieuDeMuoi) + 2;
+	Chu(szTieuDeMuoi, 0, nYTieuDe, m_uMauTieuDeMuoi);
+	x = nRongTen;
 	int aX[CHIEN_BAO_LOAI];
 	for (int k = 0; k < nCot; ++k)
 	{
