@@ -24,6 +24,9 @@ extern iCoreShell*	g_pCoreShell;
 
 // Ten file lenh, doc tu thu muc chay (cung cho voi config.ini / game.exe).
 static const char* const AUTO_CMD_FILE = "lenh-auto.txt";
+// Them tep rieng cua box: lenh-auto-<tai khoan tu dang nhap>.txt (UiInit.cpp). Nhieu box chung thu muc
+// thi tep chung bi box nao doc truoc an mat; tep rieng dieu khien dung mot box.
+extern char g_szTaiKhoanTuDong[32];
 
 //---------------------------------------------------------------------------
 // Mo mot bang dung nhu bam phim tat, nhung goi thang OpenWindow() nen luon MO
@@ -286,7 +289,18 @@ void KAutoControl::Tick()
 	if (g_pCoreShell)
 		g_pCoreShell->OperationRequest(GOI_FINDPOS, 0xFFFFFFFF, 0);
 
-	FILE* fp = fopen(AUTO_CMD_FILE, "rb");
+	ChayTepLenh(AUTO_CMD_FILE);
+	if (g_szTaiKhoanTuDong[0])
+	{
+		char szTep[64];
+		sprintf(szTep, "lenh-auto-%s.txt", g_szTaiKhoanTuDong);
+		ChayTepLenh(szTep);
+	}
+}
+
+void KAutoControl::ChayTepLenh(const char* szTep)
+{
+	FILE* fp = fopen(szTep, "rb");
 	if (!fp) return;
 
 	char szLine[256];
@@ -303,7 +317,7 @@ void KAutoControl::Tick()
 
 	if (bAny)
 	{
-		FILE* fw = fopen(AUTO_CMD_FILE, "wb");			// cat rong
+		FILE* fw = fopen(szTep, "wb");			// cat rong
 		if (fw) fclose(fw);
 	}
 }

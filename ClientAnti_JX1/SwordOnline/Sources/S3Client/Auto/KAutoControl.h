@@ -35,6 +35,7 @@ public:
 
 private:
 	static void	RunLine(const char* szLine);
+	static void	ChayTepLenh(const char* szTep);	// chay het dong roi cat rong tep
 	static void	OpenByName(const char* szName);
 };
 

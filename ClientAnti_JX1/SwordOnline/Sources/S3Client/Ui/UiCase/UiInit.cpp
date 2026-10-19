@@ -218,6 +218,10 @@ void KUiInit::Initialize()
    UiStart() thay NULL. */
 bool g_bXinDangNhapTuDong = false;
 
+/* Tai khoan tu dang nhap cua box nay - KAutoControl doc them lenh-auto-<tai khoan>.txt de dieu khien RIENG
+   tung box khi chay nhieu box cung thu muc (mo-them-box.sh). */
+char g_szTaiKhoanTuDong[32] = "";
+
 static bool DangNhapTuDongTheoCauHinh()
 {
     char szTepCauHinh[] = "\\Ui\\Setting.ini";
@@ -249,6 +253,7 @@ static bool DangNhapTuDongTheoCauHinh()
 #endif
     memset(szMatKhauTho, 0, sizeof(szMatKhauTho));
     g_DebugLog("[TuDong] Setting.ini Enable=%d Account=\"%s\"", nBat, szTaiKhoan);
+    strncpy(g_szTaiKhoanTuDong, szTaiKhoan, sizeof(g_szTaiKhoanTuDong) - 1);
     if (!szTaiKhoan[0])
         return false;
 
