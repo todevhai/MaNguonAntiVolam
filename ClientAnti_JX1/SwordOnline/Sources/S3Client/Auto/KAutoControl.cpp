@@ -189,6 +189,14 @@ void KAutoControl::RunLine(const char* szLine)
 		g_UiBase.ReloadCurScheme();
 		g_DebugLog("[AUTO] nap-giao-dien");
 	}
+	else if (!strcmp(szCmd, "gochu"))
+	{
+		// Go chu vao o dang giu focus (o nhap chat, ten bang...) nhu go phim: WM_CHAR tung byte. Thu hai nguoi
+		// (chat doi / bang, lap bang) khong can phim that.
+		for (const unsigned char* c = (const unsigned char*)szArg; *c; c++)
+			Wnd_ProcessInput(WM_CHAR, *c, 0);
+		g_DebugLog("[AUTO] gochu %s", szArg);
+	}
 	else if (!strcmp(szCmd, "enter"))
 	{
 		// Phim Enter vao cua so dang giu focus (vd o nhap chat: gui tin) - WM_KEYDOWN nhu go.
