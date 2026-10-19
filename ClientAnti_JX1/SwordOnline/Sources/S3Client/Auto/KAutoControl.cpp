@@ -11,6 +11,7 @@
 #include "../Ui/Elem/Wnds.h"			// Wnd_ProcessInput: bom click vao cay cua so UI
 #include "../Ui/UiBase.h"				// nap-giao-dien: g_UiBase.ReloadCurScheme
 #include "../Ui/ShortcutKey.h"			// phimtat: chay lenh cua phim tat (vd Open([[battlereport]]) cua phim `)
+#include "../Ui/UiCase/UiGame.h"		// nguoi: ProcessPeople + KUiPlayerItem (hanh dong menu chuot phai len nguoi choi)
 #include "../../core/src/coreshell.h"
 #include "../../core/src/gamedatadef.h"	// PA_RIDE
 /* Wine day WM_MOUSEMOVE cua con tro THAT vao ngay sau lenh hover, xoa vi tri vua dat - thu
@@ -188,6 +189,22 @@ void KAutoControl::RunLine(const char* szLine)
 		// jxstudio vua ghi ini giao dien: doc lai bo giao dien cho cac cua so dang song.
 		g_UiBase.ReloadCurScheme();
 		g_DebugLog("[AUTO] nap-giao-dien");
+	}
+	else if (!strcmp(szCmd, "nguoi"))
+	{
+		// nguoi <ma hanh dong> <ten>: chay mot muc menu chuot phai len nguoi choi (ProcessPeople, enum ACTION_* trong
+		// UiGame.h: 0 chat, 1 ket ban, 2 giao dich, 4 moi doi, 6 cuu sat, 7 xem do, 9 bang hoi). Menu that chi mo khi bam chuot that.
+		int nHanhDong = -1;
+		char szTen[64] = {0};
+		if (sscanf(szArg, "%d %63s", &nHanhDong, szTen) == 2 && g_pCoreShell)
+		{
+			KUiPlayerItem Nguoi;
+			memset(&Nguoi, 0, sizeof(Nguoi));
+			int nKind = -1;
+			if (g_pCoreShell->FindSpecialNPC(szTen, &Nguoi, nKind))
+				ProcessPeople(&Nguoi, nHanhDong);
+			g_DebugLog("[AUTO] nguoi %d %s (thay=%d)", nHanhDong, szTen, Nguoi.Name[0] != 0);
+		}
 	}
 	else if (!strcmp(szCmd, "gochu"))
 	{
