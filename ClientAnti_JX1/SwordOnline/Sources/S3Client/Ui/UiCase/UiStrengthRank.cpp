@@ -616,6 +616,11 @@ void KUiStrengthRank::NewIndexArrive(unsigned int uParam, struct KRankIndex *pIn
 			}
     	}
 	}
+	/* Danh sach bang moi THAY danh sach cu (nhu ArrangeDefaultData): goc cong don - moi lan mo bang thong bao lap them
+	   mot loat, va m_pLastGettimes (cap uParam o) bi chi so dong vuot qua -> ghi tran mang. */
+	m_IndexData.Clear();
+	if (m_pSelf)
+		m_pSelf->m_pCurrentIndexNode = NULL;
 	AddIndex(uParam, pIndex);
 	//StoreNewDataToTempFile(uParam, pIndex);
 }
