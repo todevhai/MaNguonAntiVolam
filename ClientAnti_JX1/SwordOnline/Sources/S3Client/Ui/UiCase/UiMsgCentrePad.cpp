@@ -693,7 +693,8 @@ bool KUiMsgCentrePad::ReplaceSpecialField(char* szDest, char* szSrc)
 	{
 		sprintf(s_keyDests[1], "%d", self.nCurFaction);
 	}
-	else if (self.nCurTong != 0)
+	/* Bang kieu 8.x: con mon phai van o bang - kenh bang khong con loai tru kenh mon phai. */
+	if (self.nCurTong != 0)
 	{
 		sprintf(s_keyDests[2], "%d", self.nCurTong);
 	}

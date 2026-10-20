@@ -634,7 +634,7 @@ void KUiSysMsgCentre::ConfirmMsg(KSystemMessage* pMsg, bool bImmedDel)
 	case SMCT_UI_TONG_JOIN_APPLY:
 		_ASSERT (pMsg->byParamSize >= sizeof(KUiPlayerItem));
 		pPlayer = (KUiPlayerItem*)(&pMsg[1]);
-		sprintf(szBuf, "%s mêi b¹n gia nhËp Bang.", pPlayer->Name);
+		sprintf(szBuf, "%s xin gia nhËp bang héi.", pPlayer->Name);
 		pFirstBtnText = "§ång ý";
 		pSecBtnText = "Tõ chèi";
 		_ASSERT(m_pHandlingMsg == NULL);

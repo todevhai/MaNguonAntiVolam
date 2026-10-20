@@ -12,6 +12,26 @@
 #include	"KPlayer.h"
 #include	"KPlayerSet.h"
 #include	"KPlayerTong.h"
+
+/* Bang kieu 8.x (user chot 20/10/2026): nguoi con mon phai vao / lap bang VAN GIU mon phai va phe cua phai.
+   Luat 2003 "phai xuat su (camp_free) moi vao bang, vao bang thi phe = phe bang" chi con ap cho nguoi khong mon phai.
+   May chu (server/linux-server/Core/KPlayerTong.cpp) giu cung luat. */
+static BOOL CoMonPhai(int nPlayer)
+{
+	return Player[nPlayer].m_cFaction.m_nCurFaction >= 0;
+}
+static BOOL DuPheVaoBang(int nPlayer)
+{
+	return CoMonPhai(nPlayer) || Npc[Player[nPlayer].m_nIndex].m_CurrentCamp == camp_free;
+}
+static int PheTrongBang(int nPlayer, int nPheBang)
+{
+	return CoMonPhai(nPlayer) ? Player[nPlayer].m_cFaction.GetGurFactionCamp() : nPheBang;
+}
+static int PheNgoaiBang(int nPlayer)
+{
+	return CoMonPhai(nPlayer) ? Player[nPlayer].m_cFaction.GetGurFactionCamp() : (int)camp_free;
+}
 #ifndef _SERVER
 #include	"CoreShell.h"
 #endif
@@ -80,7 +100,7 @@ BOOL	KPlayerTong::ApplyCreateTong(int nCamp, char *lpszTongName)
 		return FALSE;
 	}
 	// 自己的阵营问题
-	if (Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp != camp_free)
+	if (!DuPheVaoBang(CLIENT_PLAYER_INDEX))
 	{
 		defFuncShowNormalMsg(MSG_TONG_CREATE_ERROR04);
 		return FALSE;
@@ -144,7 +164,7 @@ BOOL	KPlayerTong::ApplyAddTong(DWORD dwNpcID)
 		return FALSE;
 	}
 	// 自己的阵营问题
-	if (Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp != camp_free)
+	if (!DuPheVaoBang(CLIENT_PLAYER_INDEX))
 	{
 		defFuncShowNormalMsg(MSG_TONG_APPLY_ADD_ERROR2);
 		return FALSE;
@@ -262,8 +282,8 @@ void	KPlayerTong::Create(TONG_CREATE_SYNC *psCreate)
 	if (!psCreate)
 		return;
 
-	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = psCreate->m_btCamp;
-	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = psCreate->m_btCamp;
+	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = PheTrongBang(CLIENT_PLAYER_INDEX, psCreate->m_btCamp);
+	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = PheTrongBang(CLIENT_PLAYER_INDEX, psCreate->m_btCamp);
 
 	m_nFlag			= 1;
 	m_nFigure		= enumTONG_FIGURE_MASTER;
@@ -513,8 +533,8 @@ BOOL	KPlayerTong::AddTong(int nCamp, char *lpszTongName, char *lpszTitle, char *
 		strcpy(m_szMasterName, lpszMaster);
 	m_dwTongNameID	= g_FileName2Id(m_szName);
 
-	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = m_nCamp;
-	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = m_nCamp;
+	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = PheTrongBang(CLIENT_PLAYER_INDEX, m_nCamp);
+	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = PheTrongBang(CLIENT_PLAYER_INDEX, m_nCamp);
 
 	defFuncShowNormalMsg(MSG_TONG_ADD_SUCCESS);
 
@@ -855,9 +875,9 @@ void	KPlayerTong::SetSelfInfo(TONG_SELF_INFO_SYNC *pInfo)
 
 			// 被踢出帮会
 //			defFuncShowNormalMsg("您被踢出帮会！");
-			Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = camp_free;
+			Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = PheNgoaiBang(CLIENT_PLAYER_INDEX);
 			if (!Player[CLIENT_PLAYER_INDEX].m_cTeam.m_nFlag)
-				Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = camp_free;
+				Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = PheNgoaiBang(CLIENT_PLAYER_INDEX);
 		}
 		Clear();
 
@@ -876,9 +896,9 @@ void	KPlayerTong::SetSelfInfo(TONG_SELF_INFO_SYNC *pInfo)
 	this->m_nFigure = pInfo->m_btFigure;
 	this->m_nCamp = pInfo->m_btCamp;
 	this->m_nMoney = pInfo->m_dwMoney;
-	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = m_nCamp;
+	Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_Camp = PheTrongBang(CLIENT_PLAYER_INDEX, m_nCamp);
 	if (Player[CLIENT_PLAYER_INDEX].m_cTeam.m_nFlag == 0)
-		Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = m_nCamp;
+		Npc[Player[CLIENT_PLAYER_INDEX].m_nIndex].m_CurrentCamp = PheTrongBang(CLIENT_PLAYER_INDEX, m_nCamp);
 	memcpy(this->m_szMasterName, pInfo->m_szMaster, sizeof(pInfo->m_szMaster));
 	memcpy(this->m_szName, pInfo->m_szTongName, sizeof(pInfo->m_szTongName));
 	memcpy(this->m_szTitle, pInfo->m_szTitle, sizeof(pInfo->m_szTitle));

@@ -705,7 +705,7 @@ void KUiTongManager::PopupConfirmWindow(const char* pszInfo, unsigned int uHandl
 	//UIMessageBox(pszInfo, this, m_szConfirm, m_szCancel, uHandleID);
 	KPilgarlicItem *pPlayer = GetSelectedPlayer();
 	if(uHandleID == RESULT_T_LEAVE)
-	    KUiTongGetString::OpenWindow(pszInfo, "100Íò", this, uHandleID, 1, 31);
+	    KUiTongGetString::OpenWindow(pszInfo, m_szPlayerName, this, uHandleID, 1, 31);	/* goc: "100<van>" GBK hien thanh chu Trung */
 	else if (pPlayer)
 		KUiTongGetString::OpenWindow(pszInfo, pPlayer->Name, this, uHandleID, 1, 31);
 	else

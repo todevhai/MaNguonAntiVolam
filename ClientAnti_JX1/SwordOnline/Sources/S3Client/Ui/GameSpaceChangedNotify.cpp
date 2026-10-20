@@ -91,22 +91,13 @@ void CoreDataChangedCallback(unsigned int uDataId, unsigned int uParam, int nPar
 			memset(&Info, 0, sizeof(KUiPlayerBaseInfo));
 			g_pCoreShell->GetGameData(GDI_PLAYER_BASE_INFO, (int)&Info, 0);
 
-			if (Info.nCurFaction >= 0 )
-			{
-				KUiMsgCentrePad::QueryAllChannel();
-			}
-			else
-			{
+			/* Bang kieu 8.x: mon phai va bang doc lap - dong rieng tung kenh, con kenh nao thi hoi lai. */
+			if (Info.nCurFaction < 0)
 				KUiMsgCentrePad::CloseSelfChannel(KUiMsgCentrePad::ch_Faction);
-				if (Info.nCurTong != 0)
-				{
-					KUiMsgCentrePad::QueryAllChannel();
-				}
-				else
-				{
-					KUiMsgCentrePad::CloseSelfChannel(KUiMsgCentrePad::ch_Tong);
-				}
-			}
+			if (Info.nCurTong == 0)
+				KUiMsgCentrePad::CloseSelfChannel(KUiMsgCentrePad::ch_Tong);
+			if (Info.nCurFaction >= 0 || Info.nCurTong != 0)
+				KUiMsgCentrePad::QueryAllChannel();
 		}
 		break;
 	case GDCNI_PLAYER_RT_ATTRIBUTE:
