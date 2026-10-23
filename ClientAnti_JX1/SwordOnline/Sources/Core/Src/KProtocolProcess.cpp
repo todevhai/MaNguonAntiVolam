@@ -615,6 +615,8 @@ void KProtocolProcess::NetCommandSkill(BYTE* pMsg)
 	MapX = *(int *)&pMsg[13];
 	MapY = *(int *)&pMsg[17];
 	nSkillEnChance = *(int *)&pMsg[21];
+	/* TAM: do vi sao chieu cua nguoi choi khac khong ve */
+	g_DebugLog("[nhan-chieu-goc] id=%u chieu=%d p=%d,%d", dwNpcID, nSkillID, MapX, MapY);
 	
 	if (MapY < 0)
 		return ;
@@ -627,17 +629,26 @@ void KProtocolProcess::NetCommandSkill(BYTE* pMsg)
 	
 		MapY = NpcSet.SearchID(MapY);
 		if (MapY == 0)
+		{
+			g_DebugLog("[nhan-chieu-bo] khong thay muc tieu chieu=%d", nSkillID);
 			return;
+		}
 
 		if (Npc[MapY].m_RegionIndex < 0)
+		{
+			g_DebugLog("[nhan-chieu-bo] muc tieu ngoai vung chieu=%d", nSkillID);
 			return;
+		}
 
 	}
 	
 	int nIdx = NpcSet.SearchID(dwNpcID);
 	
 	if (nIdx <= 0) 
+	{
+		g_DebugLog("[nhan-chieu-bo] khong thay nguoi phat id=%u chieu=%d", dwNpcID, nSkillID);
 		return;
+	}
 	/* TAM: do vi sao chieu cua nguoi choi khac khong ve */
 	if (Npc[nIdx].IsPlayer())
 		g_DebugLog("[nhan-chieu] %s chieu=%d cap=%d p=%d,%d", Npc[nIdx].Name, nSkillID, nSkillLevel, MapX, MapY);
