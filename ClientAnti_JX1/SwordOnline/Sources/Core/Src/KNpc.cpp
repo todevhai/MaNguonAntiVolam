@@ -2103,6 +2103,10 @@ void KNpc::DoSkill(int nX, int nY)
 			&& ThuThiTrienChieu(this, pSkill, nX, nY) 
 			&& 
 			( m_Kind != kind_player 
+#ifndef _SERVER
+			/* noi luc cua nguoi choi khac client khong biet (0) - may chu da tru, client chi ve */
+			|| m_Index != Player[CLIENT_PLAYER_INDEX].m_nIndex
+#endif
 			|| Cost(pSkill->GetSkillCostType(), pSkill->GetSkillCost(this))
 			)
 			)
