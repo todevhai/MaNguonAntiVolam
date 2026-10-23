@@ -2099,6 +2099,16 @@ void KNpc::DoSkill(int nX, int nY)
 	{
 		eSkillStyle eStyle = (eSkillStyle)pSkill->GetSkillStyle();
 
+#ifndef _SERVER
+		/* TAM: do vi sao chieu cua nguoi choi khac khong ve */
+		if (IsPlayer() && m_Index != Player[CLIENT_PLAYER_INDEX].m_nIndex)
+		{
+			int nX0 = nX, nY0 = nY;
+			g_DebugLog("[xem-chieu] %s chieu=%d kieu=%d p=%d,%d cancast=%d thu=%d", Name, m_ActiveSkillID, (int)eStyle, nX, nY,
+				(int)m_SkillList.CanCast(m_ActiveSkillID, SubWorld[m_SubWorldIndex].m_dwCurrentTime),
+				(int)pSkill->CanCastSkill(m_Index, nX0, nY0));
+		}
+#endif
 		if (m_SkillList.CanCast(m_ActiveSkillID, SubWorld[m_SubWorldIndex].m_dwCurrentTime)
 			&& ThuThiTrienChieu(this, pSkill, nX, nY) 
 			&& 

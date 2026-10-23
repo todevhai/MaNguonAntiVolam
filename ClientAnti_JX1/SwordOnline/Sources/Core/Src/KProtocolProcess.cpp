@@ -638,6 +638,9 @@ void KProtocolProcess::NetCommandSkill(BYTE* pMsg)
 	
 	if (nIdx <= 0) 
 		return;
+	/* TAM: do vi sao chieu cua nguoi choi khac khong ve */
+	if (Npc[nIdx].IsPlayer())
+		g_DebugLog("[nhan-chieu] %s chieu=%d cap=%d p=%d,%d", Npc[nIdx].Name, nSkillID, nSkillLevel, MapX, MapY);
 
 	if (Player[CLIENT_PLAYER_INDEX].ConformIdx(nIdx))
 	{
