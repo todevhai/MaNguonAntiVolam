@@ -157,10 +157,10 @@ BOOL KSkill::CanCastSkill(int nLauncher, int &nParam1, int &nParam2)  const
 	{
 		if (m_bTargetOnly && nParam1 != -1) return FALSE;
 #ifndef _SERVER
-		/* Nguoi choi KHAC ra chieu: may chu da kiem quan he / vu khi / cap roi, client chi ve hinh. Client khong
+		/* Nguoi choi KHAC ra chieu (o client IsPlayer() chi dung voi chinh minh nen phai xet m_Kind): may chu da kiem quan he / vu khi / cap roi, client chi ve hinh. Client khong
 		   biet cuu sat giua hai nguoi khac (cung phe -> tuong dong minh) va doan duoi lai doc vu khi cua CHINH
 		   nguoi xem (CLIENT_PLAYER_INDEX) -> don danh cua nguoi khac mat het hinh, chi bua cho minh con. */
-		if (Npc[nLauncher].IsPlayer() && nLauncher != Player[CLIENT_PLAYER_INDEX].m_nIndex)
+		if (Npc[nLauncher].m_Kind == kind_player && nLauncher != Player[CLIENT_PLAYER_INDEX].m_nIndex)
 			return nParam1 != -1 || (nParam2 > 0 && nParam2 < MAX_NPC);
 #endif
 		
