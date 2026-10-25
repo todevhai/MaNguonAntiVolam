@@ -199,6 +199,7 @@ KUiMsgCentrePad::KUiMsgCentrePad()
 {
 	m_uAutoDelMsgInterval = 0;
 	m_nSizeBtnDragOffsetY = 0;
+	m_nMinHeight = 0;
 	m_bSizingWnd = false;
 	m_bShowShadow = false;
 	m_bDockLeftSide = true;
@@ -1385,6 +1386,7 @@ void KUiMsgCentrePad::LoadScheme(KIniFile* pIni)
 	}
 	ShowChatTab(pIni);
 	int nV;
+	pIni->GetInteger("Main", "MinHeight", 0, &m_nMinHeight);
 	pIni->GetInteger("Main", "SizeUp", 0, &nV);
 	m_bSizeUp = (nV != 0);
 	if (m_bSizeUp)
@@ -2095,30 +2097,31 @@ void KUiMsgCentrePad::DragWndSize(int nMoveOffset)
 
 int KUiMsgCentrePad::ChanageHeight(int nOffsetY, bool bAtTop)
 {
+	/* Gian len tren (SizeUp): keo nut len (do doi am) la CAO them - doi dau MOT lan. Truoc day moi khung trong 6 khung
+	   tin deu doi dau roi chuyen tiep cho khung sau: doi 6 lan = khong doi, keo len lai thu nho (nguoc chieu). */
 	if (bAtTop)
-	{
-		nOffsetY = m_ChatRoom.HeightToLineHeight(-nOffsetY);
-		nOffsetY = m_Mat.HeightToLineHeight(-nOffsetY);
-		nOffsetY = m_Phong.HeightToLineHeight(-nOffsetY);
-		nOffsetY = m_Bang.HeightToLineHeight(-nOffsetY);
-		nOffsetY = m_Phai.HeightToLineHeight(-nOffsetY);
-		nOffsetY = m_Khac.HeightToLineHeight(-nOffsetY);
-	}
-	else
-	{
-		nOffsetY = m_ChatRoom.HeightToLineHeight(nOffsetY);
-		nOffsetY = m_Mat.HeightToLineHeight(nOffsetY);
-		nOffsetY = m_Phong.HeightToLineHeight(nOffsetY);
-		nOffsetY = m_Bang.HeightToLineHeight(nOffsetY);
-		nOffsetY = m_Phai.HeightToLineHeight(nOffsetY);
-		nOffsetY = m_Khac.HeightToLineHeight(nOffsetY);
-	}
+		nOffsetY = -nOffsetY;
+	nOffsetY = m_ChatRoom.HeightToLineHeight(nOffsetY);
+	nOffsetY = m_Mat.HeightToLineHeight(nOffsetY);
+	nOffsetY = m_Phong.HeightToLineHeight(nOffsetY);
+	nOffsetY = m_Bang.HeightToLineHeight(nOffsetY);
+	nOffsetY = m_Phai.HeightToLineHeight(nOffsetY);
+	nOffsetY = m_Khac.HeightToLineHeight(nOffsetY);
 
 	if (nOffsetY != 0)
 	{
 		int x, y;
 		GetSize(&x, &y);
-		if (y + nOffsetY >= m_ChatRoom.GetMinHeight())
+		/* Thap nhat cua CA KHUNG = thap nhat vung chu + phan co dinh (hang tab, nut cot trai duoi vung chu) - truoc day so
+		   ca khung voi rieng vung chu nen co duoc toi muc de len cac nut. Ini [Main] MinHeight dat san neu muon cao hon. */
+		int nChuW, nChuH;
+		m_ChatRoom.GetSize(&nChuW, &nChuH);
+		int nThapNhat = m_ChatRoom.GetMinHeight() + (y - nChuH);
+		if (nThapNhat < m_nMinHeight)
+			nThapNhat = m_nMinHeight;
+		if (y + nOffsetY < nThapNhat)
+			nOffsetY = nThapNhat - y;
+		if (nOffsetY != 0)
 		{
 			if (bAtTop)
 			{

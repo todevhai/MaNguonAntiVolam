@@ -25,6 +25,8 @@ KUiMiniSkill::KUiMiniSkill()
 	m_nBuffCount = 0;
 	m_nIconWidth = 24;
 	m_nIconHeight = 24;
+	m_nTimeWidth = 24;
+	m_nSlotWidth = 26;
 	m_nTimeHeight = 12;
 	m_uBuffColor = m_uDebuffColor = m_uWarningColor = 0xff00ff00;
 	for (int i = 0; i < UI_MAX_STATE_SKILL; i++)
@@ -104,6 +106,11 @@ void KUiMiniSkill::LoadScheme()
 	m_nIconHeight = nH > 0 ? nH : 24;
 	m_Time[0].GetSize(&nW, &nH);
 	m_nTimeHeight = nH > 0 ? nH : 12;
+	m_nTimeWidth = nW > 0 ? nW : m_nIconWidth;
+	/* O chu thoi gian rong hon icon ("10:00") thi tran sang o ben canh - buoc o lay phan rong hon cong khe ho. */
+	int nKhe = 0;
+	Ini.GetInteger("Main", "SlotGap", 2, &nKhe);
+	m_nSlotWidth = (m_nTimeWidth > m_nIconWidth ? m_nTimeWidth : m_nIconWidth) + nKhe;
 
 	// Muc co the thieu so (tep khai BuffCount=210 nhung chi co 206 muc): muc khong co ID thi bo.
 	int nCount = 0;
@@ -152,8 +159,10 @@ void KUiMiniSkill::UpdateSlot(int nSlot, const KUiStateSkill& State, const KMini
 		char szTip[300];
 		sprintf(szTip, "%s\n%s", Buff.szName, Buff.szDesc);
 		m_Icon[nSlot].SetToolTipInfo(szTip, (int)strlen(szTip));
-		m_Icon[nSlot].SetPosition(nSlot * m_nIconWidth, 0);
-		m_Time[nSlot].SetPosition(nSlot * m_nIconWidth, m_nIconHeight);
+		/* Icon va chu can giua trong o rong m_nSlotWidth (cung tam). */
+		int nO = nSlot * m_nSlotWidth;
+		m_Icon[nSlot].SetPosition(nO + (m_nSlotWidth - m_nIconWidth) / 2, 0);
+		m_Time[nSlot].SetPosition(nO + (m_nSlotWidth - m_nTimeWidth) / 2, m_nIconHeight);
 		g_DebugLog("[MiniSkill] o %d: chieu %d cap %d con %d nhip", nSlot, State.nSkillId, State.nLevel, State.nLeftFrames);
 	}
 
@@ -231,7 +240,7 @@ void KUiMiniSkill::Breathe()
 	{
 		m_nShown = nCount;
 		// Chi chiem dung phan co icon, khong nuot cu bam xuong mat dat ben canh.
-		SetSize(nCount * m_nIconWidth, m_nIconHeight + m_nTimeHeight);
+		SetSize(nCount * m_nSlotWidth, m_nIconHeight + m_nTimeHeight);
 	}
 }
 

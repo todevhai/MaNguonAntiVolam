@@ -205,6 +205,7 @@ private:
 	bool                m_bShowShadow;
 
 	short				m_nSizeBtnDragOffsetY;
+	int			m_nMinHeight;			// chieu cao thap nhat ca khung (ini Main MinHeight; ChanageHeight)
 	
 	bool				m_bSizeUp;
 

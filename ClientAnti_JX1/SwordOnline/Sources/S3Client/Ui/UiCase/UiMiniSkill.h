@@ -55,6 +55,8 @@ private:
 	int				m_nIconWidth;
 	int				m_nIconHeight;
 	int				m_nTimeHeight;
+	int				m_nTimeWidth;
+	int				m_nSlotWidth;		// buoc giua hai o = max(icon, chu thoi gian) + SlotGap (MiniSkill.ini [Main])
 	unsigned int	m_uBuffColor;
 	unsigned int	m_uDebuffColor;
 	unsigned int	m_uWarningColor;
