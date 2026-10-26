@@ -113,6 +113,8 @@ public:
 	int			FindFree();
 	BOOL		CanCast(int nSkillID, DWORD dwTime);
 	void		SetNextCastTime(int nSkillID, DWORD dwTime);
+	/* thoi diem (nhip SubWorld) chieu duoc dung lai - o chieu tren giao dien ve dem nguoc hoi chieu */
+	DWORD		GetNextCastTime(int nSkillID) { int i = FindSame(nSkillID); return i ? m_Skills[i].NextCastTime : 0; }
 	
 	int			GetSkillId(int nListIndex)
 	{

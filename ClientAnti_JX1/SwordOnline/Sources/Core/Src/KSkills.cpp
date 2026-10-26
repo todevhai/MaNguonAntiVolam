@@ -3283,6 +3283,12 @@ void KSkill::GetDescAboutLevel(char * pszMsg)
 		strcat(pszMsg, pszInfo);
 		strcat(pszMsg, "\n");
 	}
+#ifndef _SERVER
+	/* skill_desc: kich ban chieu tra chuoi mo ta rieng (chieu 120: "Thoi gian khoi phuc chieu thuc"),
+	   KSkill doc vao m_szDesc nhung truoc day khong in ra - bang mo ta thieu dong hoi chieu. */
+	if (m_szDesc[0])
+		strcat(pszMsg, m_szDesc);
+#endif
 	int nCount = 0;
 	for (i  = 0; i < m_nImmediateAttribsNum; i ++)
 	{

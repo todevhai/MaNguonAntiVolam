@@ -15,6 +15,33 @@
 
 #define SHOW_SPACE_HEIGHT 5
 
+/* O chieu dang hoi (chieu 120 hoi 30-60 giay): phu toi len bieu tuong + so giay con lai. Client von
+   ghi NextCastTime khi nhan vat thi trien (KNpc.cpp, nhanh Cast) nhung giao dien khong doc - sau khi
+   bam, o chieu trong nhu da san sang. Duoi nua giay thi bo qua cho chieu danh lien tay khong nhay nhay. */
+#define	HOI_CHIEU_NHIP_GIAY	18		// nhip SubWorld moi giay (kich ban chieu viet n*18)
+static void VeHoiChieu(int nSkillId, int x, int y, int nW, int nH)
+{
+	int nNpc = Player[CLIENT_PLAYER_INDEX].m_nIndex;
+	if (nNpc <= 0 || nW <= 0 || nH <= 0 || Npc[nNpc].m_SubWorldIndex < 0)
+		return;
+	DWORD dwNay = SubWorld[Npc[nNpc].m_SubWorldIndex].m_dwCurrentTime;
+	DWORD dwToi = Npc[nNpc].m_SkillList.GetNextCastTime(nSkillId);
+	if (dwToi <= dwNay || dwToi - dwNay < HOI_CHIEU_NHIP_GIAY / 2)
+		return;
+	KRUShadow Toi;
+	Toi.oPosition.nX = x;	Toi.oPosition.nY = y;	Toi.oPosition.nZ = 0;
+	Toi.oEndPos.nX = x + nW;	Toi.oEndPos.nY = y + nH;	Toi.oEndPos.nZ = 0;
+	Toi.Color.Color_dw = 0x0C000000;	// alpha = trong so NEN /32: 12 -> nen con ~40%
+	g_pRepresent->DrawPrimitives(1, &Toi, RU_T_SHADOW, true);
+	char szGiay[12];
+	int nGiay = (int)((dwToi - dwNay + HOI_CHIEU_NHIP_GIAY - 1) / HOI_CHIEU_NHIP_GIAY);
+	sprintf(szGiay, "%d", nGiay);
+	const int nCo = 12;
+	int nRong = nCo * (int)strlen(szGiay) / 2;
+	g_pRepresent->OutputText(nCo, szGiay, KRF_ZERO_END, x + (nW - nRong) / 2, y + (nH - nCo) / 2,
+		0xFFFFFF00, 0, TEXT_IN_SINGLE_PLANE_COORD, 0xFF000000);
+}
+
 void	CoreDrawGameObj(unsigned int uObjGenre, unsigned int uId, int x, int y, int Width, int Height, int nParam)
 {
 //	static int nSpeed = 0;
@@ -168,6 +195,7 @@ void	CoreDrawGameObj(unsigned int uObjGenre, unsigned int uId, int x, int y, int
 			if (pSkill)
             {
 				pSkill->DrawSkillIcon(x, y, Width, Height);
+				VeHoiChieu(nSkillId, x, y, Width, Height);
             }
 		}
 		else

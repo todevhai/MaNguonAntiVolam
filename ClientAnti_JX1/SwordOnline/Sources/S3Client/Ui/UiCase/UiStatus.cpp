@@ -156,7 +156,9 @@ void KUiStatus::Initialize()
 
 	AddPage(&m_AttribPage, &m_BtnAttribPage);
 	AddPage(&m_EquipPage, &m_BtnEquipPage);
-	AddPage(&m_MeridianPage, &m_BtnMeridianPage);
+	/* Tab kinh mach tam tat (27/10/2026): du an dang khoa kinh mach va chieu 180 (nao bot, may chu chi toi
+	   cap chieu 120). Khong AddPage thi ca trang lan nut tab deu khong gan vao bang F3. Mo lai: bo chu thich. */
+	// AddPage(&m_MeridianPage, &m_BtnMeridianPage);
 	AddChild(&m_Close);
 
 	Wnd_AddWindow(this);
