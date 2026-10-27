@@ -2607,6 +2607,17 @@ BOOL	KSkill::ParseString2MagicAttrib(unsigned long ulLevel, char * szMagicAttrib
 			   trong LvlSetting moi toi day (giong jx9tn); Lua de len cot skills.txt cho cap nay. Bo qua khi ma con trung
 			   chinh no: 1085/1086/1201 dung chung khoa Lua voi chieu me nen tu goi lai minh. Khong return
 			   - nhanh duoi van dua vao m_ImmediateAttribs de mo ta. */
+#ifndef _SERVER
+			/* skill_desc (318) nam NGOAI khoang magic_skill_begin..end (0..13) nen case magic_skill_desc trong
+			   switch duoi khong bao gio chay - m_szDesc luon rong, bang mo ta thieu dong "Thoi gian khoi phuc
+			   chieu thuc" cua chieu 120. szValue la chuoi ham Lua tra ve, khong phai "a,b,c". */
+			if (i == magic_skill_desc)
+			{
+				strncpy(m_szDesc, szValue, sizeof(m_szDesc) - 1);
+				m_szDesc[sizeof(m_szDesc) - 1] = 0;
+				return TRUE;
+			}
+#endif
 			if (i >= magic_skill_startevent && i <= magic_skill_vanishedevent)
 				DatSuKienTuLua(i, nValue1, nValue3);
 			if (i > magic_missle_begin && i < magic_missle_end)

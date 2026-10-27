@@ -536,6 +536,19 @@ const char* KMagicDesc::GetDesc(void *pData)
 					i += strlen(szMsg);
 				}
 				break;
+			/* #f<i>: so NHIP -> giay (18 nhip / giay). Du lieu viet 'hide=An than #f2- giay' (nValue[1] = 15*18)
+			   ma ban 2003 khong co nhanh 'f' - roi vao default, chu so bien mat: "An than  giay". */
+			case 'f':
+				{
+					char	szMsg[16];
+					if (nValue % 18)
+						sprintf(szMsg, "%d.%d", nValue / 18, (nValue % 18) * 10 / 18);
+					else
+						sprintf(szMsg, "%d", nValue / 18);
+					strcat(m_szDesc, szMsg);
+					i += strlen(szMsg);
+				}
+				break;
 			case 'x':		// ÐÔ±ð
 				if (nValue)
 					strcat(m_szDesc, "N÷ ");
